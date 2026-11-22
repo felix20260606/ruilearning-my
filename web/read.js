@@ -398,7 +398,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
       '<button id="ra-fab" data-a="all">⏹ 停止朗读</button>';
     syncTts(); fillTr();
   }
-  function draw() { if (!root) return; if (view === "read" && doc) drawRead(); else { view = "home"; drawHome(); } if (window.NAV) NAV.mark(); } // 🔙 打开 / 关上文章：记一条页面历史（nav.js）
+  function draw() { if (!root) return; if (view === "read" && doc) drawRead(); else { view = "home"; drawHome(); } if (window.NAV) NAV.mark(); setHash(view === "read" && doc ? doc.id : ""); } // 🔙 打开 / 关上文章：记一条页面历史（nav.js）；地址栏的 #article/ 只在显示文章时有
 
   /* ---------- 朗读：单句、全文逐句（高亮当前句） ---------- */
   let tts = null;
@@ -490,7 +490,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
 
   // 直达链接：地址 #article/文章id（文章会同步到后台，换设备也能打开）
   // 有页面历史（nav.js）时晚一点改地址：等它先记下新的一条，改的是新的那条（保留 history.state）
-  function setHash(id) { const f = () => { try { const h = id ? "#article/" + encodeURIComponent(id) : ""; if (location.hash !== h && (id || /^#article\//.test(location.hash))) history.replaceState(history.state, "", location.pathname + location.search + h); } catch (e) {} }; if (window.NAV) setTimeout(f, 380); else f(); }
+  function setHash(id) { const f = () => { if (id && !(root && root.getClientRects().length)) return; /* 文章不在屏幕上（切到别的标签了）：不加 #article/ */ try { const h = id ? "#article/" + encodeURIComponent(id) : ""; if (location.hash !== h && (id || /^#article\//.test(location.hash))) history.replaceState(history.state, "", location.pathname + location.search + h); } catch (e) {} }; if (window.NAV) setTimeout(f, 380); else f(); }
   async function fromHash() {
     const m = location.hash.match(/^#article\/(.+)$/); if (!m) return false; const id = decodeURIComponent(m[1]);
     let d = docs().find(x => x.id === id);

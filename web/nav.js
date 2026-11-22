@@ -5,6 +5,7 @@
    - 浏览器后退 / 前进（popstate）：把那条记录的快照交给各模块的 set；恢复期间不记新历史
    - 页面里的「← 返回」按钮：NAV.back(没有上一页时怎么办)。这次打开网站以后记过上一页就 history.back()，否则执行原来的返回
    - 别的代码自己 pushState / replaceState（阅读的 #article/、单词阅读器的 #read/）：state 不是我们的就不管；replaceState 时请保留 history.state
+   - 记新的一页时网址去掉 #article/、#read/（离开文章 / 单词阅读器后刷新不会再跳回去）；正在显示它们的模块自己把地址加回来
    - 第一次记（打开网页）用 replaceState，不多加一条 */
 (function () {
   "use strict";
@@ -20,7 +21,7 @@
     if (!booted || !cur) { booted = true; pos = cur ? cur.id : ++seq; seq = Math.max(seq, pos); try { history.replaceState(Object.assign({}, history.state || {}, { nav: { id: pos, s } }), "", location.href); } catch (e) {} return; }
     if (same(cur.s, s)) return;
     pos = ++seq; depth++;
-    try { history.pushState({ nav: { id: pos, s } }, "", location.href.replace(/#read\/.*$/, "")); } catch (e) {}
+    try { history.pushState({ nav: { id: pos, s } }, "", location.href.replace(/#(read|article)\/.*$/, "")); } catch (e) {} // 新的一页先不带直达地址（#read/ 单词阅读器、#article/ 文章）：显示那一页的模块自己再加，免得离开文章后一刷新又跳回去
   }
   function mark() { if (restoring) return; clearTimeout(T); T = setTimeout(commit, booted ? DELAY : 0); }
   function apply(s) {

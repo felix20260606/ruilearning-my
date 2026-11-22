@@ -34,6 +34,12 @@ history.forward(); history.forward(); flush(); ok(page.tab === "speak" && view =
 const n = stack.length; history.back(); NAV.mark(); flush(); ok(stack.length === n, "marks while restoring are ignored");
 // 别人的 pushState（state 不是我们的）不处理
 let before = JSON.stringify(page); L.popstate({ state: null }); ok(JSON.stringify(page) === before, "foreign popstate ignored");
+// 离开文章 / 单词阅读器：新的一页网址不带 #article/、#read/（不然刷新又跳回文章）
+win.location.href = "https://x.test/#article/n%3A8t4uo7"; page = { tab: "daily" }; NAV.mark(); flush();
+ok(stack[idx].url === "https://x.test/", "new page drops #article/ " + stack[idx].url);
+win.location.href = "https://x.test/?go=x#read/abc"; page = { tab: "speak" }; NAV.mark(); flush();
+ok(stack[idx].url === "https://x.test/?go=x", "new page drops #read/ " + stack[idx].url);
+ok(/function draw\(\) \{[^\n]*setHash\(view === "read" && doc \? doc\.id : ""\)/.test(W("read.js")) && /if \(id && !\(root && root\.getClientRects\(\)\.length\)\) return;/.test(W("read.js")), "read.js: #article/ only while the article is on screen");
 // 接进各模块：index.html 的标签、口语 / 听力 / 练习课 / 阅读 / 写作 / 视频 / 背单词
 const h = W("index.html");
 ok(/<script src="util\.js\?v=\w+"><\/script>\s*<script src="nav\.js\?v=\w+"><\/script>\s*<script src="word\.js\?v=\w+"><\/script>/.test(h), "util.js + nav.js load before everything else");
