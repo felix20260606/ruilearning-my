@@ -87,7 +87,7 @@
    - NET.g(谷歌翻译网址)：谷歌通就用谷歌；不通就请后台翻（POST /api/ai {task:"tr"}，后台再用谷歌 / Workers AI），返回和谷歌一样格式的结果，原来的代码不用改
    - NET.isBad(网站)：比如视频页看 www.youtube.com 通不通，不通就提示要开 VPN */
 (function(){
-  var KEY="net:bad", PXH=/^(en\.wikipedia\.org|zh\.wikipedia\.org|commons\.wikimedia\.org|upload\.wikimedia\.org|thumb\.wikimedia\.org|ichef\.bbci\.co\.uk|downloads\.bbc\.co\.uk|voa-audio\.voanews\.eu|voa-video\.voanews\.eu|gdb\.voanews\.com|radiodownloaddw-a\.akamaihd\.net|i\.ytimg\.com|api\.dictionaryapi\.dev|api\.languagetool\.org)$/;
+  var KEY="net:bad", PXH=/^(en\.wikipedia\.org|zh\.wikipedia\.org|commons\.wikimedia\.org|upload\.wikimedia\.org|thumb\.wikimedia\.org|ichef\.bbci\.co\.uk|downloads\.bbc\.co\.uk|voa-audio\.voanews\.eu|voa-video\.voanews\.eu|gdb\.voanews\.com|npr\.simplecastaudio\.com|npr\.brightspotcdn\.com|breakingnewsenglish\.com|radiodownloaddw-a\.akamaihd\.net|i\.ytimg\.com|api\.dictionaryapi\.dev|api\.languagetool\.org)$/;
   function bad(){try{return JSON.parse(localStorage.getItem(KEY)||"{}")||{};}catch(e){return {};}}
   function save(b){try{localStorage.setItem(KEY,JSON.stringify(b));}catch(e){}}
   function host(u){try{return new URL(u,location.href).hostname;}catch(e){return "";}}
@@ -128,7 +128,7 @@
   function probe(){
     var last=0;try{last=+localStorage.getItem("net:probe")||0;}catch(e){}
     if(Date.now()-last<6*3600e3)return;try{localStorage.setItem("net:probe",String(Date.now()));}catch(e){}
-    ["translate.googleapis.com","ichef.bbci.co.uk","downloads.bbc.co.uk","voa-audio.voanews.eu","gdb.voanews.com","en.wikipedia.org","upload.wikimedia.org","thumb.wikimedia.org","www.youtube.com","api.dictionaryapi.dev","fonts.googleapis.com"].forEach(function(h){
+    ["translate.googleapis.com","ichef.bbci.co.uk","downloads.bbc.co.uk","voa-audio.voanews.eu","gdb.voanews.com","npr.simplecastaudio.com","breakingnewsenglish.com","en.wikipedia.org","upload.wikimedia.org","thumb.wikimedia.org","www.youtube.com","api.dictionaryapi.dev","fonts.googleapis.com"].forEach(function(h){
       tfetch("https://"+h+"/favicon.ico",{mode:"no-cors",cache:"no-store"},9000).then(function(){mark(h,1);},function(){mark(h,0);});
     });
   }
@@ -609,7 +609,7 @@
       <button data-mode="grammar" class="mx">📐 语法</button>
       <button data-mode="writing" class="mx">📝 写作批改</button>
       <button data-mode="drill" class="mx">🧩 练习课</button>
-      <button data-mode="sme" class="mx">📻 BBC · VOA</button>
+      <button data-mode="sme" class="mx">📻 听力节目</button>
     </div>
   </div>
 </header>
@@ -1838,7 +1838,7 @@ refresh(); // show seed words immediately, no waiting on storage
   var tListen=document.getElementById('tab-listen'),tRead=document.getElementById('tab-read'),tWrite=document.getElementById('tab-write');
   var L2_OWNER={daily:'en',notebook:'en',listen:'en',speak:'en',read:'en',write:'en',ielts:'en',fat:'life',trip:'life'};
   var EN_PAGE={notebook:'vocab',listen:'listen',read:'read',write:'write'};
-  var SECS={listen:[['drill','🧩 练习课'],['sme','📻 BBC · VOA'],['video','🎬 视频'],['practice','🎧 听力练习']],write:[['writing','📝 写作批改'],['grammar','📐 语法']]};
+  var SECS={listen:[['drill','🧩 练习课'],['sme','📻 听力节目'],['video','🎬 视频'],['practice','🎧 听力练习']],write:[['writing','📝 写作批改'],['grammar','📐 语法']]};
   var VOCAB_MODES=/^(err|stats|pump|saved|list)$/, CUR='', busy=false;
   try{if(!localStorage.getItem('drill:seen')){localStorage.setItem('drill:seen','1');if(localStorage.getItem('en_sub_listen'))localStorage.setItem('en_sub_listen','drill');}}catch(e){} // 新加的「🧩 练习课」第一次默认选它（新标签排最前、默认选最新）
   function getSub(w){var d=SECS[w][0][0];try{var v=localStorage.getItem('en_sub_'+w);if(SECS[w].some(function(x){return x[0]===v;}))return v;}catch(e){}return d;}
@@ -1987,13 +1987,13 @@ refresh(); // show seed words immediately, no waiting on storage
 </script>
 <script src="lang.js?v=3"></script>
 <script src="tts.js?v=2"></script>
-<script src="watch.js?v=17"></script>
+<script src="watch.js?v=18"></script>
 <script src="channels.js?v=3"></script>
 <script src="pump.js?v=30"></script>
 <script src="speak.js?v=11"></script>
-<script src="daily.js?v=8"></script>
+<script src="daily.js?v=9"></script>
 <script src="read.js?v=13"></script>
-<script src="listen.js?v=15"></script>
+<script src="listen.js?v=16"></script>
 <script src="drill.js?v=3"></script>
 <script src="errbook.js?v=2"></script>
 <script src="exam.js?v=5"></script>

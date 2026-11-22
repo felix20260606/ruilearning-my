@@ -1,4 +1,6 @@
-/* 「🎧 听 → 📻 BBC · VOA」：BBC Learning English 和 VOA Learning English 的十个栏目（后台 /api/sme，见 _worker.js）
+/* 「🎧 听 → 📻 听力节目」：四个来源十七个栏目（后台 /api/sme，见 _worker.js），一个来源一行
+   分级（Breaking News English，同一篇新闻好几个难度）：📶 L1 初级 / L3 中级 / L5 中高级 / L6 高级
+   NPR（正常语速播客，进阶）：🗞 每日新闻 Up First / 🔬 科学 Short Wave / 💰 经济 Planet Money；新节目的文稿 NPR 晚一两天才放，没有时说明
    VOA（美音，2025 年 3 月起停更，旧节目都在）：📚 美国故事 American Stories / 🗝 词语故事 Words and Their Stories / ✏️ 每日语法 Everyday Grammar / 🗞 慢速新闻 As It Is
    BBC（英音）：🎭 广播剧 Drama / 🎓 大学英语 English at University（这两个也不更新了）/ 🐢 慢速对话 Real Easy English / 💬 地道说法 The English We Speak / 📰 新闻英语 Learning English from the News / 📻 6 分钟英语 6 Minute English
    故事类（美国故事、广播剧、大学英语）：列表按故事排、每个故事从第 1 集起；顶上推荐「还没听的下一集」
@@ -28,6 +30,13 @@
   const tip = m => { try { (window.toast || (() => {}))(m); } catch (e) {} };
   // 新加的排前面。[栏目, 按钮, 英文名, 一句介绍, 来源, 故事类（按集连着听）]
   const SER = [
+    ["bn1", "📶 L1 初级", "Level 1", "同一篇时事新闻按难度改写成好几级：L1 句子短、词简单；每篇一两分钟，带全文。每三四天出一篇新的", "BNE"],
+    ["bn3", "📶 L3 中级", "Level 3", "同一篇新闻的 L3 版本：句子长一点、细节多一点；每篇两三分钟，带全文", "BNE"],
+    ["bn5", "📶 L5 中高级", "Level 5", "进阶篇的 L5 版本：用词和句式接近真实新闻；带全文", "BNE"],
+    ["bn6", "📶 L6 高级", "Level 6", "进阶篇的原文（L6）：真实新闻的难度和语速；带全文", "BNE"],
+    ["nup", "🗞 每日新闻", "Up First", "NPR 每天早上 15 分钟三条要闻，几位主持人和记者对话；正常语速（进阶），带按说话人分行的全文", "NPR"],
+    ["nsw", "🔬 科学", "Short Wave", "NPR 科学播客：每期十几分钟聊一个科学话题，两人对话、讲得很清楚；正常语速，带全文", "NPR"],
+    ["npm", "💰 经济", "Planet Money", "NPR 经济播客：用故事讲经济现象，二三十分钟；语速快、生词多（高级），带全文", "NPR"],
     ["vst", "📚 美国故事", "American Stories", "爱伦·坡、马克·吐温、欧·亨利等美国作家的经典短篇，用简单英语慢速朗读，长的分几集讲完；带生词表和全文", "VOA", 1],
     ["vwd", "🗝 词语故事", "Words and Their Stories", "每期几分钟讲一个美国人常用的习语：意思、来历和例句，慢速；带生词表和全文", "VOA"],
     ["vgr", "✏️ 每日语法", "Everyday Grammar", "每期讲一个语法点或容易用错的地方，例句多、慢速；带生词表和全文", "VOA"],
@@ -40,9 +49,11 @@
     ["sme", "📻 6 分钟英语", "6 Minute English", "每周一期 · 两位主持人 6 分钟聊一个话题，有本期问题、生词表和文稿"],
   ].map(x => (x[4] ? x : x.concat("BBC")));
   const SM = Object.fromEntries(SER.map(x => [x[0], x]));
-  const serOf = id => { const m = /^(vst|vwd|vgr|vnw)\//.exec(id); return m ? m[1] : /^drama\//.test(id) ? "drama" : /^english-at-university\//.test(id) ? "eau" : /^real-easy-english\//.test(id) ? "ree" : /^the-english-we-speak/.test(id) ? "tews" : /^learning-english-from-the-news/.test(id) ? "news" : "sme"; };
-  const srcName = id => (SM[serOf(id)][4] === "VOA" ? "VOA Learning English" : "BBC Learning English");
-  const srcUrl = (id, ep) => (ep && ep.url) || (SM[serOf(id)][4] === "VOA" ? "https://learningenglish.voanews.com/a/" + id.split("/")[1] + ".html" : "https://www.bbc.co.uk/learningenglish/english/features/" + id);
+  const serOf = id => { const m = /^([a-z0-9]{2,6})\//.exec(id); return m && SM[m[1]] ? m[1] : /^drama\//.test(id) ? "drama" : /^english-at-university\//.test(id) ? "eau" : /^real-easy-english\//.test(id) ? "ree" : /^the-english-we-speak/.test(id) ? "tews" : /^learning-english-from-the-news/.test(id) ? "news" : "sme"; };
+  const SRC = { BNE: ["分级", "Breaking News English", "分级新闻：同一篇新闻有好几个难度，选适合自己的那一级"], NPR: ["NPR", "NPR", "美国公共广播电台的播客，正常语速（进阶）；新节目的文稿 NPR 一般晚一两天才放"], VOA: ["VOA", "VOA Learning English", "美音；2025 年 3 月起停更，旧节目都能听"], BBC: ["BBC", "BBC Learning English", ""] }; // [行首标签, 全名, 说明]
+  const srcName = id => SRC[SM[serOf(id)][4]][1];
+  const srcUrl = (id, ep) => { const s = serOf(id), sub = id.slice(s.length + 1), src = SM[s][4]; return (ep && ep.url) || (src === "VOA" ? "https://learningenglish.voanews.com/a/" + sub + ".html" : src === "NPR" ? "https://www.npr.org/transcripts/" + sub : src === "BNE" ? "https://breakingnewsenglish.com/" + sub + ".html" : "https://www.bbc.co.uk/learningenglish/english/features/" + id); };
+  const MORE = {}; // 列表显示到第几期（「显示更多」）
   const CSS = `
   #sme{display:none;max-width:900px;margin:0 auto;padding:6px 0 60px;overflow-wrap:anywhere;color:var(--ui-ink);font-family:var(--ui-font)}#sme.on{display:block}
   #sme .sm-ser{display:flex;flex-direction:column;gap:7px;margin:2px 0 10px}#sme .sm-row{display:flex;flex-wrap:wrap;gap:7px;align-items:center} /* 一个来源一行（VOA / BBC），放不下就折行，不用左右滑 */
@@ -181,7 +192,7 @@
     view = "ep"; trShow = false; EP = EPS[id] || null; epBusy = !EP; draw(); if (root && root.getClientRects().length) window.scrollTo(0, 0);
     if (EP) { if (zhOn) loadZh(id); return; }
     const fromOff = async () => { const o = await offJson(id); if (!o || !o.ep) return null; if (o.zh) ZH[id] = o.zh; if (o.sents) TIM[id] = o.sents; return o.ep; };
-    fetch("/api/sme?ep=" + encodeURIComponent(id)).then(r => r.json()).catch(() => null).then(async j => { if (!(j && j.ok)) j = (await fromOff()) || j; epBusy = false; if (j && j.ok) EPS[id] = j; if (view === "ep" && !EP) { EP = j && j.ok ? j : { err: 1, id }; draw(); if (zhOn && EP.ok) loadZh(id); } });
+    fetch("/api/sme?ep=" + encodeURIComponent(id)).then(r => r.json()).catch(() => null).then(async j => { if (!(j && j.ok)) j = (await fromOff()) || j; epBusy = false; if (j && j.ok) EPS[id] = j; if (view === "ep" && !EP) { EP = j && j.ok ? j : { err: 1, id, msg: (j && j.error) || "" }; draw(); if (zhOn && EP.ok) loadZh(id); } });
   }
   // 🀄 中文：先找后台（翻过的存 KV，全家共用）；后台翻不了（谷歌拦了 Cloudflare 机房的 IP）就在浏览器里直接问谷歌，和阅读、视频字幕一样
   async function gtx(arr) {
@@ -346,7 +357,7 @@
     const dk = wk.reduce((n, x) => n + x.dk, 0), dks = wk.reduce((n, x) => n + x.dks, 0), sh = wk.reduce((n, x) => n + x.sh, 0), mx = Math.max(10, ...S.map(mins));
     return '<div class="sm-box"><h3>📈 我的听力</h3><div class="st-row"><span>今天 <b>' + mins(S[13]) + "</b> 分钟</span><span>近 7 天 <b>" + wk.reduce((n, x) => n + mins(x), 0) + "</b> 分钟</span><span>连续 <b>" + streak + "</b> 天</span>" +
       (dk ? "<span>精听 <b>" + dk + "</b> 句 · 听写平均 <b>" + Math.round(dks / dk) + "%</b></span>" : "") + (sh ? "<span>跟读 <b>" + sh + "</b> 句</span>" : "") + "</div>" +
-      '<div class="st-bars">' + S.map((x, i) => '<i class="' + (mins(x) ? "" : "z") + '" style="height:' + Math.max(4, mins(x) / mx * 100) + '%" title="' + days[i].slice(5) + "：" + mins(x) + " 分钟" + (x.dk ? "，精听 " + x.dk + " 句" : "") + '"></i>').join("") + '</div><div class="st-ax"><span>' + days[0].slice(5) + "</span><span>最近 14 天（BBC · VOA、精听）</span><span>今天</span></div></div>";
+      '<div class="st-bars">' + S.map((x, i) => '<i class="' + (mins(x) ? "" : "z") + '" style="height:' + Math.max(4, mins(x) / mx * 100) + '%" title="' + days[i].slice(5) + "：" + mins(x) + " 分钟" + (x.dk ? "，精听 " + x.dk + " 句" : "") + '"></i>').join("") + '</div><div class="st-ax"><span>' + days[0].slice(5) + "</span><span>最近 14 天（听力节目、精听）</span><span>今天</span></div></div>";
   }
 
   // ---------- 📊 每期难度：语速 + 生词率 ----------
@@ -593,12 +604,13 @@
     const PP = POS();
     const OF = OFF(), QR = LQR();
     const it = x => '<div class="sm-it" data-ep="' + esc(x.id) + '"><img src="' + esc(x.img) + '" alt="" loading="lazy"><div class="t"><b>' + esc(x.t) + "</b><span>" + esc(x.d) + (D[x.id] ? ' · <em class="ok">✓ 听过</em>' : PP[x.id] ? " · ⏯ 听到 " + fmt(PP[x.id].t) : "") + (OF[x.id] ? " · 📥" : "") + (QR[x.id] ? " · 🧩 " + QR[x.id].got + "/" + QR[x.id].n : "") + diffShort(x.id) + "</span></div></div>";
-    return top + '<div class="sm-new" data-ep="' + esc(fresh.id) + '"><img src="' + esc(fresh.img) + '" alt=""><div><small>' + (story ? (fresh === n0 ? "👉 从这一集开始" : "👉 接着听下一集") : SM[ser][4] === "VOA" ? (fresh === n0 ? "🆕 最近一期" : "👉 还没听的最近一期") : fresh === n0 ? "🆕 最新一期" : "👉 还没听的最新一期") + " · " + esc(fresh.d) + "</small><b>" + esc(fresh.t) + "</b><p>" + esc(fresh.p || "") + "</p></div></div>" +
-      '<div class="sm-grid">' + L.slice(0, story || SM[ser][4] === "VOA" ? 120 : 40).map(it).join("") + "</div>"; // 故事类、VOA 是固定的旧节目（50–60 期），全列出来
+    return top + '<div class="sm-new" data-ep="' + esc(fresh.id) + '"><img src="' + esc(fresh.img) + '" alt=""><div><small>' + (story ? (fresh === n0 ? "👉 从这一集开始" : "👉 接着听下一集") : SM[ser][4] === "VOA" ? (fresh === n0 ? "🆕 最近一期" : "👉 还没听的最近一期") : SM[ser][4] === "BNE" ? (fresh === n0 ? "🆕 最新一篇" : "👉 还没听的最新一篇") : fresh === n0 ? "🆕 最新一期" : "👉 还没听的最新一期") + " · " + esc(fresh.d) + "</small><b>" + esc(fresh.t) + "</b><p>" + esc(fresh.p || "") + "</p></div></div>" +
+      '<div class="sm-grid">' + L.slice(0, MORE[ser] || (story || SM[ser][4] === "VOA" ? 120 : 40)).map(it).join("") + "</div>" + // 故事类、VOA 是固定的旧节目（50–60 期），全列出来
+      (L.length > (MORE[ser] || (story || SM[ser][4] === "VOA" ? 120 : 40)) ? '<div style="text-align:center;margin:14px 0"><button class="ui-btn" data-a="more">显示更多（还有 ' + (L.length - (MORE[ser] || 40)) + " 期，往前到 " + esc((L[L.length - 1].d || "").slice(-4)) + " 年）</button></div>" : "");
   }
   function epHtml() {
     if (!EP) return '<div class="sm-empty">' + (epBusy ? "正在取这一期的音频和文稿…" : "") + "</div>";
-    if (EP.err) return '<div class="sm-empty">这一期没取到，<a href="' + esc(srcUrl(EP.id)) + '" target="_blank" rel="noopener">去 ' + SM[serOf(EP.id)][4] + ' 网站看</a></div>';
+    if (EP.err) return '<div class="sm-empty">' + (EP.msg === "no transcript yet" ? "这一期 NPR 还没放文稿（一般播出后一两天才有），过两天再来；或者先" : EP.msg === "no such level" ? "这篇新闻没有这一级（简单篇只有 L0–L3，进阶篇只有 L4–L6），换个级别看看；或者" : "这一期没取到，") + '<a href="' + esc(srcUrl(EP.id)) + '" target="_blank" rel="noopener">去 ' + SRC[SM[serOf(EP.id)][4]][1] + ' 网站看</a></div>';
     const m = meta(EP.id), D = done(), heard = !!D[EP.id], S = SM[serOf(EP.id)], Z = zhOn ? ZH[EP.id] : null, zl = zhOn && !Z && zhBusy[EP.id];
     // 中文：开着才有；还在翻就先在前面几处显示「翻译中…」
     const zh = (arr, i) => zhOn ? '<span class="zh' + (zl ? " ld" : "") + '">' + (Z ? esc((arr ? (Z[arr] || [])[i] : Z.intro) || "") : zl && (arr !== "lines" || i < 2) ? "翻译中…" : "") + "</span>" : "";
@@ -628,9 +640,9 @@
     if (!root) return;
     const f = flEl(); if (root.contains(AU)) f.querySelector(".au").append(AU); // 先把播放器挪出去，重画页面时不会被删掉（删掉会停）
     const S = SM[ser]; if (wantFollow()) followLoad(EP.id);
-    root.innerHTML = '<div class="sm-ser">' + [...new Set(SER.map(x => x[4]))].map(src => '<div class="sm-row"><span class="src">' + src + "</span>" + SER.filter(x => x[4] === src).map(x => '<button data-ser="' + x[0] + '" class="' + (x[0] === ser ? "on" : "") + '">' + x[1] + "</button>").join("") + "</div>").join("") + "</div>" +
+    root.innerHTML = '<div class="sm-ser">' + [...new Set(SER.map(x => x[4]))].map(src => '<div class="sm-row"><span class="src">' + SRC[src][0] + "</span>" + SER.filter(x => x[4] === src).map(x => '<button data-ser="' + x[0] + '" class="' + (x[0] === ser ? "on" : "") + '">' + x[1] + "</button>").join("") + "</div>").join("") + "</div>" +
       (view === "ep" ? '<div class="sm-bar"><button class="ui-btn" data-a="home">← 节目列表</button><span class="sp"></span><button class="ui-btn' + (zhOn ? " on" : "") + '" data-a="zh" title="英文下面显示中文翻译">🀄 中文：' + (zhOn ? "开" : "关") + "</button></div>" + zhBar() + epHtml()
-        : '<div class="sm-head"><b>' + esc(S[2]) + "</b> · " + (S[4] === "VOA" ? "VOA Learning English（美音；2025 年 3 月起停更，旧节目都能听）" : "BBC Learning English") + " · " + esc(S[3]) + "</div>" + homeHtml());
+        : '<div class="sm-head"><b>' + esc(S[2]) + "</b> · " + SRC[S[4]][1] + (SRC[S[4]][2] ? "（" + SRC[S[4]][2] + "）" : "") + " · " + esc(S[3]) + "</div>" + homeHtml());
     if (view === "ep" && EP && !EP.err && AU.dataset.id !== EP.id) { AU.pause(); AU.src = srcOf(EP.id); AU.dataset.id = EP.id; auTitle = SM[serOf(EP.id)][1] + " · " + EP.title; AU.playbackRate = rate; flClosed = false; }
     sync(); stickTop(); curK = -1; curW = null; hl(true); hlWord();
     if (view === "ep" && EP && !EP.err && autoNext === EP.id && AU.dataset.id === EP.id) { autoNext = null; AU.play().catch(() => {}); }
@@ -687,6 +699,7 @@
       const r = t.closest("[data-rate]"); if (r) { rate = +r.dataset.rate; LS("sme:rate", rate); AU.playbackRate = rate; root.querySelectorAll("[data-rate]").forEach(x => x.classList.toggle("on", x === r)); return; }
       const ad = t.closest("[data-add]"); if (ad && EP) { const v = EP.vocab[+ad.dataset.add], w = String(v[0]).replace(/\s*\(.*?\)\s*/g, " ").trim(), re = new RegExp("\\b" + w.split(/\s+/)[0].replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"), line = (EP.lines || []).find(l => re.test(l.t)); if (window.vocabAddWord) { ad.disabled = true; window.vocabAddWord(w, v[2] || (line ? line.t : "")).then(ok => { ad.textContent = ok ? "✓ 已加" : "已在本里"; }); } return; }
       const b = t.closest("[data-a]"); if (!b) return; const a = b.dataset.a;
+      if (a === "more") { MORE[ser] = (MORE[ser] || 40) + 80; draw(); return; }
       if (a === "home") { view = "home"; if (EP && !EP.err) ser = serOf(EP.id); loadList(ser); draw(); return; }
       if (a === "dk" && EP && !EP.err) { dkLoad(EP.id); return; }
       if (/^dk-/.test(a) && EP && DK[EP.id] && DK[EP.id].sents) {

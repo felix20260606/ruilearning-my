@@ -1,7 +1,7 @@
 /* 📅 每日一练（英语 → 第一个标签）：把每天该做的「词 · 听 · 说 · 读 · 写」排成一张清单，点「去练」直接跳到那个模块，做完自动打勾
    - 自动打勾用各模块自己记的数据：
        🔤 背单词：pump:log[今天].n（练习每做一张卡 +1）≥ 目标张数；有难词时多一个「🔥 只练难词」
-       🎧 听：「🧩 练习课」今天做完一节或复习 5 句（window.drillToday），或「📻 BBC · VOA」今天听完一期（sme:done），或练习里 10 张听力 / 听写卡（pump:log[今天].ls），或口语原声跟读一条（speak:done 的 v:）
+       🎧 听：「🧩 练习课」今天做完一节或复习 5 句（window.drillToday），或「📻 听力节目」今天听完一期（sme:done），或练习里 10 张听力 / 听写卡（pump:log[今天].ls），或口语原声跟读一条（speak:done 的 v:）
        🗣 说：口语「📅 每日一练」今天打卡（speak:days[今天]）
        📖 读：今天打开过一篇文章（reading:docs 的 at）；「去练」直接打开「📰 今日新闻」
        ✍️ 写：今天批改过一篇（writing:history 的 at），或者在这里用 3 个词各造一句、交给 AI 看过（daily:sent）
@@ -108,7 +108,7 @@
     let dr = { n: 0, rv: 0, due: 0 }; try { if (window.drillToday) dr = window.drillToday(); } catch (e) {} // 🧩 练习课（drill.js）：今天做完几节、复习几句、还有几句该复习
     const L = [
       { id: "word", ic: "🔤", t: "背单词", sub: "在「📖 词汇 → 🔊 练习」里复习、学新词，做满 " + o.word + " 张卡" + (hard ? "；还有 " + hard + " 个老忘的难词，可以单独练" : ""), prog: Math.min(pn, o.word) + " / " + o.word + " 张", pct: pn / o.word, auto: pn >= o.word, min: Math.round(o.word / 2), extra: hard ? '<button class="dy-chk" data-hard="1">🔥 只练难词（' + hard + "）</button>" : "" },
-      { id: "listen", ic: "🎧", t: "听", sub: "「🎧 听 → 🧩 练习课」做一节（或者把做错的复习 5 句）；或者「📻 BBC · VOA」听一期（有文稿、生词和中文对照）；或者听力练习做 10 张听力 / 听写卡", prog: [dr.n ? "练习课 " + dr.n + " 节" : "", dr.rv ? "复习 " + dr.rv + " 句" : "", smeT ? "BBC · VOA " + smeT + " 期" : "", ls ? "听力卡 " + Math.min(ls, 10) + " / 10" : "", vToday ? "原声 " + vToday + " 条" : ""].filter(Boolean).join(" · "), pct: smeT || vToday || dr.n || dr.rv >= 5 ? 1 : Math.max(ls / 10, dr.rv / 5), auto: smeT > 0 || vToday > 0 || ls >= 10 || dr.n > 0 || dr.rv >= 5, min: 8, extra: dr.due ? '<button class="dy-chk" data-drillrv="1">📅 复习做错的 ' + dr.due + " 句</button>" : "" },
+      { id: "listen", ic: "🎧", t: "听", sub: "「🎧 听 → 🧩 练习课」做一节（或者把做错的复习 5 句）；或者「📻 听力节目」听一期（有文稿、生词和中文对照）；或者听力练习做 10 张听力 / 听写卡", prog: [dr.n ? "练习课 " + dr.n + " 节" : "", dr.rv ? "复习 " + dr.rv + " 句" : "", smeT ? "听力节目 " + smeT + " 期" : "", ls ? "听力卡 " + Math.min(ls, 10) + " / 10" : "", vToday ? "原声 " + vToday + " 条" : ""].filter(Boolean).join(" · "), pct: smeT || vToday || dr.n || dr.rv >= 5 ? 1 : Math.max(ls / 10, dr.rv / 5), auto: smeT > 0 || vToday > 0 || ls >= 10 || dr.n > 0 || dr.rv >= 5, min: 8, extra: dr.due ? '<button class="dy-chk" data-drillrv="1">📅 复习做错的 ' + dr.due + " 句</button>" : "" },
       { id: "speak", ic: "🗣", t: "说", sub: "「🗣 说 → 📅 每日一练」：1 段情景对话 + 跟读 5 句 + 说 1 个话题", prog: sday ? "今天已打卡" : slog ? "今天练了 " + slog + " 次，还没打卡" : "", pct: sday ? 1 : Math.min(.9, slog / 7), auto: sday, min: 15 },
       { id: "read", ic: "📖", t: "读", sub: "读「📰 今日新闻」（觉得难就点「✨ 简单版 + 小测」），或者阅读里任意一篇；点不认识的词查意思、收进生词本", prog: rd.length ? "今天读了：" + rd.map(d => d.title).slice(0, 2).join("、") : "", pct: rd.length ? 1 : 0, auto: rd.length > 0, min: 10 },
       { id: "write", ic: "✍️", t: "写", sub: "在「✍️ 写 → 📝 写作批改」写一段交给它批改；时间不够就用下面 3 个词各造一句（AI 帮你看对不对）", prog: [wr.length ? "今天批改了 " + wr.length + " 篇" : "", sn ? "造句 " + Math.min(sn, 3) + " / 3" : ""].filter(Boolean).join(" · "), pct: wr.length ? 1 : sn / 3, auto: wr.length > 0 || sn >= 3, min: 10, extra: '<button class="dy-chk' + (sentOpen ? " on" : "") + '" data-sent="1">✏️ 用新词造 3 句</button>', more: sentOpen ? sentHtml() : "" },
@@ -159,7 +159,7 @@
     return '<div class="dy-wkbox"><div class="h"><b>📊 本周小结</b><small>' + md(w.from) + " – " + md(w.to) + '</small><span style="flex:1"></span><button class="dy-chk" data-act="wk">收起</button></div>' +
       '<div class="nums"><div><b>' + w.act + "</b><span>天有练习</span></div><div><b>" + w.full7 + "</b><span>天全勤</span></div><div><b>" + w.cards + '</b><span>张卡片 <em class="' + (diff >= 0 ? "up" : "dn") + '">' + (w.cardsP || diff ? (diff >= 0 ? "↑" : "↓") + Math.abs(diff) : "") + "</em></span></div><div><b>" + (acc ? acc + "%" : "—") + "</b><span>记得率</span></div><div><b>" + w.nw + "</b><span>个新词</span></div><div><b>" + w.mins + "</b><span>分钟背词</span></div></div>" +
       '<div class="areas">' + Object.keys(w.area).map(k => '<span><b>' + k + "</b> " + w.area[k] + " 天</span>").join("") + "</div>" +
-      '<div class="more">' + ["读了 " + w.docsN + " 篇文章", "听了 " + w.smeN + " 期 BBC · VOA", "批改了 " + w.wr + " 篇作文" + (w.band ? "（最高 " + w.band + " 分）" : "")].join(" · ") + "</div>" +
+      '<div class="more">' + ["读了 " + w.docsN + " 篇文章", "听了 " + w.smeN + " 期听力节目", "批改了 " + w.wr + " 篇作文" + (w.band ? "（最高 " + w.band + " 分）" : "")].join(" · ") + "</div>" +
       (w.hard.length ? '<div class="more">🔥 最难的词：' + w.hard.map(h => "<b>" + esc(h.word) + "</b>" + (h.f ? "（忘了 " + h.f + " 次）" : "")).join("、") + "</div>" : "") +
       '<div class="adv">💡 ' + esc(tip1) + "</div></div>";
   }

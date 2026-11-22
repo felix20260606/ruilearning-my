@@ -647,7 +647,7 @@
     return apiP;
   }
   // 🇨🇳 大陆打不开 YouTube：说清楚，别让人对着黑框干等
-  const ytMsg = '<div style="padding:28px 18px;text-align:center;line-height:1.7;color:var(--ui-ink-2,#cfd2d6)"><div style="font-size:30px">🚫</div><b>现在的网络连不上 YouTube</b><br>在中国大陆要开 VPN 才能看视频。<br><small style="color:var(--ui-muted,#9aa0a6)">BBC 听力、阅读、口语、写作、生词本这些不受影响。</small><br><button type="button" class="ui-btn" style="margin-top:10px" onclick="try{NET.mark(\'www.youtube.com\',1)}catch(e){}location.reload()">已经开了 VPN，重试</button></div>';
+  const ytMsg = '<div style="padding:28px 18px;text-align:center;line-height:1.7;color:var(--ui-ink-2,#cfd2d6)"><div style="font-size:30px">🚫</div><b>现在的网络连不上 YouTube</b><br>在中国大陆要开 VPN 才能看视频。<br><small style="color:var(--ui-muted,#9aa0a6)">听力节目、阅读、口语、写作、生词本这些不受影响。</small><br><button type="button" class="ui-btn" style="margin-top:10px" onclick="try{NET.mark(\'www.youtube.com\',1)}catch(e){}location.reload()">已经开了 VPN，重试</button></div>';
   async function startPlayer(v) {
     stopTick(); ready = false; try { player && player.destroy && player.destroy(); } catch (e) {} player = null;
     $(".wt-video", root).innerHTML = '<div id="wt-yt"></div>';
