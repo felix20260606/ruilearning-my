@@ -66,7 +66,8 @@ const path = require("path");
   globalThis.fetch = async () => new Response("", { status: 500 });
   // 用一个不会是「今天」的日期：上面「bad date → 今天」那次已经把今天的缓存好了（以前写死 2026-11-22，到了 11 月 22 日这天就撞上，测试就一直失败）
   // 后台只认最近 30 天的日期（再早的当今天），所以用「北京时间前天」：上面没缓存过
-  const d2 = new Date(Date.now() + 8 * 3600e3 - 2 * 86400e3).toISOString().slice(0, 10);
+  // 还要避开上面写死缓存过的 2026-11-21（到了 11 月 23 日，「前天」正好是它）：从前天往前找第一个没用过的
+  let d2 = ""; for (let k = 2; k < 9; k++) { d2 = new Date(Date.now() + 8 * 3600e3 - k * 86400e3).toISOString().slice(0, 10); if (d2 !== "2026-11-21") break; }
   r = await call("/api/news?d=" + d2); ok(r.status === 502 && !r.j.ok && !kv.has("news/" + d2), "no feeds → 502, not cached");
   const n0 = kv.size; r = await call("/api/news?d=2000-01-01"); ok(kv.size === n0 && !kv.has("news/2000-01-01"), "old date not stored as its own key");
   console.log(fail ? "t46 FAILED" : "t46 ok");
