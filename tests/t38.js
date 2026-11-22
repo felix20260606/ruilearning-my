@@ -2,7 +2,7 @@
 const fs=require('fs'),vm=require('vm'),path=require('path');
 // 服务器端的合并逻辑直接取自 web/_worker.js，测试和线上保持一致
 const W=fs.readFileSync(path.join(__dirname,'..','web','_worker.js'),'utf8');
-const { vadd }=new Function(W.slice(W.indexOf('const vnorm'),W.indexOf('async function vocab'))+';return {vadd};')();
+const { vadd }=new Function(W.slice(W.indexOf('const atOk'),W.indexOf('\n',W.indexOf('const atOk')))+W.slice(W.indexOf('const vdef'),W.indexOf('async function vocab'))+';return {vadd};')();
 let bin={custom:[{id:"u_1",word:"tire"}],progress:{a:"known"},deleted:["v_growth"],pending:["growth","thesis","wake up"]},posts=0;
 const store={saved:["growth","Tire"],savedSents:[{k:"ph|wake up",t:"wake up",tr:"醒来",ph:1,ctx:"And one day I woke up"}],savedCtx:{growth:{t:"The growth  mindset matters."}},"med:w:thesis":{t:"I wrote my thesis.",tr:"我写了论文。"}};
 const ctx={console,setTimeout,clearTimeout,URL,encodeURIComponent,Promise,
@@ -28,7 +28,7 @@ let fail=0;const ok=(c,m)=>{if(!c){fail++;console.log("FAIL",m)}};
  const r=await ctx.__t.syncAll("zh-CN");
  const ws=bin.custom.map(x=>x.word.toLowerCase());
  ok(ws.filter(x=>x==="tire").length===1,"no dup of existing word"); ok(ws.includes("growth")&&ws.includes("thesis")&&ws.includes("wake up"),"backfill "+ws);
- ok(bin.pending.length===0,"pending cleared "+bin.pending); ok(!bin.deleted.includes("v_growth"),"undeleted"); ok(bin.progress.a==="known","progress kept");
+ ok(bin.pending.length===0,"pending cleared "+bin.pending); ok(bin.deleted.includes("v_growth")&&bin.custom.some(x=>x.word==="growth"&&x.id!=="v_growth"),"deleted word re-added with a new id (old id stays deleted)"); ok(bin.progress.a==="known","progress kept");
  const th=bin.custom.find(x=>x.word==="thesis"); ok(th.examples[0][1]==="我写了论文。","media ctx");
  const gr=bin.custom.find(x=>x.word==="growth"); ok(gr.examples[0][0]==="The {growth} mindset matters."&&gr.examples[0][1].startsWith("译:"),"ctx translated "+JSON.stringify(gr.examples));
  ok(r.cloud&&r.added===3,"result "+JSON.stringify(r));
