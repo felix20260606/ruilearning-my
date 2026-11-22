@@ -20,6 +20,9 @@ jobs:
           node-version: 22
       - name: 生成一批
         run: node tools/gen-tts.mjs
+        env:
+          # 每天最多生成多少个字母：GitHub 仓库 → Settings → Secrets and variables → Actions → Variables 里加 TTS_BUDGET（不设 = 3600，约 4,900 neurons）
+          TTS_BUDGET: ${{ vars.TTS_BUDGET }}
       - name: 有新文件就提交
         run: |
           git config user.name "github-actions[bot]"
