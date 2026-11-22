@@ -8,7 +8,7 @@
   const DAY = 864e5, PER = 3, NUMS = [20, 40, 60, 80, 100], NEWS = [0, 5, 10, 15, 20, 25];
   const LG = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, LS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
   const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const today = () => new Date().toISOString().slice(0, 10);
+  const today = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }; // 本地日期（以前是 UTC：北京时间 8 点才换天）
   // 默认值同 PhrasePump：测验、建议、练习都开，练习数量 60，新项目 15 %（和默认不一样时「会话」旁出现「重置」）；后面几项是我们加的
   const DEF = { quiz: true, sugg: true, listen: true, num: 60, newPct: 15, tags: [], recall: false, dir: "en", types: ["word", "phrase", "sentence"], speed: 1, dict: false, shadow: false, gfill: false }; // 听写、跟读、语法填空也是我们加的，默认关 // 认词卡是我们加的，默认关（RL 没有）
   let opt = Object.assign(JSON.parse(JSON.stringify(DEF)), LG("pump:opt", {})); if (!Array.isArray(opt.tags)) opt.tags = [];
@@ -185,7 +185,7 @@
   const dayLevel = () => LEVELS_DAY.filter(l => l.p <= day.n).pop();
   const emoji = () => dayLevel().e;
   const dayBar = () => { const l = dayLevel(); return '<div class="pp-bar" title="0 张 😭 · 1–49 😢 · 50–99 🙂 · 100–199 😎💯 · 200 以上 🐢👑"><i style="width:' + Math.min(100, l.min + (day.n - l.p) * l.per) + "%;background:" + l.bg + '"></i></div>'; };
-  const countCard = c => { if (c && !c.counted) { c.counted = true; day.n++; LS("pump:day", day); logDay(Object.assign({ n: 1, sec: spent() }, c.k === "listen" || c.k === "dict" ? { ls: 1 } : {})); } }; // 按「下一个」离开一张卡时算练了一张（同 PhrasePump）；听力、听写卡另记 ls（「📅 每日一练」的「听」用）
+  const countCard = c => { if (c && !c.counted) { c.counted = true; if (day.d !== today()) day = { d: today(), n: 0 }; day.n++; LS("pump:day", day); logDay(Object.assign({ n: 1, sec: spent() }, c.k === "listen" || c.k === "dict" ? { ls: 1 } : {})); } }; // 按「下一个」离开一张卡时算练了一张（同 PhrasePump）；听力、听写卡另记 ls（「📅 每日一练」的「听」用）
   // ---------- 每天的练习记录（「📊 统计」用）：本机 pump:log + /api/ext 的 "stat|日期"（换设备也在）----------
   // { "YYYY-MM-DD"（本地日期）: { n 卡片数, ok 记得, fail 忘了, nw 新词, sec 用时秒 } }
   const lday = () => { const d = new Date(); return new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); };
@@ -272,7 +272,7 @@
   }
   const html = en => esc(en).replace(/\{([^}]+)\}/g, '<span class="t">$1</span>');
   function home() {
-    playing = false; root.classList.remove("pp-known"); if (window.NAV) NAV.mark(); // 🔙 页面历史（nav.js） const p = plan(), S = srs();
+    playing = false; root.classList.remove("pp-known"); if (window.NAV) NAV.mark(); /* 🔙 页面历史（nav.js） */ const p = plan(), S = srs();
     const VS = window.vocabStats ? window.vocabStats() : null; // 学习中 / 已掌握：和顶部、统计页同一个口径（index.html 的 vocabStats）
     const lrn = VS ? VS.learning : p.P.filter(w => S[w.id] && w.status !== "known").length, done = VS ? VS.known : p.P.filter(w => w.status === "known").length;
     const rs = p.live.filter(w => S[w.id] && S[w.id].at).map(w => rNow(S[w.id])), avgR = rs.length ? Math.round(rs.reduce((a, x) => a + x, 0) / rs.length * 100) : 0;
@@ -386,10 +386,10 @@
   }
   // 推荐生词收进生词本：查释义生成词条（同网站视频页），并告诉插件「将要学习」
   async function addSugg(c, silent) {
-    const w = c.w.word, id = "v_" + w.replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""), sg = EXT.sugg[w] || {};
+    const w = c.w.word, id0 = "v_" + w.replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""), id = window.freshId ? window.freshId(id0) : id0, sg = EXT.sugg[w] || {};
     let zh = ""; try { const j = await (await NET.g("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&dt=bd&q=" + encodeURIComponent(w))).json(); const L = []; const add = x => { x = String(x || "").trim(); if (x && x.toLowerCase() !== w && !L.includes(x)) L.push(x); }; add((j[0] || []).map(x => x[0]).join("")); (j[1] || []).forEach(e => (e[1] || []).slice(0, 3).forEach(add)); zh = L.slice(0, 4).join("；"); } catch (e) {}
     const ex = sg.t ? [[String(sg.t).replace(new RegExp("\\b(" + w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")\\b", "i"), "{$1}"), ""]] : [];
-    try { state.custom = state.custom || []; if (!state.custom.some(x => x && (x.id === id || String(x.word || "").toLowerCase() === w))) state.custom.push({ id, type: "word", word: w, phon: "", en: "", zh: zh || "(未查到，可手动补)", tag: "视频", date: new Date().toISOString().slice(0, 10), forms: [], examples: ex, tip: "" }); if (typeof refresh === "function") refresh(); save(state); } catch (e) { toast("收进生词本失败"); return; }
+    try { state.custom = state.custom || []; if (!state.custom.some(x => x && (x.id === id || String(x.word || "").toLowerCase() === w))) state.custom.push({ id, type: "word", word: w, phon: "", en: "", zh: zh || "(未查到，可手动补)", tag: "视频", date: window.ymdLocal ? window.ymdLocal() : today(), forms: [], examples: ex, tip: "" }); if (typeof refresh === "function") refresh(); save(state); } catch (e) { toast("收进生词本失败"); return; }
     EXT.saved.add(w); c.w.added = true; cards.forEach(x => { if (x.w.word === w) x.w.added = true; });
     try { await fetch("/api/ext", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ changes: { ["saved|" + w]: { v: w, at: Date.now() } } }) }); } catch (e) {}
     if (!silent) toast("已收进生词本：" + w);
@@ -467,10 +467,10 @@
   const starred = c => !!(EXT && c.s && c.s.en && EXT.sents.has(sentText(c).toLowerCase()));
   async function toggleStar(c) {
     if (!EXT || !c.s || !c.s.en) return; const t = sentText(c), lt = t.toLowerCase(), k0 = EXT.sents.get(lt), now = Date.now();
-    const id = "v_" + lt.replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 70), post = ch => fetch("/api/ext", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ changes: ch }) }).catch(() => {});
+    const id0 = "v_" + lt.replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 70), post = ch => fetch("/api/ext", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ changes: ch }) }).catch(() => {});
     state.custom = state.custom || [];
-    if (k0) { EXT.sents.delete(lt); post({ ["savedSents|" + k0]: { del: 1, at: now } }); const e = state.custom.find(x => x && x.id === id && x.type === "sentence"); if (e) { state.custom = state.custom.filter(x => x !== e); state.deleted = (state.deleted || []).concat(id); } toast("已取消收藏这句"); }
-    else { const k = "web|" + lt.replace(/[^a-z0-9]+/g, " ").trim().slice(0, 90); EXT.sents.set(lt, k); post({ ["savedSents|" + k]: { v: { k, t, tr: c.s.zh || "", at: now, v: "", s: 0 }, at: now } }); if (!state.custom.some(x => x && (x.id === id || String(x.word || "").toLowerCase() === lt))) state.custom.push({ id, type: "sentence", word: t, phon: "", en: "", zh: c.s.zh || "(未查到，可手动补)", tag: "练习", date: new Date().toISOString().slice(0, 10), forms: [], examples: [], tip: "" }); toast("已收藏这句"); }
+    if (k0) { EXT.sents.delete(lt); post({ ["savedSents|" + k0]: { del: 1, at: now } }); const e = state.custom.find(x => x && x.type === "sentence" && (x.id === id0 || String(x.word || "").toLowerCase() === lt)); if (e) { state.custom = state.custom.filter(x => x !== e); state.deleted = (state.deleted || []).concat(e.id); } toast("已取消收藏这句"); }
+    else { const k = "web|" + lt.replace(/[^a-z0-9]+/g, " ").trim().slice(0, 90); EXT.sents.set(lt, k); post({ ["savedSents|" + k]: { v: { k, t, tr: c.s.zh || "", at: now, v: "", s: 0 }, at: now } }); if (!state.custom.some(x => x && (x.id === id0 || String(x.word || "").toLowerCase() === lt))) state.custom.push({ id: window.freshId ? window.freshId(id0) : id0, type: "sentence", word: t, phon: "", en: "", zh: c.s.zh || "(未查到，可手动补)", tag: "练习", date: window.ymdLocal ? window.ymdLocal() : today(), forms: [], examples: [], tip: "" }); toast("已收藏这句"); }
     if (typeof refresh === "function") refresh(); save(state); show();
   }
   function srcOf(c) { // 例句出处（同 RL 卡片右下角的提示）
@@ -612,7 +612,7 @@
     setTimeout(home, 500); // 同 PhrasePump：停半秒回首页
   }
   document.addEventListener("keydown", e => {
-    if (!playing || !root || !root.classList.contains("on") || e.metaKey || e.ctrlKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    if (!playing || !root || !root.classList.contains("on") || !root.offsetParent || e.metaKey || e.ctrlKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
     const c = cards[at]; if (!c) return; const k = e.key.toLowerCase();
     if (k === "d" || k === "arrowright") go(1); else if (k === "a" || k === "arrowleft") { if (at) go(-1); } else if (k === "s" || k === "arrowdown" || k === " ") say(c); else if (k === "r") toggleStar(c); else if (k === "e") { if (c.k === "listen") reveal(c); else if (c.k === "recall") flip(c); else if (c.k === "quiz") revealQuiz(c); else if (c.k === "dict" || c.k === "gfill") giveUp(c); } else if (c.k === "quiz" && !c.done && (k === "z" || k === "c")) rate(c, k === "c"); else if (c.k === "sugg" && /^[zxc]$/.test(k)) chooseSugg(c, { z: "known", x: "learn", c: "skip" }[k]); else if (c.k === "recall" && c.flip && !c.done && (k === "z" || k === "c")) rate(c, k === "c"); else return;
     e.preventDefault();

@@ -3,8 +3,8 @@
 const path = require("path"), fs = require("fs");
 (async () => {
   const W = (await import(path.join(__dirname, "..", "web", "_worker.js"))).default;
-  const kv = new Map();
-  const KV = { get: async (k, t) => { const v = kv.get(k); return v == null ? null : t === "json" ? JSON.parse(v) : v; }, put: async (k, v) => { kv.set(k, String(v)); }, delete: async k => { kv.delete(k); }, list: async ({ prefix }) => ({ keys: [...kv.keys()].filter(k => k.startsWith(prefix)).map(name => ({ name })), list_complete: true }) };
+  const kv = new Map(); let nPut = 0; const kvPuts = () => nPut;
+  const KV = { get: async (k, t) => { const v = kv.get(k); return v == null ? null : t === "json" ? JSON.parse(v) : v; }, put: async (k, v) => { kv.set(k, String(v)); nPut++; }, delete: async k => { kv.delete(k); }, list: async ({ prefix }) => ({ keys: [...kv.keys()].filter(k => k.startsWith(prefix)).map(name => ({ name })), list_complete: true }) };
   const html = fs.readFileSync(path.join(__dirname, "..", "web", "index.html"), "utf8");
   const code = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]).find(s => s.includes("mineSyncPull"));
   let pending = [];
@@ -32,7 +32,11 @@ const path = require("path"), fs = require("fs");
   ok(JSON.parse(kv.get("mine:vtest")).items["5"].v.size === 3000, "old local item uploaded");
   // 改一条（读到的位置）也会传
   A.ls.setItem("reading:docs", JSON.stringify([{ id: "d2", title: "T2", text: "x", at: 2, pos: 0 }])); await settle();
-  A.ls.setItem("reading:docs", JSON.stringify([{ id: "d2", title: "T2", text: "x", at: 2, pos: 3 }])); await settle();
+  A.ls.setItem("reading:docs", JSON.stringify([{ id: "d2", title: "T2", text: "x", at: 2, pos: 3 }])); await new Promise(r => setTimeout(r, 20)); await settle();
+  // 位置单独传一小项「pos:d2」，不再把整篇文章重传
+  const R1 = JSON.parse(kv.get("mine:reading")).items; ok(R1["pos:d2"] && R1["pos:d2"].v === 3 && R1.d2.v.pos === 0, "pos sent as its own small item");
+  const w0 = kvPuts(); A.ls.setItem("reading:docs", JSON.stringify([{ id: "d2", title: "T2", text: "x", at: 2, pos: 7 }])); await new Promise(r => setTimeout(r, 20)); await settle();
+  ok(kvPuts() === w0, "second pos change within 2 minutes is not sent right away");
   await B.pull("reading:docs"); await settle();
   ok(JSON.parse(B.ls.getItem("reading:docs"))[0].pos === 3, "B gets updated pos");
   console.log(fail ? fail + " failed" : "t45 ok"); process.exit(fail ? 1 : 0);

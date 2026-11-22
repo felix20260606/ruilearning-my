@@ -582,7 +582,7 @@
   let SY = {}, syQ = {}, syT = 0;
   function syPut(id, v) { const at = Date.now(); SY[id] = { v, at }; syQ[id] = { v, at }; clearTimeout(syT); syT = setTimeout(syFlush, 1500); }
   function syDel(id) { const at = Date.now(); delete SY[id]; syQ[id] = { del: 1, at }; clearTimeout(syT); syT = setTimeout(syFlush, 1500); }
-  function syFlush() { const ch = syQ; syQ = {}; if (!Object.keys(ch).length) return; fetch("/api/mine", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ k: "speak", changes: ch }) }).catch(() => { Object.assign(syQ, ch); }); }
+  function syFlush() { const ch = syQ; syQ = {}; if (!Object.keys(ch).length) return; fetch("/api/mine", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ k: "speak", changes: ch }) }).then(r => { if (!r.ok && (r.status >= 500 || r.status === 429)) throw 0; }).catch(() => { for (const k in ch) if (!(k in syQ)) syQ[k] = ch[k]; }); } // 断网、服务器出错（5xx / 429）：放回去下次再传（同一项后来又改过的以新的为准）
   window.addEventListener("pagehide", () => { if (Object.keys(syQ).length) try { navigator.sendBeacon("/api/mine", new Blob([JSON.stringify({ k: "speak", changes: syQ })], { type: "application/json" })); syQ = {}; } catch (e) {} });
   let syPulled = null;
   function syPull() {

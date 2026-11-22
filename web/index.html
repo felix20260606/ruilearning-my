@@ -26,7 +26,7 @@
     return of.call(this,u,o);
   };
   if(navigator.sendBeacon){var ob=navigator.sendBeacon.bind(navigator);navigator.sendBeacon=function(u,d){try{u=fix(u);}catch(e){}return ob(u,d);};}
-  var MINE=/^(vocab_state_v1|pump:opt|pump:heard|pump:day|pump:log|wt:meta|reading:docs|reading:tr|speak:done|speak:log|speak:days|reading:lv|writing:draft|writing:history|writing:lang|vocab:test|remind:time|daily:opt|daily:check|daily:days|daily:sat|daily:sent|daily:wkseen|sme:done|sme:pos|sme:stat|sme:lq|sme:diff|err:items|exam:hist|lang|drill:[\w:]+|mine:seen:reading|mine:seen:writing|mine:seen:vtest)$/,S=Storage.prototype,g=S.getItem,st=S.setItem,rm=S.removeItem;
+  var MINE=/^(vocab_state_v1|pump:opt|pump:heard|pump:day|pump:log|wt:meta|reading:docs|reading:tr|speak:done|speak:log|speak:days|reading:lv|writing:draft|writing:history|writing:lang|vocab:test|remind:time|daily:opt|daily:check|daily:days|daily:sat|daily:sent|daily:wkseen|sme:done|sme:pos|sme:stat|sme:lq|sme:diff|err:items|exam:hist|lang|drill:[\w:]+|mine:seen:reading|mine:seen:writing|mine:seen:vtest|speak:howto|speak:coachAns|remind:last)$/,S=Storage.prototype,g=S.getItem,st=S.setItem,rm=S.removeItem;
   var k=function(t,key){var ls=null;try{ls=window.localStorage;}catch(e){}key=String(key);return t===ls&&MINE.test(key)?key+us+(key==="lang"?"":ls2):key;};
   S.getItem=function(key){return g.call(this,k(this,key));};
   S.setItem=function(key,v){return st.call(this,k(this,key),v);};
@@ -1143,11 +1143,30 @@ async function load(){
   try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):def();}catch(e){return mem||def();}
 }
 async function save(s){
+  vStamp(s);
   if(hasStore){try{await Promise.race([window.storage.set(KEY,JSON.stringify(s)),new Promise((_,r)=>setTimeout(r,1500))]);}catch(e){}}
   else{mem=s;try{localStorage.setItem(KEY,JSON.stringify(s));}catch(e){}}
   schedulePush();
 }
 function def(){return{progress:{},custom:[],deleted:[],pending:[],srs:{}};}
+/* 掌握状态、待整理队列：改了的项记下时间（progAt / pendAdd / pendDel），合并时同一项按时间新的为准（后台同样）——
+   别的设备 / 标签页的旧缓存改不回去，「清空待整理」也清得掉。哪个页面改的都一样：保存前和上次的样子比一下就知道改了哪些 */
+let vSnap=null;
+const lowSet=L=>new Set((L||[]).map(w=>(w+"").toLowerCase()));
+function vResnap(){vSnap={p:Object.assign({},state.progress||{}),q:lowSet(state.pending)};}
+function vStamp(s){
+  if(s!==state)return; if(!vSnap){vResnap();return;}
+  const now=Date.now();s.progAt=s.progAt||{};s.pendAdd=s.pendAdd||{};s.pendDel=s.pendDel||{};
+  const P=s.progress||{};for(const k of new Set([...Object.keys(P),...Object.keys(vSnap.p)]))if(P[k]!==vSnap.p[k])s.progAt[k]=now;
+  const Q=lowSet(s.pending);Q.forEach(w=>{if(!vSnap.q.has(w))s.pendAdd[w]=now;});vSnap.q.forEach(w=>{if(!Q.has(w))s.pendDel[w]=now;});
+  vResnap();
+}
+const tMax=(x,y)=>{const o={},cut=Date.now()-90*864e5;[x||{},y||{}].forEach(m=>{for(const k in m){const t=Math.min(+m[k]||0,Date.now()+5000);if(t>cut&&t>(o[k]||0))o[k]=t;}});return o;};
+// 新词条的日期：本地日期（toISOString 是 UTC，北京时间 0–8 点加的词会记成前一天）
+const ymdLocal=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
+window.ymdLocal=ymdLocal;
+// 用固定 id（v_单词）加词的页面：这个 id 删过就换一个新的（删除记录只增不减，用旧 id 会被合并时再删掉）
+window.freshId=id=>(state.deleted||[]).includes(id)?id+"_"+Date.now().toString(36):id;
 
 /* ===== cloud sync — 生词本存在本站后台（Cloudflare KV，/api/vocab）=====
    不设口令：打开就同步；被乱改时可从后台存档或仓库 data/vocab.json 还原 */
@@ -1166,22 +1185,28 @@ function mergeState(a,b){ // union of two states; on same id, b wins. deletions 
   const deleted=Array.from(new Set([...(a.deleted||[]),...(b.deleted||[])]));
   const del=new Set(deleted);
   const custom=Object.values(byId).filter(e=>!del.has(e.id));
-  const progress=Object.assign({},a.progress||{},b.progress||{});
-  const pend={};[...(a.pending||[]),...(b.pending||[])].forEach(w=>{if(w)pend[(w+"").toLowerCase()]=w;});
+  // 掌握状态：同一个词两边都有时间就按新的为准；都没有时间按以前的规矩（b 有就用 b）
+  const ap=a.progress||{},bp=b.progress||{},pa=a.progAt||{},pb=b.progAt||{},progress={},progAt=tMax(pa,pb);
+  for(const k of new Set([...Object.keys(ap),...Object.keys(bp)])){const ta=+pa[k]||0,tb=+pb[k]||0,w=ta>tb?ap:tb>ta?bp:(k in bp?bp:ap);if(k in w)progress[k]=w[k];}
+  // 待整理队列：一个词最近一次拿掉的时间比加入的新，就不要了
+  const pendAdd=tMax(a.pendAdd,b.pendAdd),pendDel=tMax(a.pendDel,b.pendDel);
+  const pend={};[...(a.pending||[]),...(b.pending||[])].forEach(w=>{const k=(w+"").toLowerCase();if(w&&(!pendDel[k]||(pendAdd[k]||0)>pendDel[k]))pend[k]=w;});
   const pending=Object.values(pend);
   const srs=Object.assign({},a.srs||{}); for(const k in (b.srs||{})){const x=b.srs[k]; if(x&&(!srs[k]||(+x.at||0)>=(+srs[k].at||0)))srs[k]=x;} // 复习进度：同一个词以最近练习的为准
-  return {custom,progress,deleted,pending,srs};
+  return {custom,progress,deleted,pending,srs,progAt,pendAdd,pendDel};
 }
-const pick=s=>({custom:s.custom||[],progress:s.progress||{},deleted:s.deleted||[],pending:s.pending||[],srs:s.srs||{}});
+const pick=s=>({custom:s.custom||[],progress:s.progress||{},deleted:s.deleted||[],pending:s.pending||[],srs:s.srs||{},progAt:s.progAt||{},pendAdd:s.pendAdd||{},pendDel:s.pendDel||{}});
 function adopt(merged){
   if(JSON.stringify(pick(merged))===JSON.stringify(pick(state)))return;
   state.custom=merged.custom;state.progress=merged.progress;state.deleted=merged.deleted;state.pending=merged.pending;state.srs=merged.srs||{};
+  state.progAt=merged.progAt||{};state.pendAdd=merged.pendAdd||{};state.pendDel=merged.pendDel||{};vResnap();
   try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){} refresh();
 }
 async function syncNow(){
   if(syncing){syncAgain=true;return;}
   syncing=true;
   try{
+    vStamp(state); // 有的页面改完只调 schedulePush，没走 save
     const r=await fetch(SYNC_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({v:2,state:pick(state)})}); // 本机内容交给后台合并，拿回合并结果
     if(r.ok){const j=await r.json();if(j&&j.ok&&j.state)adopt(mergeState(j.state,state));}
   }catch(e){}finally{syncing=false; if(syncAgain){syncAgain=false;schedulePush();}}
@@ -1631,7 +1656,7 @@ async function quickAdd(word,sentence){
   if(words.some(w=>w.word.toLowerCase()===word.toLowerCase())){return false;}
   const re=new RegExp("\\b("+word.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\w*)","i"),own=sentence&&re.test(sentence)?[[String(sentence).trim().replace(re,"{$1}"),""]]:[];
   const entry={id:"u_"+Date.now()+"_"+Math.random().toString(36).slice(2,6),type:/\s/.test(word)?"phrase":"word",word:word,
-    phon:"",en:"(查询中…)",zh:"(翻译中…)",tag:"收集",date:new Date().toISOString().slice(0,10),forms:[],examples:own,tip:"",auto:1}; // auto：自动生成的词条（想要多义项、记忆法时再发给 Claude 补）
+    phon:"",en:"(查询中…)",zh:"(翻译中…)",tag:"收集",date:ymdLocal(),forms:[],examples:own,tip:"",auto:1}; // auto：自动生成的词条（想要多义项、记忆法时再发给 Claude 补）
   state.custom.push(entry);refresh();save(state);
   await enrich(entry);refresh();save(state);
   return true;
@@ -1734,6 +1759,7 @@ refresh(); // show seed words immediately, no waiting on storage
     if(state.sort){sortBy=state.sort;const ss=document.getElementById("sort-sel");if(ss)ss.value=sortBy;renderList();}
     loadVoices();
   }
+  vResnap(); // 记下载入时的掌握状态 / 待整理队列，之后改了哪些一比就知道
   var collect=document.documentElement.classList.contains('collect-mode');
   var collectWord='';
   if(collect){var mm=location.hash.match(/[#&]add=([^&]+)/);if(mm){try{collectWord=decodeURIComponent(mm[1].replace(/\+/g," ")).trim();}catch(e){}}}
@@ -2021,21 +2047,21 @@ refresh(); // show seed words immediately, no waiting on storage
 </script>
 <script src="lang.js?v=3"></script>
 <script src="tts.js?v=2"></script>
-<script src="watch.js?v=21"></script>
+<script src="watch.js?v=22"></script>
 <script src="channels.js?v=3"></script>
-<script src="pump.js?v=32"></script>
-<script src="speak.js?v=14"></script>
+<script src="pump.js?v=33"></script>
+<script src="speak.js?v=15"></script>
 <script src="basic.js?v=1"></script>
 <script src="quota.js?v=4"></script>
 <script src="daily.js?v=11"></script>
-<script src="read.js?v=16"></script>
+<script src="read.js?v=17"></script>
 <script src="listen.js?v=19"></script>
 <script src="drill.js?v=5"></script>
-<script src="errbook.js?v=2"></script>
+<script src="errbook.js?v=3"></script>
 <script src="exam.js?v=5"></script>
 <script src="import.js?v=1"></script>
 <script src="write.js?v=4"></script>
-<script src="stats.js?v=1"></script>
+<script src="stats.js?v=2"></script>
 <script>
 /* 个人学习资料换设备也在：阅读的文章（reading:docs）、作文批改历史（writing:history）、词汇量测试（vocab:test）
    这三页照旧存本机；这里在本机存储这一层盯着：哪一条变了就传到后台 /api/mine（按人分开），删掉的传删除记号；
@@ -2048,10 +2074,17 @@ refresh(); // show seed words immediately, no waiting on storage
   function setSeen(k,o){quiet=true;try{localStorage.setItem("mine:seen:"+k,JSON.stringify(o));}catch(e){}quiet=false;}
   function post(k,ch){if(!Object.keys(ch).length)return;var sn=seen(k);for(var id in ch){ch[id].at=Math.max(ch[id].at,(+sn[id]||0)+1);sn[id]=ch[id].at;}setSeen(k,sn);
     fetch("/api/mine",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({k:k,changes:ch})}).catch(function(){});}
-  function push(key,before,after){var c=KS[key],B={},A={},ch={},now=Date.now();
-    before.forEach(function(x){if(x&&c.id(x))B[c.id(x)]=JSON.stringify(x);});
-    after.forEach(function(x){if(x&&c.id(x)){A[c.id(x)]=1;if(B[c.id(x)]!==JSON.stringify(x))ch[c.id(x)]={v:x,at:now};}});
-    for(var id in B)if(!A[id])ch[id]={del:1,at:now};
+  // 阅读位置 pos 单独传（一项「pos:文章id」= 位置数字）：读的时候每滚一下、每朗读一句都会改它，以前每次都把整篇文章（最多 8 万字）传一遍、
+  //   后台每次写一次 KV（一天只有 1000 次）。现在最多两分钟传一次，切走页面时马上传。存储满了本机少存几篇（__mineKeepDel）不当成删除
+  function sig(key,x){if(key!=="reading:docs")return JSON.stringify(x);var y=Object.assign({},x);delete y.pos;return JSON.stringify(y);}
+  var posQ={},posT=0,posLast=0;
+  function posFlush(){clearTimeout(posT);posT=0;if(!Object.keys(posQ).length)return;var ch={},now=Date.now();for(var id in posQ)ch["pos:"+id]={v:posQ[id],at:now};posQ={};posLast=now;post("reading",ch);}
+  function posLater(){if(posT)return;posT=setTimeout(posFlush,Math.max(0,120e3-(Date.now()-posLast)));}
+  document.addEventListener("visibilitychange",function(){if(document.visibilityState==="hidden")posFlush();});
+  function push(key,before,after){var c=KS[key],B={},P={},A={},ch={},now=Date.now();
+    before.forEach(function(x){if(x&&c.id(x)){B[c.id(x)]=sig(key,x);P[c.id(x)]=x.pos;}});
+    after.forEach(function(x){if(x&&c.id(x)){A[c.id(x)]=1;if(B[c.id(x)]!==sig(key,x))ch[c.id(x)]={v:x,at:now};else if(key==="reading:docs"&&P[c.id(x)]!==x.pos){posQ[c.id(x)]=x.pos;posLater();}}});
+    if(!window.__mineKeepDel)for(var id in B)if(!A[id])ch[id]={del:1,at:now};
     post(c.k,ch);}
   S.setItem=function(key,v){var c=!quiet&&KS[key];var ls=null;try{ls=window.localStorage;}catch(e){}if(this!==ls)c=null;var before=c?rd(key):null;var r=set0.apply(this,arguments);if(c)push(key,before,rd(key));return r;};
   var busy={};
@@ -2060,11 +2093,12 @@ refresh(); // show seed words immediately, no waiting on storage
       if(!j||!j.ok)return false;var R=j.items||{},sn=seen(c.k),L=rd(key),byId={},changed=false,up={};
       L.forEach(function(x){if(x&&c.id(x))byId[c.id(x)]=x;});
       for(var id in R){var r=R[id];var known=+sn[id]||0;
+        if(key==="reading:docs"&&id.indexOf("pos:")===0){var pd=byId[id.slice(4)];if(pd&&!r.del&&r.at>known&&pd.pos!==r.v&&!(id.slice(4) in posQ)){pd.pos=r.v;changed=true;}sn[id]=Math.max(known,+r.at||0);continue;} // 别的设备读到哪了
         if(r.del){if(byId[id]&&r.at>known){delete byId[id];changed=true;}}
         else if(!byId[id]){if(r.at>known||!sn[id]){byId[id]=r.v;changed=true;}}
         else if(r.at>known&&JSON.stringify(byId[id])!==JSON.stringify(r.v)){byId[id]=r.v;changed=true;}
         sn[id]=Math.max(known,+r.at||0);}
-      for(var id2 in byId)if(!R[id2]&&!sn[id2])up[id2]={v:byId[id2],at:Date.now()}; // 这台设备上从没传过的：补传
+      for(var id2 in byId)if(!R[id2]&&!sn[id2]&&id2.indexOf("pos:")!==0)up[id2]={v:byId[id2],at:Date.now()}; // 这台设备上从没传过的：补传
       setSeen(c.k,sn);post(c.k,up);
       if(changed){var M=Object.keys(byId).map(function(i){return byId[i];}).sort(function(a,b){return (+b.at||0)-(+a.at||0);}).slice(0,c.max);
         quiet=true;try{localStorage.setItem(key,JSON.stringify(M));}catch(e){}quiet=false;}
@@ -2081,9 +2115,9 @@ refresh(); // show seed words immediately, no waiting on storage
 })();
 </script>
 <script>if('serviceWorker' in navigator&&location.protocol!=='file:'){navigator.serviceWorker.register('/sw.js').catch(function(){});} // 装到手机桌面后离线也能打开（sw.js：网络优先，断网用上次的）</script>
-<script src="export.js?v=1"></script>
-<script src="saved-web.js?v=5"></script>
+<script src="export.js?v=2"></script>
+<script src="saved-web.js?v=6"></script>
 <script src="reader.js?v=3"></script>
-<script src="grammar.js?v=4"></script>
+<script src="grammar.js?v=5"></script>
 </body>
 </html>

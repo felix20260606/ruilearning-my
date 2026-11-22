@@ -7,6 +7,16 @@
   const $ = (s, r) => (r || document).querySelector(s);
   const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const LS = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+  // 本机缓存（字幕、翻译、查词）只留最近用过的那些：以前每看一个视频存一份（约 50KB）永不清理，存储满了生词本、练习记录都存不进去
+  //   key = 记最近顺序的列表，v = 这次用到的，n = 留几个，pre = 要跟着删的键前缀；第一次用时把以前留下的同类缓存都清掉
+  function wtKeep(key, v, n, pre) {
+    try {
+      let L = JSON.parse(localStorage.getItem(key) || "null");
+      if (!Array.isArray(L)) { L = []; for (let i = localStorage.length - 1; i >= 0; i--) { const k = localStorage.key(i); if (k && pre.some(p => k.startsWith(p)) && !pre.some(p => k === p + v)) localStorage.removeItem(k); } }
+      L = [v].concat(L.filter(x => x !== v)); const drop = L.slice(n); L = L.slice(0, n);
+      drop.forEach(x => pre.forEach(p => localStorage.removeItem(p + x))); localStorage.setItem(key, JSON.stringify(L));
+    } catch (e) {}
+  }
   const fmt = t => { t = Math.max(0, Math.floor(t)); const m = Math.floor(t / 60), s = t % 60; return (m >= 60 ? Math.floor(m / 60) + ":" + String(m % 60).padStart(2, "0") : m) + ":" + String(s).padStart(2, "0"); };
   const WORD = /[A-Za-z][A-Za-z'’-]*/g;
   const tip = m => { try { toast(m); } catch (e) {} };
@@ -318,7 +328,7 @@
     VS_MARKS = marks; VS_SAVED = saved;
     try { // 生词本里的掌握状态跟着变
       const e = (state.custom || []).find(x => x && String(x.word || "").toLowerCase() === k);
-      if (e && (m === "known" || m === "learn")) { state.progress = state.progress || {}; if (m === "known") state.progress[e.id] = "known"; else delete state.progress[e.id]; refresh(); save(state); loadBook(); }
+      if (e && (m === "known" || m === "learn")) { state.progress = state.progress || {}; state.progress[e.id] = m === "known" ? "known" : "learning"; /* 写 learning 不是删掉：带着修改时间才能盖过别处的「已掌握」 */ refresh(); save(state); loadBook(); }
     } catch (er) {}
     vsRedraw();
     try { await fetch("/api/ext", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ changes: ch }) }); } catch (er) { tip("没连上网络，标记只在这台设备生效"); }
@@ -615,7 +625,7 @@
     try { const r = await fetch(API + "?v=" + v); if (r.ok) d = await r.json(); } catch (e) { d = LS.get("wt:doc:" + v, null); }
     if (!doc || doc.v !== v) return;
     if (d && d.ok && d.cues && d.cues.length) {
-      d.cues = tidy(d.cues); doc = d; cues = d.cues; LS.set("wt:doc:" + v, d);
+      d.cues = tidy(d.cues); doc = d; cues = d.cues; LS.set("wt:doc:" + v, d); wtKeep("wt:recent", v, 15, ["wt:doc:", "wt:tr:"]);
       const tr = LS.get("wt:tr:" + v, {}); cues.forEach(c => { if (!c.r && tr[c.s]) c.r = tr[c.s]; });
       $("#wt-title").textContent = d.title || v; drawCues(); fillTrans(v);
     } else {
@@ -742,7 +752,7 @@
     if (!/\s/.test(k)) try {
       const r = await NET.fetch("https://api.dictionaryapi.dev/api/v2/entries/en/" + encodeURIComponent(k)); if (r.ok) { const j = await r.json(); const e = j[0] || {}; o.phon = e.phonetic || ((e.phonetics || []).find(p => p.text) || {}).text || ""; const d = ((e.meanings || [])[0] || {}).definitions; o.en = (d && d[0] && d[0].definition) || ""; }
     } catch (e) {}
-    if (o.zh.length) LS.set("wt:w:" + k, o);
+    if (o.zh.length) { LS.set("wt:w:" + k, o); wtKeep("wt:wl", k, 400, ["wt:w:"]); }
     return dc[k] = o;
   }
   const POS = { noun: "名", verb: "动", adjective: "形", adverb: "副", preposition: "介", pronoun: "代", conjunction: "连", interjection: "叹" };
@@ -771,11 +781,11 @@
     if (a === "mk") { const m = b.dataset.m; b.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b && !!m)); await vsSetMark(w, m); tip(w + " → " + ({ learn: "将要学习", known: "已掌握", ignore: "不学习", "": "恢复默认" })[m]); if (m === "learn") { const ab = $("#wt-sheet [data-a=add]"); if (ab && !ab.classList.contains("in")) ab.click(); } return; } // 将要学习 = 同时加进生词本
     if (a === "add") {
       if (b.classList.contains("in")) return;
-      const lw = w.toLowerCase(), g = await gword(w), id = "v_" + lw.replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+      const lw = w.toLowerCase(), g = await gword(w), id0 = "v_" + lw.replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""), id = window.freshId ? window.freshId(id0) : id0;
       const ex = sheetCtx ? [[sheetCtx.t.replace(/\s+/g, " ").replace(new RegExp("\\b(" + w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")\\b", "i"), "{$1}"), sheetCtx.r]] : [];
-      const entry = { id, type: /\s/.test(lw) ? "phrase" : "word", word: lw, phon: g.phon || "", en: g.en || "", zh: g.zh.slice(0, 4).join("；") || "(未查到，可手动补)", tag: "视频", date: new Date().toISOString().slice(0, 10), forms: [], examples: ex, tip: "" };
+      const entry = { id, type: /\s/.test(lw) ? "phrase" : "word", word: lw, phon: g.phon || "", en: g.en || "", zh: g.zh.slice(0, 4).join("；") || "(未查到，可手动补)", tag: "视频", date: window.ymdLocal ? window.ymdLocal() : new Date().toISOString().slice(0, 10), forms: [], examples: ex, tip: "" };
       try {
-        state.custom = state.custom || []; state.deleted = (state.deleted || []).filter(x => x !== id);
+        state.custom = state.custom || [];
         if (!state.custom.some(x => x && (x.id === id || String(x.word || "").toLowerCase() === lw))) state.custom.push(entry);
         refresh(); save(state); loadBook();
         b.classList.add("in"); b.textContent = "已在生词本"; tip("已加入生词本：" + lw);

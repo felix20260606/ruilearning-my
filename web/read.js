@@ -336,7 +336,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
 
   /* ---------- 我的文章（本机 localStorage） ---------- */
   const docs = () => { const L = LG(KEY, []); return Array.isArray(L) ? L.filter(d => d && d.id && typeof d.text === "string") : []; };
-  function saveDocs(L) { L = L.slice(0, MAX_DOCS); if (!LS(KEY, L)) { if (!LS(KEY, L.slice(0, 8))) tip("本机存储满了，这篇文章没存下来"); } } // 存不下时只留最近 8 篇
+  function saveDocs(L) { L = L.slice(0, MAX_DOCS); if (!LS(KEY, L)) { window.__mineKeepDel = 1; try { if (!LS(KEY, L.slice(0, 8))) tip("本机存储满了，这篇文章没存下来"); } finally { window.__mineKeepDel = 0; } } } // 存不下时本机只留最近 8 篇（少掉的不当成删除传上去：别的设备上还在）
   function remember(d) { const L = docs().filter(x => x.id !== d.id); L.unshift({ id: d.id, title: d.title, text: d.text, at: d.at, pos: d.pos || 0 }); saveDocs(L); }
   let posTimer = 0;
   function setPos(i) { if (!doc || doc.pos === i) return; doc.pos = i; clearTimeout(posTimer); posTimer = setTimeout(() => { const L = docs(), x = L.find(y => y.id === doc.id); if (x) { x.pos = doc.pos; saveDocs(L); } }, 800); }
@@ -524,7 +524,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
       const sm = t.closest("[data-si]"); if (sm) { sayOne(+sm.dataset.si); return; }
       if (t.closest(".ra-tr.err, .ra-ttr.err")) { const n = t.closest(".err"); n.textContent = "翻译中…"; n.classList.remove("err"); n.classList.add("ld"); fillTr(); return; }
       const b = t.closest("[data-a]"); if (!b) return; const a = b.dataset.a;
-      if (a === "del") { e.stopPropagation(); const L = docs(), d = L.find(x => x.id === b.dataset.id); if (!d || !confirm("删除「" + (d.title || "这篇文章") + "」？只删这台设备上的记录。")) return; saveDocs(L.filter(x => x.id !== d.id)); if (doc && doc.id === d.id) doc = null; draw(); return; }
+      if (a === "del") { e.stopPropagation(); const L = docs(), d = L.find(x => x.id === b.dataset.id); if (!d || !confirm("删除「" + (d.title || "这篇文章") + "」？换设备同步的记录也会一起删掉。")) return; saveDocs(L.filter(x => x.id !== d.id)); if (doc && doc.id === d.id) doc = null; draw(); return; }
       if (a === "open") { const d = docs().find(x => x.id === b.dataset.id); if (d) openDoc(d.text, d.title, d.id); return; }
       if (a === "news") { newsRead(); return; }
       if (a === "news-alt") { newsAlt(); return; }
