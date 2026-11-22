@@ -44,7 +44,9 @@ const path = require("path");
   const call = async p => { const r = await W.fetch(new Request("https://x.test" + p), env); return { status: r.status, j: await r.json() }; };
   let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); } };
 
-  let r = await call("/api/news?d=2026-11-21");
+  // 日期都按现在往前推（后台只认最近 30 天的日期，写死的日期过一个月就会被当成今天）：D1 = 北京时间昨天
+  const bjAgo = k => new Date(Date.now() + 8 * 3600e3 - k * 86400e3).toISOString().slice(0, 10), D1 = bjAgo(1);
+  let r = await call("/api/news?d=" + D1);
   ok(r.j.ok, "news ok " + JSON.stringify(r.j).slice(0, 200));
   ok(["https://www.bbc.co.uk/news/articles/long1", "https://www.theguardian.com/world/2026/nov/20/g1", "https://www.npr.org/2026/11/20/n1"].includes(r.j.url), "picked a long article, got " + r.j.url);
   ok(r.j.words >= 250, "words >= 250: " + r.j.words);
@@ -53,10 +55,10 @@ const path = require("path");
   ok(!r.j.list.some(x => /videos|\/old$/.test(x.u)), "no video / old items in list " + JSON.stringify(r.j.list.map(x => x.u)));
   ok(r.j.list.filter(x => /long1/.test(x.u)).length + (/long1/.test(r.j.url) ? 1 : 0) === 1, "duplicate (same title from NPR) removed");
   ok(!r.j.list.concat([{ u: r.j.url }]).some(x => /at_medium/.test(x.u)), "BBC tracking query stripped");
-  ok(kv.has("news/2026-11-21") && KV.lastOpt && KV.lastOpt.expirationTtl === 3 * 86400, "cached 3 days");
+  ok(kv.has("news/" + D1) && KV.lastOpt && KV.lastOpt.expirationTtl === 3 * 86400, "cached 3 days");
   const pick1 = r.j.url, c1 = calls;
-  r = await call("/api/news?d=2026-11-21"); ok(r.j.url === pick1 && calls === c1, "second call served from cache");
-  r = await call("/api/news?d=2026-11-21&fresh=1"); ok(r.j.ok && r.j.url === pick1 && calls > c1, "fresh re-picks deterministically for the same date");
+  r = await call("/api/news?d=" + D1); ok(r.j.url === pick1 && calls === c1, "second call served from cache");
+  r = await call("/api/news?d=" + D1 + "&fresh=1"); ok(r.j.ok && r.j.url === pick1 && calls > c1, "fresh re-picks deterministically for the same date");
   r = await call("/api/news?d=bad"); ok(r.j.ok && /^\d{4}-\d{2}-\d{2}$/.test(r.j.date), "bad date falls back to today");
   // readurl 还是原样工作（拆成 extractArticle 之后）
   r = await call("/api/readurl?url=" + encodeURIComponent("https://www.npr.org/2026/11/20/n1")); ok(r.j.ok && r.j.text.split(/\s+/).length >= 300 && r.j.title === "N1", "readurl ok");
@@ -66,8 +68,8 @@ const path = require("path");
   globalThis.fetch = async () => new Response("", { status: 500 });
   // 用一个不会是「今天」的日期：上面「bad date → 今天」那次已经把今天的缓存好了（以前写死 2026-11-22，到了 11 月 22 日这天就撞上，测试就一直失败）
   // 后台只认最近 30 天的日期（再早的当今天），所以用「北京时间前天」：上面没缓存过
-  // 还要避开上面写死缓存过的 2026-11-21（到了 11 月 23 日，「前天」正好是它）：从前天往前找第一个没用过的
-  let d2 = ""; for (let k = 2; k < 9; k++) { d2 = new Date(Date.now() + 8 * 3600e3 - k * 86400e3).toISOString().slice(0, 10); if (d2 !== "2026-11-21") break; }
+  // 前天：上面只缓存过昨天（D1）和今天
+  const d2 = bjAgo(2);
   r = await call("/api/news?d=" + d2); ok(r.status === 502 && !r.j.ok && !kv.has("news/" + d2), "no feeds → 502, not cached");
   const n0 = kv.size; r = await call("/api/news?d=2000-01-01"); ok(kv.size === n0 && !kv.has("news/2000-01-01"), "old date not stored as its own key");
   console.log(fail ? "t46 FAILED" : "t46 ok");
