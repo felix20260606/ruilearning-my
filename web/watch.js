@@ -436,10 +436,14 @@
     sheet.addEventListener("click", onSheet);
     // 右键单词（同插件、同阅读页）：本来的颜色 → 将要学习 → 已掌握 → 回到本来的颜色；手机长按也一样
     root.addEventListener("contextmenu", e => {
-      const w = e.target.closest(".wt-w[data-w]"); if (!w || !VS) return;
-      e.preventDefault(); e.stopPropagation(); const m = vsNextMark(w.dataset.w);
+      const w = e.target.closest(".wt-w[data-w]"); if (!w) return;
+      e.preventDefault(); e.stopPropagation();
+      if (window.WORD) { WORD.close(); WORD.cycle(w.dataset.w); return; } // 全站共用（word.js）
+      if (!VS) return; const m = vsNextMark(w.dataset.w);
       tip(w.dataset.w + " → " + ({ learn: "将要学习", known: "已掌握", ignore: "不学习", "": "恢复默认" })[m]); vsSetMark(w.dataset.w, m);
     });
+    // 别的页面 / 查词卡片里加了词、改了标记：字幕和字幕列表重新上色
+    document.addEventListener("word-change", () => { if (!doc || !cues.length) return; try { loadBook(); } catch (e) {} if (cur >= 0) showSub(cur); const top = listEl.scrollTop; drawCues(); listEl.scrollTop = top; const row = listEl.children[cur]; if (row && row.classList.contains("wt-row")) row.classList.add("cur"); });
     addEventListener("resize", fit);
     paintSet();
     return true;
@@ -745,6 +749,7 @@
   let sheetCtx = null;
   async function lookup(w, ci, el) {
     try { if (playing()) player.pauseVideo(); } catch (e) {}
+    { const c = cues[ci]; if (window.WORD) return WORD.open(w, el, { sent: c ? c.t : "", zh: c ? c.r || "" : "", showCtx: true }); } // 全站共用的查词卡片（word.js）；下面是没有 word.js 时的旧卡片
     sheetWord = w; const c = cues[ci], sheet = $("#wt-sheet"), st = statusOf(w);
     sheetCtx = c ? { t: c.t, r: c.r || "" } : null;
     const ctxHtml = c ? '<div class="x">' + esc(c.t).replace(new RegExp("\\b(" + w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")\\b", "i"), "<b>$1</b>") + "<span>" + esc(c.r || "") + "</span></div>" : "";

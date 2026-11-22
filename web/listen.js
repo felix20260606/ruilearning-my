@@ -502,7 +502,7 @@
     if (curW) { curW.classList.remove("on"); curW = null; }
     curK = k; const el = k >= 0 ? box.querySelector('[data-si="' + k + '"]') : null; if (!el) return; el.classList.add("cur");
     // 自动滚：在播、文稿在屏幕上、这句跑出屏幕了、最近 4 秒没自己滑动页面
-    if (noScroll || AU.paused || Date.now() - userScrollT < 4000 || !root.getClientRects().length || document.querySelector("#ra-pop.on")) return; // 查词框开着不滚（一滚它就关了）
+    if (noScroll || AU.paused || Date.now() - userScrollT < 4000 || !root.getClientRects().length || document.querySelector("#wd-pop.on")) return; // 查词框开着不滚（一滚它就关了）
     const r = el.getBoundingClientRect(), b = box.getBoundingClientRect(), H = window.innerHeight;
     if (b.bottom < 0 || b.top > H) return;
     const pl = root.querySelector(".sm-pl.stick"), lim = pl ? pl.getBoundingClientRect().bottom + 8 : 70; // 吸顶的播放器下面才算看得见
@@ -691,6 +691,13 @@
     if (root) return; root = document.getElementById("sme"); if (!root) return;
     const st = document.createElement("style"); st.textContent = CSS; document.head.append(st);
     flEl();
+    // 文稿里的词：全站共用的 word.js（点词查词卡片、右键循环标记，同看视频 / 插件）；标记 / 加词以后重新上色
+    if (window.WORD) WORD.bind(root, {
+      skip: el => !(trShow && EP && el.closest(".sm-tr")),
+      sent: el => { const sn = el.closest("[data-si]"), p = el.closest("[data-li]"); return (sn && TIM[EP.id] ? (TIM[EP.id][+sn.dataset.si] || {}).t : p ? (EP.lines[+p.dataset.li] || {}).t : "") || ""; },
+      quiet: () => !AU.paused,
+    });
+    document.addEventListener("word-change", () => { if (trShow && view === "ep" && root.getClientRects().length) { const y = window.scrollY; draw(); window.scrollTo(0, y); } });
     // 切标签（#sme 或外面的页面被藏起来）时把播放器挪进悬浮条
     const mo = new MutationObserver(() => sync());
     mo.observe(root, { attributes: true, attributeFilter: ["class"] }); mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "data-en", "data-mode"] });
@@ -715,13 +722,6 @@
     root.addEventListener("click", e => {
       const t = e.target, sp = trShow && EP && TIM[EP.id] && t.closest(".sm-tr [data-sp]");
       if (sp) { seekSent(+sp.dataset.sp); return; }
-      const wd = trShow && EP && t.closest(".sm-tr [data-w]");
-      if (wd) { // 点词查词（拖选文字不算点）
-        if (String(window.getSelection ? getSelection() : "").trim()) return;
-        const sn = wd.closest("[data-si]"), p = wd.closest("[data-li]"), sent = sn && TIM[EP.id] ? TIM[EP.id][+sn.dataset.si].t : p ? (EP.lines[+p.dataset.li] || {}).t : "";
-        if (window.readPop) window.readPop(wd.dataset.w, wd, { sent: sent || "", quiet: !AU.paused, onAdd: () => { const y = window.scrollY; draw(); window.scrollTo(0, y); } });
-        return;
-      }
       const sy = t.closest("[data-say]"); if (sy) { try { AU.pause(); speak(sy.dataset.say, { rate: 0.85 }); } catch (e) {} return; }
       const lq = t.closest("[data-lq]"); if (lq && EP) { lqPick(EP.id, +lq.dataset.lq, +lq.dataset.o); return; }
       const od = t.closest("[data-offdel]"); if (od) { if (confirm("删掉下载的这一期？（以后还能再下）")) offDel(od.dataset.offdel); return; }

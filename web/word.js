@@ -1,0 +1,174 @@
+/* 🔤 全站共用的单词操作（阅读、听力文稿、视频字幕、练习卡片、口语对话、练习课……都用这一套，和插件一致）
+   - 点词 → 查词卡片：音标、🔊、中文、英文释义、例句、这里的语法、单词注释、📌 将要学习 / ✅ 已掌握 / 🚫 不学习 / ↺ 恢复默认、＋ 加入生词本、Cambridge 链接
+     电脑上贴着单词弹出，手机上从底部弹出；点外面 / Esc / 滚动（电脑）关掉
+   - 右键（手机长按）单词：本来的颜色 → 将要学习（带框）→ 已掌握（白色）→ 回到本来的颜色；本来就是白色的词只在「白色 / 带框」之间切换
+   - 加进生词本 = 同时标「将要学习」；标记写回 /api/ext（插件同步过去）和生词本的掌握状态（watch.js 的 window.__vs.setMark）
+   - 标记 / 加词以后发 document 事件「word-change」{w, m}，各页面自己重新上色
+   用法：
+     WORD.bind(容器, { sent(el) → 这个词所在的句子, quiet() → true 时点词不自动朗读, onOpen(w, el) 打开卡片前（比如暂停视频）, onAdd(w) })
+       容器里带 data-w="词" 的元素都按这一套处理（点词 + 右键）；一个容器只 bind 一次
+     WORD.open(词, 元素, { sent, quiet, onAdd })、WORD.close()、WORD.mark(词, "learn"|"known"|"ignore"|"")
+     WORD.status(词) → "kn" 已掌握 / "lr" 在学 / ""（按原形匹配生词本，收了 go，went / goes 也算）；WORD.loadBook() 生词本变了以后重读
+   旧接口照旧能用：window.readPop(词, 元素, opt)、window.readBook(reload) → status 函数（听力文稿上色用）
+   依赖 index.html 的全局：words（生词本）、speak、toast、window.vocabAddWord(词, 例句)、window.dictGet（查词，没有就直接 /api/dict）；watch.js 的 window.__vs */
+(function () {
+  "use strict";
+  if (window.WORD) return;
+  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const tip = m => { try { toast(m); } catch (e) {} };
+  const say = t => { try { speak(t); } catch (e) {} };
+  const reEsc = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const isSheet = () => { try { return matchMedia("(max-width: 600px)").matches; } catch (e) { return innerWidth <= 600; } };
+  const V = () => window.__vs || null, vsOk = () => !!(V() && V().ready && V().ready());
+  const vsLoad = () => { try { return V() && V().load ? V().load() : Promise.resolve(); } catch (e) { return Promise.resolve(); } };
+
+  const CSS = `
+  #wd-mask{position:fixed;inset:0;z-index:8990;background:rgba(0,0,0,.45);display:none}#wd-mask.on{display:block}
+  #wd-pop{position:fixed;z-index:9000;display:none;width:340px;max-width:calc(100vw - 16px);max-height:60vh;overflow:auto;background:var(--ui-surface,#26282c);border:1px solid var(--ui-line-2,#454950);border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.45);padding:12px 14px;color:var(--ui-ink,#eee);font-family:var(--ui-font,system-ui);text-align:left}
+  #wd-pop.on{display:block}
+  #wd-pop.sheet{left:0!important;right:0;top:auto!important;bottom:0;width:auto;max-width:none;max-height:72vh;border-radius:18px 18px 0 0;border-bottom:0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px))}
+  #wd-pop .hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap}#wd-pop .hd b{font-size:22px}#wd-pop .hd .ph{color:var(--ui-muted);font-size:14px}
+  #wd-pop .hd button{border:0;background:var(--ui-surface-2,#2d2f34);color:var(--ui-ink-2);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:15px}#wd-pop .hd .x{margin-left:auto;background:none}
+  #wd-pop .mk{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}#wd-pop .mk button{flex:1 1 auto;min-height:36px;border-radius:9px;border:1px solid var(--ui-line-2,#454950);background:var(--ui-surface-2,#2d2f34);color:var(--ui-ink,#eee);font:inherit;font-size:13px;cursor:pointer;padding:0 8px}
+  #wd-pop .mk button.on{background:var(--ui-pur,#9C3FD0);border-color:var(--ui-pur,#9C3FD0);color:#fff}#wd-pop .vs-wns{margin-top:8px}
+  #wd-pop .zh{margin-top:8px;font-size:16.5px;font-weight:700;line-height:1.5}#wd-pop .en{margin-top:6px;color:var(--ui-ink-2);font-size:14px;line-height:1.55}
+  #wd-pop .ld{margin-top:8px;color:var(--ui-muted);font-size:14px}
+  #wd-pop .ex{display:flex;gap:8px;align-items:flex-start;margin-top:8px;background:var(--ui-surface-2,#2d2f34);border-radius:10px;padding:8px 10px;font-size:14px;line-height:1.5}#wd-pop .ex small{display:block;color:var(--ui-muted);font-size:12.5px}
+  #wd-pop .ex button{flex:0 0 auto;border:0;background:none;cursor:pointer;padding:0;font-size:13px;line-height:1.5}
+  #wd-pop .ctx{margin-top:8px;font-size:13.5px;line-height:1.55;color:var(--ui-ink-2);border-left:3px solid var(--ui-pur-line,#6d3a8f);padding-left:8px}#wd-pop .ctx b{color:var(--ui-ink)}#wd-pop .ctx small{display:block;color:var(--ui-muted)}
+  #wd-pop .gm{margin-top:8px;font-size:13px;color:#9cc8ff}
+  #wd-pop .act{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}#wd-pop .act .ui-btn{flex:1 1 auto}#wd-pop .act .ui-btn.in{background:var(--ui-surface-2);border-color:var(--ui-line-2);color:var(--ui-muted);cursor:default}
+  #wd-pop .act a{font-size:13px;white-space:nowrap;color:var(--ui-pur-text)}
+  @media(max-width:600px){#wd-pop .act .ui-btn{min-height:46px}}`;
+
+  /* ---------- 生词本状态（按原形匹配；规则同插件 web/vs/vlevel.js 的 vsKeys） ---------- */
+  function stems(w) { const o = [w]; if (/ies$/.test(w)) o.push(w.slice(0, -3) + "y"); if (/(es|ed)$/.test(w)) o.push(w.slice(0, -2), w.slice(0, -1)); if (/s$/.test(w)) o.push(w.slice(0, -1)); if (/ing$/.test(w)) o.push(w.slice(0, -3), w.slice(0, -3) + "e"); if (/(.)\1(ed|ing)$/.test(w)) o.push(w.replace(/(.)\1(ed|ing)$/, "$1")); return o; }
+  const keysOf = w => { try { if (typeof vsKeys === "function") return [w].concat(vsKeys(w)); } catch (e) {} return stems(w); };
+  const lemma = w => { try { return typeof vsLemma === "function" ? vsLemma(w) : w; } catch (e) { return w; } };
+  let book = new Map(), bookK = null;
+  function loadBook() {
+    book = new Map(); bookK = null;
+    try { (typeof words !== "undefined" ? words : []).forEach(w => { const k = String(w.word || "").toLowerCase().replace(/[{}]/g, "").replace(/’/g, "'").trim(); if (k && (!book.has(k) || w.status === "known")) book.set(k, w.status === "known" ? "kn" : "lr"); }); } catch (e) {}
+  }
+  function bookIdx() { if (!bookK || bookK.fn !== typeof vsKeys) { bookK = new Map(); bookK.fn = typeof vsKeys; book.forEach((v, k) => keysOf(k).forEach(q => { if (!bookK.has(q) || v === "kn") bookK.set(q, v); })); } return bookK; }
+  function status(w) {
+    w = String(w || "").toLowerCase().replace(/’/g, "'"); if (!w) return "";
+    if (!book.size) loadBook();
+    const B = bookIdx(); for (const s of keysOf(w)) if (B.has(s)) return B.get(s);
+    return "";
+  }
+
+  /* ---------- 查词（/api/dict 或 index.html 的 dictGet；变形查不到用原形再查） ---------- */
+  const DC = new Map();
+  async function dict(w) {
+    const k = w.toLowerCase(); if (DC.has(k)) return DC.get(k);
+    const get = async q => { try { if (window.dictGet) return await window.dictGet(q); const r = await fetch("/api/dict?w=" + encodeURIComponent(q)); if (!r.ok) return null; const j = await r.json(); return j && j.ok ? j : null; } catch (e) { return null; } };
+    let j = await get(k); const l = lemma(k); if (!j && l && l !== k) j = await get(l);
+    if (j) DC.set(k, j); return j;
+  }
+
+  /* ---------- 查词卡片 ---------- */
+  let pop = null, mask = null, req = 0, pWord = "", pSent = "", pEl = null, pOpt = null;
+  function build() {
+    if (pop) return;
+    const st = document.createElement("style"); st.textContent = CSS; document.head.append(st);
+    mask = document.createElement("div"); mask.id = "wd-mask"; mask.onclick = close;
+    pop = document.createElement("div"); pop.id = "wd-pop"; pop.setAttribute("role", "dialog");
+    document.body.append(mask, pop);
+    pop.addEventListener("click", e => {
+      const b = e.target.closest("[data-a]"); if (!b) return; const a = b.dataset.a;
+      if (a === "px") close(); else if (a === "psay") say(b.dataset.t || pWord); else if (a === "padd") addWord(b);
+      else if (a === "mk") { const m = b.dataset.m; b.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b && !!m)); mark(pWord, m); }
+    });
+    // 点卡片外面关掉（点的是另一个词就换成那个词）；Esc 关；电脑上滚动就关（贴着单词的位置不对了）
+    document.addEventListener("click", e => { if (pop.classList.contains("on") && !pop.contains(e.target) && !(pEl && pEl.contains(e.target)) && !e.target.closest("[data-w]")) close(); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape" && pop.classList.contains("on")) { close(); e.stopPropagation(); } }, true);
+    window.addEventListener("scroll", () => { if (pop.classList.contains("on") && !pop.classList.contains("sheet")) close(); }, { passive: true });
+    window.addEventListener("resize", place);
+  }
+  function place() {
+    if (!pop || !pop.classList.contains("on")) return;
+    const sh = isSheet(); pop.classList.toggle("sheet", sh); mask.classList.toggle("on", sh);
+    if (sh || !pEl || !pEl.isConnected) { if (!sh) { pop.style.left = Math.max(8, (innerWidth - pop.offsetWidth) / 2) + "px"; pop.style.top = "80px"; } return; }
+    const r = pEl.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight;
+    let left = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), innerWidth - w - 8), top = r.bottom + 8;
+    if (top + h > innerHeight - 8 && r.top - h - 8 > 8) top = r.top - h - 8; // 下面放不下就放到上面
+    pop.style.left = left + "px"; pop.style.top = Math.max(8, Math.min(top, innerHeight - h - 8)) + "px";
+  }
+  function addBtn(w) {
+    const st = status(w);
+    return st ? '<button class="ui-btn in" disabled>' + (st === "kn" ? "已在生词本（已掌握）" : "已在生词本") + "</button>" : '<button class="ui-btn pri" data-a="padd">＋ 加入生词本</button>';
+  }
+  function html(w, d, loading) {
+    const word = (d && d.word) || w, cam = "https://dictionary.cambridge.org/dictionary/english-chinese-simplified/" + encodeURIComponent(word.toLowerCase());
+    const g = pEl && typeof VS_GRAM_NAME !== "undefined" ? [...pEl.classList].filter(c => /^g-/.test(c)).map(c => VS_GRAM_NAME[c.slice(2)]).filter(Boolean) : [];
+    let h = '<div class="hd"><b>' + esc(word) + "</b>" + (d && d.phon ? '<span class="ph">' + esc(d.phon) + "</span>" : "") + '<button data-a="psay" data-t="' + esc(word) + '" title="朗读">🔊</button><button class="x" data-a="px" title="关闭">✕</button></div>';
+    if (loading) h += '<div class="ld">查询中…</div>';
+    else if (d) {
+      const zh = (Array.isArray(d.zh) ? d.zh.join("；") : d.zh || "") + (Array.isArray(d.zhs) && d.zhs.length ? "（" + d.zhs.map(x => (x.pos ? x.pos + " " : "") + (x.terms || []).slice(0, 3).join("、")).join("；") + "）" : "");
+      const en = Array.isArray(d.en) ? d.en.slice(0, 3).map(x => typeof x === "string" ? x : (x.pos ? "(" + x.pos + ") " : "") + (x.def || "")).join("; ") : d.en || ""; // /api/dict：en 是 [{pos, def, ex}]
+      if (zh) h += '<div class="zh">' + esc(zh) + "</div>"; if (en) h += '<div class="en">' + esc(en) + "</div>";
+      (Array.isArray(d.examples) ? d.examples : []).filter(x => x && x[0]).slice(0, 2).forEach(x => { h += '<div class="ex"><button data-a="psay" data-t="' + esc(x[0]) + '" title="朗读例句">🔊</button><div>' + esc(x[0]) + (x[1] ? "<small>" + esc(x[1]) + "</small>" : "") + "</div></div>"; });
+    } else h += '<div class="ld">（没查到释义）</div>';
+    if (!loading) {
+      if (pSent && pOpt && pOpt.showCtx) h += '<div class="ctx">' + esc(pSent).replace(new RegExp("(^|[^\\p{L}])(" + reEsc(esc(w)) + ")(?![\\p{L}])", "iu"), "$1<b>$2</b>") + (pOpt.zh ? "<small>" + esc(pOpt.zh) + "</small>" : "") + "</div>";
+      const extra = vsOk() && V().sheetExtra ? V().sheetExtra(word, pEl) : ""; // 语法、单词注释、📌 将要学习 / ✅ 已掌握 / 不学习（同插件）
+      if (extra) h += extra; else if (g.length) h += '<div class="gm">这里的语法：' + esc(g.join(" · ")) + "</div>";
+    }
+    return h + '<div class="act">' + (loading ? "" : addBtn(word)) + '<a href="' + cam + '" target="_blank" rel="noopener">Cambridge 词典 ↗</a></div>';
+  }
+  async function open(w, el, opt) { // opt：{ sent 例句, zh 例句的中文, quiet 不自动读, onAdd(词), showCtx 卡片里显示这句 }
+    build(); w = String(w || "").replace(/’/g, "'").trim(); if (!w) return;
+    const my = ++req; pWord = w; pEl = el || null; pOpt = opt || {}; pSent = pOpt.sent ? String(pOpt.sent) : "";
+    pop.innerHTML = html(w, null, true); pop.classList.add("on"); place();
+    if (!pOpt.quiet) say(w);
+    const [d] = await Promise.all([dict(w), vsLoad()]); if (my !== req || !pop.classList.contains("on")) return;
+    pop.innerHTML = html(w, d, false); place();
+  }
+  function close() { if (!pop) return; req++; pWord = ""; pEl = null; pop.classList.remove("on", "sheet"); mask.classList.remove("on"); }
+  const changed = (w, m) => { try { document.dispatchEvent(new CustomEvent("word-change", { detail: { w, m } })); } catch (e) {} };
+  function addWord(b) {
+    const d = DC.get(pWord.toLowerCase()), w = String((d && d.word) || pWord).toLowerCase(), f = window.vocabAddWord, cb = pOpt && pOpt.onAdd;
+    if (typeof f !== "function") { tip("生词本还没准备好，暂时加不了"); return; }
+    b.disabled = true; b.textContent = "加入中…";
+    let r; try { r = f(w, pSent); } catch (e) { r = Promise.reject(e); }
+    Promise.resolve(r).then(res => {
+      if (res === false) { b.disabled = false; b.textContent = "＋ 加入生词本"; return; }
+      b.className = "ui-btn in"; b.textContent = "已在生词本";
+      if (vsOk() && V().markOf(w) !== "learn") { V().setMark(w, "learn"); const lb = pop && pop.querySelector("[data-m=learn]"); if (lb) lb.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === lb)); } // 加进生词本 = 将要学习
+      setTimeout(() => { loadBook(); if (book.size && !status(w)) book.set(w, "lr"); bookK = null; changed(w, "learn"); if (cb) try { cb(w); } catch (e) {} }, 300);
+    }).catch(() => { b.disabled = false; b.textContent = "＋ 加入生词本"; tip("加入失败，请再试一次"); });
+  }
+  const MK_NAME = { learn: "将要学习", known: "已掌握", ignore: "不学习", "": "恢复默认" };
+  async function mark(w, m, toastIt) {
+    await vsLoad(); if (!(V() && V().setMark)) { tip("标记功能还没加载好"); return; }
+    if (toastIt) tip(w + " → " + MK_NAME[m || ""]);
+    try { await V().setMark(w, m || ""); } catch (e) {}
+    loadBook(); changed(w, m || "");
+  }
+  function cycle(w) { // 右键：按插件的规则换到下一个标记
+    w = String(w || "").replace(/’/g, "'"); if (!w) return;
+    vsLoad().then(() => { if (!(V() && V().next)) return; mark(w, V().next(w), true); });
+  }
+
+  /* ---------- 绑到页面上：容器里带 data-w 的都按这一套 ---------- */
+  function bind(box, o) {
+    if (!box || box.__word) return; box.__word = 1; o = o || {};
+    box.addEventListener("click", e => {
+      const el = e.target.closest("[data-w]"); if (!el || !box.contains(el) || (o.skip && o.skip(el))) return;
+      if (String(window.getSelection ? getSelection() : "").trim()) return; // 拖选文字不算点词
+      e.stopPropagation(); e.preventDefault();
+      if (o.onOpen) try { o.onOpen(el.dataset.w, el); } catch (er) {}
+      open(el.dataset.w, el, { sent: o.sent ? o.sent(el) : "", zh: o.zh ? o.zh(el) : "", quiet: o.quiet ? !!o.quiet(el) : false, onAdd: o.onAdd, showCtx: !!o.showCtx });
+    }, true);
+    box.addEventListener("contextmenu", e => {
+      const el = e.target.closest("[data-w]"); if (!el || !box.contains(el) || (o.skip && o.skip(el))) return;
+      e.preventDefault(); e.stopPropagation(); close(); cycle(el.dataset.w);
+    }, true);
+  }
+
+  window.WORD = { bind, open, close, mark, cycle, status, loadBook, dict, get openWord() { return pWord; } };
+  // 旧接口（read.js / listen.js 以前用的）
+  window.readPop = (w, el, opt) => open(w, el, opt || {});
+  window.readBook = reload => { if (reload || !book.size) loadBook(); if (typeof vsKeys !== "function") vsLoad(); return status; };
+})();

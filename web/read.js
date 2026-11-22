@@ -200,22 +200,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
   #reading .vs-w.g-pa{text-decoration:underline solid #5BB0FF 2px}#reading .vs-w.g-pf{text-decoration:underline double #35D0BA 2px}#reading .vs-w.g-pg{text-decoration:underline wavy #8EE05A 2px}#reading .vs-w.g-md{text-decoration:underline dashed #FF8FC7 2px}#reading .vs-w.g-pv{text-decoration:underline solid #FF7A59 3.5px}#reading .vs-w.g-s3{text-decoration:underline dotted #5BB0FF 2.5px}#reading .vs-w.g-pl{text-decoration:underline dotted #B0B7C0 2.5px}#reading .vs-w.g-art{text-decoration:underline dotted #E8D36B 2.5px}#reading .vs-w.g-cmp{text-decoration:underline dashed #C9A0FF 2px}#reading .vs-w.g-neg{box-shadow:inset 0 2px 0 #FF5C5C}
   #reading .vs-w.vs-ph{background:rgba(255,226,140,.13);box-shadow:inset 0 1.5px 0 #E9CF8A,inset 0 -1.5px 0 #E9CF8A;border-radius:0;padding:0 2px}#reading .vs-w.vs-ph.ph-s{border-radius:5px 0 0 5px;box-shadow:inset 0 1.5px 0 #E9CF8A,inset 0 -1.5px 0 #E9CF8A,inset 1.5px 0 0 #E9CF8A}#reading .vs-w.vs-ph.ph-e{border-radius:0 5px 5px 0;box-shadow:inset 0 1.5px 0 #E9CF8A,inset 0 -1.5px 0 #E9CF8A,inset -1.5px 0 0 #E9CF8A}
   #reading .vs-w.ra-lr{background:var(--ui-pur-soft,rgba(156,63,208,.18));box-shadow:0 0 0 2px var(--ui-pur-soft,rgba(156,63,208,.18));border-radius:4px}
-  /* 点词弹窗：电脑上贴着单词，手机上从底部弹出 */
-  #ra-mask{position:fixed;inset:0;z-index:8990;background:rgba(0,0,0,.45);display:none}#ra-mask.on{display:block}
-  #ra-pop{position:fixed;z-index:9000;display:none;width:340px;max-width:calc(100vw - 16px);max-height:60vh;overflow:auto;background:var(--ui-surface,#26282c);border:1px solid var(--ui-line-2,#454950);border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.5);padding:14px 16px;color:var(--ui-ink,#E6E8EB);font-family:var(--ui-font);overflow-wrap:anywhere}#ra-pop.on{display:block}
-  #ra-pop.sheet{left:0!important;right:0;top:auto!important;bottom:0;width:auto;max-width:none;max-height:72vh;border-radius:18px 18px 0 0;border-bottom:0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px))}
-  #ra-pop .hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap}#ra-pop .hd b{font-size:22px}#ra-pop .hd .ph{color:var(--ui-muted);font-size:14px}
-  #ra-pop .hd button{border:0;background:var(--ui-surface-2,#2d2f34);color:var(--ui-ink-2);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:15px}#ra-pop .hd .x{margin-left:auto;background:none;color:var(--ui-muted);font-size:18px}
-  #ra-pop .mk{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}#ra-pop .mk button{flex:1 1 auto;min-height:36px;border-radius:9px;border:1px solid var(--ui-line-2,#454950);background:var(--ui-surface-2,#2d2f34);color:var(--ui-ink,#eee);font:inherit;font-size:13px;cursor:pointer;padding:0 8px}
-  #ra-pop .mk button.on{background:var(--ui-pur,#9C3FD0);border-color:var(--ui-pur,#9C3FD0);color:#fff}#ra-pop .vs-wns{margin-top:8px}
-  #ra-pop .zh{margin-top:8px;font-size:16.5px;font-weight:700;line-height:1.5}#ra-pop .en{margin-top:6px;color:var(--ui-ink-2);font-size:14px;line-height:1.55}
-  #ra-pop .ld{margin-top:8px;color:var(--ui-muted);font-size:14px}
-  #ra-pop .ex{display:flex;gap:8px;align-items:flex-start;margin-top:8px;background:var(--ui-surface-2,#2d2f34);border-radius:10px;padding:8px 10px;font-size:14px;line-height:1.5}#ra-pop .ex small{display:block;color:var(--ui-muted);font-size:13px}
-  #ra-pop .ex button{flex:0 0 auto;border:0;background:none;cursor:pointer;padding:0;font-size:13px;line-height:1.5}
-  #ra-pop .gm{margin-top:8px;font-size:13px;color:#9cc8ff}
-  #ra-pop .act{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}#ra-pop .act .ui-btn{flex:1 1 auto}#ra-pop .act .ui-btn.in{background:var(--ui-surface-2);border-color:var(--ui-line-2);color:var(--ui-muted);cursor:default}
-  #ra-pop .act a{font-size:13px;white-space:nowrap}
-  @media(max-width:600px){.ra-body{font-size:18.5px;line-height:1.9}.ra-title{font-size:22px}.ra-nums label{margin-left:0;width:100%}.ra-nums select{flex:1 1 auto;max-width:none}#ra-pop .act .ui-btn{min-height:46px}}
+  @media(max-width:600px){.ra-body{font-size:18.5px;line-height:1.9}.ra-title{font-size:22px}.ra-nums label{margin-left:0;width:100%}.ra-nums select{flex:1 1 auto;max-width:none}}
   .toast{z-index:9700!important}`;
 
   let quiet = 0, root = null, view = "home", doc = null, P = { paras: [], sents: [] }, draft = "", urlDraft = "", msg = "", msgOk = false, fetching = false;
@@ -265,21 +250,11 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
   function trHtml(k, cls) { const t = doc ? trGet(doc.id)[k] : null; return '<div class="' + cls + (t == null ? " ld" : "") + '" data-p="' + k + '">' + (t == null ? "翻译中…" : esc(t)) + "</div>"; }
 
   /* ---------- 生词本状态（words：已掌握 known / 在学 learning） ---------- */
-  let book = new Map();
-  function loadBook() {
-    book = new Map(); bookK = null;
-    try { (typeof words !== "undefined" ? words : []).forEach(w => { const k = String(w.word || "").toLowerCase().replace(/[{}]/g, "").replace(/’/g, "'").trim(); if (k && (!book.has(k) || w.status === "known")) book.set(k, w.status === "known" ? "kn" : "lr"); }); } catch (e) {}
-  }
-  // 生词本按原形建索引：收了 go，went / goes / going 也算；收了 bigger，big 也算（规则同插件：web/vs/vlevel.js 的 vsKeys，含不规则变化表；还没加载时退回简单去词尾）
-  let bookK = null;
-  const keysOf = w => { try { if (typeof vsKeys === "function") return [w].concat(vsKeys(w)); } catch (e) {} return stems(w); };
-  function bookIdx() { if (!bookK || bookK.fn !== typeof vsKeys) { bookK = new Map(); bookK.fn = typeof vsKeys; book.forEach((v, k) => keysOf(k).forEach(q => { if (!bookK.has(q) || v === "kn") bookK.set(q, v); })); } return bookK; }
+  // 生词本状态（已掌握 kn / 在学 lr，按原形匹配）：全站共用 word.js 的 WORD.status
+  function loadBook() { if (window.WORD) WORD.loadBook(); }
+  const bookStatus = w => (window.WORD ? WORD.status(w) : "");
   const lemma = w => { try { return typeof vsLemma === "function" ? vsLemma(w) : w; } catch (e) { return w; } };
-  function bookStatus(w) {
-    w = String(w || "").toLowerCase().replace(/’/g, "'"); if (!w) return "";
-    const B = bookIdx(); for (const s of keysOf(w)) if (B.has(s)) return B.get(s);
-    return "";
-  }
+
 
   /* ---------- 上色：和视频字幕同一套（web/vs/ 的 vsMark + vsGramHtml） ---------- */
   // 加载 vs/ 模块：优先用 watch.js 的 window.__vs.load()（顺便把插件标记、生词本合进 VS_MARKS）；没有视频页就自己加载那几个文件
@@ -460,8 +435,6 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
       '<div class="ra-row"><button class="ui-btn" data-a="sw">' + (isS ? "📰 看原文" : "✨ 看简单版") + "</button></div></div>";
   }
   // 给别的页面用（📻 BBC 听力的文稿）：点词弹同一个查词框；生词本里这个词的状态（"lr" 在学 / "kn" 已掌握 / ""）；一段文字的生词率
-  window.readPop = (w, el, opt) => { init(); if (!book.size) loadBook(); openPop(w, el, null, opt || {}); };
-  window.readBook = reload => { if (reload || !book.size) loadBook(); if (typeof vsKeys !== "function") ensureVs(); return bookStatus; }; // BBC 文稿（listen.js）也用：顺手加载 vs/（不规则变化表），加载完下次重画就按原形标
   window.readTextDiff = async text => { init(); loadBook(); await ensureVs(); const sv = P; P = parse(String(text || "")); try { const a = analyze(); return { ready: a.ready, n: a.n, unkN: a.unkN, rate: a.rate, unk: a.unk.length, level: effLevel() }; } finally { P = sv; } };
   window.readingOpen = (text, title, id) => { init(); if (!root) return; openDoc(text, title, id); }; // 别的页面（📻 6 分钟英语的文稿）在阅读里打开一篇
   window.readingNews = () => { newsLoad(); if (NEWS) newsRead(); else newsOpenAfter = true; }; // 还没取到：取到后自动打开 // 「📅 每日一练」的「读」可以直接打开今天这篇
@@ -522,86 +495,13 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
   // 屏幕上第一句看得见的句子（全文朗读从这里开始；滚动时记进度）
   function firstVisible() { const L = root.querySelectorAll(".ra-s"); for (const el of L) if (el.getBoundingClientRect().bottom > 90) return +el.dataset.i; return 0; }
 
-  /* ---------- 点词弹窗 ---------- */
-  let pop = null, mask = null, popReq = 0, popWord = "", popSent = "", popEl = null, popOpt = null;
-  const DC = new Map();
-  async function dict(w) {
-    const k = w.toLowerCase(); if (DC.has(k)) return DC.get(k);
-    const get = async q => { try { if (window.dictGet) return await window.dictGet(q); const r = await fetch("/api/dict?w=" + encodeURIComponent(q)); if (!r.ok) return null; const j = await r.json(); return j && j.ok ? j : null; } catch (e) { return null; } }; // dictGet（index.html）：后台没拿到中文时浏览器自己补
-    let j = await get(k); const l = lemma(k); if (!j && l && l !== k) j = await get(l); // 变形查不到时用原形再查一次
-    if (j) DC.set(k, j); return j;
+  /* ---------- 点词：全站共用的 word.js（点词查词卡片、右键循环标记，和看视频 / 插件一样） ---------- */
+  const closePop = () => { if (window.WORD) WORD.close(); };
+  function sentOf(el) { // 这个词所在的句子（生词清单里的词：文章里第一句有它的）
+    const w = String(el.dataset.w || "").replace(/’/g, "'"), re = new RegExp("(^|[^\\p{L}])" + reEsc(w) + "(?![\\p{L}])", "iu");
+    const s = el.closest(".ra-s"), si = s ? +s.dataset.i : el.dataset.si != null ? +el.dataset.si : null;
+    return si != null && P.sents[si] && re.test(P.sents[si]) ? P.sents[si] : P.sents.find(x => re.test(x)) || "";
   }
-  function buildPop() {
-    if (pop) return;
-    mask = document.createElement("div"); mask.id = "ra-mask"; mask.onclick = closePop;
-    pop = document.createElement("div"); pop.id = "ra-pop"; pop.setAttribute("role", "dialog");
-    document.body.append(mask, pop);
-    pop.addEventListener("click", e => {
-      const b = e.target.closest("[data-a]"); if (!b) return; const a = b.dataset.a;
-      if (a === "px") closePop(); else if (a === "psay") say(b.dataset.t || popWord); else if (a === "padd") addWord(b);
-      else if (a === "mk") { const m = b.dataset.m; b.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b && !!m)); markWord(popWord, m); }
-    });
-  }
-  function placePop() {
-    if (!pop || !pop.classList.contains("on")) return;
-    const sh = isSheet(); pop.classList.toggle("sheet", sh); mask.classList.toggle("on", sh);
-    if (sh || !popEl || !popEl.isConnected) { if (!sh) { pop.style.left = Math.max(8, (innerWidth - pop.offsetWidth) / 2) + "px"; pop.style.top = "80px"; } return; }
-    const r = popEl.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight;
-    let left = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), innerWidth - w - 8), top = r.bottom + 8;
-    if (top + h > innerHeight - 8 && r.top - h - 8 > 8) top = r.top - h - 8; // 下面放不下就放到上面
-    pop.style.left = left + "px"; pop.style.top = Math.max(8, Math.min(top, innerHeight - h - 8)) + "px";
-  }
-  function addBtn(w) {
-    const st = bookStatus(w);
-    return st ? '<button class="ui-btn in" disabled>' + (st === "kn" ? "已在生词本（已掌握）" : "已在生词本") + "</button>" : '<button class="ui-btn pri" data-a="padd">＋ 加入生词本</button>';
-  }
-  function popHtml(w, d, loading) {
-    const word = (d && d.word) || w, cam = "https://dictionary.cambridge.org/dictionary/english-chinese-simplified/" + encodeURIComponent(word.toLowerCase());
-    const g = popEl && typeof VS_GRAM_NAME !== "undefined" ? [...popEl.classList].filter(c => /^g-/.test(c)).map(c => VS_GRAM_NAME[c.slice(2)]).filter(Boolean) : [];
-    let h = '<div class="hd"><b>' + esc(word) + "</b>" + (d && d.phon ? '<span class="ph">' + esc(d.phon) + "</span>" : "") + '<button data-a="psay" data-t="' + esc(word) + '" title="朗读">🔊</button><button class="x" data-a="px" title="关闭">✕</button></div>';
-    if (loading) h += '<div class="ld">查询中…</div>';
-    else if (d) {
-      const zh = (Array.isArray(d.zh) ? d.zh.join("；") : d.zh) + (Array.isArray(d.zhs) && d.zhs.length ? "（" + d.zhs.map(x => (x.pos ? x.pos + " " : "") + (x.terms || []).slice(0, 3).join("、")).join("；") + "）" : ""), en = Array.isArray(d.en) ? d.en.slice(0, 3).map(x => typeof x === "string" ? x : (x.pos ? "(" + x.pos + ") " : "") + (x.def || "")).join("; ") : d.en; // /api/dict：en 是 [{pos, def, ex}]，zhs 是各词性的中文
-      if (zh) h += '<div class="zh">' + esc(zh) + "</div>"; if (en) h += '<div class="en">' + esc(en) + "</div>";
-      (Array.isArray(d.examples) ? d.examples : []).filter(x => x && x[0]).slice(0, 2).forEach(x => { h += '<div class="ex"><button data-a="psay" data-t="' + esc(x[0]) + '" title="朗读例句">🔊</button><div>' + esc(x[0]) + (x[1] ? "<small>" + esc(x[1]) + "</small>" : "") + "</div></div>"; });
-      const V = window.__vs, extra = V && V.ready && V.ready() && V.sheetExtra ? V.sheetExtra(word, popEl) : ""; // 同看视频的查词卡片：语法、单词注释、📌 将要学习 / ✅ 已掌握 / 不学习
-      if (extra) h += extra; else if (g.length) h += '<div class="gm">这里的语法：' + esc(g.join(" · ")) + "</div>";
-    }
-    return h + '<div class="act">' + (loading ? "" : addBtn(word)) + '<a href="' + cam + '" target="_blank" rel="noopener">Cambridge 词典 ↗</a></div>';
-  }
-  async function openPop(w, el, si, opt) { // opt（别的页面用）：{ sent: 例句, quiet: 不自动读, onAdd(词) }
-    buildPop(); w = String(w || "").replace(/’/g, "'"); if (!w) return;
-    const req = ++popReq; popWord = w; popEl = el; popOpt = opt || null;
-    const re = new RegExp("(^|[^\\p{L}])" + reEsc(w) + "(?![\\p{L}])", "iu");
-    popSent = opt && opt.sent != null ? String(opt.sent) : si != null && P.sents[si] && re.test(P.sents[si]) ? P.sents[si] : P.sents.find(s => re.test(s)) || "";
-    pop.innerHTML = popHtml(w, null, true); pop.classList.add("on"); placePop();
-    if (!tts && !(opt && opt.quiet)) say(w);
-    const d = await dict(w); if (req !== popReq || !pop.classList.contains("on")) return;
-    pop.innerHTML = popHtml(w, d, false); placePop(); // 查不到：只剩单词、朗读、加入生词本、Cambridge 链接
-  }
-  // 标记（同看视频 / 插件）：写回 /api/ext 和生词本的掌握状态（watch.js 的 vsSetMark），再重新上色
-  const MK_NAME = { learn: "将要学习", known: "已掌握", ignore: "不学习", "": "恢复默认" };
-  async function markWord(w, m, toastIt) {
-    const V = window.__vs; if (!V || !V.setMark) return;
-    if (!(V.ready && V.ready())) { try { await ensureVs(); } catch (e) {} }
-    if (toastIt) tip(w + " → " + MK_NAME[m || ""]);
-    try { await V.setMark(w, m); } catch (e) {}
-    loadBook(); redrawKeep();
-  }
-  function closePop() { if (!pop) return; popReq++; popWord = ""; popEl = null; pop.classList.remove("on", "sheet"); mask.classList.remove("on"); }
-  function addWord(b) {
-    const d = DC.get(popWord.toLowerCase()), w = String((d && d.word) || popWord).toLowerCase(), f = window.vocabAddWord;
-    if (typeof f !== "function") { tip("生词本还没准备好，暂时加不了"); return; }
-    b.disabled = true; b.textContent = "加入中…";
-    let r; try { r = f(w, popSent); } catch (e) { r = Promise.reject(e); }
-    Promise.resolve(r).then(res => {
-      if (res === false) { b.disabled = false; b.textContent = "＋ 加入生词本"; return; }
-      b.className = "ui-btn in"; b.textContent = "已在生词本"; const cb = popOpt && popOpt.onAdd;
-      const V = window.__vs; if (V && V.ready && V.ready() && V.markOf(w) !== "learn") { V.setMark(w, "learn"); const lb = pop && pop.querySelector("[data-m=learn]"); if (lb) lb.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === lb)); } // 同看视频：加进生词本 = 将要学习
-      setTimeout(() => { loadBook(); if (book.size && !bookStatus(w)) book.set(w, "lr"); redrawKeep(); if (cb) try { cb(w); } catch (e) {} }, 300); // 重新上色：新加的词换成「在学」
-    }).catch(() => { b.disabled = false; b.textContent = "＋ 加入生词本"; tip("加入失败，请再试一次"); });
-  }
-
   /* ---------- 重画（保持滚动位置、朗读高亮） ---------- */
   function redrawKeep() {
     if (!root || !root.classList.contains("on") || view !== "read") return; // 首页不依赖上色，不重画（免得打字时文本框被换掉）
@@ -616,14 +516,11 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
     if (root) return; root = document.getElementById("reading"); if (!root) return;
     const st = document.createElement("style"); st.textContent = CSS; document.head.append(st);
     loadBook();
-    // 右键单词（同看视频 / 插件）：本来的颜色 → 将要学习（带框）→ 已掌握 → 回到本来的颜色；手机长按也一样
-    root.addEventListener("contextmenu", e => {
-      const w = e.target.closest(".vs-w[data-w]"), V = window.__vs; if (!w || !V || !V.next || !(V.ready && V.ready())) return;
-      e.preventDefault(); e.stopPropagation(); closePop(); markWord(w.dataset.w.replace(/’/g, "'"), V.next(w.dataset.w), true);
-    });
+    // 点词 / 右键单词：全站共用的 word.js；标记 / 加词以后重新上色
+    if (window.WORD) WORD.bind(root, { sent: sentOf, quiet: () => !!tts });
+    document.addEventListener("word-change", () => { loadBook(); redrawKeep(); });
     root.addEventListener("click", e => {
       const t = e.target;
-      const w = t.closest("[data-w]"); if (w) { e.stopPropagation(); const s = w.closest(".ra-s"); openPop(w.dataset.w, w, s ? +s.dataset.i : w.dataset.si != null ? +w.dataset.si : null); return; }
       const sm = t.closest("[data-si]"); if (sm) { sayOne(+sm.dataset.si); return; }
       if (t.closest(".ra-tr.err, .ra-ttr.err")) { const n = t.closest(".err"); n.textContent = "翻译中…"; n.classList.remove("err"); n.classList.add("ld"); fillTr(); return; }
       const b = t.closest("[data-a]"); if (!b) return; const a = b.dataset.a;
@@ -654,16 +551,13 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
     root.addEventListener("input", e => { if (e.target.id === "ra-text") draft = e.target.value; else if (e.target.id === "ra-url") urlDraft = e.target.value; });
     root.addEventListener("keydown", e => { if (e.target.id === "ra-url" && e.key === "Enter") { e.preventDefault(); urlDraft = e.target.value; fromUrl(urlDraft); } });
     root.addEventListener("change", e => { if (e.target.id !== "ra-lv") return; lvSel = e.target.value; LS("reading:lv", lvSel); redrawKeep(); });
-    // 点弹窗外面关掉；Esc 先关弹窗，再停朗读
-    document.addEventListener("click", e => { if (pop && pop.classList.contains("on") && !pop.contains(e.target) && !e.target.closest("#reading [data-w]") && !(popEl && popEl.contains(e.target))) closePop(); }); // popEl：别的页面（听力文稿）刚点开的那个词
-    document.addEventListener("keydown", e => { if (e.key !== "Escape" || !root.classList.contains("on")) return; if (pop && pop.classList.contains("on")) closePop(); else if (tts) stopAll(); });
+    // Esc 停朗读（查词卡片的 Esc 由 word.js 处理）
+    document.addEventListener("keydown", e => { if (e.key === "Escape" && root.classList.contains("on") && tts) stopAll(); });
     let sT = 0;
     window.addEventListener("scroll", () => {
-      if (pop && pop.classList.contains("on") && !pop.classList.contains("sheet")) closePop();
       if (view !== "read" || tts || !root.classList.contains("on") || sT || Date.now() < quiet) return;
       sT = setTimeout(() => { sT = 0; if (view === "read" && !tts && root.classList.contains("on")) setPos(firstVisible()); }, 500); // 记住读到哪一句
     }, { passive: true });
-    window.addEventListener("resize", () => placePop());
   }
 
   // 直达链接：地址 #article/文章id（文章会同步到后台，换设备也能打开）
