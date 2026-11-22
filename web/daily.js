@@ -164,6 +164,13 @@
       (w.hard.length ? '<div class="more">🔥 最难的词：' + w.hard.map(h => "<b>" + esc(h.word) + "</b>" + (h.f ? "（忘了 " + h.f + " 次）" : "")).join("、") + "</div>" : "") +
       '<div class="adv">💡 ' + esc(tip1) + "</div></div>";
   }
+  function weekBrief() { // 收起时：一行简略的（几天有练习、几天全勤、卡片数和正确率），点「展开」看全部
+    const w = week(), acc = w.ok + w.fail ? Math.round(w.ok / (w.ok + w.fail) * 100) : 0, diff = w.cards - w.cardsP;
+    const md = d => +d.slice(5, 7) + "/" + +d.slice(8);
+    return '<div class="dy-wkbox sm"><div class="h"><b>📊 本周小结</b><small>' + md(w.from) + "–" + md(w.to) + '</small><span class="brief">练了 <b>' + w.act + "</b> 天 · 全勤 <b>" + w.full7 + "</b> 天 · <b>" + w.cards + "</b> 张卡" +
+      (w.cardsP || diff ? '<em class="' + (diff >= 0 ? "up" : "dn") + '">' + (diff >= 0 ? "↑" : "↓") + Math.abs(diff) + "</em>" : "") + (w.ok + w.fail ? " · 正确率 <b>" + acc + "%</b>" : "") +
+      '</span><span style="flex:1"></span><button class="dy-chk" data-act="wk">展开 ▾</button></div></div>';
+  }
   const wkKey = () => { const d = new Date(lday() + "T12:00:00"); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return lday(d.getTime()); }; // 这周一
   let showWk = null;
 
@@ -198,6 +205,7 @@
   .dy-set label{display:inline-flex;align-items:center;gap:5px;margin:4px 14px 4px 0;cursor:pointer}.dy-set .row{margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .dy-set input[type=date]{height:36px;border-radius:9px;border:1px solid var(--ui-line-2);background:var(--ui-surface-2);color:var(--ui-ink);padding:0 8px;font:inherit;color-scheme:dark}
   .dy-wkbox{background:linear-gradient(135deg,color-mix(in srgb,var(--ui-pur) 14%,var(--ui-surface)),var(--ui-surface));border:1px solid color-mix(in srgb,var(--ui-pur) 40%,var(--ui-line));border-radius:16px;padding:14px 16px;margin-bottom:14px}
+  .dy-wkbox.sm{padding:10px 14px}.dy-wkbox .h{flex-wrap:wrap}.dy-wkbox .brief{font-size:13.5px;color:var(--ui-ink-2)}.dy-wkbox .brief b{color:var(--ui-ink)}.dy-wkbox .brief em{font-style:normal;font-weight:700;margin-left:3px}.dy-wkbox .brief em.up{color:var(--ui-green,#3fb37f)}.dy-wkbox .brief em.dn{color:var(--ui-orange)}
   .dy-wkbox .h{display:flex;align-items:center;gap:8px}.dy-wkbox .h b{font-size:17px}.dy-wkbox .h small{color:var(--ui-muted)}
   .dy-wkbox .nums{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:10px 0}.dy-wkbox .nums b{display:block;font-size:20px;font-weight:900}.dy-wkbox .nums span{font-size:12px;color:var(--ui-muted)}.dy-wkbox em{font-style:normal;font-weight:700}.dy-wkbox em.up{color:var(--ui-green,#3fb37f)}.dy-wkbox em.dn{color:var(--ui-orange)}
   .dy-wkbox .areas{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13.5px;color:var(--ui-ink-2)}.dy-wkbox .more{font-size:13.5px;color:var(--ui-ink-2);margin-top:6px;line-height:1.6}.dy-wkbox .adv{margin-top:8px;font-size:14px}
@@ -222,7 +230,7 @@
     root.innerHTML = '<div class="dy">' +
       '<div id="dy-quota">' + (window.quotaHtml ? window.quotaHtml() : "") + "</div>" + // 🔋 AI 额度（quota.js）
       '<div class="dy-hd"><h1>📅 每日一练</h1><p>每天按顺序做完这几项：词 → 听 → 说 → 读 → 写。点「去练」直接跳过去，做完回来会自动打勾。</p><button class="ui-btn" data-act="wk">📊 本周小结</button><button class="ui-btn" data-act="set">⚙ 设置</button></div>' + set +
-      (showWk ? weekHtml() : "") +
+      (showWk ? weekHtml() : weekBrief()) +
       '<div class="dy-top"><div class="dy-ring" style="--p:' + (L.length ? Math.round(n / L.length * 100) : 0) + '"><div><div><b>' + n + "/" + L.length + '</b><span>今天</span></div></div></div>' +
       '<div class="dy-meta"><b>' + (!L.length ? "在 ⚙ 设置里选几项开始" : n >= L.length ? "🎉 今天全部完成" : "还剩 " + (L.length - n) + " 项，约 " + left + " 分钟") + "</b><div>" + exTxt + "🔥 连续全勤 " + st + " 天" + (Object.keys(D).length ? " · 共练了 " + Object.keys(D).filter(k => D[k][0] > 0).length + " 天" : "") + (!o.exam ? ' · <a href="javascript:void 0" data-act="set" style="color:var(--ui-muted)">设考试日期</a>' : "") + "</div></div>" +
       '<div class="dy-wk">' + wk.map(d => { const x = D[d]; return '<i class="' + (d === lday() ? "td" : "") + '" title="' + d + (x ? "：" + x[0] + " / " + x[1] : "") + '"><u class="' + (full(x) ? "f" : x && x[0] ? "h" : "") + '"></u><em>' + WD[new Date(d + "T12:00:00").getDay()] + "</em></i>"; }).join("") + "</div>" +
