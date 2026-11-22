@@ -49,6 +49,9 @@
   #sme .ui-btn.on{border-color:var(--ui-pur);color:var(--ui-pur-text)}
   #sme h1{margin:4px 0 6px;font-size:24px;line-height:1.35}#sme .sm-date{color:var(--ui-muted);font-size:13px;margin-bottom:10px}
   #sme .sm-box{background:var(--ui-surface);border:1px solid var(--ui-line);border-radius:14px;padding:12px 14px;margin:0 0 12px}#sme .sm-box h3{margin:0 0 8px;font-size:15px}
+  #sme .sm-opts{margin:-4px 2px 12px}
+  #sme .sm-pl.stick{position:sticky;top:var(--sm-top,104px);z-index:30;transition:box-shadow .2s}#sme .sm-pl.stick.stuck{box-shadow:0 10px 24px rgba(0,0,0,.45);border-color:var(--ui-line-2)}
+  #sme .sm-pl .sm-kbd{font-size:12px;color:var(--ui-muted);margin-left:4px}@media (hover:none),(max-width:600px){#sme .sm-pl .sm-kbd{display:none}}
   #sme audio,#sm-float audio{width:100%;margin:4px 0 6px;display:block}#sme .sm-rate{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--ui-muted)}
   #sme .sm-rate button{border:1px solid var(--ui-line-2);background:var(--ui-surface-2);color:var(--ui-ink);border-radius:8px;padding:3px 10px;font:inherit;font-size:13px;cursor:pointer}#sme .sm-rate button.on{border-color:var(--ui-pur);color:var(--ui-pur-text)}
   #sme .sm-q div{margin:3px 0;font-size:14.5px}#sme .sm-intro{font-size:14.5px;line-height:1.6;color:var(--ui-ink-2)}
@@ -460,7 +463,8 @@
     if (noScroll || AU.paused || Date.now() - userScrollT < 4000 || !root.getClientRects().length || document.querySelector("#ra-pop.on")) return; // 查词框开着不滚（一滚它就关了）
     const r = el.getBoundingClientRect(), b = box.getBoundingClientRect(), H = window.innerHeight;
     if (b.bottom < 0 || b.top > H) return;
-    if (r.top < 70 || r.bottom > H - 90) window.scrollBy({ top: r.top - H * 0.35, behavior: "smooth" });
+    const pl = root.querySelector(".sm-pl.stick"), lim = pl ? pl.getBoundingClientRect().bottom + 8 : 70; // 吸顶的播放器下面才算看得见
+    if (r.top < lim || r.bottom > H - 90) window.scrollBy({ top: r.top - Math.max(H * 0.35, lim + 24), behavior: "smooth" });
   }
   AU.addEventListener("timeupdate", () => { hl(); hlWord(); }); AU.addEventListener("seeked", () => { hl(); hlWord(); }); // 逐词主要靠 tick（每帧），后台标签页里帧停了就靠这个
   function seekSent(k) { // 点文稿里的一句 → 从那句开始播
@@ -593,9 +597,9 @@
     const F = FL[EP.id] || {}, fst = !trShow || news || !follow ? "" : TS ? '<div class="sm-trst">🎵 放到哪句亮哪句' + (fword ? "、逐词跟着亮" : "") + "；点句首 ▸ 从那句播，点词查意思" + (bs ? "（橙色下划线 = 生词本里在学的词）" : "") + "</div>" : F.busy ? '<div class="sm-trst">🎵 正在给每一句对时间（这期第一次要一两分钟，以后打开就不用等）… <span class="fl-prog">' + esc(F.prog || "") + "</span></div>" : F.err ? '<div class="sm-trst">🎵 ' + esc(F.err) + ' <button class="ui-btn" data-a="follow-retry">重试</button></div>' : "";
     const off = OFF()[EP.id], ob = OFFB[EP.id];
     return '<h1>' + esc(EP.title) + '</h1><div class="sm-date">' + esc(m.d || "") + " · BBC Learning English · " + esc(S[2]) + (heard ? ' · <span class="ok">✓ 听过</span>' : "") + "</div>" + (news ? "" : diffHtml(EP.id)) +
-      '<div class="sm-box"><div id="sm-slot"></div><div class="sm-rate">速度 ' + [0.75, 0.9, 1, 1.15].map(v => '<button data-rate="' + v + '" class="' + (Math.abs(rate - v) < .01 ? "on" : "") + '">' + v + "×</button>").join("") +
-      '<span style="flex:1"></span><button data-a="done">' + (heard ? "✓ 已听完" : "✓ 听完了") + "</button></div>" +
-      '<div class="sm-rate" style="margin-top:6px"><button data-a="cont" class="' + (cont ? "on" : "") + '" title="播完自动放这个栏目里下一期没听过的">⏭ 播完接下一期：' + (cont ? "开" : "关") + "</button>" + (ob != null ? '<button disabled>📥 下载中 <span class="off-prog">' + esc(ob) + "</span></button>" : off ? '<button data-a="offdel" title="删掉下载的文件">📥 已下载 ' + mb(off.size || 0) + " · 删除</button>" : '<button data-a="off" title="存到这台设备上，没网也能听（连同文稿、每句时间）">📥 下载离线听</button>') + "</div></div>" + dkHtml() +
+      '<div class="sm-box sm-pl' + (trShow && tr ? " stick" : "") + '"><div id="sm-slot"></div><div class="sm-rate">速度 ' + [0.75, 0.9, 1, 1.15].map(v => '<button data-rate="' + v + '" class="' + (Math.abs(rate - v) < .01 ? "on" : "") + '">' + v + "×</button>").join("") +
+      '<span class="sm-kbd" title="不在输入框里时按空格">空格 ⏯</span><span style="flex:1"></span><button data-a="done">' + (heard ? "✓ 已听完" : "✓ 听完了") + "</button></div></div>" +
+      '<div class="sm-rate sm-opts"><button data-a="cont" class="' + (cont ? "on" : "") + '" title="播完自动放这个栏目里下一期没听过的">⏭ 播完接下一期：' + (cont ? "开" : "关") + "</button>" + (ob != null ? '<button disabled>📥 下载中 <span class="off-prog">' + esc(ob) + "</span></button>" : off ? '<button data-a="offdel" title="删掉下载的文件">📥 已下载 ' + mb(off.size || 0) + " · 删除</button>" : '<button data-a="off" title="存到这台设备上，没网也能听（连同文稿、每句时间）">📥 下载离线听</button>') + "</div>" + dkHtml() +
       (EP.intro ? '<div class="sm-box"><h3>' + (news ? "📰 新闻背景" : "📝 简介") + '</h3><div class="sm-intro">' + esc(EP.intro) + zh("", 0) + "</div></div>" : "") +
       ((EP.q || []).length ? '<div class="sm-box sm-q"><h3>❓ 本期问题（答案在节目最后）</h3>' + EP.q.map((x, i) => "<div>" + esc(x) + zh("q", i) + "</div>").join("") + "</div>" : "") +
       ((EP.heads || []).length ? '<div class="sm-box sm-hd"><h3>🗞️ 各家新闻标题</h3>' + EP.heads.map((h, i) => "<div>" + esc(h[0]) + (h[1] ? "<small>— " + esc(h[1]) + "</small>" : "") + zh("heads", i) + "</div>").join("") + "</div>" : "") +
@@ -616,10 +620,17 @@
       (view === "ep" ? '<div class="sm-bar"><button class="ui-btn" data-a="home">← 节目列表</button><span class="sp"></span><button class="ui-btn' + (zhOn ? " on" : "") + '" data-a="zh" title="英文下面显示中文翻译">🀄 中文：' + (zhOn ? "开" : "关") + "</button></div>" + zhBar() + epHtml()
         : '<div class="sm-head"><b>' + esc(S[2]) + "</b> · BBC Learning English · " + esc(S[3]) + "</div>" + homeHtml());
     if (view === "ep" && EP && !EP.err && AU.dataset.id !== EP.id) { AU.pause(); AU.src = srcOf(EP.id); AU.dataset.id = EP.id; auTitle = SM[serOf(EP.id)][1] + " · " + EP.title; AU.playbackRate = rate; flClosed = false; }
-    sync(); curK = -1; curW = null; hl(true); hlWord();
+    sync(); stickTop(); curK = -1; curW = null; hl(true); hlWord();
     if (view === "ep" && EP && !EP.err && autoNext === EP.id && AU.dataset.id === EP.id) { autoNext = null; AU.play().catch(() => {}); }
     if (view === "ep" && EP && !EP.err && !DIFF()[EP.id] && navigator.onLine !== false) diffCalc(EP.id);
   }
+  function stickTop() { // 顶上固定的几条（标签栏、子标签、栏目条）下面
+    if (!root) return; let b = 0;
+    document.querySelectorAll("#apptabs,#subtabs,#en-secbar").forEach(e => { if (e.getClientRects().length && getComputedStyle(e).position === "fixed") b = Math.max(b, e.getBoundingClientRect().bottom); });
+    root.style.setProperty("--sm-top", Math.round(b + 6) + "px"); stuckChk();
+  }
+  function stuckChk() { const pl = root && root.querySelector(".sm-pl.stick"); if (pl) pl.classList.toggle("stuck", pl.getBoundingClientRect().top <= parseFloat(root.style.getPropertyValue("--sm-top") || "104") + 1 && window.scrollY > 0); }
+  function playPause() { if (!EP || EP.err || AU.dataset.id !== EP.id) return; if (AU.paused) AU.play().catch(() => {}); else AU.pause(); }
   function init() {
     if (root) return; root = document.getElementById("sme"); if (!root) return;
     const st = document.createElement("style"); st.textContent = CSS; document.head.append(st);
@@ -628,13 +639,18 @@
     const mo = new MutationObserver(() => sync());
     mo.observe(root, { attributes: true, attributeFilter: ["class"] }); mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "data-en", "data-mode"] });
     const ven = document.getElementById("view-en"); if (ven) mo.observe(ven, { attributes: true, attributeFilter: ["class", "style"] });
-    document.addEventListener("keydown", e => { // 精听快捷键：节目页看得见、不在输入框里
-      const d = EP && DK[EP.id]; if (!d || !d.sents || view !== "ep" || !root.classList.contains("on") || !root.getClientRects().length) return;
+    window.addEventListener("scroll", stuckChk, { passive: true }); window.addEventListener("resize", stickTop);
+    let spKey = false;
+    document.addEventListener("keydown", e => { // 快捷键：节目页看得见、不在输入框里。空格 = 播放 / 暂停；开了精听就是精听的键
+      if (view !== "ep" || !EP || EP.err || !root.classList.contains("on") || !root.getClientRects().length) return;
       const tg = e.target; if (e.metaKey || e.ctrlKey || e.altKey || (tg && (tg.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName)))) return;
-      const k = e.key; if (k === " " || k === "Spacebar" || k === "r" || k === "R") { e.preventDefault(); if (d.auto) autoStop(); dkPlay(false); }
+      const d = DK[EP.id], k = e.key;
+      if (!d || !d.sents) { if ((k === " " || k === "Spacebar") && tg !== AU) { e.preventDefault(); spKey = true; if (!e.repeat) playPause(); } return; }
+      if (k === " " || k === "Spacebar" || k === "r" || k === "R") { e.preventDefault(); if (d.auto) autoStop(); dkPlay(false); }
       else if (k === "s" || k === "S") { e.preventDefault(); if (d.auto) autoStop(); dkPlay(true); }
       else if (k === "ArrowLeft") { e.preventDefault(); dkGo(-1); } else if (k === "ArrowRight") { e.preventDefault(); dkGo(1); }
     });
+    document.addEventListener("keyup", e => { if (spKey && (e.key === " " || e.key === "Spacebar")) { spKey = false; e.preventDefault(); } }); // 焦点在按钮上时，别让空格再「点」一下那个按钮
     root.addEventListener("input", e => { if (e.target.id === "dk-in" && EP && DK[EP.id]) DK[EP.id].typed = e.target.value; });
     root.addEventListener("keydown", e => {
       const d = EP && DK[EP.id]; if (!d || !d.sents || view !== "ep") return;
