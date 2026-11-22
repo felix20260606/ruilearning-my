@@ -2,7 +2,7 @@
    🐢 慢速对话 Real Easy English / 💬 地道说法 The English We Speak / 📰 新闻英语 Learning English from the News / 📻 6 分钟英语 6 Minute English
    - 顶上一排切换栏目（记住上次选的 sme:s）；每个栏目：最新（或还没听的最新）一期 + 列表
    - 一期页面：播放器（慢 / 正常 / 快）、简介、本期问题、新闻标题、生词表（＋ 加生词本，例句取节目里那一句）、文稿按说话人分行（默认折起来，先盲听）
-     「🀄 中文」开关（sme:zh）：所有英文下面加中文（后台用谷歌翻译，一期翻一次存起来）
+     「🀄 中文」开关（sme:zh）：所有英文下面加中文（后台用谷歌翻译，一期翻一次存起来；后台被谷歌拦了就在浏览器里直接翻）
      「📰 在阅读里打开文稿」= 用阅读页打开（按水平上色、点词查词、译文）
    - 播放中切到别的页面：播放器变成底部悬浮条继续播（↩ 回到节目 / ✕ 关掉）；同一个 <audio> 元素在页面和悬浮条之间挪，不会断
    - 听完（播放到 90% 以上，或点「✓ 听完了」）记进 sme:done {期号: 时间}，同步到后台 /api/mine k=sme；「📅 每日」的「听」今天听完一期就自动打勾
@@ -168,10 +168,33 @@
     const fromOff = async () => { const o = await offJson(id); if (!o || !o.ep) return null; if (o.zh) ZH[id] = o.zh; if (o.sents) TIM[id] = o.sents; return o.ep; };
     fetch("/api/sme?ep=" + encodeURIComponent(id)).then(r => r.json()).catch(() => null).then(async j => { if (!(j && j.ok)) j = (await fromOff()) || j; epBusy = false; if (j && j.ok) EPS[id] = j; if (view === "ep" && !EP) { EP = j && j.ok ? j : { err: 1, id }; draw(); if (zhOn && EP.ok) loadZh(id); } });
   }
-  function loadZh(id) {
-    if (ZH[id] || zhBusy[id]) return; zhBusy[id] = true;
-    fetch("/api/sme?zh=1&ep=" + encodeURIComponent(id)).then(r => r.json()).then(j => { zhBusy[id] = false; if (j && j.ok) ZH[id] = j; else tip("中文翻译没取到，过一会儿再点一次「🀄 中文」"); if (EP && EP.id === id) draw(); }).catch(() => { zhBusy[id] = false; tip("中文翻译没取到（网络问题）"); if (EP && EP.id === id) draw(); });
+  // 🀄 中文：先找后台（翻过的存 KV，全家共用）；后台翻不了（谷歌拦了 Cloudflare 机房的 IP）就在浏览器里直接问谷歌，和阅读、视频字幕一样
+  async function gtx(arr) {
+    const out = arr.map(() => ""), go = async idx => {
+      const r = await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q=" + encodeURIComponent(idx.map(i => arr[i].replace(/\s+/g, " ")).join("\n")));
+      const zh = ((await r.json())[0] || []).map(x => x[0] || "").join("").split("\n").map(x => x.trim());
+      if (zh.length === idx.length) idx.forEach((i, k) => { out[i] = zh[k]; }); else if (idx.length === 1) out[idx[0]] = zh.join(" ").trim(); else for (const i of idx) await go([i]); // 行数对不上就一行一行翻
+    };
+    const chunks = []; let cur = [], len = 0;
+    arr.forEach((t, i) => { if (!t) return; if (cur.length && len + t.length > 1500) { chunks.push(cur); cur = []; len = 0; } cur.push(i); len += t.length + 1; });
+    if (cur.length) chunks.push(cur);
+    for (let i = 0; i < chunks.length; i += 3) await Promise.all(chunks.slice(i, i + 3).map(c => go(c).catch(() => {})));
+    return out;
   }
+  async function zhLocal(ep) { // 和后台 /api/sme?zh=1 拼的顺序一样
+    const q = ep.q || [], V = ep.vocab || [], H = ep.heads || [], Ls = ep.lines || [];
+    const all = [ep.intro || "", ...q, ...V.map(v => v[1] || ""), ...V.map(v => v[2] || ""), ...H.map(h => h[0]), ...Ls.map(l => l.t)];
+    const zh = await gtx(all); if (!zh.some(Boolean)) return null; let i = 1; const take = n => { const r = zh.slice(i, i + n); i += n; return r; };
+    return { ok: true, id: ep.id, intro: zh[0], q: take(q.length), vocab: take(V.length), vex: take(V.length), heads: take(H.length), lines: take(Ls.length), local: true };
+  }
+  async function loadZh(id) {
+    if (ZH[id] || zhBusy[id]) return; zhBusy[id] = true;
+    let j = null; try { j = await (await fetch("/api/sme?zh=1&ep=" + encodeURIComponent(id))).json(); } catch (e) {}
+    if (!(j && j.ok) && EPS[id]) { try { j = await zhLocal(EPS[id]); } catch (e) { j = null; } }
+    zhBusy[id] = false; if (j && j.ok) ZH[id] = j; else tip("中文翻译没取到（网络问题？），过一会儿再点一次「🀄 中文」");
+    if (EP && EP.id === id) draw();
+  }
+
   const meta = id => (LISTS[serOf(id)] || []).find(x => x.id === id) || {};
 
   // ---------- 🎯 逐句精听：每句单独播、重复、放慢、听写对答案 ----------
