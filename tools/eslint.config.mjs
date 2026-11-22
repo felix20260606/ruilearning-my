@@ -15,7 +15,7 @@ export default [{
       ...globals.browser,
       ...g(SHARED),
       ...g(["NET", "LANG", "ERR", "videoCore", "YT", "module"]), // index.html 的 NET、lang.js、errbook.js、watch.js 的视频、YouTube 播放器、node 测试用的 module
-      ...g(["state", "words", "toast", "speak", "save", "refresh", "quickAdd", "masteryOf", "chosenVoice"]), // index.html 里生词本那段的全局（用之前都判断过）
+      ...g(["state", "words", "toast", "speak", "save", "refresh", "quickAdd", "masteryOf", "chosenVoice", "syncNow", "schedulePush", "vStamp", "freshId", "ymdLocal"]), // index.html 里生词本那段的全局（用之前都判断过）
       ...g(["vsMark", "vsGramHtml", "vsKeys", "vsLemma", "vsCat", "vsRank", "vsMarkOf", "vsPatterns", "vsSentNotes", "vsWordNotesHtml", "VS_RANK", "VS_WORDS", "VS_WORD_RE", "VS_GRAM_NAME", "VS_GRAM_ABBR", "VS_MARKS", "VS_SAVED"]), // web/vs/（插件同一份）
     },
   },
