@@ -382,6 +382,19 @@
     const pre = (c.s.en.split("{")[0].match(/[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu) || []).length, m = c.s.en.match(/\{([^}]+)\}/), len = m ? (m[1].match(/[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu) || []).length : 0;
     el.innerHTML = h; const ws = el.querySelectorAll(".vs-w"); for (let i = pre; i < pre + len && i < ws.length; i++) ws[i].classList.add("t");
   }
+  // 其它卡片里的英文也能停留查词（测验的填空句、认词卡翻过来的词和例句、建议的词、语法填空）：只给纯英文的文字上色，
+  // 中文、按钮、输入框、还没揭开的空格不动；认词卡正面不上（一停就看到意思，等于偷看答案）
+  function colorText(el) {
+    if (!el || el.__wdc === el.innerHTML) return;
+    const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, { acceptNode: n => (!/[A-Za-z]/.test(n.nodeValue) || /[\u3400-\u9fff]/.test(n.nodeValue) || n.parentNode.closest(".vs-w, button, input, textarea, .pp-gap:not(.on), kbd, .rc-q") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
+    const L = []; while (tw.nextNode()) L.push(tw.currentNode);
+    L.forEach(n => { const t = document.createElement("template"); t.innerHTML = WORD.html(n.nodeValue); n.replaceWith(t.content); });
+    el.__wdc = el.innerHTML;
+  }
+  function colorAll(c) { // 🎨 这张卡片上的英文都上色、都能停留查词（同 Language Reactor 练习）
+    if (!c || !root) return; colorEn(c);
+    root.querySelectorAll(".pp-en:not(#pp-en), .pp-sgw > b" + (c.k !== "recall" || c.flip ? ", .pp-rc .rc-ex, .pp-rc .rc-w" : "")).forEach(colorText);
+  }
   // 推荐生词收进生词本：查释义生成词条（同网站视频页），并告诉插件「将要学习」
   async function addSugg(c, silent) {
     const w = c.w.word, sg = EXT.sugg[w] || {};
@@ -435,7 +448,7 @@
         '<div class="pp-card"><button class="pl" id="pp-pl" title="播放">▶</button><button class="cp" id="pp-cp">复制</button><button class="st" id="pp-star" title="收藏这句（R）">☆</button><div class="pp-en" id="pp-en">' + html(c.s.en) + "</div>" + (c.s.zh ? '<div class="pp-zh">' + esc(c.s.zh) + "</div>" : "") + (c.gc > 1 ? '<div class="pp-dots">' + Array.from({ length: c.gc }, (x, i) => '<i class="' + (i === c.gi ? "on" : "") + '"></i>').join("") + "</div>" : "") + '<span class="pp-chip">建议</span></div>' +
         '<div class="pp-stage">' + ["known", "learn", "skip"].map((k, i) => '<button data-st="' + k + '" class="' + k + (w.stage === k ? " on" : "") + '"><kbd>' + "ZXC"[i] + "</kbd>" + lab[k] + "</button>").join("") + "</div>" + ctl("sugg");
       if (!c.spoken) { c.spoken = true; say(c); }
-      colorEn(c);
+      colorAll(c);
       root.querySelectorAll(".pp-stage button").forEach(b => (b.onclick = () => chooseSugg(c, b.dataset.st)));
     } else if (c.k === "dict" || c.k === "gfill" || c.k === "shadow") { cardX(c, top, ctl, def, first);
     } else { // ❔ 测验：填空。看翻译找提示。目标词先遮住，按 E 看答案，再点「忘了 / 记得」（同 PhrasePump，不用打字）
@@ -454,6 +467,7 @@
     root.querySelector("#pp-pl").onclick = root.querySelector("#pp-s").onclick = () => say(c);
     root.querySelector("#pp-cp").onclick = () => { U.copy(plain(c.s.en)); }; /* 📋 全站共用（util.js） */
     root.querySelector("#pp-a").onclick = () => go(-1); root.querySelector("#pp-d").onclick = () => go(1);
+    if (c.k === "recall" || c.k === "quiz" || c.k === "gfill" || c.k === "dict") colorAll(c); // 测验 / 认词 / 语法填空 / 听写的英文也能停留查词
     const st0 = root.querySelector("#pp-star"); if (st0) { const on = starred(c); st0.textContent = on ? "★" : "☆"; st0.classList.toggle("on", on); st0.onclick = e => { e.stopPropagation(); toggleStar(c); }; }
     const chip = root.querySelector(".pp-chip"); if (chip) chip.title = srcOf(c); // 鼠标停在右下角：例句出处（同 RL）
     root.querySelector("#pp-e").onclick = () => (c.k === "listen" ? reveal(c) : c.k === "recall" ? flip(c) : c.k === "quiz" ? revealQuiz(c) : c.k === "dict" || c.k === "gfill" ? giveUp(c) : null);
@@ -609,8 +623,8 @@
     root = document.getElementById("pump"); if (!root) return;
     const st = document.createElement("style"); st.textContent = CSS; document.head.append(st);
     // 卡片上英文句子里的词：全站共用的 word.js（点词查词卡片、右键循环标记，同看视频 / 插件）；标记 / 加词以后重新上色
-    if (window.WORD) WORD.bind(root, { skip: el => !el.closest("#pp-en") || el.closest(".hid"), sent: () => (cards[at] && cards[at].s ? plain(cards[at].s.en) : ""), quiet: () => false, onOpen: () => stopAudio(), hover: "rl" }); /* 停留：同 Language Reactor 练习的小卡片（• 意思 + ✓ 已掌握 + 📖 词典） */
-    document.addEventListener("word-change", () => { if (playing && cards[at]) colorEn(cards[at]); });
+    if (window.WORD) WORD.bind(root, { skip: el => !el.closest(".pp-en, .pp-sgw, .rc-ex, .rc-w") || el.closest(".hid"), sent: () => (cards[at] && cards[at].s ? plain(cards[at].s.en) : ""), quiet: () => false, onOpen: () => stopAudio(), hover: "rl" }); /* 停留：同 Language Reactor 练习的小卡片（• 意思 + ✓ 已掌握 + 📖 词典） */
+    document.addEventListener("word-change", () => { if (playing && cards[at]) { root.querySelectorAll(".pp-en:not(#pp-en), .pp-sgw > b, .rc-ex, .rc-w").forEach(e => { e.__wdc = null; }); colorAll(cards[at]); } });
     // 生词本的模式：新加的「⭐ 已保存」排最前，第一次打开默认进它；之后记住上次选的模式
     // ?go=pump / ?go=saved：插件里的「复习」「已保存」按钮直接打开这里
     let m = "saved"; try { m = localStorage.getItem("vocab_mode") || "saved"; } catch (e) {}
