@@ -1,7 +1,7 @@
 // 全站 AI 真人语音：把固定的英文预先生成成 web/tts/<编号>.mp3，网页（web/tts.js）优先播这些静态文件（不花额度）。
 // 内容：口语 web/speak-data.js 的句子、生词本（线上 /api/vocab，主人和每个家人）的词 + 例句 + 相关词、雅思笔记 web/ielts-notes.html 的 data-say。
 // 编号 = FNV-1a 32 位（"声音|句子"），web/tts.js 的 key() 用同一个算法。
-// 每次最多生成 TTS_BUDGET 个字母（默认 6000，约 8,200 neurons，Workers AI 免费额度每天 1 万），接口报错（额度用完等）就停下，下次接着做。
+// 每次最多生成 TTS_BUDGET 个字母（默认 3600，约 4,900 neurons；Workers AI 免费额度每天 1 万，白天练习留 5,000 左右），接口报错（额度用完等）就停下，下次接着做。
 // 用法：node tools/gen-tts.mjs            生成一批并更新 web/tts/index.json
 //       node tools/gen-tts.mjs --dry      只统计：一共多少句、多少字母、还剩多少没生成
 // GitHub Actions（.github/workflows/tts.yml）每天跑一次，直到全部生成完；以后新加的生词、改了 speak-data.js 也会自动补上。
@@ -13,7 +13,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = path.join(ROOT, "web/tts");
 const API = process.env.TTS_API || "https://ruilearning-my.pages.dev/api/tts";
-const BUDGET = +(process.env.TTS_BUDGET || 6000);
+const BUDGET = +(process.env.TTS_BUDGET || 3600);
 const DRY = process.argv.includes("--dry");
 export const VOICES = { "": "asteria", A: "orion" }; // 默认（B 和其它所有句子）女声，对话里的 A 男声；改了要同步 web/speak.js 不用改（它读 index.json 里的 voices）
 

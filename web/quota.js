@@ -151,7 +151,7 @@
       (T.e ? '<div class="qa-st warn">今天有 ' + T.e + " 次 AI 调用失败（多半是额度用完）</div>" : "") + "</div>" +
       acts + feats +
       '<div class="qa-grid"><div class="qa-box"><h4>每个模型今天用了多少<small>neurons · 次数' + (J.src === "cf" ? " · Cloudflare 数据" : " · 估算") + "</small></h4>" + models + "</div>" +
-      '<div class="qa-box"><h4>最近 7 天<small>按 UTC 日期，虚线 = 每天 1 万</small></h4>' + wk + '<div class="qa-wks">前 6 天平均每天 ' + fmt(avgN) + "（" + Math.round(avgN / LIMIT * 100) + "%）。每天早上 6:30 GitHub 会自动用当天剩下的额度预先生成 AI 语音（最多约 8,200），所以白天剩下的不会浪费。</div></div></div>" +
+      '<div class="qa-box"><h4>最近 7 天<small>按 UTC 日期，虚线 = 每天 1 万</small></h4>' + wk + '<div class="qa-wks">前 6 天平均每天 ' + fmt(avgN) + "（" + Math.round(avgN / LIMIT * 100) + "%）。每天早上 6:30 GitHub 会自动预先生成 AI 语音（最多约 5,000），算在当天的额度里；白天练习最好留在 5,000 以内，加起来就不会超过 1 万。</div></div></div>" +
       '<div class="qa-note">「还能做几次」= 今天剩下的 ÷ 每次大约花多少，点卡片直接去做；已经生成过的（AI 语音、BBC 对过时间、新闻简单版、出过的题）再打开不花额度。' + (J.src === "cf" ? "模型用量是 Cloudflare 记的；「今天用了」和单次花费是网站自己按功能记的估算，加起来和 Cloudflare 的数可能差一点。" : '数字是网站后台按 <a href="https://developers.cloudflare.com/workers-ai/platform/pricing/" target="_blank" rel="noopener">官方价格</a> 估的。') + "</div>" + setup + "</div>";
   }
   document.addEventListener("click", e => {
