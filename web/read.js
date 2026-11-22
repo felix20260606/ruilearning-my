@@ -459,7 +459,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
   }
   // 给别的页面用（📻 BBC 听力的文稿）：点词弹同一个查词框；生词本里这个词的状态（"lr" 在学 / "kn" 已掌握 / ""）；一段文字的生词率
   window.readPop = (w, el, opt) => { init(); if (!book.size) loadBook(); openPop(w, el, null, opt || {}); };
-  window.readBook = reload => { if (reload || !book.size) loadBook(); return bookStatus; };
+  window.readBook = reload => { if (reload || !book.size) loadBook(); if (typeof vsKeys !== "function") ensureVs(); return bookStatus; }; // BBC 文稿（listen.js）也用：顺手加载 vs/（不规则变化表），加载完下次重画就按原形标
   window.readTextDiff = async text => { init(); loadBook(); await ensureVs(); const sv = P; P = parse(String(text || "")); try { const a = analyze(); return { ready: a.ready, n: a.n, unkN: a.unkN, rate: a.rate, unk: a.unk.length, level: effLevel() }; } finally { P = sv; } };
   window.readingOpen = (text, title, id) => { init(); if (!root) return; openDoc(text, title, id); }; // 别的页面（📻 6 分钟英语的文稿）在阅读里打开一篇
   window.readingNews = () => { newsLoad(); if (NEWS) newsRead(); else newsOpenAfter = true; }; // 还没取到：取到后自动打开 // 「📅 每日一练」的「读」可以直接打开今天这篇
