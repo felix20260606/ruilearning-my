@@ -1,8 +1,33 @@
 {
+ "med:s:ph|beat up": {
+  "dir": "s",
+  "name": "ph_beat_up",
+  "sig": "1795336301300:48963:15583:16011"
+ },
+ "med:s:ph|first pick": {
+  "dir": "s",
+  "name": "ph_first_pick",
+  "sig": "1795338032654:29759:13583:12943"
+ },
  "med:s:ph|nasal consonant": {
   "dir": "s",
   "name": "ph_nasal_consonant",
   "sig": "1794990183511:55015:18203:0"
+ },
+ "med:s:ph|net worth": {
+  "dir": "s",
+  "name": "ph_net_worth",
+  "sig": "1795336330025:26075:12323:15383"
+ },
+ "med:s:ph|pay cut": {
+  "dir": "s",
+  "name": "ph_pay_cut",
+  "sig": "1795355636990:25531:11859:14939"
+ },
+ "med:s:ph|power forward": {
+  "dir": "s",
+  "name": "ph_power_forward",
+  "sig": "1795338752374:24499:12095:0"
  },
  "med:s:ph|pump fake": {
   "dir": "s",
@@ -19,6 +44,21 @@
   "name": "ph_sorts_of",
   "sig": "1795081602379:30747:11063:0"
  },
+ "med:s:ph|standing in": {
+  "dir": "s",
+  "name": "ph_standing_in",
+  "sig": "1795336252604:35031:11183:15171"
+ },
+ "med:s:ph|urged on": {
+  "dir": "s",
+  "name": "ph_urged_on",
+  "sig": "1795336525928:44247:15251:0"
+ },
+ "med:w:assists": {
+  "dir": "w",
+  "name": "assists",
+  "sig": "1795339342221:29767:15139:12491"
+ },
  "med:w:assumed": {
   "dir": "w",
   "name": "assumed",
@@ -33,6 +73,16 @@
   "dir": "w",
   "name": "backspin",
   "sig": "1795081678716:15507:7891:0"
+ },
+ "med:w:beat": {
+  "dir": "w",
+  "name": "beat",
+  "sig": "1795336301247:48963:15583:16011"
+ },
+ "med:w:blocks": {
+  "dir": "w",
+  "name": "blocks",
+  "sig": "1795339336785:29767:15139:12491"
  },
  "med:w:bone": {
   "dir": "w",
@@ -59,6 +109,11 @@
   "name": "cruel",
   "sig": "1794905908665:28771:10239:0"
  },
+ "med:w:cut": {
+  "dir": "w",
+  "name": "cut",
+  "sig": "1795355624592:25531:11859:14939"
+ },
  "med:w:cuz": {
   "dir": "w",
   "name": "cuz",
@@ -69,15 +124,40 @@
   "name": "dedicated",
   "sig": "1795079561783:18791:7543:0"
  },
+ "med:w:dominant": {
+  "dir": "w",
+  "name": "dominant",
+  "sig": "1795337797783:18607:10499:0"
+ },
+ "med:w:duncan": {
+  "dir": "w",
+  "name": "duncan",
+  "sig": "1795339349286:29767:15139:12491"
+ },
+ "med:w:ego": {
+  "dir": "w",
+  "name": "ego",
+  "sig": "1795338658775:22071:14535:9543"
+ },
  "med:w:fake": {
   "dir": "w",
   "name": "fake",
   "sig": "1795078717219:0:17803:10963"
  },
+ "med:w:first": {
+  "dir": "w",
+  "name": "first",
+  "sig": "1795338032593:29759:13583:12943"
+ },
  "med:w:flick": {
   "dir": "w",
   "name": "flick",
   "sig": "1795079030533:0:11531:0"
+ },
+ "med:w:forward": {
+  "dir": "w",
+  "name": "forward",
+  "sig": "1795338752310:24499:12095:0"
  },
  "med:w:genes": {
   "dir": "w",
@@ -88,6 +168,11 @@
   "dir": "w",
   "name": "good_looking",
   "sig": "1795090155860:12579:21879:21815"
+ },
+ "med:w:grief": {
+  "dir": "w",
+  "name": "grief",
+  "sig": "1795337815979:23111:9675:0"
  },
  "med:w:growth": {
   "dir": "w",
@@ -134,6 +219,16 @@
   "name": "mindset",
   "sig": "1794907111021:0:17035:0"
  },
+ "med:w:negotiate": {
+  "dir": "w",
+  "name": "negotiate",
+  "sig": "1795355594774:24635:22287:15983"
+ },
+ "med:w:net": {
+  "dir": "w",
+  "name": "net",
+  "sig": "1795336329972:26075:12323:15383"
+ },
  "med:w:obsessed": {
   "dir": "w",
   "name": "obsessed",
@@ -159,10 +254,30 @@
   "name": "pitch",
   "sig": "1794906123155:45899:11383:0"
  },
+ "med:w:preached": {
+  "dir": "w",
+  "name": "preached",
+  "sig": "1795337870314:39619:14555:0"
+ },
+ "med:w:proven": {
+  "dir": "w",
+  "name": "proven",
+  "sig": "1795339629073:27755:12619:0"
+ },
  "med:w:pump": {
   "dir": "w",
   "name": "pump",
   "sig": "1795078718687:0:17803:10963"
+ },
+ "med:w:pursue": {
+  "dir": "w",
+  "name": "pursue",
+  "sig": "1795355753338:23839:10203:23915"
+ },
+ "med:w:rebounds": {
+  "dir": "w",
+  "name": "rebounds",
+  "sig": "1795339316839:33111:22983:0"
  },
  "med:w:reinvented": {
   "dir": "w",
@@ -184,6 +299,11 @@
   "name": "sorts",
   "sig": "1795081590998:30747:10255:0"
  },
+ "med:w:standing": {
+  "dir": "w",
+  "name": "standing",
+  "sig": "1795336252548:35031:11183:15171"
+ },
  "med:w:stereotypes": {
   "dir": "w",
   "name": "stereotypes",
@@ -198,6 +318,16 @@
   "dir": "w",
   "name": "thesis",
   "sig": "1794906898806:13187:6759:0"
+ },
+ "med:w:urged": {
+  "dir": "w",
+  "name": "urged",
+  "sig": "1795336525874:44247:15251:0"
+ },
+ "med:w:wore": {
+  "dir": "w",
+  "name": "wore",
+  "sig": "1795339545291:19599:14163:0"
  },
  "med:w:wrist": {
   "dir": "w",

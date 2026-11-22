@@ -22,5 +22,8 @@
   "progress": {},
   "deleted": [],
   "pending": [],
-  "srs": {}
+  "srs": {},
+  "progAt": {},
+  "pendAdd": {},
+  "pendDel": {}
 }

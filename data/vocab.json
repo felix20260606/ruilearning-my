@@ -40306,6 +40306,1646 @@
         ]
       ],
       "tip": ""
+    },
+    {
+      "id": "v_standing_in",
+      "type": "phrase",
+      "word": "standing in",
+      "phon": "",
+      "en": "",
+      "zh": "站在；参加；帮忙；帮助",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "by the Securities Exchange Commission. Picture this. You're {standing in} line at a convenience store in San Antonio, Texas. The guy in front of you",
+          "证券交易委员会提起的民事诉讼的依据。想象一下这个场景。你正在德克萨斯州圣安东尼奥的一家便利店排队。你前面的那个人"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_standing",
+      "type": "word",
+      "word": "standing",
+      "phon": "/stˈændɪŋ/",
+      "en": "present participle and gerund of stand",
+      "zh": "常设；长远；长期的；直立的",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "by the Securities Exchange Commission. Picture this. You're {standing} in line at a convenience store in San Antonio, Texas. The guy in front of you",
+          "证券交易委员会提起的民事诉讼的依据。想象一下这个场景。你正在德克萨斯州圣安东尼奥的一家便利店排队。你前面的那个人"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_beat_up",
+      "type": "phrase",
+      "word": "beat up",
+      "phon": "",
+      "en": "",
+      "zh": "殴打；毒打；殴",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "is wearing a baggy plaid shirt, busted jeans that look like they haven't been updated since 1998, and {beat up} sneakers.",
+          "穿着宽松的格子衬衫、破旧的牛仔裤（看起来像是 1998年以后就没更新过）和破旧的运动鞋。"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_beat",
+      "type": "word",
+      "word": "beat",
+      "phon": "/bˈit/",
+      "en": "A stroke; a blow.",
+      "zh": "打；击败；拍；打败",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "is wearing a baggy plaid shirt, busted jeans that look like they haven't been updated since 1998, and {beat} up sneakers.",
+          "穿着宽松的格子衬衫、破旧的牛仔裤（看起来像是 1998年以后就没更新过）和破旧的运动鞋。"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_net_worth",
+      "type": "phrase",
+      "word": "net worth",
+      "phon": "",
+      "en": "",
+      "zh": "净值",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "everybody else. That man has a {net worth} of over $100 million.",
+          "其他人一样，默默地等着付款买菜。那个人身价超过1亿美元。"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_net",
+      "type": "word",
+      "word": "net",
+      "phon": "/nˈɛt/",
+      "en": "A mesh of string, cord or rope.",
+      "zh": "网；净；网络；网路",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "everybody else. That man has a {net} worth of over $100 million.",
+          "其他人一样，默默地等着付款买菜。那个人身价超过1亿美元。"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_urged_on",
+      "type": "phrase",
+      "word": "urged on",
+      "phon": "",
+      "en": "",
+      "zh": "敦促；鞭策；驱；趱",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "in basketball, in swimming. As a child growing up in the American Virgin Islands, Duncan and his two sisters were highly rated swimmers, {urged on} by their",
+          "篮球里没有音乐，游泳里没有音乐。邓肯和他的两个姐妹在美属维尔京群岛长大，从小就是游泳健将，这都得益于他们的"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_urged",
+      "type": "word",
+      "word": "urged",
+      "phon": "/ˈɝdʒd/",
+      "en": "having an urge to do something",
+      "zh": "敦促；督促；促使；催",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "in basketball, in swimming. As a child growing up in the American Virgin Islands, Duncan and his two sisters were highly rated swimmers, {urged} on by their",
+          "篮球里没有音乐，游泳里没有音乐。邓肯和他的两个姐妹在美属维尔京群岛长大，从小就是游泳健将，这都得益于他们的"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_dominant",
+      "type": "word",
+      "word": "dominant",
+      "phon": "/dˈɑmənənt/",
+      "en": "The fifth major tone of a musical scale (five major steps above the note in question); thus G is the dominant of C, A of D, and so on.",
+      "zh": "主导的；优势；主导；统治",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "yet within a few years, he was the most {dominant} player in college",
+          "然而几年之内，他就成为了大学篮球界最具统治力的球员"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_grief",
+      "type": "word",
+      "word": "grief",
+      "phon": "/ɡɹˈif/",
+      "en": "Suffering, hardship.",
+      "zh": "悲伤；悲；哀；哀思",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "basketball. That is not a normal story. That is a story forged by {grief},",
+          "。这并非一个正常的故事。这是一个由悲痛、"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_preached",
+      "type": "word",
+      "word": "preached",
+      "phon": "/pɹˈitʃt/",
+      "en": "simple past and past participle of preach",
+      "zh": "宣讲的；讲道；传教；传道",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "discipline, and a promise made at a bedside. A psychology major who practiced what he {preached}.",
+          "自律和床边许下的承诺铸就的故事。一位心理学专业的学生，用实际行动践行了他所宣扬的（音乐）理念。"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_first_pick",
+      "type": "phrase",
+      "word": "first pick",
+      "phon": "",
+      "en": "",
+      "zh": "第一选择",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "in the NBA draft. {First pick} in the 1997 NBA draft,",
+          "在NBA选秀中被选中为状元。在 1997 年 NBA 选秀中，"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_ego",
+      "type": "word",
+      "word": "ego",
+      "phon": "/ˈiɡoʊ/",
+      "en": "The self, especially with a sense of self-importance.",
+      "zh": "自我",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "graduate. That's not {ego} management, that's character. And it set the",
+          "毕业。那不是自我管理，那是品格。它"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_power_forward",
+      "type": "phrase",
+      "word": "power forward",
+      "phon": "",
+      "en": "",
+      "zh": "大前锋",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "incredible. Tim Duncan, widely regarded as the greatest {power forward} in NBA",
+          "不可思议。蒂姆·邓肯被广泛认为是NBA历史上最伟大的大前锋"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_rebounds",
+      "type": "word",
+      "word": "rebounds",
+      "phon": "/ɹˈibaʊndz/",
+      "en": "plural of rebound",
+      "zh": "篮板球；复原；复兴；弹回",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "MVP trophies. His career statistics are impressive. 19 points, 10.8 {rebounds},",
+          "MVP 奖。他的职业生涯统计数据令人印象深刻。场均得到 19 分、10.8 个篮板、"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_blocks",
+      "type": "word",
+      "word": "blocks",
+      "phon": "/blˈɑks/",
+      "en": "plural of block",
+      "zh": "块；木块；分段；机组",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "three assists, and 2.2 {blocks} per game. Tim Duncan won 71% of his games,",
+          "3 次助攻和 2.2 次盖帽。蒂姆·邓肯赢得了 71% 的比赛，"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_assists",
+      "type": "word",
+      "word": "assists",
+      "phon": "/əsˈɪsts/",
+      "en": "plural of assist",
+      "zh": "助攻；协助；辅助；帮助",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "three {assists}, and 2.2 blocks per game. Tim Duncan won 71% of his games,",
+          "3 次助攻和 2.2 次盖帽。蒂姆·邓肯赢得了 71% 的比赛，"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_duncan",
+      "type": "word",
+      "word": "Duncan",
+      "phon": "/dˈʌŋkən/",
+      "en": "United States dancer and pioneer of modern dance (1878-1927)",
+      "zh": "邓肯",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "three assists, and 2.2 blocks per game. Tim {Duncan} won 71% of his games,",
+          "3 次助攻和 2.2 次盖帽。蒂姆·邓肯赢得了 71% 的比赛，"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_wore",
+      "type": "word",
+      "word": "wore",
+      "phon": "/wˈɔɹ/",
+      "en": "simple past of wear",
+      "zh": "穿着；穿；戴；佩带",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "Duncan was showing up to practice in the same beat-up clothes he {wore} to the",
+          "邓肯却穿着去杂货店时穿的那身破旧衣服来参加训练"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_proven",
+      "type": "word",
+      "word": "proven",
+      "phon": "/pɹˈuvən/",
+      "en": "Having been proved; having proved its value or truth.",
+      "zh": "已证实的",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "that is Tim Duncan. He didn't need the theater of wealth. He had already {proven}",
+          "那他就是蒂姆·邓肯本人。他不需要炫耀财富。他已经证明了"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "irr_verbs_aaa",
+      "type": "pattern",
+      "word": "不规则动词 · AAA 型（原形 = 过去式 = 过去分词）",
+      "zh": "三个形式一模一样，多是 -t / -d 结尾的短词：cut–cut–cut。",
+      "tag": "拼写规律",
+      "forms": [
+        [
+          "put",
+          "put  ·  put",
+          "放"
+        ],
+        [
+          "let",
+          "let  ·  let",
+          "让"
+        ],
+        [
+          "set",
+          "set  ·  set",
+          "设置、放"
+        ],
+        [
+          "cut",
+          "cut  ·  cut",
+          "切"
+        ],
+        [
+          "hit",
+          "hit  ·  hit",
+          "打"
+        ],
+        [
+          "hurt",
+          "hurt  ·  hurt",
+          "伤害"
+        ],
+        [
+          "cost",
+          "cost  ·  cost",
+          "花费（钱）"
+        ],
+        [
+          "shut",
+          "shut  ·  shut",
+          "关上"
+        ],
+        [
+          "quit",
+          "quit  ·  quit",
+          "放弃、辞职"
+        ],
+        [
+          "read",
+          "read  ·  read",
+          "读（过去式读 /red/）"
+        ],
+        [
+          "spread",
+          "spread  ·  spread",
+          "传播、展开"
+        ],
+        [
+          "split",
+          "split  ·  split",
+          "分开"
+        ],
+        [
+          "burst",
+          "burst  ·  burst",
+          "爆裂"
+        ],
+        [
+          "cast",
+          "cast  ·  cast",
+          "投、扔"
+        ],
+        [
+          "bet",
+          "bet  ·  bet",
+          "打赌"
+        ],
+        [
+          "shed",
+          "shed  ·  shed",
+          "脱落、流（泪）"
+        ],
+        [
+          "upset",
+          "upset  ·  upset",
+          "使难过"
+        ],
+        [
+          "broadcast",
+          "broadcast  ·  broadcast",
+          "广播"
+        ],
+        [
+          "forecast",
+          "forecast  ·  forecast",
+          "预报"
+        ],
+        [
+          "thrust",
+          "thrust  ·  thrust",
+          "猛推"
+        ],
+        [
+          "fit",
+          "fit / fitted  ·  fit / fitted",
+          "适合"
+        ]
+      ],
+      "examples": [
+        [
+          "Yesterday I {cut} my finger.",
+          "我昨天切到了手指。"
+        ],
+        [
+          "She has {put} the keys on the table.",
+          "她把钥匙放在桌上了。"
+        ]
+      ],
+      "tip": "以 t / d 结尾的单音节动词最常见（cut, put, hit, let, set, cost）；read 写法不变，过去式读 /red/。",
+      "date": "2026-11-22"
+    },
+    {
+      "id": "irr_verbs_abb",
+      "type": "pattern",
+      "word": "不规则动词 · ABB 型（过去式 = 过去分词）",
+      "zh": "过去式和过去分词一样，只要多记一个词：buy–bought–bought。",
+      "tag": "拼写规律",
+      "forms": [
+        [
+          "have",
+          "had  ·  had",
+          "有"
+        ],
+        [
+          "say",
+          "said  ·  said",
+          "说"
+        ],
+        [
+          "get",
+          "got  ·  got / gotten",
+          "得到"
+        ],
+        [
+          "make",
+          "made  ·  made",
+          "做、制作"
+        ],
+        [
+          "think",
+          "thought  ·  thought",
+          "想、认为"
+        ],
+        [
+          "find",
+          "found  ·  found",
+          "找到"
+        ],
+        [
+          "tell",
+          "told  ·  told",
+          "告诉"
+        ],
+        [
+          "feel",
+          "felt  ·  felt",
+          "感觉"
+        ],
+        [
+          "leave",
+          "left  ·  left",
+          "离开"
+        ],
+        [
+          "mean",
+          "meant  ·  meant",
+          "意思是"
+        ],
+        [
+          "keep",
+          "kept  ·  kept",
+          "保持"
+        ],
+        [
+          "bring",
+          "brought  ·  brought",
+          "带来"
+        ],
+        [
+          "hold",
+          "held  ·  held",
+          "拿着、举行"
+        ],
+        [
+          "stand",
+          "stood  ·  stood",
+          "站"
+        ],
+        [
+          "hear",
+          "heard  ·  heard",
+          "听见"
+        ],
+        [
+          "lose",
+          "lost  ·  lost",
+          "丢失、输"
+        ],
+        [
+          "pay",
+          "paid  ·  paid",
+          "付钱"
+        ],
+        [
+          "meet",
+          "met  ·  met",
+          "遇见"
+        ],
+        [
+          "sit",
+          "sat  ·  sat",
+          "坐"
+        ],
+        [
+          "lead",
+          "led  ·  led",
+          "带领"
+        ],
+        [
+          "understand",
+          "understood  ·  understood",
+          "理解"
+        ],
+        [
+          "spend",
+          "spent  ·  spent",
+          "花费"
+        ],
+        [
+          "win",
+          "won  ·  won",
+          "赢"
+        ],
+        [
+          "buy",
+          "bought  ·  bought",
+          "买"
+        ],
+        [
+          "send",
+          "sent  ·  sent",
+          "发送"
+        ],
+        [
+          "build",
+          "built  ·  built",
+          "建造"
+        ],
+        [
+          "sell",
+          "sold  ·  sold",
+          "卖"
+        ],
+        [
+          "teach",
+          "taught  ·  taught",
+          "教"
+        ],
+        [
+          "catch",
+          "caught  ·  caught",
+          "抓住"
+        ],
+        [
+          "fight",
+          "fought  ·  fought",
+          "打架"
+        ],
+        [
+          "sleep",
+          "slept  ·  slept",
+          "睡觉"
+        ],
+        [
+          "hang",
+          "hung  ·  hung",
+          "挂"
+        ],
+        [
+          "shoot",
+          "shot  ·  shot",
+          "射击、拍摄"
+        ],
+        [
+          "feed",
+          "fed  ·  fed",
+          "喂"
+        ],
+        [
+          "deal",
+          "dealt  ·  dealt",
+          "处理"
+        ],
+        [
+          "dig",
+          "dug  ·  dug",
+          "挖"
+        ],
+        [
+          "lend",
+          "lent  ·  lent",
+          "借出"
+        ],
+        [
+          "bend",
+          "bent  ·  bent",
+          "弯曲"
+        ],
+        [
+          "light",
+          "lit  ·  lit",
+          "点燃"
+        ],
+        [
+          "shine",
+          "shone  ·  shone",
+          "照耀"
+        ],
+        [
+          "stick",
+          "stuck  ·  stuck",
+          "粘住、刺"
+        ],
+        [
+          "strike",
+          "struck  ·  struck",
+          "打击"
+        ],
+        [
+          "swing",
+          "swung  ·  swung",
+          "摆动"
+        ],
+        [
+          "sting",
+          "stung  ·  stung",
+          "刺、蜇"
+        ],
+        [
+          "cling",
+          "clung  ·  clung",
+          "紧抓"
+        ],
+        [
+          "spin",
+          "spun  ·  spun",
+          "旋转"
+        ],
+        [
+          "slide",
+          "slid  ·  slid",
+          "滑"
+        ],
+        [
+          "seek",
+          "sought  ·  sought",
+          "寻找"
+        ],
+        [
+          "sweep",
+          "swept  ·  swept",
+          "扫"
+        ],
+        [
+          "weep",
+          "wept  ·  wept",
+          "哭泣"
+        ],
+        [
+          "creep",
+          "crept  ·  crept",
+          "爬行、悄悄走"
+        ],
+        [
+          "kneel",
+          "knelt  ·  knelt",
+          "跪下"
+        ],
+        [
+          "flee",
+          "fled  ·  fled",
+          "逃跑"
+        ],
+        [
+          "bleed",
+          "bled  ·  bled",
+          "流血"
+        ],
+        [
+          "bind",
+          "bound  ·  bound",
+          "捆绑"
+        ],
+        [
+          "grind",
+          "ground  ·  ground",
+          "磨碎"
+        ],
+        [
+          "wind",
+          "wound  ·  wound",
+          "缠绕、上发条"
+        ],
+        [
+          "lay",
+          "laid  ·  laid",
+          "放置、下蛋"
+        ],
+        [
+          "burn",
+          "burnt / burned  ·  burnt / burned",
+          "燃烧"
+        ],
+        [
+          "dream",
+          "dreamt / dreamed  ·  dreamt / dreamed",
+          "做梦"
+        ],
+        [
+          "learn",
+          "learnt / learned  ·  learnt / learned",
+          "学习"
+        ],
+        [
+          "lean",
+          "leant / leaned  ·  leant / leaned",
+          "倚靠"
+        ],
+        [
+          "leap",
+          "leapt / leaped  ·  leapt / leaped",
+          "跳跃"
+        ],
+        [
+          "smell",
+          "smelt / smelled  ·  smelt / smelled",
+          "闻"
+        ],
+        [
+          "spell",
+          "spelt / spelled  ·  spelt / spelled",
+          "拼写"
+        ],
+        [
+          "spill",
+          "spilt / spilled  ·  spilt / spilled",
+          "洒出"
+        ],
+        [
+          "spoil",
+          "spoilt / spoiled  ·  spoilt / spoiled",
+          "宠坏、破坏"
+        ],
+        [
+          "speed",
+          "sped  ·  sped",
+          "加速"
+        ],
+        [
+          "spit",
+          "spat  ·  spat",
+          "吐"
+        ],
+        [
+          "dwell",
+          "dwelt  ·  dwelt",
+          "居住"
+        ],
+        [
+          "fling",
+          "flung  ·  flung",
+          "扔、抛"
+        ],
+        [
+          "wring",
+          "wrung  ·  wrung",
+          "拧"
+        ],
+        [
+          "misunderstand",
+          "misunderstood  ·  misunderstood",
+          "误解"
+        ]
+      ],
+      "examples": [
+        [
+          "I {bought} a new bike last week.",
+          "我上周买了辆新自行车。"
+        ],
+        [
+          "Have you {heard} the news?",
+          "你听说那个消息了吗？"
+        ]
+      ],
+      "tip": "按读音分组：-ought（bought, brought, thought, fought, sought）、-aught（caught, taught）、-ept（kept, slept, swept, wept）、-ent（sent, spent, lent, bent）、-ung（hung, swung, stung, clung）。",
+      "date": "2026-11-22"
+    },
+    {
+      "id": "irr_verbs_abc",
+      "type": "pattern",
+      "word": "不规则动词 · ABC 型（三个都不一样）",
+      "zh": "原形、过去式、过去分词各不相同，要成组背：write–wrote–written。",
+      "tag": "拼写规律",
+      "forms": [
+        [
+          "be",
+          "was / were  ·  been",
+          "是"
+        ],
+        [
+          "do",
+          "did  ·  done",
+          "做"
+        ],
+        [
+          "go",
+          "went  ·  gone",
+          "去"
+        ],
+        [
+          "know",
+          "knew  ·  known",
+          "知道"
+        ],
+        [
+          "take",
+          "took  ·  taken",
+          "拿、带走"
+        ],
+        [
+          "see",
+          "saw  ·  seen",
+          "看见"
+        ],
+        [
+          "give",
+          "gave  ·  given",
+          "给"
+        ],
+        [
+          "begin",
+          "began  ·  begun",
+          "开始"
+        ],
+        [
+          "write",
+          "wrote  ·  written",
+          "写"
+        ],
+        [
+          "speak",
+          "spoke  ·  spoken",
+          "说话"
+        ],
+        [
+          "grow",
+          "grew  ·  grown",
+          "生长"
+        ],
+        [
+          "fall",
+          "fell  ·  fallen",
+          "落下"
+        ],
+        [
+          "eat",
+          "ate  ·  eaten",
+          "吃"
+        ],
+        [
+          "drive",
+          "drove  ·  driven",
+          "开车"
+        ],
+        [
+          "break",
+          "broke  ·  broken",
+          "打破"
+        ],
+        [
+          "choose",
+          "chose  ·  chosen",
+          "选择"
+        ],
+        [
+          "wear",
+          "wore  ·  worn",
+          "穿戴"
+        ],
+        [
+          "draw",
+          "drew  ·  drawn",
+          "画、拉"
+        ],
+        [
+          "throw",
+          "threw  ·  thrown",
+          "扔"
+        ],
+        [
+          "forget",
+          "forgot  ·  forgotten",
+          "忘记"
+        ],
+        [
+          "drink",
+          "drank  ·  drunk",
+          "喝"
+        ],
+        [
+          "fly",
+          "flew  ·  flown",
+          "飞"
+        ],
+        [
+          "rise",
+          "rose  ·  risen",
+          "上升"
+        ],
+        [
+          "hide",
+          "hid  ·  hidden",
+          "藏"
+        ],
+        [
+          "ride",
+          "rode  ·  ridden",
+          "骑"
+        ],
+        [
+          "sing",
+          "sang  ·  sung",
+          "唱"
+        ],
+        [
+          "swim",
+          "swam  ·  swum",
+          "游泳"
+        ],
+        [
+          "shake",
+          "shook  ·  shaken",
+          "摇"
+        ],
+        [
+          "steal",
+          "stole  ·  stolen",
+          "偷"
+        ],
+        [
+          "wake",
+          "woke  ·  woken",
+          "醒来"
+        ],
+        [
+          "bite",
+          "bit  ·  bitten",
+          "咬"
+        ],
+        [
+          "blow",
+          "blew  ·  blown",
+          "吹"
+        ],
+        [
+          "freeze",
+          "froze  ·  frozen",
+          "冻结"
+        ],
+        [
+          "forgive",
+          "forgave  ·  forgiven",
+          "原谅"
+        ],
+        [
+          "lie",
+          "lay  ·  lain",
+          "躺"
+        ],
+        [
+          "arise",
+          "arose  ·  arisen",
+          "出现"
+        ],
+        [
+          "awake",
+          "awoke  ·  awoken",
+          "醒来"
+        ],
+        [
+          "bear",
+          "bore  ·  born / borne",
+          "忍受、生育"
+        ],
+        [
+          "beat",
+          "beat  ·  beaten",
+          "打败、敲打"
+        ],
+        [
+          "forbid",
+          "forbade  ·  forbidden",
+          "禁止"
+        ],
+        [
+          "mistake",
+          "mistook  ·  mistaken",
+          "弄错"
+        ],
+        [
+          "ring",
+          "rang  ·  rung",
+          "（铃）响"
+        ],
+        [
+          "shrink",
+          "shrank  ·  shrunk",
+          "缩小"
+        ],
+        [
+          "sink",
+          "sank  ·  sunk",
+          "下沉"
+        ],
+        [
+          "spring",
+          "sprang  ·  sprung",
+          "跳、涌出"
+        ],
+        [
+          "stink",
+          "stank  ·  stunk",
+          "发臭"
+        ],
+        [
+          "swear",
+          "swore  ·  sworn",
+          "发誓、骂人"
+        ],
+        [
+          "tear",
+          "tore  ·  torn",
+          "撕"
+        ],
+        [
+          "weave",
+          "wove  ·  woven",
+          "编织"
+        ],
+        [
+          "withdraw",
+          "withdrew  ·  withdrawn",
+          "撤回、取钱"
+        ],
+        [
+          "undertake",
+          "undertook  ·  undertaken",
+          "承担"
+        ],
+        [
+          "show",
+          "showed  ·  shown",
+          "展示"
+        ],
+        [
+          "prove",
+          "proved  ·  proven",
+          "证明"
+        ],
+        [
+          "sew",
+          "sewed  ·  sewn",
+          "缝"
+        ],
+        [
+          "swell",
+          "swelled  ·  swollen",
+          "肿胀"
+        ]
+      ],
+      "examples": [
+        [
+          "She {wrote} me a letter.",
+          "她给我写了一封信。"
+        ],
+        [
+          "I have never {eaten} sushi.",
+          "我从没吃过寿司。"
+        ]
+      ],
+      "tip": "按元音变化分组：i–a–u（begin, drink, ring, sing, sink, swim）、-ow / -ew / -own（blow, grow, know, throw, fly）、-ear / -ore / -orn（bear, swear, tear, wear）、-ake / -ook / -aken（take, shake, mistake）。",
+      "date": "2026-11-22"
+    },
+    {
+      "id": "irr_verbs_aba",
+      "type": "pattern",
+      "word": "不规则动词 · ABA 型（过去分词 = 原形）",
+      "zh": "只有过去式变，过去分词和原形一样：come–came–come。",
+      "tag": "拼写规律",
+      "forms": [
+        [
+          "come",
+          "came  ·  come",
+          "来"
+        ],
+        [
+          "become",
+          "became  ·  become",
+          "变成"
+        ],
+        [
+          "run",
+          "ran  ·  run",
+          "跑"
+        ],
+        [
+          "overcome",
+          "overcame  ·  overcome",
+          "克服"
+        ]
+      ],
+      "examples": [
+        [
+          "He {became} a doctor.",
+          "他成了医生。"
+        ],
+        [
+          "Prices have {become} higher.",
+          "物价变高了。"
+        ]
+      ],
+      "tip": "就这几个：come, become, overcome, run；记住「过去分词回到原形」。",
+      "date": "2026-11-22"
+    },
+    {
+      "id": "irr_plurals",
+      "type": "pattern",
+      "word": "不规则名词复数（全表）",
+      "zh": "不加 -s 的复数：改元音、-en、-f→-ves，以及拉丁 / 希腊来的 -is→-es、-on→-a、-us→-i、-um→-a。",
+      "tag": "拼写规律",
+      "forms": [
+        [
+          "man",
+          "→",
+          "men：男人"
+        ],
+        [
+          "woman",
+          "→",
+          "women：女人"
+        ],
+        [
+          "child",
+          "→",
+          "children：孩子"
+        ],
+        [
+          "person",
+          "→",
+          "people：人"
+        ],
+        [
+          "foot",
+          "→",
+          "feet：脚"
+        ],
+        [
+          "tooth",
+          "→",
+          "teeth：牙齿"
+        ],
+        [
+          "goose",
+          "→",
+          "geese：鹅"
+        ],
+        [
+          "mouse",
+          "→",
+          "mice：老鼠"
+        ],
+        [
+          "louse",
+          "→",
+          "lice：虱子"
+        ],
+        [
+          "ox",
+          "→",
+          "oxen：公牛"
+        ],
+        [
+          "knife",
+          "→",
+          "knives：刀"
+        ],
+        [
+          "wife",
+          "→",
+          "wives：妻子"
+        ],
+        [
+          "life",
+          "→",
+          "lives：生命、生活"
+        ],
+        [
+          "leaf",
+          "→",
+          "leaves：叶子"
+        ],
+        [
+          "half",
+          "→",
+          "halves：一半"
+        ],
+        [
+          "wolf",
+          "→",
+          "wolves：狼"
+        ],
+        [
+          "shelf",
+          "→",
+          "shelves：架子"
+        ],
+        [
+          "calf",
+          "→",
+          "calves：小牛、小腿"
+        ],
+        [
+          "loaf",
+          "→",
+          "loaves：（一条）面包"
+        ],
+        [
+          "thief",
+          "→",
+          "thieves：小偷"
+        ],
+        [
+          "self",
+          "→",
+          "selves：自己"
+        ],
+        [
+          "scarf",
+          "→",
+          "scarves：围巾"
+        ],
+        [
+          "crisis",
+          "→",
+          "crises：危机"
+        ],
+        [
+          "analysis",
+          "→",
+          "analyses：分析"
+        ],
+        [
+          "basis",
+          "→",
+          "bases：基础"
+        ],
+        [
+          "thesis",
+          "→",
+          "theses：论文"
+        ],
+        [
+          "hypothesis",
+          "→",
+          "hypotheses：假设"
+        ],
+        [
+          "diagnosis",
+          "→",
+          "diagnoses：诊断"
+        ],
+        [
+          "emphasis",
+          "→",
+          "emphases：强调"
+        ],
+        [
+          "phenomenon",
+          "→",
+          "phenomena：现象"
+        ],
+        [
+          "criterion",
+          "→",
+          "criteria：标准"
+        ],
+        [
+          "cactus",
+          "→",
+          "cacti：仙人掌"
+        ],
+        [
+          "fungus",
+          "→",
+          "fungi：真菌"
+        ],
+        [
+          "nucleus",
+          "→",
+          "nuclei：核"
+        ],
+        [
+          "radius",
+          "→",
+          "radii：半径"
+        ],
+        [
+          "stimulus",
+          "→",
+          "stimuli：刺激"
+        ],
+        [
+          "alumnus",
+          "→",
+          "alumni：校友"
+        ],
+        [
+          "curriculum",
+          "→",
+          "curricula：课程"
+        ],
+        [
+          "bacterium",
+          "→",
+          "bacteria：细菌"
+        ],
+        [
+          "medium",
+          "→",
+          "media：媒介"
+        ],
+        [
+          "datum",
+          "→",
+          "data：数据"
+        ],
+        [
+          "appendix",
+          "→",
+          "appendices：附录"
+        ],
+        [
+          "index",
+          "→",
+          "indices：索引、指数"
+        ],
+        [
+          "matrix",
+          "→",
+          "matrices：矩阵"
+        ],
+        [
+          "sheep",
+          "同形",
+          "单复数一样"
+        ],
+        [
+          "deer",
+          "同形",
+          "单复数一样"
+        ],
+        [
+          "fish",
+          "同形",
+          "单复数一样"
+        ],
+        [
+          "series",
+          "同形",
+          "单复数一样"
+        ],
+        [
+          "species",
+          "同形",
+          "单复数一样"
+        ],
+        [
+          "aircraft",
+          "同形",
+          "单复数一样"
+        ],
+        [
+          "offspring",
+          "同形",
+          "单复数一样"
+        ]
+      ],
+      "examples": [
+        [
+          "Two {women} and three {children} came in.",
+          "进来了两个女人和三个孩子。"
+        ],
+        [
+          "These {criteria} are too strict.",
+          "这些标准太严了。"
+        ]
+      ],
+      "tip": "man→men、foot→feet 改元音；-f / -fe 多变 -ves；学术词 crisis→crises、phenomenon→phenomena、stimulus→stimuli。",
+      "date": "2026-11-22"
+    },
+    {
+      "id": "irr_comparatives",
+      "type": "pattern",
+      "word": "不规则比较级和最高级（全表）",
+      "zh": "不加 -er / -est、也不用 more / most 的几组，要整组背。",
+      "tag": "拼写规律",
+      "forms": [
+        [
+          "good / well",
+          "→",
+          "better  ·  best：好"
+        ],
+        [
+          "bad / badly / ill",
+          "→",
+          "worse  ·  worst：坏、差"
+        ],
+        [
+          "many / much",
+          "→",
+          "more  ·  most：多"
+        ],
+        [
+          "little",
+          "→",
+          "less  ·  least：少"
+        ],
+        [
+          "far",
+          "→",
+          "farther / further  ·  farthest / furthest：远"
+        ],
+        [
+          "old",
+          "→",
+          "older / elder  ·  oldest / eldest：老、年长"
+        ]
+      ],
+      "examples": [
+        [
+          "Your English is getting {better}.",
+          "你的英语越来越好了。"
+        ],
+        [
+          "This is the {worst} day ever.",
+          "这是有史以来最糟的一天。"
+        ]
+      ],
+      "tip": "good / well → better → best，bad → worse → worst，many / much → more → most，little → less → least。",
+      "date": "2026-11-22"
+    },
+    {
+      "id": "u_1795350234277_bgf9",
+      "type": "word",
+      "word": "culture",
+      "phon": "/ˈkʌlt͡ʃə/",
+      "en": "(noun) The arts, customs, lifestyles, background, and habits that characterize a particular society or nation.",
+      "zh": "文化；文化、培养、文；耕种、籀",
+      "tag": "收集",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "The chef said topping pizzas with the tropical fruit was an \"insult to his {culture}\".",
+          ""
+        ],
+        [
+          "Youth has its own {culture}.",
+          "年轻人有自己的文化。"
+        ],
+        [
+          "Korean entertainment {culture} is popular worldwide.",
+          "韓國的娛樂文化在全球都很受歡迎。"
+        ],
+        [
+          "Is PC {culture} good or bad?",
+          "電腦文化是好是壞？"
+        ]
+      ],
+      "tip": "",
+      "auto": 1,
+      "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/culture-us.mp3"
+    },
+    {
+      "id": "v_negotiate",
+      "type": "word",
+      "word": "negotiate",
+      "phon": "/nəɡˈoʊʃieɪt/",
+      "en": "To confer with others in order to come to terms or reach an agreement.",
+      "zh": "谈判；交涉；讲",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "status to {negotiate} the biggest contract possible. That's not greed. That's just",
+          "地位去谈判尽可能大的合同。那不是贪婪。"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_pay_cut",
+      "type": "phrase",
+      "word": "pay cut",
+      "phon": "",
+      "en": "",
+      "zh": "减薪",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "{pay cut} Duncan took in 2012 represents one of the most remarkable moments in",
+          "邓肯在 2012 年大幅降薪，这是"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_cut",
+      "type": "word",
+      "word": "cut",
+      "phon": "/kˈʌt/",
+      "en": "To incise, to cut into the surface of something. To perform an incision on, for example with a knife. To divide with a knife, scissors, or another…",
+      "zh": "切；砍；斩；削",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "pay {cut} Duncan took in 2012 represents one of the most remarkable moments in",
+          "邓肯在 2012 年大幅降薪，这是"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_pursue",
+      "type": "word",
+      "word": "pursue",
+      "phon": "/pɚsˈu/",
+      "en": "To follow urgently, originally with intent to capture or harm; to chase.",
+      "zh": "追求；奉行；推行；追寻",
+      "tag": "视频",
+      "date": "2026-11-22",
+      "forms": [],
+      "examples": [
+        [
+          "cut over his final four seasons to allow San Antonio to {pursue} additional talent",
+          "在最后四个赛季大幅降薪，以便圣安东尼奥能够"
+        ]
+      ],
+      "tip": ""
     }
   ],
   "progress": {
@@ -40343,7 +41983,35 @@
     "bar": "known",
     "skyscraper": "known",
     "v_ball": "known",
-    "v_matrix": "learning"
+    "v_matrix": "learning",
+    "forward": "known",
+    "v_blocks": "known",
+    "v_assists": "known",
+    "v_duncan": "known",
+    "v_growth": "known",
+    "v_careless": "known",
+    "v_wrist": "known",
+    "v_guys": "known",
+    "v_brains": "known",
+    "v_unlike": "known",
+    "v_fake": "known",
+    "v_motion": "known",
+    "v_cut": "known",
+    "v_wore": "known",
+    "v_pay_cut": "known",
+    "triggered": "known",
+    "liquid": "known",
+    "issue": "known",
+    "downstairs": "known",
+    "palm": "known",
+    "lemon": "known",
+    "curry_favor": "known",
+    "curry": "known",
+    "crab": "known",
+    "flavor": "known",
+    "fine": "known",
+    "lemongrass": "known",
+    "v_assumed": "known"
   },
   "deleted": [
     "u_1782668109496_exc6",
@@ -40365,139 +42033,141 @@
     "v_retirement",
     "v_humor",
     "v_quickly",
-    "v_study"
+    "v_study",
+    "v_first"
   ],
   "pending": [],
   "srs": {
     "v_productive": {
-      "n": 9,
-      "b": 0,
-      "at": 1795187310649,
-      "due": 1795272685026.153,
+      "n": 12,
+      "b": 1,
+      "at": 1795363733366,
+      "due": 1795495532608.5254,
       "x": 7,
       "e": [
-        3.0356,
-        3.0356,
-        0.9881
+        3.0862,
+        3.0862,
+        1.5255
       ],
-      "h": 0.988
+      "h": 1.525
     },
     "v_nasal_consonant": {
-      "n": 10,
-      "b": 0,
-      "at": 1795187309896,
-      "due": 1795273709896,
+      "n": 13,
+      "b": 1,
+      "at": 1795363734373,
+      "due": 1795497176661.1143,
       "e": [
-        3,
-        3,
-        1
+        3.0498,
+        3.0498,
+        1.5445
       ],
-      "h": 1,
+      "h": 1.544,
       "x": 6
     },
     "v_consonant": {
-      "n": 9,
-      "b": 0,
-      "at": 1795187310732,
-      "due": 1795272683177.3108,
+      "n": 12,
+      "b": 1,
+      "at": 1795363733698,
+      "due": 1795495533005.4749,
       "x": 7,
       "e": [
-        3.0356,
-        3.0356,
-        0.9881
+        3.0862,
+        3.0862,
+        1.5255
       ],
-      "h": 0.988
+      "h": 1.525
     },
     "v_applause": {
-      "n": 11,
+      "n": 14,
       "b": 0,
-      "at": 1795187320795,
-      "due": 1795272718802.925,
+      "at": 1795364407904,
+      "due": 1795440719449.6985,
       "x": 7,
       "e": [
-        3.0356,
-        3.0356,
-        0.9884
+        3.8809,
+        3.8809,
+        0.8832
       ],
-      "h": 0.988
+      "h": 0.883,
+      "f": 1
     },
     "v_careless": {
-      "n": 21,
-      "b": 0,
-      "at": 1795187310397,
-      "due": 1795272640264.9734,
+      "n": 24,
+      "b": 1,
+      "at": 1795363732366,
+      "due": 1795495488006.33,
       "x": 9,
       "e": [
-        3.0356,
-        3.0356,
-        0.9876
+        3.0863,
+        3.0863,
+        1.5249
       ],
-      "h": 0.988
+      "h": 1.525
     },
     "v_cruel": {
-      "n": 22,
-      "b": 0,
-      "at": 1795187310062,
-      "due": 1795271007319.8623,
+      "n": 25,
+      "b": 1,
+      "at": 1795363731022,
+      "due": 1795493831998.5845,
       "x": 9,
       "e": [
-        3.0364,
-        3.0364,
-        0.9687
+        3.0876,
+        3.0876,
+        1.5058
       ],
-      "h": 0.969
+      "h": 1.506
     },
     "v_reinvented": {
-      "n": 17,
-      "b": 0,
-      "at": 1795187310146,
-      "due": 1795272624905.1948,
+      "n": 20,
+      "b": 1,
+      "at": 1795363731357,
+      "due": 1795495469436.7417,
       "x": 8,
       "e": [
-        3.0356,
-        3.0356,
-        0.9874
+        3.0863,
+        3.0863,
+        1.5247
       ],
-      "h": 0.987
+      "h": 1.525
     },
     "v_impacts": {
-      "n": 16,
-      "b": 0,
-      "at": 1795187310314,
-      "due": 1795272633194.5442,
+      "n": 19,
+      "b": 1,
+      "at": 1795363732023,
+      "due": 1795495478914.0784,
       "x": 8,
       "e": [
-        3.0356,
-        3.0356,
-        0.9875
+        3.0863,
+        3.0863,
+        1.5248
       ],
-      "h": 0.988
+      "h": 1.525
     },
     "v_growth": {
-      "n": 20,
-      "b": 0,
-      "at": 1795187310480,
-      "due": 1795272639327.3071,
+      "n": 23,
+      "b": 1,
+      "at": 1795363732694,
+      "due": 1795495488398.2358,
       "x": 9,
       "e": [
-        3.0356,
-        3.0356,
-        0.9876
+        3.0863,
+        3.0863,
+        1.525
       ],
-      "h": 0.988
+      "h": 1.525
     },
     "v_mindset": {
-      "n": 16,
-      "b": 0,
-      "at": 1795187310230,
-      "due": 1795272631026.6353,
+      "n": 19,
+      "b": 1,
+      "at": 1795363731690,
+      "due": 1795495478516.1294,
       "x": 9,
       "e": [
-        3.0356,
-        3.0356,
-        0.9875
+        3.0863,
+        3.0863,
+        1.5248
       ],
-      "h": 0.988
+      "h": 1.525
     },
     "v_squint": {
       "at": 1794998235197,
@@ -40506,248 +42176,264 @@
       "n": 1
     },
     "v_decisions": {
-      "n": 11,
+      "n": 12,
       "b": 2,
-      "at": 1795187321545,
-      "due": 1795489120417.6887,
+      "at": 1795363748391,
+      "due": 1795712789077.4792,
       "x": 5,
       "e": [
-        3.011,
-        3.011,
-        3.493
+        3.0324,
+        3.0324,
+        4.0398
       ],
-      "h": 3.493
+      "h": 4.04
     },
     "v_reinvent": {
-      "n": 11,
+      "n": 13,
       "b": 1,
-      "at": 1795187320879,
-      "due": 1795277458579.752,
+      "at": 1795363736049,
+      "due": 1795500350032.1868,
       "x": 7,
       "e": [
-        3.0341,
-        3.0341,
-        1.0433
+        3.0833,
+        3.0833,
+        1.5812
       ],
-      "h": 1.043
+      "h": 1.581
     },
     "v_brains": {
-      "n": 15,
-      "b": 0,
-      "at": 1795187320712,
-      "due": 1795272702928.1667,
+      "n": 18,
+      "b": 1,
+      "at": 1795363734038,
+      "due": 1795495539512.3645,
       "x": 8,
       "e": [
-        3.0356,
-        3.0356,
-        0.9882
+        3.0862,
+        3.0862,
+        1.5255
       ],
-      "h": 0.988
+      "h": 1.526
     },
     "v_pitch": {
-      "n": 11,
-      "b": 0,
-      "at": 1795186937170,
-      "due": 1795239724460.6282,
+      "n": 17,
+      "b": 1,
+      "at": 1795363728110,
+      "due": 1795451589063.6777,
       "x": 4,
       "e": [
-        3.9167,
-        3.9167,
-        0.611
+        3.9961,
+        3.9961,
+        1.0169
       ],
-      "h": 0.611
+      "h": 1.017
     },
     "v_thesis": {
-      "n": 12,
-      "b": 0,
-      "at": 1795187310565,
-      "due": 1795272635356.6433,
+      "n": 15,
+      "b": 1,
+      "at": 1795363733028,
+      "due": 1795495488797.1848,
       "x": 7,
       "e": [
-        3.0356,
-        3.0356,
-        0.9876
+        3.0863,
+        3.0863,
+        1.525
       ],
-      "h": 0.988
+      "h": 1.525
     },
     "v_scoop": {
-      "n": 10,
-      "b": 0,
-      "at": 1795186932428,
-      "due": 1795239698002.1917,
+      "n": 16,
+      "b": 1,
+      "at": 1795363727161,
+      "due": 1795451562775.0198,
       "x": 4,
       "e": [
-        3.9167,
-        3.9167,
-        0.6107
+        3.9961,
+        3.9961,
+        1.0166
       ],
-      "h": 0.611
+      "h": 1.017
     },
     "v_i_poured_myself_some_wine": {
-      "n": 7,
-      "b": 0,
-      "at": 1795187309979,
-      "due": 1795273709979,
+      "n": 10,
+      "b": 1,
+      "at": 1795363734706,
+      "due": 1795497177060.1885,
       "e": [
-        3,
-        3,
-        1
+        3.0498,
+        3.0498,
+        1.5445
       ],
-      "h": 1,
+      "h": 1.544,
       "x": 6
     },
     "v_guys": {
-      "n": 7,
+      "n": 14,
       "b": 2,
-      "at": 1795111180527,
-      "due": 1795528171626.7268,
-      "s": 4.826285876468261,
-      "d": 4.934810347999999,
-      "x": 2
+      "at": 1795363747124,
+      "due": 1795848637470.3154,
+      "x": 2,
+      "e": [
+        3.022,
+        3.022,
+        5.6122
+      ],
+      "h": 5.612
     },
     "v_motion": {
-      "n": 7,
+      "n": 14,
       "b": 2,
-      "at": 1795111181401,
-      "due": 1795528173360.037,
-      "s": 4.826295822188794,
-      "d": 4.934810347999999,
-      "x": 2
+      "at": 1795363747748,
+      "due": 1795848638887.3657,
+      "x": 2,
+      "e": [
+        3.022,
+        3.022,
+        5.6122
+      ],
+      "h": 5.612
     },
     "v_possessions": {
-      "n": 12,
-      "b": 2,
-      "at": 1795187321796,
-      "due": 1795624707687.2737,
-      "x": 6,
-      "e": [
-        3.0077,
-        3.0077,
-        5.0623
-      ],
-      "h": 5.062
-    },
-    "v_procrastinator": {
-      "n": 3,
-      "b": 2,
-      "at": 1795111196199,
-      "due": 1795528041487.4045,
-      "s": 4.824598245423094,
-      "d": 4.934810347999999,
-      "x": 2
-    },
-    "v_deadline": {
-      "n": 9,
-      "b": 2,
-      "at": 1795187321883,
-      "due": 1795624696036.014,
-      "x": 5,
-      "e": [
-        3.0077,
-        3.0077,
-        5.0622
-      ],
-      "h": 5.062
-    },
-    "flourish": {
-      "n": 9,
-      "b": 2,
-      "at": 1795111198442,
-      "due": 1795528032588.2827,
-      "s": 4.8244692856782825,
-      "d": 4.934810347999999,
-      "x": 3
-    },
-    "nourish": {
       "n": 13,
       "b": 2,
-      "at": 1795187321716,
-      "due": 1795624673754.7314,
+      "at": 1795363755812,
+      "due": 1795848511684.4429,
       "x": 6,
       "e": [
-        3.0077,
-        3.0077,
-        5.0619
+        3.0234,
+        3.0234,
+        5.6106
       ],
-      "h": 5.062
+      "h": 5.611
     },
-    "v_congenital": {
-      "n": 6,
-      "b": 1,
-      "at": 1795187321212,
-      "due": 1795319707296.399,
-      "x": 4,
+    "v_procrastinator": {
+      "n": 10,
+      "b": 2,
+      "at": 1795363745598,
+      "due": 1795848485421.9001,
+      "x": 2,
       "e": [
-        3.0241,
-        3.0241,
-        1.5322
+        3.022,
+        3.022,
+        5.6104
       ],
-      "h": 1.532
+      "h": 5.61
     },
-    "v_athletic": {
-      "n": 8,
-      "b": 1,
-      "at": 1795187321295,
-      "due": 1795319711878.8848,
-      "x": 4,
-      "e": [
-        3.0241,
-        3.0241,
-        1.5323
-      ],
-      "h": 1.532
-    },
-    "v_genes": {
-      "n": 15,
-      "at": 1795187309729,
-      "due": 1795244075368.0435,
-      "b": 0,
+    "v_deadline": {
+      "n": 10,
+      "b": 2,
+      "at": 1795363754321,
+      "due": 1795848501128.0298,
       "x": 5,
       "e": [
-        3.0501,
-        3.0501,
-        0.657
+        3.0234,
+        3.0234,
+        5.6105
       ],
-      "h": 0.657
+      "h": 5.61
+    },
+    "flourish": {
+      "n": 16,
+      "b": 2,
+      "at": 1795363744070,
+      "due": 1795848471734.3237,
+      "x": 3,
+      "e": [
+        3.022,
+        3.022,
+        5.6103
+      ],
+      "h": 5.61
+    },
+    "nourish": {
+      "n": 14,
+      "b": 2,
+      "at": 1795363753588,
+      "due": 1795848474314.1653,
+      "x": 6,
+      "e": [
+        3.0234,
+        3.0234,
+        5.6102
+      ],
+      "h": 5.61
+    },
+    "v_congenital": {
+      "n": 8,
+      "b": 1,
+      "at": 1795363737720,
+      "due": 1795542907623.649,
+      "x": 4,
+      "e": [
+        3.0633,
+        3.0633,
+        2.0737
+      ],
+      "h": 2.074
+    },
+    "v_athletic": {
+      "n": 10,
+      "b": 1,
+      "at": 1795363738056,
+      "due": 1795542916688.8713,
+      "x": 4,
+      "e": [
+        3.0633,
+        3.0633,
+        2.0738
+      ],
+      "h": 2.074
+    },
+    "v_genes": {
+      "n": 18,
+      "at": 1795363729882,
+      "due": 1795466503496.102,
+      "b": 1,
+      "x": 5,
+      "e": [
+        3.1115,
+        3.1115,
+        1.1895
+      ],
+      "h": 1.19
     },
     "v_laces": {
-      "n": 5,
-      "at": 1795187321633,
-      "due": 1795528792109.712,
+      "n": 6,
+      "at": 1795363752387,
+      "due": 1795752514755.2327,
       "b": 2,
       "x": 4,
       "e": [
-        3.0098,
-        3.0098,
-        3.9522
+        3.0292,
+        3.0292,
+        4.4996
       ],
-      "h": 3.952
+      "h": 4.5
     },
     "v_flick": {
-      "n": 15,
-      "at": 1795187309812,
-      "due": 1795244071601.3457,
-      "b": 0,
+      "n": 18,
+      "at": 1795363730315,
+      "due": 1795466504019.5022,
+      "b": 1,
       "x": 5,
       "e": [
-        3.0501,
-        3.0501,
-        0.657
+        3.1115,
+        3.1115,
+        1.1895
       ],
-      "h": 0.657
+      "h": 1.19
     },
     "v_wrist": {
-      "n": 17,
-      "at": 1795187309645,
-      "due": 1795244047969.6575,
-      "b": 0,
+      "n": 20,
+      "at": 1795363729372,
+      "due": 1795466475088.8455,
+      "b": 1,
       "x": 5,
       "e": [
-        3.0502,
-        3.0502,
-        0.6567
+        3.1116,
+        3.1116,
+        1.1892
       ],
-      "h": 0.657
+      "h": 1.189
     },
     "v_cuz": {
       "n": 1,
@@ -40759,100 +42445,196 @@
       "x": 1
     },
     "v_fake": {
-      "n": 14,
-      "at": 1795187309560,
-      "due": 1795242027188.7776,
-      "b": 0,
+      "n": 20,
+      "at": 1795363728803,
+      "due": 1795464413276.8833,
+      "b": 1,
       "x": 4,
       "e": [
-        3.0516,
-        3.0516,
-        0.6333
+        3.1139,
+        3.1139,
+        1.1653
       ],
-      "h": 0.633
+      "h": 1.165
     },
     "v_dedicated": {
-      "n": 5,
+      "n": 7,
       "e": [
-        3.0289,
-        3.0289,
-        1.2317
+        3.0737,
+        3.0737,
+        1.7714
       ],
-      "h": 1.232,
-      "at": 1795187321129,
-      "due": 1795293741294.1794,
+      "h": 1.771,
+      "at": 1795363737055,
+      "due": 1795516782272.7393,
       "b": 1,
       "x": 3
     },
     "v_pump_fake": {
-      "n": 5,
+      "n": 7,
       "e": [
-        3.0197,
-        3.0197,
-        1.1425
+        3.0663,
+        3.0663,
+        1.6836
       ],
-      "h": 1.142,
-      "at": 1795187321379,
-      "due": 1795286030445.791,
+      "h": 1.684,
+      "at": 1795363736381,
+      "due": 1795509202445.7454,
       "b": 1,
       "x": 3
     },
     "v_knack": {
-      "n": 5,
+      "n": 7,
       "e": [
-        3.0197,
-        3.0197,
-        1.1425
+        3.0663,
+        3.0663,
+        1.6836
       ],
-      "h": 1.142,
-      "at": 1795187321462,
-      "due": 1795286029646.1318,
+      "h": 1.684,
+      "at": 1795363736715,
+      "due": 1795509202845.7073,
       "b": 1,
       "x": 3
     },
     "v_matrix": {
-      "n": 4,
+      "n": 7,
       "e": [
-        3,
-        3,
-        1
+        3.0498,
+        3.0498,
+        1.5444
       ],
-      "h": 1,
-      "at": 1795187320962,
-      "due": 1795273720962,
-      "b": 0,
+      "h": 1.544,
+      "at": 1795363735040,
+      "due": 1795497174579.6868,
+      "b": 1,
       "x": 3
     },
     "v_completely": {
-      "n": 4,
+      "n": 7,
       "e": [
-        3,
-        3,
-        1
+        3.0498,
+        3.0498,
+        1.5444
       ],
-      "h": 1,
-      "at": 1795187321045,
-      "due": 1795273721045,
-      "b": 0,
+      "h": 1.544,
+      "at": 1795363735375,
+      "due": 1795497174981.2898,
+      "b": 1,
       "x": 3
     },
     "v_unlike": {
-      "n": 4,
+      "n": 7,
       "e": [
-        3,
-        3,
-        1
+        3.0498,
+        3.0498,
+        1.5444
       ],
-      "h": 1,
-      "at": 1795187347691,
-      "due": 1795273747691,
-      "b": 0,
+      "h": 1.544,
+      "at": 1795363735716,
+      "due": 1795497168369.9417,
+      "b": 1,
       "x": 3
     },
     "v_obsessed": {
       "n": 3
     },
     "v_backspin": {
+      "n": 3,
+      "e": [
+        3.041,
+        3.041,
+        1.3867
+      ],
+      "h": 1.387,
+      "at": 1795363737387,
+      "due": 1795483549138.1428,
+      "b": 1,
+      "x": 0
+    },
+    "v_sorts_of": {
+      "n": 10,
+      "f": 1,
+      "e": [
+        3.0738,
+        3.0738,
+        0.6338
+      ],
+      "h": 0.634,
+      "at": 1795364403996,
+      "due": 1795419161752.7283,
+      "b": 0,
+      "x": 6
+    },
+    "v_standing_in": {
+      "n": 1
+    },
+    "v_standing": {
+      "n": 2,
+      "e": [
+        3.0004,
+        3.0004,
+        1.0021
+      ],
+      "h": 1.002,
+      "at": 1795364416490,
+      "due": 1795450999745.6445,
+      "b": 1,
+      "x": 0
+    },
+    "v_beat_up": {
+      "n": 2,
+      "e": [
+        3.0004,
+        3.0004,
+        1.0021
+      ],
+      "h": 1.002,
+      "at": 1795364423820,
+      "due": 1795451008966.1523,
+      "b": 1,
+      "x": 0
+    },
+    "v_beat": {
+      "n": 2,
+      "e": [
+        3.0004,
+        3.0004,
+        1.0022
+      ],
+      "h": 1.002,
+      "at": 1795364426764,
+      "due": 1795451012614.9033,
+      "b": 1,
+      "x": 0
+    },
+    "v_net_worth": {
+      "n": 2,
+      "e": [
+        3.9705,
+        3.9705,
+        0.7206
+      ],
+      "h": 0.721,
+      "at": 1795364435585,
+      "due": 1795426697062.722,
+      "b": 0,
+      "x": 0,
+      "f": 1
+    },
+    "v_net": {
+      "n": 2,
+      "e": [
+        3.0004,
+        3.0004,
+        1.0022
+      ],
+      "h": 1.002,
+      "at": 1795364438374,
+      "due": 1795451027180.908,
+      "b": 1,
+      "x": 0
+    },
+    "v_urged_on": {
       "n": 1,
       "e": [
         3,
@@ -40860,12 +42642,77 @@
         1
       ],
       "h": 1,
-      "at": 1795238789449,
-      "due": 1795325189449,
+      "at": 1795363740065,
+      "due": 1795450140065,
       "b": 0,
       "x": 0
     },
-    "v_sorts_of": {
+    "v_urged": {
+      "n": 1,
+      "e": [
+        3,
+        3,
+        1
+      ],
+      "h": 1,
+      "at": 1795363741469,
+      "due": 1795450141469,
+      "b": 0,
+      "x": 0
+    },
+    "v_dominant": {
+      "n": 1,
+      "e": [
+        3,
+        3,
+        1
+      ],
+      "h": 1,
+      "at": 1795363742042,
+      "due": 1795450142042,
+      "b": 0,
+      "x": 0
+    },
+    "v_grief": {
+      "n": 1,
+      "e": [
+        3,
+        3,
+        1
+      ],
+      "h": 1,
+      "at": 1795363743220,
+      "due": 1795450143220,
+      "b": 0,
+      "x": 0
+    },
+    "v_preached": {
+      "n": 1,
+      "e": [
+        3,
+        3,
+        1
+      ],
+      "h": 1,
+      "at": 1795363769977,
+      "due": 1795450169977,
+      "b": 0,
+      "x": 0
+    },
+    "v_first_pick": {
+      "n": 1,
+      "e": [
+        3,
+        3,
+        1
+      ],
+      "h": 1,
+      "at": 1795363773760,
+      "due": 1795450173760,
+      "b": 0,
+      "x": 0
+    },
+    "v_ego": {
       "n": 1,
       "f": 1,
       "e": [
@@ -40874,9 +42721,247 @@
         0.25
       ],
       "h": 0.25,
-      "at": 1795238801999,
-      "due": 1795260401999,
+      "at": 1795364356327,
+      "due": 1795385956327,
+      "b": 0
+    },
+    "v_power_forward": {
+      "n": 1,
+      "e": [
+        3,
+        3,
+        1
+      ],
+      "h": 1,
+      "at": 1795364361651,
+      "due": 1795450761651,
+      "b": 0,
+      "x": 0
+    },
+    "v_rebounds": {
+      "n": 1,
+      "e": [
+        3,
+        3,
+        1
+      ],
+      "h": 1,
+      "at": 1795364370279,
+      "due": 1795450770279,
+      "b": 0,
+      "x": 0
+    },
+    "v_proven": {
+      "n": 1,
+      "e": [
+        3,
+        3,
+        1
+      ],
+      "h": 1,
+      "at": 1795364373739,
+      "due": 1795450773739,
+      "b": 0,
+      "x": 0
+    },
+    "u_1795350234277_bgf9": {
+      "n": 1,
+      "e": [
+        3,
+        3,
+        1
+      ],
+      "h": 1,
+      "at": 1795364376967,
+      "due": 1795450776967,
+      "b": 0,
+      "x": 0
+    },
+    "v_negotiate": {
+      "n": 1,
+      "f": 1,
+      "e": [
+        3,
+        3,
+        0.25
+      ],
+      "h": 0.25,
+      "at": 1795364383117,
+      "due": 1795385983117,
+      "b": 0
+    },
+    "v_pursue": {
+      "n": 1,
+      "e": [
+        3,
+        3,
+        1
+      ],
+      "h": 1,
+      "at": 1795364389451,
+      "due": 1795450789451,
+      "b": 0,
+      "x": 0
+    },
+    "v_kebab": {
+      "n": 1,
+      "f": 1,
+      "e": [
+        3,
+        3,
+        0.25
+      ],
+      "h": 0.25,
+      "at": 1795364396647,
+      "due": 1795385996647,
+      "b": 0
+    },
+    "v_skip_the_line": {
+      "n": 1,
+      "e": [
+        3,
+        3,
+        1
+      ],
+      "h": 1,
+      "at": 1795364401002,
+      "due": 1795450801002,
+      "b": 0,
+      "x": 0
+    },
+    "v_offended": {
+      "n": 1,
+      "e": [
+        3,
+        3,
+        1
+      ],
+      "h": 1,
+      "at": 1795364617017,
+      "due": 1795451017017,
+      "b": 0,
+      "x": 0
+    },
+    "v_assumed": {
+      "n": 1,
+      "e": [
+        3,
+        3,
+        1
+      ],
+      "h": 1,
+      "at": 1795365026158,
+      "due": 1795451426158,
+      "b": 0,
+      "x": 0
+    },
+    "v_stereotypes": {
+      "n": 1,
+      "e": [
+        3,
+        3,
+        1
+      ],
+      "h": 1,
+      "at": 1795365031554,
+      "due": 1795451431554,
+      "b": 0,
+      "x": 0
+    },
+    "v_good_looking": {
+      "n": 1,
+      "f": 1,
+      "e": [
+        3,
+        3,
+        0.25
+      ],
+      "h": 0.25,
+      "at": 1795365043284,
+      "due": 1795386643284,
+      "b": 0
+    },
+    "v_licking": {
+      "n": 1,
+      "e": [
+        3,
+        3,
+        1
+      ],
+      "h": 1,
+      "at": 1795365177159,
+      "due": 1795451577159,
+      "b": 0,
+      "x": 0
+    },
+    "ooze": {
+      "n": 1,
+      "f": 1,
+      "e": [
+        3,
+        3,
+        0.25
+      ],
+      "h": 0.25,
+      "at": 1795365182901,
+      "due": 1795386782901,
+      "b": 0
+    },
+    "melt": {
+      "n": 1,
+      "f": 1,
+      "e": [
+        3,
+        3,
+        0.25
+      ],
+      "h": 0.25,
+      "at": 1795365189798,
+      "due": 1795386789798,
+      "b": 0
+    },
+    "fondant": {
+      "n": 1,
+      "f": 1,
+      "e": [
+        3,
+        3,
+        0.25
+      ],
+      "h": 0.25,
+      "at": 1795365198051,
+      "due": 1795386798051,
       "b": 0
     }
-  }
+  },
+  "progAt": {
+    "v_substance": 1795355339852,
+    "v_growth": 1795363865681,
+    "v_careless": 1795363870585,
+    "v_wrist": 1795363891525,
+    "v_guys": 1795363898407,
+    "v_brains": 1795363905223,
+    "v_unlike": 1795363913200,
+    "v_fake": 1795363922141,
+    "v_motion": 1795363927856,
+    "v_cut": 1795363970984,
+    "v_wore": 1795363989067,
+    "v_pay_cut": 1795364011087,
+    "triggered": 1795364035643,
+    "liquid": 1795364044087,
+    "issue": 1795364053646,
+    "downstairs": 1795364070159,
+    "palm": 1795364093625,
+    "lemon": 1795364109308,
+    "curry_favor": 1795364158004,
+    "curry": 1795364163571,
+    "crab": 1795364169536,
+    "flavor": 1795364178206,
+    "fine": 1795364196103,
+    "lemongrass": 1795364201498,
+    "v_assumed": 1795364837508,
+    "v_cuz": 1795368903655
+  },
+  "pendAdd": {},
+  "pendDel": {}
 }
