@@ -87,11 +87,20 @@
   function mark(h,ok){var b=bad();if(ok){if(!(h in b))return;delete b[h];}else b[h]=Date.now();save(b);}
   function pxu(u){return "/api/px?u="+encodeURIComponent(u);}
   function tfetch(u,o,ms){var ac=window.AbortController?new AbortController():null,t=setTimeout(function(){if(ac)ac.abort();},ms);return fetch(u,Object.assign({},o||{},ac?{signal:ac.signal}:{})).then(function(r){clearTimeout(t);return r;},function(e){clearTimeout(t);throw e;});}
+  // 中转一次最多 4 个（页面上几百张配图同时要，维基会把后台限流成 429）
+  var q=[],run=0;function pq(f){return new Promise(function(res,rej){q.push(function(){run++;f().then(res,rej).then(next,next);});next0();});}
+  function next(){run--;next0();}function next0(){while(run<4&&q.length)q.shift()();}
   function nfetch(u,o){
-    var h=host(u);
+    var h=host(u),tried=false;
     if(!PXH.test(h))return fetch(u,o);
-    var direct=isBad(h)?Promise.reject(0):tfetch(u,o,6000).then(function(r){if(r.ok||r.status===404){mark(h,1);return r;}throw 0;});
-    return direct.catch(function(){mark(h,0);return fetch(pxu(u),o);});
+    var direct=isBad(h)?Promise.reject(0):(tried=true,tfetch(u,o,6000).then(function(r){if(r.ok||r.status===404){mark(h,1);return r;}throw 0;}));
+    return direct.catch(function(){
+      if(tried)mark(h,0);
+      return pq(function(){return fetch(pxu(u),o);}).then(function(r){
+        if(r.ok||r.status===404||tried)return r;
+        return tfetch(u,o,10000).then(function(d){if(d.ok){mark(h,1);return d;}return r;},function(){return r;}); // 中转也不行（限流）：说不定直连其实通，试一下，通了就撤销「不通」
+      });
+    });
   }
   function src(u){var h=host(u);return u&&PXH.test(h)&&isBad(h)?pxu(u):u;}
   function g(u){ // 谷歌翻译：translate.googleapis.com/translate_a/single?…&q=
@@ -112,7 +121,7 @@
     var last=0;try{last=+localStorage.getItem("net:probe")||0;}catch(e){}
     if(Date.now()-last<6*3600e3)return;try{localStorage.setItem("net:probe",String(Date.now()));}catch(e){}
     ["translate.googleapis.com","ichef.bbci.co.uk","downloads.bbc.co.uk","en.wikipedia.org","upload.wikimedia.org","thumb.wikimedia.org","www.youtube.com","api.dictionaryapi.dev","fonts.googleapis.com"].forEach(function(h){
-      tfetch("https://"+h+"/favicon.ico",{mode:"no-cors",cache:"no-store"},5000).then(function(){mark(h,1);},function(){mark(h,0);});
+      tfetch("https://"+h+"/favicon.ico",{mode:"no-cors",cache:"no-store"},9000).then(function(){mark(h,1);},function(){mark(h,0);});
     });
   }
   setTimeout(probe,3000);

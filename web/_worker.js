@@ -996,11 +996,11 @@ async function px(req, u) {
   let t; try { t = new URL(u.searchParams.get("u") || ""); } catch (e) { return json({ ok: false, error: "bad url" }, 400); }
   const rule = PX_HOSTS[t.hostname]; if (t.protocol !== "https:" || !rule || !rule.test(t.pathname)) return json({ ok: false, error: "not allowed" }, 403);
   const post = req.method === "POST"; if (post && t.hostname !== "api.languagetool.org") return json({ ok: false, error: "method" }, 405);
-  const h = { "User-Agent": "ruilearning/1.0 (family English learning site; proxy)", "Accept": req.headers.get("accept") || "*/*" }, range = req.headers.get("range");
+  const h = { "User-Agent": "ruilearning-family-english/1.0 (https://ruilearning-my.pages.dev; low-volume cached proxy)", "Accept": req.headers.get("accept") || "*/*" }, range = req.headers.get("range");
   if (range) h.Range = range; if (post) h["Content-Type"] = req.headers.get("content-type") || "application/x-www-form-urlencoded";
   const img = /^(upload\.wikimedia\.org|thumb\.wikimedia\.org|ichef\.bbci\.co\.uk|i\.ytimg\.com)$/.test(t.hostname);
-  let r; try { r = await fetch(t.toString(), { method: post ? "POST" : "GET", headers: h, body: post ? await req.text() : undefined, cf: img && !range ? { cacheEverything: true, cacheTtl: 86400 } : undefined }); } catch (e) { return json({ ok: false, error: "fetch failed" }, 502); }
-  const out = new Headers({ "access-control-allow-origin": "*", "cache-control": img ? "public, max-age=86400" : "private, max-age=600" });
+  let r; try { r = await fetch(t.toString(), { method: post ? "POST" : "GET", headers: h, body: post ? await req.text() : undefined, cf: !post && !range && t.hostname !== "downloads.bbc.co.uk" ? { cacheEverything: true, cacheTtl: 86400 } : undefined }); } catch (e) { return json({ ok: false, error: "fetch failed" }, 502); }
+  const out = new Headers({ "access-control-allow-origin": "*", "cache-control": r.ok && !post ? "public, max-age=86400" : "no-store" });
   for (const k of ["content-type", "content-length", "content-range", "accept-ranges", "last-modified", "etag"]) { const v = r.headers.get(k); if (v) out.set(k, v); }
   return new Response(r.body, { status: r.status, headers: out });
 }
