@@ -45,10 +45,11 @@
   const srcUrl = (id, ep) => (ep && ep.url) || (SM[serOf(id)][4] === "VOA" ? "https://learningenglish.voanews.com/a/" + id.split("/")[1] + ".html" : "https://www.bbc.co.uk/learningenglish/english/features/" + id);
   const CSS = `
   #sme{display:none;max-width:900px;margin:0 auto;padding:6px 0 60px;overflow-wrap:anywhere;color:var(--ui-ink);font-family:var(--ui-font)}#sme.on{display:block}
-  #sme .sm-ser{display:flex;gap:8px;overflow-x:auto;padding:2px 0 4px;margin:2px 0 8px;scrollbar-width:none}#sme .sm-ser::-webkit-scrollbar{display:none}
+  #sme .sm-ser{display:flex;flex-direction:column;gap:7px;margin:2px 0 10px}#sme .sm-row{display:flex;flex-wrap:wrap;gap:7px;align-items:center} /* 一个来源一行（VOA / BBC），放不下就折行，不用左右滑 */
   #sme .sm-ser button{flex:0 0 auto;border:1px solid var(--ui-line-2);background:var(--ui-surface);color:var(--ui-ink);border-radius:999px;padding:7px 14px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
   #sme .sm-ser button.on{background:var(--ui-pur);border-color:var(--ui-pur);color:#fff}
-  #sme .sm-ser .src{flex:0 0 auto;align-self:center;font-size:11.5px;font-weight:800;letter-spacing:.04em;color:var(--ui-muted);padding:0 0 0 4px}#sme .sm-ser .src+button{margin-left:-2px}
+  #sme .sm-ser .src{flex:0 0 34px;font-size:11.5px;font-weight:800;letter-spacing:.04em;color:var(--ui-muted)}
+  @media(max-width:640px){#sme .sm-ser button{padding:6px 11px;font-size:13.5px}#sme .sm-row{gap:6px}}
   #sme .sm-head{margin:2px 0 12px;color:var(--ui-muted);font-size:13.5px;line-height:1.55}#sme .sm-head b{color:var(--ui-ink-2)}
   #sme .sm-new{display:grid;grid-template-columns:200px 1fr;gap:14px;align-items:center;background:linear-gradient(135deg,color-mix(in srgb,var(--ui-pur) 16%,var(--ui-surface)),var(--ui-surface));border:1px solid color-mix(in srgb,var(--ui-pur) 40%,var(--ui-line));border-radius:16px;padding:14px;cursor:pointer;margin-bottom:16px}
   #sme .sm-new img{width:100%;border-radius:10px;display:block;aspect-ratio:16/9;object-fit:cover}#sme .sm-new small{color:var(--ui-pur-text);font-weight:800;font-size:12.5px}#sme .sm-new b{display:block;font-size:19px;margin:4px 0}#sme .sm-new p{margin:0;color:var(--ui-ink-2);font-size:14px}
@@ -627,11 +628,10 @@
     if (!root) return;
     const f = flEl(); if (root.contains(AU)) f.querySelector(".au").append(AU); // 先把播放器挪出去，重画页面时不会被删掉（删掉会停）
     const S = SM[ser]; if (wantFollow()) followLoad(EP.id);
-    root.innerHTML = '<div class="sm-ser">' + SER.map((x, i) => (i && SER[i - 1][4] === x[4] ? "" : '<span class="src">' + x[4] + "</span>") + '<button data-ser="' + x[0] + '" class="' + (x[0] === ser ? "on" : "") + '">' + x[1] + "</button>").join("") + "</div>" +
+    root.innerHTML = '<div class="sm-ser">' + [...new Set(SER.map(x => x[4]))].map(src => '<div class="sm-row"><span class="src">' + src + "</span>" + SER.filter(x => x[4] === src).map(x => '<button data-ser="' + x[0] + '" class="' + (x[0] === ser ? "on" : "") + '">' + x[1] + "</button>").join("") + "</div>").join("") + "</div>" +
       (view === "ep" ? '<div class="sm-bar"><button class="ui-btn" data-a="home">← 节目列表</button><span class="sp"></span><button class="ui-btn' + (zhOn ? " on" : "") + '" data-a="zh" title="英文下面显示中文翻译">🀄 中文：' + (zhOn ? "开" : "关") + "</button></div>" + zhBar() + epHtml()
         : '<div class="sm-head"><b>' + esc(S[2]) + "</b> · " + (S[4] === "VOA" ? "VOA Learning English（美音；2025 年 3 月起停更，旧节目都能听）" : "BBC Learning English") + " · " + esc(S[3]) + "</div>" + homeHtml());
     if (view === "ep" && EP && !EP.err && AU.dataset.id !== EP.id) { AU.pause(); AU.src = srcOf(EP.id); AU.dataset.id = EP.id; auTitle = SM[serOf(EP.id)][1] + " · " + EP.title; AU.playbackRate = rate; flClosed = false; }
-    { const bar = root.querySelector(".sm-ser"), on = bar && bar.querySelector("button.on"); if (on && bar.scrollWidth > bar.clientWidth) bar.scrollLeft += on.getBoundingClientRect().left - bar.getBoundingClientRect().left - (bar.clientWidth - on.offsetWidth) / 2; } // 栏目多、手机上一行放不下：选中的那个滚到中间
     sync(); stickTop(); curK = -1; curW = null; hl(true); hlWord();
     if (view === "ep" && EP && !EP.err && autoNext === EP.id && AU.dataset.id === EP.id) { autoNext = null; AU.play().catch(() => {}); }
     if (view === "ep" && EP && !EP.err && !DIFF()[EP.id] && navigator.onLine !== false) diffCalc(EP.id);
