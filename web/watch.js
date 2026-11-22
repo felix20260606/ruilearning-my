@@ -18,7 +18,6 @@
     } catch (e) {}
   }
   const fmt = t => { t = Math.max(0, Math.floor(t)); const m = Math.floor(t / 60), s = t % 60; return (m >= 60 ? Math.floor(m / 60) + ":" + String(m % 60).padStart(2, "0") : m) + ":" + String(s).padStart(2, "0"); };
-  const WORD = /[A-Za-z][A-Za-z'’-]*/g;
 
   let set = Object.assign({ autoPause: false, hideTr: false, hideEn: false, rate: 1, fs: 1 }, LS.get("wt:set", {}));
   let doc = null, cues = [], cur = -1, player = null, ready = false, timer = null, pausedFor = -1, lock = false, follow = true, userScroll = 0, apiP = null, sheetWord = "";
@@ -35,7 +34,7 @@
   const pctOf = (v, x) => { const m = M[v] || {}, d = durOf(v, x); return m.w ? 1 : d && m.p ? Math.min(1, m.p / d) : 0; };
   const stOf = (v, x) => { const m = M[v] || {}; return m.w ? "seen" : (m.p || 0) > 5 && pctOf(v, x) < 0.97 ? "ing" : "new"; };
   const fineKeys = () => { try { return matchMedia("(hover:hover) and (pointer:fine)").matches; } catch (e) { return false; } };
-  async function copyText(s) { try { await navigator.clipboard.writeText(s); return true; } catch (e) { const ta = document.createElement("textarea"); ta.value = s; ta.setAttribute("readonly", ""); ta.style.cssText = "position:fixed;opacity:0;top:0"; document.body.append(ta); ta.select(); let ok = false; try { ok = document.execCommand("copy"); } catch (er) {} ta.remove(); return ok; } }
+  const copyText = s => U.copy(s, { ok: false, manual: false }); // 📋 全站共用（util.js）：返回成没成，提示下面自己说
 
   /* 书签小工具：在 YouTube 页面里读出正在显示的字幕，存到本站，再跳回来学习（手机上不依赖电脑） */
   const BM_SRC = "(function(){ var S=\"__SITE__\",D=document,L=location; if(!/(^|\\.)youtube\\.com$/.test(L.hostname)){alert(\"请先在 Safari 里打开 YouTube 的视频页，再点这个书签\");return;} var m=L.href.match(/[?&]v=([\\w-]{11})/)||L.href.match(/\\/shorts\\/([\\w-]{11})/); if(!m){alert(\"请先打开一个 YouTube 视频，再点这个书签\");return;} var v=m[1],p=D.getElementById(\"movie_player\")||D.querySelector(\".html5-video-player\"),done=false,hit=false; var box=D.createElement(\"div\");box.style.cssText=\"position:fixed;left:12px;right:12px;top:12px;z-index:2147483647;background:#0c9370;color:#fff;font:600 15px/1.4 system-ui;padding:12px 14px;border-radius:12px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.35)\"; var say=function(t){box.textContent=t;if(!box.parentNode)D.body.appendChild(box);}; say(\"正在读取字幕…\"); function parse(t){var j=JSON.parse(t),c=[],i,e,s;for(i=0;i<(j.events||[]).length;i++){e=j.events[i];if(!e.segs)continue;s=e.segs.map(function(x){return x.utf8||\"\"}).join(\"\").replace(/\\s+/g,\" \").trim();if(!s)continue;c.push({s:(e.tStartMs||0)/1000,e:((e.tStartMs||0)+(e.dDurationMs||0))/1000,t:s});} for(i=0;i<c.length-1;i++)if(c[i].e>c[i+1].s)c[i].e=c[i+1].s;return c.filter(function(x){return x.e>x.s});} function send(c,lang){if(done||!c.length)return;done=true;hit=true;say(\"共 \"+c.length+\" 句（\"+c.filter(function(x){return x.r}).length+\" 句有中文），正在保存…\");var a=\"\";try{a=p.getVideoData().author||\"\"}catch(e){} F.call(window,S+\"/api/cap\",{method:\"POST\",headers:{\"Content-Type\":\"application/json\"},body:JSON.stringify({v:v,tl:\"zh-CN\",title:D.title.replace(/^\\(\\d+\\)\\s*/,\"\").replace(/ - YouTube$/,\"\"),author:a,lang:lang||\"en\",cues:c})}).then(function(r){return r.json()}).then(function(r){if(r&&r.ok){say(\"已保存，正在打开学习页…\");L.href=S+\"/?v=\"+v;}else{done=false;say(\"保存失败：\"+((r&&r.error)||\"未知错误\"));}}).catch(function(){done=false;say(\"保存失败：网络问题，请再点一次书签\");});} var F=window.fetch,O=XMLHttpRequest.prototype.open,seen={}; function cl(t){t=String(t||\"\").replace(/\\[[^\\]]*\\]|\\u266a|>>+|\\u00bb/g,\" \").replace(/\\s+/g,\" \").trim();return /^\\([^)]*\\)$/.test(t)?\"\":t;} function merge(c,z){var m={},i,k,b,d;for(i=0;i<z.length;i++)m[Math.round(z[i].s*10)]=z[i].t; for(i=0;i<c.length;i++){k=Math.round(c[i].s*10);c[i].r=m[k]||m[k-1]||m[k+1]||\"\";if(!c[i].r&&z.length){b=null;for(d=0;d<z.length;d++)if(z[d].s<c[i].e&&z[d].e>c[i].s&&Math.abs(z[d].s-c[i].s)<1.5){b=z[d];break;}if(b)c[i].r=b.t;}} var o=[];for(i=0;i<c.length;i++){c[i].t=cl(c[i].t);c[i].r=cl(c[i].r);if(c[i].t)o.push(c[i]);}return o;} function grab(u){if(done||!/\\/api\\/timedtext/.test(u))return;var a;try{a=new URL(u,L.href)}catch(e){return}if(a.searchParams.get(\"v\")&&a.searchParams.get(\"v\")!==v)return;a.searchParams.delete(\"tlang\");a.searchParams.set(\"fmt\",\"json3\");var k=a.href;if(seen[k])return;seen[k]=1;var lang=a.searchParams.get(\"lang\")||\"en\"; F.call(window,k).then(function(r){return r.ok?r.text():\"\"}).then(function(t){if(!t||done)return;var c=parse(t);if(!c.length)return;say(\"拿到 \"+c.length+\" 句字幕，正在取中文…\");a.searchParams.set(\"tlang\",\"zh-Hans\"); return F.call(window,a.href).then(function(r){return r.ok?r.text():\"\"}).then(function(x){var z=[];try{z=x?parse(x):[]}catch(e){}send(merge(c,z),lang)},function(){send(merge(c,[]),lang)});}).catch(function(){seen[k]=0});} XMLHttpRequest.prototype.open=function(a,u){try{grab(String(u))}catch(e){}return O.apply(this,arguments);}; window.fetch=function(i){try{grab(String(typeof i===\"string\"?i:(i&&i.url)||\"\"))}catch(e){}return F.apply(this,arguments);}; var scan=function(){if(done)return;var es=performance.getEntriesByType(\"resource\"),i;for(i=es.length-1;i>=0;i--)grab(es[i].name);}; var kick=function(){if(done||!p)return;try{p.loadModule&&p.loadModule(\"captions\");var tl=p.getOption(\"captions\",\"tracklist\")||[],en=tl.filter(function(x){return /^en/.test(x.languageCode)}),tr=en.filter(function(x){return x.kind!==\"asr\"})[0]||en[0]||tl[0];p.setOption(\"captions\",\"track\",{});if(tr)setTimeout(function(){try{p.setOption(\"captions\",\"track\",{languageCode:tr.languageCode})}catch(e){}},350);else if(p.toggleSubtitlesOn)p.toggleSubtitlesOn();}catch(e){}}; scan();setTimeout(function(){if(!done)kick()},1200);setTimeout(kick,4000);setTimeout(kick,7500);var iv=setInterval(function(){if(done)clearInterval(iv);else scan()},700);setTimeout(function(){clearInterval(iv)},11000); setTimeout(function(){if(!hit)say(\"没拿到字幕：这个视频可能没有字幕。请先点一下播放，再点一次书签试试\");setTimeout(function(){if(!hit&&box.parentNode)box.parentNode.removeChild(box)},6000);},11000); })();";
@@ -214,32 +213,16 @@
     .wt-video{max-height:calc(100vh - 300px)}
   }`;
 
-  /* ---------- 生词本状态 ---------- */
-  let book = new Map();
-  function loadBook() { book = new Map(); bookK = null; try { words.forEach(w => { const k = String(w.word || "").toLowerCase().replace(/[{}]/g, ""); if (k) book.set(k, w.status === "known" ? "kn" : "lr"); }); } catch (e) {} }
-  function stems(w) { const o = [w]; if (/ies$/.test(w)) o.push(w.slice(0, -3) + "y"); if (/(es|ed)$/.test(w)) o.push(w.slice(0, -2), w.slice(0, -1)); if (/s$/.test(w)) o.push(w.slice(0, -1)); if (/ing$/.test(w)) o.push(w.slice(0, -3), w.slice(0, -3) + "e"); if (/(.)\1(ed|ing)$/.test(w)) o.push(w.replace(/(.)\1(ed|ing)$/, "$1")); return o; }
-  // 生词本按原形建索引：收了 go，went / goes / going 也算；收了 bigger，big 也算（规则同插件：web/vs/vlevel.js 的 vsKeys，含不规则变化表；还没加载时退回简单去词尾）
-  let bookK = null;
-  const keysOf = w => { try { if (typeof vsKeys === "function") return [w].concat(vsKeys(w)); } catch (e) {} return stems(w); };
-  function bookIdx() { if (!bookK || bookK.fn !== typeof vsKeys) { bookK = new Map(); bookK.fn = typeof vsKeys; book.forEach((v, k) => keysOf(k).forEach(q => { if (!bookK.has(q) || v === "kn") bookK.set(q, v); })); } return bookK; }
-  const statusOf = w => { const B = bookIdx(); for (const s of keysOf(w.toLowerCase().replace(/’/g, "'"))) if (B.has(s)) return B.get(s); return ""; };
-  const markup0 = t => esc(t).replace(WORD, w => '<span class="wt-w ' + statusOf(w.replace(/’/g, "'")) + '" data-w="' + w.replace(/’/g, "'") + '">' + w + "</span>");
-  const markup = t => (VS ? vsHtml(t) : markup0(t));
+  /* ---------- 生词本状态、上色：全站共用的 word.js（WORD.status、WORD.html） ---------- */
+  const loadBook = () => WORD.loadBook(), statusOf = w => WORD.status(w);
+  const markup = t => WORD.html(t); // 插件那套颜色 + 生词本（已掌握去色、在学淡紫底），和阅读、听力一样
 
   /* ---------- 和插件一致：按词汇水平上色、语法下划线、句型 / 习语 / 短语动词注释、单词注释、颜色标记 ----------
      判断规则和数据用插件同一份（web/vs/，由 tools/sync-shared.sh 从 extension/ 复制）；
      插件设置（词汇水平、颜色、开关）和你的标记从 /api/ext 读，在网站上改标记也写回 /api/ext，插件那边自动跟上 */
   const VS_FILES = ["freq.js", "vlevel.js", "gram.js", "pattern.js", "data-phrases.js", "data-words.js", "data-morph.js", "notes.js"];
   const VS_DEF = { showMarks: true, level: -1, ratio: 1.5, greenKnown: false, fadeRare: true, showSuggest: true, showLearn: true, showLearnOutline: true, showIgnore: true, showSpecial: true, colKnown: "#7CE3B8", colSuggest: "#FFB86B", colIgnore: "#CDA8F7", colSpecial: "#7CE3B8", showGram: true, gramLabel: "abbr", g_pa: true, g_pf: true, g_pg: true, g_md: true, g_pv: true, g_s3: true, g_pl: true, g_art: true, g_cmp: true, g_neg: true, showPat: true, n_phrase: true, n_spoken: true, n_link: true, n_word: true, cloze: false, target: "zh-CN" };
-  const VS_CSS = `
-  :is(#view-video,#pump) .vs-w{cursor:pointer;border-radius:3px}
-  :is(#view-video,#pump) .vs-w.vs-k{color:var(--vs-ck,#7CE3B8)}:is(#view-video,#pump) .vs-w.vs-u1,:is(#view-video,#pump) .vs-w.vs-ln{color:var(--vs-cs,#FFB86B)}:is(#view-video,#pump) .vs-w.vs-u2{color:var(--vs-ci,#CDA8F7)}:is(#view-video,#pump) .vs-w.vs-sp{color:var(--vs-cp,#7CE3B8)}
-  :is(#view-video,#pump) .vs-w.vs-rare{opacity:.55}
-  :is(#view-video,#pump) .vs-w.vs-lo{box-shadow:inset 0 0 0 1.5px #E9CF8A;background:rgba(255,226,140,.14);border-radius:6px;padding:0 3px}
-  :is(#view-video,#pump) .vs-w.vs-pk{background:rgba(120,175,240,.32);box-shadow:0 0 0 2px rgba(120,175,240,.32);border-radius:4px}
-  :is(#view-video,#pump) .vs-w[class*=" g-"]{text-underline-offset:4px}
-  :is(#view-video,#pump) .vs-w.g-pa{text-decoration:underline solid #5BB0FF 2px}:is(#view-video,#pump) .vs-w.g-pf{text-decoration:underline double #35D0BA 2px}:is(#view-video,#pump) .vs-w.g-pg{text-decoration:underline wavy #8EE05A 2px}:is(#view-video,#pump) .vs-w.g-md{text-decoration:underline dashed #FF8FC7 2px}:is(#view-video,#pump) .vs-w.g-pv{text-decoration:underline solid #FF7A59 3.5px}:is(#view-video,#pump) .vs-w.g-s3{text-decoration:underline dotted #5BB0FF 2.5px}:is(#view-video,#pump) .vs-w.g-pl{text-decoration:underline dotted #B0B7C0 2.5px}:is(#view-video,#pump) .vs-w.g-art{text-decoration:underline dotted #E8D36B 2.5px}:is(#view-video,#pump) .vs-w.g-cmp{text-decoration:underline dashed #C9A0FF 2px}:is(#view-video,#pump) .vs-w.g-neg{box-shadow:inset 0 2px 0 #FF5C5C}
-  :is(#view-video,#pump) .vs-w.vs-ph{background:rgba(255,226,140,.13);box-shadow:inset 0 1.5px 0 #E9CF8A,inset 0 -1.5px 0 #E9CF8A;border-radius:0;padding:0 2px}:is(#view-video,#pump) .vs-w.vs-ph.ph-s{border-radius:5px 0 0 5px;box-shadow:inset 0 1.5px 0 #E9CF8A,inset 0 -1.5px 0 #E9CF8A,inset 1.5px 0 0 #E9CF8A}:is(#view-video,#pump) .vs-w.vs-ph.ph-e{border-radius:0 5px 5px 0;box-shadow:inset 0 1.5px 0 #E9CF8A,inset 0 -1.5px 0 #E9CF8A,inset -1.5px 0 0 #E9CF8A}
+  const VS_CSS = ` /* 单词颜色、语法下划线在 word.js 的 COLOR_CSS（全站共用一份），这里只留视频页自己的 */
   #view-video.vs-cloze .wt-sub .en .vs-w:is(.vs-u1,.vs-u2,.vs-lo,.vs-ln){color:transparent!important;background:rgba(255,255,255,.16);border-radius:4px;border-bottom:2px dashed rgba(255,255,255,.55)}#view-video.vs-cloze .wt-sub .en .vs-w:is(.vs-u1,.vs-u2,.vs-lo,.vs-ln):hover{color:#fff!important}
   .wt-sub .vs-p{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:8px}
   .wt-sub .vs-pc{cursor:pointer;font:600 13px/1.5 system-ui,-apple-system,"PingFang SC",sans-serif;color:#d8e9ff;background:rgba(47,109,176,.38);border:1px solid rgba(120,175,240,.45);border-radius:999px;padding:1px 10px;text-align:left}
@@ -262,7 +245,7 @@
     return vsP;
   }
   // 练习页（pump.js）也用同一套上色；阅读页（read.js）还用同一套标记：右键循环、查词卡片里的「将要学习 / 已掌握 / 不学习」
-  window.__vs = { load: () => vsLoad(), ready: () => !!VS, html: t => (VS ? vsHtml(t) : null),
+  window.__vs = { load: () => vsLoad(), ready: () => !!VS, html: t => (VS ? vsHtml(t) : null), settings: () => (VS ? VS.S : null),
     markOf: w => vsMarkNow(String(w || "")), setMark: (w, m) => vsSetMark(w, m), sheetExtra: (w, el) => vsSheetExtra(w, el),
     cat: w => (VS && typeof vsCat === "function" ? vsCat(w, VS.S, false, false, true) : ""), next: w => vsNextMark(w) };
   // 右键循环（同插件）：本来的颜色 → 将要学习（带框）→ 已掌握（白色）→ 回到本来的颜色；本来就是白色的词只在「白色 / 带框」之间切换

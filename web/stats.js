@@ -431,8 +431,7 @@
   }
   function icsDownload() {
     const t = (root.querySelector("#st-rm-time") || {}).value || rmTime() || "20:00";
-    const blob = new Blob([icsText(t, Date.now())], { type: "text/calendar;charset=utf-8" }), url = URL.createObjectURL(blob), a = document.createElement("a");
-    a.href = url; a.download = "英语练习提醒.ics"; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 30e3);
+    U.download("英语练习提醒.ics", icsText(t, Date.now())); // ⬇️ 全站共用（util.js）
     say("已生成日历文件：打开后选「添加」，每天 " + t + " 提醒");
   }
 

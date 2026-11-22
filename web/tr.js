@@ -23,12 +23,12 @@
     o = o || {}; q = String(q || "").trim(); if (!q) return ""; const tl = o.tl || "zh-CN", sl = o.sl || "en", k = sl + ">" + tl + "|" + q;
     if (MEM.has(k)) return MEM.get(k);
     const parts = []; let cur = "";
-    (q.match(/[^.!?…]+[.!?…]*["'”’)\]]*\s*/g) || [q]).forEach(s => { if (cur && (cur + s).length > 1500) { parts.push(cur); cur = s; } else cur += s; }); if (cur) parts.push(cur);
+    U.sents(q).forEach(s => { if (cur && (cur + " " + s).length > 1500) { parts.push(cur); cur = s; } else cur = cur ? cur + " " + s : s; }); if (cur) parts.push(cur); // ✂️ 全站共用的分句（util.js）
     const out = [];
     for (const p of parts) {
       let t = "";
       try { t = await google(p, tl, sl); } catch (e) { log("谷歌翻译不行，换 MyMemory", String(e.message || e)); }
-      if (!t) { const z = []; for (const s of p.match(/[^.!?…]+[.!?…]*["'”’)\]]*\s*/g) || [p]) z.push(await mymemory(s.trim(), tl, sl)); t = z.join(""); } // 这层也不行就抛错
+      if (!t) { const z = []; for (const s of U.sents(p)) z.push(await mymemory(s, tl, sl)); t = z.join(""); } // 这层也不行就抛错
       out.push(t);
     }
     const r = out.join(""); if (r) MEM.set(k, r); return r;

@@ -143,13 +143,13 @@
   // ---------- 导出 ----------
   let zipP = null;
   const loadZip = () => zipP || (zipP = new Promise((res, rej) => { if (window.JSZip) return res(window.JSZip); const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"; s.onload = () => res(window.JSZip); s.onerror = () => { zipP = null; rej(new Error("JSZip")); }; document.head.append(s); }));
-  function save(name, blob) { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }
+  const save = (name, blob) => U.download(name, blob); // ⬇️ 全站共用（util.js）
   async function run() {
     if (busy) return; const ws = pickWords(); if (!ws.length) { msg("这个范围里没有词"); return; }
     busy = true; const btn = document.getElementById("exp-run"); if (btn) btn.disabled = true;
     const tag = { all: "全部", learning: "未掌握", known: "已掌握" }[opt.scope], stamp = today();
     try {
-      if (opt.fmt === "text") { const t = plainText(ws); try { await navigator.clipboard.writeText(t); msg("已复制 " + ws.length + " 个"); } catch (e) { save("生词本_" + tag + "_" + stamp + ".txt", new Blob([t], { type: "text/plain;charset=utf-8" })); msg("已下载为文本"); } return; }
+      if (opt.fmt === "text") { const t = plainText(ws); if (await U.copy(t, { ok: false, manual: false })) msg("已复制 " + ws.length + " 个"); else { save("生词本_" + tag + "_" + stamp + ".txt", new Blob([t], { type: "text/plain;charset=utf-8" })); msg("已下载为文本"); } return; }
       const media = await collectMedia(ws); nameMedia(ws, media); const fl = files(media), nImg = fl.filter(f => /^image/.test(f.mime)).length, nAud = fl.filter(f => /^audio/.test(f.mime)).length;
       const sum = ws.length + " 个词" + (opt.img ? "，图片 " + nImg + " 张" : "") + (opt.aud ? "，原声 " + nAud + " 条" : "");
       if (opt.fmt === "html") { save("生词本_" + tag + "_" + stamp + ".html", new Blob([htmlPage(ws, media)], { type: "text/html;charset=utf-8" })); msg("已下载离线网页：" + sum); return; }

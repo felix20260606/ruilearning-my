@@ -78,11 +78,11 @@
   };
 })();
 </script>
-<script src="util.js?v=2"></script>
+<script src="util.js?v=3"></script>
 <script src="nav.js?v=1"></script>
-<script src="word.js?v=2"></script>
+<script src="word.js?v=3"></script>
 <script src="ai.js?v=1"></script>
-<script src="tr.js?v=1"></script>
+<script src="tr.js?v=2"></script>
 <script src="cloud.js?v=2"></script>
 <script src="media.js?v=1"></script>
 <script src="keys.js?v=1"></script>
@@ -1488,10 +1488,7 @@ function renderList(){
 }
 
 /* ===== export ===== */
-function download(name,text,type){
-  const b=new Blob([type==="csv"?"\uFEFF"+text:text],{type:type==="csv"?"text/csv;charset=utf-8":"text/plain;charset=utf-8"});
-  const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-}
+function download(name,text,type){U.download(name,text,type);} // ⬇️ 全站共用（util.js）
 function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),1800);}
 
 /* ===== events ===== */
@@ -1718,7 +1715,7 @@ function renderPending(){
   box.innerHTML='<div class="pend-card"><div style="font-size:13px;font-weight:700;color:var(--accent);margin:2px 0 8px">📤 待整理 '+p.length+' 个 · 发给 Claude 做成完整词条</div>'+
     '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">'+p.map(w=>'<span style="font-size:13px;background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:4px 11px">'+escHtml(w)+'</span>').join('')+'</div>'+
     '<div class="vrow"><button id="pend-auto" class="bulk-btn primary-btn">⚡ 自动生成词条</button><button id="pend-copy" class="bulk-btn">📋 复制发给 Claude</button><button id="pend-clear" class="bulk-btn">清空</button></div></div>';
-  const cp=document.getElementById("pend-copy");if(cp)cp.onclick=async()=>{const t=(state.pending||[]).join("\n");try{await navigator.clipboard.writeText(t);toast("已复制，粘贴发给 Claude");}catch(e){download("pending.txt",t,"txt");toast("已下载为文本");}};
+  const cp=document.getElementById("pend-copy");if(cp)cp.onclick=async()=>{const t=(state.pending||[]).join("\n");if(await U.copy(t,{ok:"已复制，粘贴发给 Claude",manual:false})){}else{download("pending.txt",t,"txt");toast("已下载为文本");}};
   const au=document.getElementById("pend-auto");if(au)au.onclick=async()=>{const L=(state.pending||[]).slice();au.disabled=true;au.textContent="生成中…";await addMany(L);prunePending();renderPending();};
   const cl=document.getElementById("pend-clear");if(cl)cl.onclick=async()=>{if(await U.ask("清空待整理队列？",{ok:"清空",danger:true})){state.pending=[];save(state);renderPending();}};
 }
@@ -2067,21 +2064,21 @@ refresh(); // show seed words immediately, no waiting on storage
 <script src="lang.js?v=3"></script>
 <script src="tts.js?v=3"></script>
 <script src="rec.js?v=1"></script>
-<script src="watch.js?v=24"></script>
+<script src="watch.js?v=25"></script>
 <script src="channels.js?v=4"></script>
-<script src="pump.js?v=36"></script>
+<script src="pump.js?v=37"></script>
 <script src="speak.js?v=18"></script>
 <script src="basic.js?v=2"></script>
 <script src="quota.js?v=5"></script>
 <script src="daily.js?v=13"></script>
-<script src="read.js?v=20"></script>
-<script src="listen.js?v=22"></script>
-<script src="drill.js?v=8"></script>
+<script src="read.js?v=21"></script>
+<script src="listen.js?v=23"></script>
+<script src="drill.js?v=9"></script>
 <script src="errbook.js?v=4"></script>
 <script src="exam.js?v=7"></script>
 <script src="import.js?v=3"></script>
-<script src="write.js?v=6"></script>
-<script src="stats.js?v=4"></script>
+<script src="write.js?v=7"></script>
+<script src="stats.js?v=5"></script>
 <script>
 /* 个人学习资料换设备也在：阅读的文章（reading:docs）、作文批改历史（writing:history）、词汇量测试（vocab:test）
    这三页照旧存本机；这里在本机存储这一层盯着：哪一条变了就传到后台 /api/mine（按人分开），删掉的传删除记号；
@@ -2135,7 +2132,7 @@ refresh(); // show seed words immediately, no waiting on storage
 })();
 </script>
 <script>if('serviceWorker' in navigator&&location.protocol!=='file:'){navigator.serviceWorker.register('/sw.js').catch(function(){});} // 装到手机桌面后离线也能打开（sw.js：网络优先，断网用上次的）</script>
-<script src="export.js?v=4"></script>
+<script src="export.js?v=5"></script>
 <script src="saved-web.js?v=8"></script>
 <script src="reader.js?v=5"></script>
 <script src="grammar.js?v=7"></script>

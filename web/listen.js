@@ -12,7 +12,7 @@
    - 听完（播放到 90% 以上，或点「✓ 听完了」）记进 sme:done {期号: 时间}，同步到后台 /api/mine k=sme；「📅 每日」的「听」今天听完一期就自动打勾
    - 🎯 逐句精听：每句单独播、慢放、听写对答案、🎙 跟读打分；「🔁 自动连播」每句放 N 遍、停几秒再下一句；快捷键 空格 / ← → / R / S
    - 🎵 文稿跟着语音（sme:follow，默认开）：放到哪句就高亮哪句、自动滚到那里；点任意一句从那句开始播（每句的时间和精听共用，同一期第一次要对一两分钟）
-   - 文稿里点词 = 查词弹窗（read.js 的 window.readPop，能加生词本）；点句首 ▸ = 从这句播；生词本里「在学」的词标橙色下划线；开着「🎵 跟着语音」时还逐词亮（用 Whisper 每个词的时间）
+   - 文稿里点词 = 查词弹窗（word.js 的 WORD，能加生词本）；点句首 ▸ = 从这句播；单词按词汇水平上色（word.js 的 WORD.html，和阅读、视频字幕一样），生词本里「在学」的词淡紫底；开着「🎵 跟着语音」时还逐词亮（用 Whisper 每个词的时间）
    - 🤔 为什么没听出来：精听听写没全对时，AI 讲漏掉的地方是连读 / 弱读 / 吞音…，原文读起来像什么（POST /api/ai {task:"whymiss"}，同一句存 KV）
    - 🧩 听后小测：每期 5 道四选一（POST /api/ai {task:"lquiz"}，同一期全家共用一份），成绩记 sme:lq，做错的进错题本
    - 📥 离线下载：mp3 经 /api/sme?mp3=期号 转一手存进 Cache Storage「sme-off-v1」（连同文稿、每句时间），下好的在列表顶上；sme:off 记下了哪几期
@@ -95,7 +95,7 @@
   #sme .sm-voc{display:grid;grid-template-columns:auto 1fr auto;gap:8px 12px;align-items:center}#sme .sm-voc b{font-size:15px}#sme .sm-voc span.d{color:var(--ui-ink-2);font-size:13.5px}#sme .sm-voc i{display:block;font-style:normal;color:var(--ui-muted);font-size:13px;margin-top:3px}
   #sme .sm-voc button{border:1px solid var(--ui-line-2);background:transparent;color:var(--ui-ink);border-radius:8px;height:30px;padding:0 9px;font:inherit;font-size:13px;cursor:pointer}
   #sme .sm-hd div{margin:0 0 8px;font-size:14.5px}#sme .sm-hd small{color:var(--ui-muted);font-size:12px;margin-left:6px}
-  #sme .sm-tr{font-size:16px;line-height:1.7}#sme .sm-tr p{margin:0 0 10px}#sme .sm-tr .w{display:block;font-size:12px;font-weight:800;color:var(--ui-pur-text)}#sme .sm-tr .sn{border-radius:5px;padding:1px 2px;margin:0 -2px;transition:background .25s,color .25s}#sme .sm-tr i.wd{font-style:normal;cursor:pointer;border-radius:3px;transition:background .12s,color .12s}#sme .sm-tr i.wd:hover{background:var(--ui-pur-soft)}#sme .sm-tr i.lr{box-shadow:inset 0 -2px 0 var(--ui-orange)}#sme .sm-tr .sn.cur i.on{background:var(--ui-pur);color:#fff}#sme .sm-tr .sp{font-style:normal;font-weight:400;color:var(--ui-pur-text);opacity:.55;cursor:pointer;font-size:.78em;padding:0 4px 0 1px}#sme .sm-tr .sp:hover{opacity:1}#sme .sm-tr .sn.cur{background:var(--ui-pur-soft);color:var(--ui-pur-text);box-shadow:inset 0 -2px 0 var(--ui-pur)}#sme .sm-trst{font-size:13px;color:var(--ui-muted);margin:-4px 0 10px}#sme .sm-tr.hide{filter:blur(6px);user-select:none;max-height:220px;overflow:hidden;cursor:pointer}
+  #sme .sm-tr{font-size:16px;line-height:1.7}#sme .sm-tr p{margin:0 0 10px}#sme .sm-tr .w{display:block;font-size:12px;font-weight:800;color:var(--ui-pur-text)}#sme .sm-tr .sn{border-radius:5px;padding:1px 2px;margin:0 -2px;transition:background .25s,color .25s}#sme .sm-tr .sn.cur .vs-w.on{background:var(--ui-pur);color:#fff}#sme .sm-tr .sp{font-style:normal;font-weight:400;color:var(--ui-pur-text);opacity:.55;cursor:pointer;font-size:.78em;padding:0 4px 0 1px}#sme .sm-tr .sp:hover{opacity:1}#sme .sm-tr .sn.cur{background:var(--ui-pur-soft);color:var(--ui-pur-text);box-shadow:inset 0 -2px 0 var(--ui-pur)}#sme .sm-trst{font-size:13px;color:var(--ui-muted);margin:-4px 0 10px}#sme .sm-tr.hide{filter:blur(6px);user-select:none;max-height:220px;overflow:hidden;cursor:pointer}
   #sme .sm-empty{color:var(--ui-muted);padding:16px 2px}
   #sme .sm-diff{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 10px;font-size:12.5px}#sme .sm-diff span{border:1px solid var(--ui-line-2);border-radius:999px;padding:2px 9px;color:var(--ui-ink-2)}#sme .sm-diff span.e{border-color:var(--ui-green-line);color:var(--ui-green)}#sme .sm-diff span.m{border-color:var(--ui-orange-line);color:var(--ui-orange)}#sme .sm-diff span.h{border-color:var(--ui-red-line);color:var(--ui-red)}
   #sme .dk-why{border-left:3px solid var(--ui-pur);padding:6px 10px;margin:8px 0 0;background:var(--ui-surface-2);border-radius:0 10px 10px 0;font-size:14px;line-height:1.6}#sme .dk-why b{font-size:15px}#sme .dk-why code{background:var(--ui-pur-soft);color:var(--ui-pur-text);border-radius:5px;padding:1px 6px;font-family:inherit;font-weight:700}#sme .dk-why .kd{font-size:12px;border:1px solid var(--ui-line-2);border-radius:999px;padding:0 7px;margin-left:6px;color:var(--ui-muted)}#sme .dk-why button{margin-left:6px}
@@ -251,7 +251,7 @@
   const ntok = t => String(t || "").toLowerCase().replace(/[’‘]/g, "'").replace(/[^\p{L}\p{N}'\s-]+/gu, " ").split(/[\s-]+/).map(x => x.replace(/^'+|'+$/g, "")).filter(Boolean);
   function splitSents(lines) {
     const out = [];
-    (lines || []).forEach((l, li) => (String(l.t || "").match(/[^.!?]+[.!?]+["'”’)]*|[^.!?]+$/g) || []).forEach(t => { t = t.trim(); if (/\p{L}/u.test(t)) { const p = out[out.length - 1]; if (p && p.li === li && ntok(t).length < 3) p.t += " " + t; else out.push({ who: l.who || "", t, li }); } }));
+    (lines || []).forEach((l, li) => U.sents(l.t).forEach(t => { /* ✂️ 全站共用的分句（util.js） */ t = t.trim(); if (/\p{L}/u.test(t)) { const p = out[out.length - 1]; if (p && p.li === li && ntok(t).length < 3) p.t += " " + t; else out.push({ who: l.who || "", t, li }); } }));
     return out;
   }
   function alignTimes(S, W) {
@@ -437,22 +437,25 @@
       (W.tip ? '<div class="dk-why">💡 ' + esc(W.tip) + "</div>" : "") + '<div class="dk-b" style="margin-top:8px"><button class="ui-btn" data-a="dk-slow">🐢 慢放原声再听</button><button class="ui-btn" data-a="dk-play">▶ 正常速度</button></div>';
   }
 
-  // ---------- 文稿：每个词能点（查词），生词本里在学的词标出来，句首 ▸ 从这句播 ----------
-  function wordsHtml(t, wt, bs) {
-    let k = 0;
-    return String(t).split(/(\s+)/).map(tok => {
-      if (!tok || /^\s+$/.test(tok)) return tok;
-      const n = ntok(tok).length, m = tok.match(/[A-Za-z0-9](?:[A-Za-z0-9'’-]*[A-Za-z0-9])?/), tm = wt && n ? wt.slice(k, k + n).find(v => v != null) : null; k += n;
-      if (!m || !/[A-Za-z]/.test(m[0])) return esc(tok);
-      const st = bs ? bs(m[0]) : "";
-      return '<i class="wd' + (st === "lr" ? " lr" : "") + '" data-w="' + esc(m[0]) + '"' + (tm != null ? ' data-t="' + tm + '"' : "") + ">" + esc(tok) + "</i>";
-    }).join("");
+  // ---------- 文稿：每个词能点（查词）、按词汇水平上色，句首 ▸ 从这句播 ----------
+  // 上色是全站共用的 word.js（WORD.html，和阅读、视频字幕同一套颜色；生词本里在学的淡紫底）；逐词时间写进 data-t（播放时跟着高亮）
+  function wordsHtml(t, wt) {
+    const h = WORD.html(t); if (!wt) return h;
+    const tk = ntok(t); let p = 0;
+    return h.replace(/<span class="([^"]*\bvs-w\b[^"]*)" data-w="([^"]*)">/g, (a, cl, w) => {
+      const ks = ntok(w); if (!ks.length) return a;
+      let j = p; while (j < tk.length && tk[j] !== ks[0]) j++;
+      if (j >= tk.length || j - p > 8) return a; // 对不上（数字、符号）：这个词不写时间
+      const tm = wt.slice(j, j + ks.length).find(v => v != null); p = j + ks.length;
+      return tm != null ? '<span class="' + cl + '" data-w="' + w + '" data-t="' + tm + '">' : a;
+    });
   }
+
   window.smeWordsHtml = wordsHtml; // 测试用
   let curW = null;
   function hlWord() { // 逐词：当前这句里，最后一个已经开口的词
     const box = root && fword && curK >= 0 && wantFollow() ? root.querySelector('.sm-tr [data-si="' + curK + '"]') : null; let on = null;
-    if (box) { const t = AU.currentTime + 0.08; for (const el of box.querySelectorAll("i[data-t]")) { if (+el.dataset.t <= t) on = el; else break; } }
+    if (box) { const t = AU.currentTime + 0.08; for (const el of box.querySelectorAll("[data-t]")) { if (+el.dataset.t <= t) on = el; else break; } }
     if (on === curW) return; if (curW) curW.classList.remove("on"); curW = on; if (on) on.classList.add("on");
   }
   let raf = 0;
@@ -613,10 +616,9 @@
     // 中文：开着才有；还在翻就先在前面几处显示「翻译中…」
     const zh = (arr, i) => zhOn ? '<span class="zh' + (zl ? " ld" : "") + '">' + (Z ? esc((arr ? (Z[arr] || [])[i] : Z.intro) || "") : zl && (arr !== "lines" || i < 2) ? "翻译中…" : "") + "</span>" : "";
     const TS = follow && TIM[EP.id], byLi = {}; if (TS) TS.forEach((x, k) => (byLi[x.li] = byLi[x.li] || []).push(k));
-    const bs = trShow && window.readBook ? window.readBook(true) : null; // 文稿折着时不用标
-    const tr = (EP.lines || []).map((l, i) => '<p data-li="' + i + '">' + (l.who ? '<span class="w">' + esc(l.who === "Examples" ? "例句 Examples" : l.who) + "</span>" : "") + (byLi[i] ? byLi[i].map(k => '<span class="sn" data-si="' + k + '"><b class="sp" data-sp="' + k + '" title="从这句开始播">▸</b>' + wordsHtml(TS[k].t, fword ? TS[k].w : null, bs) + "</span>").join(" ") : wordsHtml(l.t, null, bs)) + zh("lines", i) + "</p>").join("");
+    const tr = (EP.lines || []).map((l, i) => '<p data-li="' + i + '">' + (l.who ? '<span class="w">' + esc(l.who === "Examples" ? "例句 Examples" : l.who) + "</span>" : "") + (byLi[i] ? byLi[i].map(k => '<span class="sn" data-si="' + k + '"><b class="sp" data-sp="' + k + '" title="从这句开始播">▸</b>' + wordsHtml(TS[k].t, fword ? TS[k].w : null) + "</span>").join(" ") : wordsHtml(l.t, null)) + zh("lines", i) + "</p>").join("");
     const news = serOf(EP.id) === "news";
-    const F = FL[EP.id] || {}, fst = !trShow || news || !follow ? "" : TS ? '<div class="sm-trst">🎵 放到哪句亮哪句' + (fword ? "、逐词跟着亮" : "") + "；点句首 ▸ 从那句播，点词查意思" + (bs ? "（橙色下划线 = 生词本里在学的词）" : "") + "</div>" : F.busy ? '<div class="sm-trst">🎵 正在给每一句对时间（这期第一次要一两分钟，以后打开就不用等）… <span class="fl-prog">' + esc(F.prog || "") + "</span></div>" : F.err ? '<div class="sm-trst">🎵 ' + esc(F.err) + ' <button class="ui-btn" data-a="follow-retry">重试</button></div>' : "";
+    const F = FL[EP.id] || {}, fst = !trShow || news || !follow ? "" : TS ? '<div class="sm-trst">🎵 放到哪句亮哪句' + (fword ? "、逐词跟着亮" : "") + "；点句首 ▸ 从那句播，点词查意思（颜色和插件、视频字幕一样按词汇水平；淡紫底 = 生词本里在学的词）</div>" : F.busy ? '<div class="sm-trst">🎵 正在给每一句对时间（这期第一次要一两分钟，以后打开就不用等）… <span class="fl-prog">' + esc(F.prog || "") + "</span></div>" : F.err ? '<div class="sm-trst">🎵 ' + esc(F.err) + ' <button class="ui-btn" data-a="follow-retry">重试</button></div>' : "";
     const off = OFF()[EP.id], ob = OFFB[EP.id];
     return '<h1>' + esc(EP.title) + '</h1><div class="sm-date">' + esc(m.d || "") + " · " + srcName(EP.id) + " · " + esc(S[2]) + (heard ? ' · <span class="ok">✓ 听过</span>' : "") + "</div>" + (news ? "" : diffHtml(EP.id)) +
       '<div class="sm-box sm-pl' + (trShow && tr ? " stick" : "") + '"><div id="sm-slot"></div><div class="sm-rate">速度 ' + [0.75, 0.9, 1, 1.15].map(v => '<button data-rate="' + v + '" class="' + (Math.abs(rate - v) < .01 ? "on" : "") + '">' + v + "×</button>").join("") +

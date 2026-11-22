@@ -11,6 +11,10 @@
    ✅ 弹窗（代替浏览器自带的 confirm / prompt，和网站一样的深色主题，手机上从底部弹出）：
      await U.ask(问题, {ok: "确定", cancel: "取消", danger: true 红色按钮}) → true / false（Enter = 确定，Esc / 点外面 = 取消）
      await U.input(问题, 默认值, {ok, cancel, placeholder}) → 输入的文字 / null（取消）
+   📋 await U.copy(文字, {ok: 成功提示（false = 不提示）, manual: false 复制不了时不弹窗}) → true / false
+     先用剪贴板，不行用老办法（选中再复制）；都不行弹出文字让你手动复制
+   ⬇️ U.download(文件名, 文字或 Blob, 类型)：存成文件（类型默认看后缀：.csv 带 BOM 让 Excel 认中文、.json、.html、.ics、其它当纯文本）
+   ✂️ U.sents(文字) → 句子数组：. ! ? … 后面跟空格、下一个字不是小写才断；缩写（Mr.）、人名首字母（J. K.）、e.g. / U.S.、No. 5、小数都不断；有换行先按行分
    🐞 排查：U.log(模块, 事情, 详情) 记一条（只在内存里，最多 300 条）；在浏览器控制台打 U.logs() 看全部，U.logs("ai") 只看一个模块
      AI、翻译、同步、录音、朗读这些公用模块出错都会记在这里，有问题先看这个 */
 (function () {
@@ -73,7 +77,46 @@
       askDone = r => { askDone = null; askBox.classList.remove("on"); const v = inp ? inp.value : ""; askBox.innerHTML = ""; log("ask", (r ? "✓ " : "✗ ") + String(q).slice(0, 40)); res(withInput ? (r ? v : null) : !!r); };
     });
   }
+  async function copy(text, o) {
+    o = o || {}; text = String(text == null ? "" : text); let ok = false;
+    try { if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(text); ok = true; } } catch (e) {}
+    if (!ok) try { const ta = document.createElement("textarea"); ta.value = text; ta.setAttribute("readonly", ""); ta.style.cssText = "position:fixed;opacity:0;top:0"; document.body.append(ta); ta.select(); ok = document.execCommand("copy"); ta.remove(); } catch (e) {}
+    if (ok) { if (o.ok !== false) tip(o.ok || "已复制"); return true; }
+    log("copy", "复制不了（浏览器不让）", text.slice(0, 40));
+    if (o.manual !== false) await dialog("复制不了，请长按 / 选中下面的文字手动复制：", { ok: "好了", cancel: "关掉" }, true, text);
+    return false;
+  }
+  const MIME = { csv: "text/csv;charset=utf-8", json: "application/json", html: "text/html;charset=utf-8", ics: "text/calendar;charset=utf-8", txt: "text/plain;charset=utf-8" };
+  function download(name, data, type) {
+    const ext = (type || (String(name).match(/\.(\w+)$/) || [])[1] || "txt").toLowerCase();
+    const blob = data instanceof Blob ? data : new Blob([ext === "csv" ? "\uFEFF" + data : String(data)], { type: MIME[ext] || MIME.txt });
+    const a = document.createElement("a"), url = URL.createObjectURL(blob); a.href = url; a.download = name; document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30e3); log("download", name, Math.round(blob.size / 1024) + " KB");
+  }
+  // 不算句末的缩写（后面跟大写也不断句）："Mr. Lee"、"Dr. Tan"、"St. Paul"
+  const ABBR = new Set("mr mrs ms dr prof st jr sr mt vs fig gen col lt sgt capt rev hon inc ltd co corp dept approx jan feb mar apr jun jul aug sep sept oct nov dec al".split(" "));
+  // 分句：. ! ? … 后面跟空格、下一个字不是小写时断开；缩写（Mr.）、人名首字母（J. K.）、e.g. / U.S.、No. 5、小数都不断
+  function sentsOf(p) {
+    p = String(p == null ? "" : p).replace(/\s+/g, " ").trim(); if (!p) return [];
+    const out = [], re = /[.!?…]+["'”’)\]]*(?=\s|$)/g; let m, start = 0;
+    while ((m = re.exec(p))) {
+      const end = m.index + m[0].length, rest = p.slice(end).replace(/^\s+/, "");
+      if (!rest) break;
+      if (/^[a-z]/.test(rest)) continue; // 下一个字小写：多半不是句末（"Really?" she asked. / Hmm... maybe）
+      if (/^\.["'”’)\]]*$/.test(m[0])) { // 只有一个句点：看前面那个词是不是缩写
+        const lw = (p.slice(start, m.index).match(/([A-Za-z][A-Za-z.]*)$/) || [])[1] || "";
+        if (ABBR.has(lw.toLowerCase())) continue;
+        if (/^[A-Z]$/.test(lw)) continue; // 人名首字母 J. K. Rowling
+        if (/^([A-Za-z]\.)+[A-Za-z]$/.test(lw)) continue; // e.g. / i.e. / U.S.
+        if (/^no$/i.test(lw) && /^\d/.test(rest)) continue; // No. 5
+      }
+      out.push(p.slice(start, end).trim()); start = end;
+    }
+    const last = p.slice(start).trim(); if (last) out.push(last);
+    return out;
+  }
+  const sents = t => String(t == null ? "" : t).split(/\n\s*/).flatMap(sentsOf); // 有换行先按行分（每行各自分句）
   const ask = (q, o) => dialog(q, o, false);
   const input = (q, def, o) => dialog(q, o, true, def);
-  window.U = { esc, LG, LS, tip, log, logs, json, day, dayStart, dayAgo, daysBetween, streak, ask, input };
+  window.U = { esc, LG, LS, tip, log, logs, json, day, dayStart, dayAgo, daysBetween, streak, ask, input, copy, download, sents };
 })();

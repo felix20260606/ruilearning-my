@@ -378,8 +378,7 @@
   const zhHtml = c => { const m = medOf(c), hu = m && m.hu ? String(m.hu).trim() : "", zh = String(c.s.zh || (m && m.tr) || "").trim(); return hu && zh && hu !== zh ? '<span class="hm">H</span>' + esc(hu) + '<br><span class="hm">M</span>' + esc(zh) : esc(hu || zh); };
   // 句子按词汇水平上色（和视频字幕、插件一样），目标词照旧带框
   function colorEn(c) {
-    const V = window.__vs; if (!V) return; if (!V.ready()) { V.load().then(() => { if (cards[at] === c && playing) colorEn(c); }); return; }
-    const el = root.querySelector("#pp-en"); if (!el) return; const h = V.html(plain(c.s.en)); if (!h) return;
+    const el = root.querySelector("#pp-en"); if (!el) return; const h = WORD.html(plain(c.s.en)); // 🎨 全站共用的上色（word.js）；插件模块还没加载好时先不上色，加载好发 word-change 再画
     const pre = (c.s.en.split("{")[0].match(/[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu) || []).length, m = c.s.en.match(/\{([^}]+)\}/), len = m ? (m[1].match(/[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu) || []).length : 0;
     el.innerHTML = h; const ws = el.querySelectorAll(".vs-w"); for (let i = pre; i < pre + len && i < ws.length; i++) ws[i].classList.add("t");
   }
@@ -453,7 +452,7 @@
     root.querySelector("#pp-speed").onclick = () => { opt.speed = opt.speed === 1 ? 0.75 : opt.speed === 0.75 ? 0.5 : 1; LS("pump:opt", opt); show(); say(c); }; // 同 RL：1x → 0.75x → 0.5x
     root.querySelector("#pp-keys").onclick = () => { const k = root.querySelector(".pp-keyhelp"); if (k) return k.remove(); const d = document.createElement("div"); d.className = "pp-keyhelp"; d.innerHTML = "<b>快捷键</b>" + [["A / ←", "上一个"], ["S / ↓ / 空格", "播放"], ["E", "显示（听力：先原文、再翻译）/ 看答案（测验）"], ["D / →", "下一个"], ["Z / C", "测验：忘了 / 记得"], ["Z / X / C", "建议：已知 / 学习 / 跳过"], ["R", "收藏这句（☆）"]].map(x => "<div><kbd>" + x[0] + "</kbd>" + x[1] + "</div>").join(""); d.onclick = () => d.remove(); root.querySelector(".pp-top").after(d); };
     root.querySelector("#pp-pl").onclick = root.querySelector("#pp-s").onclick = () => say(c);
-    root.querySelector("#pp-cp").onclick = () => { const t = plain(c.s.en); (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast("已复制"), () => toast("复制失败")); };
+    root.querySelector("#pp-cp").onclick = () => { U.copy(plain(c.s.en)); }; /* 📋 全站共用（util.js） */
     root.querySelector("#pp-a").onclick = () => go(-1); root.querySelector("#pp-d").onclick = () => go(1);
     const st0 = root.querySelector("#pp-star"); if (st0) { const on = starred(c); st0.textContent = on ? "★" : "☆"; st0.classList.toggle("on", on); st0.onclick = e => { e.stopPropagation(); toggleStar(c); }; }
     const chip = root.querySelector(".pp-chip"); if (chip) chip.title = srcOf(c); // 鼠标停在右下角：例句出处（同 RL）

@@ -13,11 +13,8 @@
             GET /api/ext（只读，取插件设置里的词汇水平，和 watch.js 同一个接口） */
 (function () {
   "use strict";
-  const { esc, LG, LS, tip } = U; // 全站共用的小工具（util.js）
 
   /* ================= 纯函数：清理文本、分段、分句、分词（不碰页面，node 里也能测） ================= */
-  // 不算句末的缩写（后面跟大写也不断句）："Mr. Lee"、"Dr. Tan"、"St. Paul"
-  const ABBR = new Set("mr mrs ms dr prof st jr sr mt vs fig gen col lt sgt capt rev hon inc ltd co corp dept approx jan feb mar apr jun jul aug sep sept oct nov dec al".split(" "));
   // 和 web/vs/vlevel.js 的 VS_WORD_RE 一样的分词规则（字母数字，中间可以带 ' ’ -）
   const WORD_RE = /[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu;
 
@@ -36,26 +33,7 @@
     }
     return blocks.map(b => b.replace(/\s+/g, " ").trim()).filter(b => /[A-Za-z]/.test(b));
   }
-  // 分句：. ! ? … 后面跟空格、下一个字不是小写时断开；缩写（Mr.）、人名首字母（J. K.）、e.g. / U.S.、No. 5、小数都不断
-  function splitSents(p) {
-    p = String(p == null ? "" : p).replace(/\s+/g, " ").trim(); if (!p) return [];
-    const out = [], re = /[.!?…]+["'”’)\]]*(?=\s|$)/g; let m, start = 0;
-    while ((m = re.exec(p))) {
-      const end = m.index + m[0].length, rest = p.slice(end).replace(/^\s+/, "");
-      if (!rest) break;
-      if (/^[a-z]/.test(rest)) continue; // 下一个字小写：多半不是句末（"Really?" she asked. / Hmm... maybe）
-      if (/^\.["'”’)\]]*$/.test(m[0])) { // 只有一个句点：看前面那个词是不是缩写
-        const lw = (p.slice(start, m.index).match(/([A-Za-z][A-Za-z.]*)$/) || [])[1] || "";
-        if (ABBR.has(lw.toLowerCase())) continue;
-        if (/^[A-Z]$/.test(lw)) continue; // 人名首字母 J. K. Rowling
-        if (/^([A-Za-z]\.)+[A-Za-z]$/.test(lw)) continue; // e.g. / i.e. / U.S.
-        if (/^no$/i.test(lw) && /^\d/.test(rest)) continue; // No. 5
-      }
-      out.push(p.slice(start, end).trim()); start = end;
-    }
-    const last = p.slice(start).trim(); if (last) out.push(last);
-    return out;
-  }
+  const splitSents = p => U.sents(p); // ✂️ 分句：全站共用（util.js，听力文稿、练习课、翻译、写作统计也用这一个）
   // 分词：[{ w 词, i 位置, first 是否句首（判断大写是不是专有名词用，规则同 vlevel.js 的 vsMark） }]
   function tokens(s) {
     s = String(s == null ? "" : s); const out = []; let m; WORD_RE.lastIndex = 0;
@@ -123,7 +101,8 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
 
   const PURE = { cleanText, splitParas, splitSents, tokens, wordCount, titleOf, parse, stems, SAMPLES };
   if (typeof module === "object" && module && module.exports) module.exports = PURE;
-  if (typeof document === "undefined") return; // node 测试：只要上面的纯函数
+  if (typeof document === "undefined") return; // node 测试：只要上面的纯函数（要先加载 util.js）
+  const { esc, LG, LS, tip } = U; // 全站共用的小工具（util.js）
 
   /* ================= 页面部分 ================= */
   const say = t => { try { speak(t); } catch (e) {} };
@@ -188,15 +167,6 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
   #reading .ui-btn[data-a="tr"].on{background:var(--ui-pur-soft,rgba(156,63,208,.22));border-color:var(--ui-pur);color:var(--ui-pur-text)}
   .ra-end{margin-top:26px;display:flex;justify-content:center}
   #ra-fab{position:fixed;right:16px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:60;display:none;border:0;border-radius:999px;height:44px;padding:0 18px;background:var(--ui-pur);color:#fff;font:inherit;font-size:15px;font-weight:700;box-shadow:var(--ui-shadow);cursor:pointer}#ra-fab.on{display:block}
-  /* 单词：和视频字幕同一套颜色、下划线（watch.js 的 VS_CSS 只作用于视频页和练习页，这里照抄一份给阅读页） */
-  #reading .vs-w{cursor:pointer;border-radius:3px}#reading .vs-w:hover{background:var(--ui-surface-3)}
-  #reading .vs-w.vs-k{color:var(--vs-ck,#7CE3B8)}#reading .vs-w.vs-u1,#reading .vs-w.vs-ln{color:var(--vs-cs,#FFB86B)}#reading .vs-w.vs-u2{color:var(--vs-ci,#CDA8F7)}#reading .vs-w.vs-sp{color:var(--vs-cp,#7CE3B8)}
-  #reading .vs-w.vs-rare{opacity:.55}
-  #reading .vs-w.vs-lo{box-shadow:inset 0 0 0 1.5px #E9CF8A;background:rgba(255,226,140,.14);border-radius:6px;padding:0 3px}
-  #reading .vs-w[class*=" g-"]{text-underline-offset:5px}
-  #reading .vs-w.g-pa{text-decoration:underline solid #5BB0FF 2px}#reading .vs-w.g-pf{text-decoration:underline double #35D0BA 2px}#reading .vs-w.g-pg{text-decoration:underline wavy #8EE05A 2px}#reading .vs-w.g-md{text-decoration:underline dashed #FF8FC7 2px}#reading .vs-w.g-pv{text-decoration:underline solid #FF7A59 3.5px}#reading .vs-w.g-s3{text-decoration:underline dotted #5BB0FF 2.5px}#reading .vs-w.g-pl{text-decoration:underline dotted #B0B7C0 2.5px}#reading .vs-w.g-art{text-decoration:underline dotted #E8D36B 2.5px}#reading .vs-w.g-cmp{text-decoration:underline dashed #C9A0FF 2px}#reading .vs-w.g-neg{box-shadow:inset 0 2px 0 #FF5C5C}
-  #reading .vs-w.vs-ph{background:rgba(255,226,140,.13);box-shadow:inset 0 1.5px 0 #E9CF8A,inset 0 -1.5px 0 #E9CF8A;border-radius:0;padding:0 2px}#reading .vs-w.vs-ph.ph-s{border-radius:5px 0 0 5px;box-shadow:inset 0 1.5px 0 #E9CF8A,inset 0 -1.5px 0 #E9CF8A,inset 1.5px 0 0 #E9CF8A}#reading .vs-w.vs-ph.ph-e{border-radius:0 5px 5px 0;box-shadow:inset 0 1.5px 0 #E9CF8A,inset 0 -1.5px 0 #E9CF8A,inset -1.5px 0 0 #E9CF8A}
-  #reading .vs-w.ra-lr{background:var(--ui-pur-soft,rgba(156,63,208,.18));box-shadow:0 0 0 2px var(--ui-pur-soft,rgba(156,63,208,.18));border-radius:4px}
   @media(max-width:600px){.ra-body{font-size:18.5px;line-height:1.9}.ra-title{font-size:22px}.ra-nums label{margin-left:0;width:100%}.ra-nums select{flex:1 1 auto;max-width:none}}
   .toast{z-index:9700!important}`;
 
@@ -259,29 +229,9 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
   }
   const plugLevel = () => { const n = Number(PS.level); return PS.level != null && isFinite(n) && n >= 0 ? n : -1; };
   const effLevel = () => (lvSel === "auto" ? (plugLevel() >= 0 ? plugLevel() : 3000) : Number(lvSel) || 3000);
-  // 文章里的 & < > 和直引号：vs 模块是在「转义后的文本」里找单词的，&amp; / &quot; 里的字母会被当成单词，所以先换成占位符 / 弯引号，上色后再换回实体
-  const protect = t => String(t).replace(/&/g, "").replace(/</g, "").replace(/>/g, "").replace(/(^|[\s(\[{—–-])"/g, "$1“").replace(/"/g, "”");
-  const unprotect = h => h.replace(//g, "&amp;").replace(//g, "&lt;").replace(//g, "&gt;");
-  function sentHtml(t) {
-    const pt = protect(t); let h = null;
-    try {
-      // 跟随插件水平、插件也设了水平：直接用视频页那一份（还带保存过的短语框）
-      if (lvSel === "auto" && plugLevel() >= 0 && window.__vs && window.__vs.ready && window.__vs.ready()) h = window.__vs.html(pt);
-      if (h == null && typeof vsMark === "function") { // 自己选了水平 / 插件没设水平：同样的函数，换个水平
-        const S = Object.assign({ fadeRare: true }, PS, { level: effLevel() });
-        h = vsMark(pt, S);
-        if (S.showGram !== false && /\s/.test(t) && typeof vsGramHtml === "function") h = vsGramHtml(h).replace(/ g-(\w+)(?=[ "])/g, (a, c) => (S["g_" + c] === false ? "" : a));
-      }
-    } catch (e) { h = null; }
-    if (h == null) h = pt.replace(WORD_RE, w => '<span class="vs-w" data-w="' + w + '">' + w + "</span>"); // vs 模块还没加载：先不上色，照样能点
-    // 生词本里的词：已掌握的去掉颜色，在学的换成淡紫底
-    h = h.replace(/<span class="([^"]*)" data-w="([^"]*)">/g, (a, cl, w) => {
-      if (!/\bvs-w\b/.test(cl)) return a; const st = bookStatus(w); if (!st) return a;
-      const c = cl.replace(/\s*\bvs-(u1|u2|ln|lo|k|sp|rare)\b/g, "") + (st === "lr" ? " ra-lr" : "");
-      return '<span class="' + c + '" data-w="' + w + '">';
-    });
-    return unprotect(h);
-  }
+  // 🎨 一句英文 → 能点、按水平上色的 html：全站共用的 word.js（WORD.html，和视频字幕、听力文稿同一套颜色）
+  // 跟随插件水平、插件也设了水平：直接用插件设置；自己选了水平 / 插件没设水平：同样的函数，换个水平
+  const sentHtml = t => WORD.html(t, lvSel === "auto" && plugLevel() >= 0 ? {} : { level: effLevel(), settings: PS });
 
   /* ---------- 统计：词数、阅读时间、生词率、水平分布 ---------- */
   function rankOf(w) {
@@ -521,7 +471,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
         if (!v) { const u = ((root.querySelector("#ra-url") || {}).value || "").trim(); if (u) { fromUrl(u); return; } }
         showMsg(""); openDoc(v); if (view === "read") draft = ""; return;
       }
-      if (a === "link") { const u = location.origin + "/#article/" + encodeURIComponent(doc.id); (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(() => tip("已复制这篇文章的链接（换设备打开也能直接读到这篇）"), () => U.input("复制这个链接：", u, { ok: "好了", cancel: "关掉" })); return; }
+      if (a === "link") { const u = location.origin + "/#article/" + encodeURIComponent(doc.id); U.copy(u, { ok: "已复制这篇文章的链接（换设备打开也能直接读到这篇）" }); return; } /* 📋 全站共用（util.js） */
       if (a === "home") { stopAll(); closePop(); const home = () => { view = "home"; draw(); setHash(""); try { root.scrollIntoView({ block: "start" }); } catch (er) {} }; if (window.NAV) NAV.back(home); else home(); return; } // 回到上一个页面
       if (a === "all") { if (tts) stopAll(); else readAll(firstVisible()); }
       if (a === "tr") { trOn = !trOn; LS("reading:trOn", trOn); root.classList.toggle("tr-on", trOn); b.classList.toggle("on", trOn); b.textContent = "文 译文" + (trOn ? "：显示" : "：隐藏"); fillTr(); }

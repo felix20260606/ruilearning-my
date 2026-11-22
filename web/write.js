@@ -9,7 +9,6 @@
    本地分析部分是纯函数（不碰 DOM），在 node 里 require 本文件可以拿到它们单独测试。 */
 (function () {
   "use strict";
-  const { esc, LG, LS } = U; // 全站共用的小工具（util.js）
 
   /* ================= 一、内置数据 ================= */
   const TYPES = {
@@ -162,12 +161,9 @@
   const round1 = x => Math.round(x * 10) / 10;
 
   // 分句：先保护缩写和小数里的点
-  function sentences(text) {
-    const t = String(text || "")
-      .replace(/\b(e\.g|i\.e|etc|Mr|Mrs|Ms|Dr|vs|approx|No|St)\./gi, (m, a) => a.replace(/\./g, "․") + "․")
-      .replace(/(\d)\.(\d)/g, "$1․$2");
-    return (t.match(/[^.!?…\n]+(?:[.!?…]+["'”’)\]]*|\n|$)/g) || []).map(s => s.replace(/․/g, ".").trim()).filter(s => /[A-Za-z0-9]/.test(s));
-  }
+  // ✂️ 分句：全站共用（util.js 的 U.sents：缩写、人名首字母、小数不断句；node 里跑要先加载 util.js）
+  const sentences = text => (typeof U !== "undefined" ? U.sents(text) : String(text || "").split(/(?<=[.!?…])\s+|\n+/)).map(s => s.trim()).filter(s => /[A-Za-z0-9]/.test(s));
+
   const paragraphs = text => String(text || "").split(/\n+/).filter(p => /[A-Za-z0-9]/.test(p));
 
   // 在词表里找这个词的原形（只用于 SYN 这类小表）
@@ -403,6 +399,7 @@
   const API = { TYPES, BANK, SYN, LINKS, words, countWords, sentences, paragraphs, diversity, levelDist, overused, connectives, complexSentences, passives, informal, expandContraction, analyze, ltCat, catCount, estimate, keyIn };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   if (typeof window === "undefined" || typeof document === "undefined") return;
+  const { esc, LG, LS } = U; // 全站共用的小工具（util.js）
 
   /* ================= 三、界面 ================= */
   const say = m => { if (typeof window.toast === "function") window.toast(m); else if (typeof toast === "function") toast(m); };
@@ -966,7 +963,7 @@
       else if (A === "relt" && res) callLT(res).then(() => recordHist(res));
       else if (A === "reai" && res) callAI(res).then(() => recordHist(res));
       else if (A === "say" && cur && cur.ai) talk(cur.ai.rewrite);
-      else if (A === "copy" && cur && cur.ai) { try { navigator.clipboard.writeText(cur.ai.rewrite).then(() => say("已复制范文"), () => say("复制失败")); } catch (er) { say("复制失败"); } }
+      else if (A === "copy" && cur && cur.ai) U.copy(cur.ai.rewrite, { ok: "已复制范文" }); // 📋 全站共用（util.js）
       else if (A === "hopen") { const x = hist().find(y => y.id === b.dataset.id); if (x) { histId = x.id; histView = fromHist(x); draw(); loadVocab().then(() => { if (histView) { runLocal(histView); redrawRes(); } }); } }
       else if (A === "hdel") { if (!(await U.ask("删除这条批改记录？", { ok: "删除", danger: true }))) return; saveHist(hist().filter(y => y.id !== b.dataset.id)); draw(); }
       else if (A === "hback") { const up = () => { histView = null; draw(); }; if (window.NAV) NAV.back(up); else up(); } // 回到上一个页面

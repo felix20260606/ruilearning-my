@@ -34,12 +34,13 @@
       a.src = src; try { a.load(); } catch (e) {}
     });
   }
-  function splitSents(lines) { // listen.js 没加载时的备用（同样的切法）
+  function splitSents(lines) { // listen.js 的分句（短句并到前一句）；没加载时：全站共用的分句（util.js）
     if (window.smeSplitSents) return window.smeSplitSents(lines);
     const out = [];
-    (lines || []).forEach((l, li) => (String(l.t || "").match(/[^.!?]+[.!?]+["'”’)]*|[^.!?]+$/g) || []).forEach(t => { t = t.trim(); if (/\p{L}/u.test(t)) out.push({ who: l.who || "", t, li }); }));
+    (lines || []).forEach((l, li) => U.sents(l.t).forEach(t => { if (/\p{L}/u.test(t)) out.push({ who: l.who || "", t, li }); }));
     return out;
   }
+
   const within = (ms, p) => Promise.race([p, new Promise(res => setTimeout(() => res(null), ms))]);
   // 一句一句翻成中文：全站共用的翻译（tr.js），按学的语言翻；翻不出的是 ""（还用整段的中文）
   const trSents = arr => TR.lines(arr, { sl: LANG().cur(), ai: false });
@@ -170,13 +171,13 @@
     }).filter(c => c.opts.length >= 2);
     const gaps = []; const used = new Set();
     for (const s of gapPool) { if (gaps.length >= P.gap || used.has(s)) continue; used.add(s); const g = blankOf(M.sents[s].t, M.vocab.map(v => v.w.split(/\s+/)[0]), stop, r); if (g) gaps.push(Object.assign({ k: "gap", s }, g)); }
-    const U = new Set(pickS.concat(gaps.map(g => g.s)));
-    const fresh = list => list.slice().sort((p, q) => (U.has(p) ? 1 : 0) - (U.has(q) ? 1 : 0) + (r() - 0.5) * 0.9); // 没考过的句子排前面
+    const USED = new Set(pickS.concat(gaps.map(g => g.s)));
+    const fresh = list => list.slice().sort((p, q) => (USED.has(p) ? 1 : 0) - (USED.has(q) ? 1 : 0) + (r() - 0.5) * 0.9); // 没考过的句子排前面
     const ords = fresh(idx.filter(i => chunksOf(M.sents[i].t) && (lv === 1 ? nw(i) <= 12 : nw(i) <= 20))).slice(0, P.ord).map(s => { const ch = chunksOf(M.sents[s].t); return { k: "ord", s, ch, sh: shufIdx(ch.length, r) }; });
-    ords.forEach(o => U.add(o.s));
+    ords.forEach(o => USED.add(o.s));
     let dPool = idx.filter(i => nw(i) >= 4 && nw(i) <= (lv === 3 ? 18 : 12)); const dNo = dPool.filter(i => !ords.some(o => o.s === i)); if (dNo.length >= P.dict) dPool = dNo; // 排过的句子再听写就是送答案
     const dicts = fresh(dPool).slice(0, P.dict).map(s => ({ k: "dict", s }));
-    dicts.forEach(o => U.add(o.s));
+    dicts.forEach(o => USED.add(o.s));
     const zhs = fresh(idx.filter(i => M.sents[i].zh && !M.sents[i].zhAll && nw(i) >= 3)).slice(0, P.zh).map(s => ({ k: "zh", s }));
     if (li === 0) add("📒 本期重点词", "先认识这期要用的词：点 🔊 听发音，想记的加进生词本", M.vocab.slice(0, 10).map((v, i) => ({ k: "voc", v: i })));
     add("🔁 跟读", "听一句，大声跟着读；点 🎙 录下来，看哪些词没读准（R）", idx.map(s => ({ k: "say", s })));

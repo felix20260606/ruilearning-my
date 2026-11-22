@@ -8,6 +8,7 @@
      WORD.bind(容器, { sent(el) → 这个词所在的句子, quiet() → true 时点词不自动朗读, onOpen(w, el) 打开卡片前（比如暂停视频）, onAdd(w) })
        容器里带 data-w="词" 的元素都按这一套处理（点词 + 右键）；一个容器只 bind 一次
      WORD.open(词, 元素, { sent, quiet, onAdd })、WORD.close()、WORD.mark(词, "learn"|"known"|"ignore"|"")
+     WORD.html(英文, {level, settings, gram}) → 能点、按水平上色的 html（全站单词颜色都用它）
      WORD.add(词, {sent, silent, learn, from}) 加进生词本（全站加词都用它）→ true 加了 / false 本来就有 / null 失败
      WORD.status(词) → "kn" 已掌握 / "lr" 在学 / ""（按原形匹配生词本，收了 go，went / goes 也算）；WORD.loadBook() 生词本变了以后重读
    旧接口照旧能用：window.readPop(词, 元素, opt)、window.readBook(reload) → status 函数（听力文稿上色用）
@@ -40,6 +41,19 @@
   #wd-pop .act{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}#wd-pop .act .ui-btn{flex:1 1 auto}#wd-pop .act .ui-btn.in{background:var(--ui-surface-2);border-color:var(--ui-line-2);color:var(--ui-muted);cursor:default}
   #wd-pop .act a{font-size:13px;white-space:nowrap;color:var(--ui-pur-text)}
   @media(max-width:600px){#wd-pop .act .ui-btn{min-height:46px}}`;
+  const COLOR_CSS = `
+  /* 🎨 单词颜色（全站共用：阅读、视频字幕、听力文稿、背单词卡片……都是这一份；颜色和插件一样，按词汇水平） */
+  .vs-w{cursor:pointer;border-radius:3px}.vs-w:hover{background:var(--ui-surface-3,#363940)}
+  .vs-w.vs-k{color:var(--vs-ck,#7CE3B8)}.vs-w.vs-u1,.vs-w.vs-ln{color:var(--vs-cs,#FFB86B)}.vs-w.vs-u2{color:var(--vs-ci,#CDA8F7)}.vs-w.vs-sp{color:var(--vs-cp,#7CE3B8)}
+  .vs-w.vs-rare{opacity:.55}
+  .vs-w.vs-lo{box-shadow:inset 0 0 0 1.5px #E9CF8A;background:rgba(255,226,140,.14);border-radius:6px;padding:0 3px}
+  .vs-w.vs-pk{background:rgba(120,175,240,.32);box-shadow:0 0 0 2px rgba(120,175,240,.32);border-radius:4px}
+  .vs-w[class*=" g-"]{text-underline-offset:4px}
+  .vs-w.g-pa{text-decoration:underline solid #5BB0FF 2px}.vs-w.g-pf{text-decoration:underline double #35D0BA 2px}.vs-w.g-pg{text-decoration:underline wavy #8EE05A 2px}.vs-w.g-md{text-decoration:underline dashed #FF8FC7 2px}.vs-w.g-pv{text-decoration:underline solid #FF7A59 3.5px}.vs-w.g-s3{text-decoration:underline dotted #5BB0FF 2.5px}.vs-w.g-pl{text-decoration:underline dotted #B0B7C0 2.5px}.vs-w.g-art{text-decoration:underline dotted #E8D36B 2.5px}.vs-w.g-cmp{text-decoration:underline dashed #C9A0FF 2px}.vs-w.g-neg{box-shadow:inset 0 2px 0 #FF5C5C}
+  .vs-w.vs-ph{background:rgba(255,226,140,.13);box-shadow:inset 0 1.5px 0 #E9CF8A,inset 0 -1.5px 0 #E9CF8A;border-radius:0;padding:0 2px}.vs-w.vs-ph.ph-s{border-radius:5px 0 0 5px;box-shadow:inset 0 1.5px 0 #E9CF8A,inset 0 -1.5px 0 #E9CF8A,inset 1.5px 0 0 #E9CF8A}.vs-w.vs-ph.ph-e{border-radius:0 5px 5px 0;box-shadow:inset 0 1.5px 0 #E9CF8A,inset 0 -1.5px 0 #E9CF8A,inset -1.5px 0 0 #E9CF8A}
+  .vs-w.wd-lr{background:var(--ui-pur-soft,rgba(156,63,208,.18));box-shadow:0 0 0 2px var(--ui-pur-soft,rgba(156,63,208,.18));border-radius:4px}
+`;
+  { const st = document.createElement("style"); st.id = "wd-color-css"; st.textContent = COLOR_CSS; (document.head || document.documentElement).append(st); } // 颜色一加载就要有（不等查词卡片）
 
   /* ---------- 生词本状态（按原形匹配；规则同插件 web/vs/vlevel.js 的 vsKeys） ---------- */
   function stems(w) { const o = [w]; if (/ies$/.test(w)) o.push(w.slice(0, -3) + "y"); if (/(es|ed)$/.test(w)) o.push(w.slice(0, -2), w.slice(0, -1)); if (/s$/.test(w)) o.push(w.slice(0, -1)); if (/ing$/.test(w)) o.push(w.slice(0, -3), w.slice(0, -3) + "e"); if (/(.)\1(ed|ing)$/.test(w)) o.push(w.replace(/(.)\1(ed|ing)$/, "$1")); return o; }
@@ -178,7 +192,36 @@
     }, true);
   }
 
-  window.WORD = { bind, open, close, mark, cycle, status, loadBook, dict, add, get openWord() { return pWord; } };
+  /* 🎨 英文 → 能点、按水平上色的 html（全站共用：阅读、视频字幕、听力文稿、背单词卡片）
+     WORD.html(英文, { level 换一个词汇水平（不传 = 跟插件设置）, settings 额外的插件设置, gram:false 不画语法下划线 })
+     ① 插件那套（web/vs/：按词汇水平上色、语法下划线、短语框、你的标记）② 生词本：已掌握的去掉颜色，在学的淡紫底（wd-lr）
+     vs 模块还没加载：先给不上色、但能点的词，同时去加载，加载好发 word-change {m:"ready"}，各页面重画 */
+  const WORD_RE = /[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu; // 和 web/vs/vlevel.js 的 VS_WORD_RE 一样
+  // vs 模块在「转义后的文本」里找单词：&amp; / &quot; 里的字母会被当成单词，所以先换成占位符 / 弯引号，上色后再换回实体
+  const protect = t => String(t).replace(/&/g, "\u0001").replace(/</g, "\u0002").replace(/>/g, "\u0003").replace(/(^|[\s(\[{—–-])"/g, "$1“").replace(/"/g, "”");
+  const unprotect = h => h.replace(/\u0001/g, "&amp;").replace(/\u0002/g, "&lt;").replace(/\u0003/g, "&gt;");
+  let colorLoading = null;
+  function html(t, o) {
+    o = o || {}; const pt = protect(t), v = V(); let h = null;
+    try {
+      if (o.level == null && !o.settings && v && v.ready && v.ready()) h = v.html(pt); // 跟插件设置：直接用视频页那一份（还带你的标记、保存过的短语框）
+      else if (typeof vsMark === "function") {
+        const S = Object.assign({ fadeRare: true }, (v && v.settings && v.settings()) || {}, o.settings || {}, o.level != null ? { level: o.level } : {});
+        h = vsMark(pt, S);
+        if (o.gram !== false && S.showGram !== false && /\s/.test(t) && typeof vsGramHtml === "function") h = vsGramHtml(h).replace(/ g-(\w+)(?=[ "])/g, (a, c) => (S["g_" + c] === false ? "" : a));
+      }
+    } catch (e) { h = null; U.log("word", "上色出错", String(e && e.message || e)); }
+    if (h == null) {
+      h = pt.replace(WORD_RE, w => '<span class="vs-w" data-w="' + w + '">' + w + "</span>");
+      if (!colorLoading && v && v.load) colorLoading = Promise.resolve(v.load()).then(() => changed("", "ready"), () => {});
+    }
+    h = h.replace(/<span class="([^"]*)" data-w="([^"]*)">/g, (a, cl, w) => {
+      if (!/\bvs-w\b/.test(cl)) return a; const st = status(w); if (!st) return a;
+      return '<span class="' + cl.replace(/\s*\bvs-(u1|u2|ln|lo|k|sp|rare)\b/g, "") + (st === "lr" ? " wd-lr" : "") + '" data-w="' + w + '">';
+    });
+    return unprotect(h);
+  }
+  window.WORD = { html, bind, open, close, mark, cycle, status, loadBook, dict, add, get openWord() { return pWord; } };
   // 旧接口（read.js / listen.js 以前用的）
   window.readPop = (w, el, opt) => open(w, el, opt || {});
   window.readBook = reload => { if (reload || !book.size) loadBook(); if (typeof vsKeys !== "function") vsLoad(); return status; };
