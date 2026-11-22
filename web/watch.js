@@ -252,7 +252,15 @@
     })().catch(() => { vsP = null; });
     return vsP;
   }
-  window.__vs = { load: () => vsLoad(), ready: () => !!VS, html: t => (VS ? vsHtml(t) : null) }; // 练习页（pump.js）也用同一套上色
+  // 练习页（pump.js）也用同一套上色；阅读页（read.js）还用同一套标记：右键循环、查词卡片里的「将要学习 / 已掌握 / 不学习」
+  window.__vs = { load: () => vsLoad(), ready: () => !!VS, html: t => (VS ? vsHtml(t) : null),
+    markOf: w => vsMarkNow(String(w || "")), setMark: (w, m) => vsSetMark(w, m), sheetExtra: (w, el) => vsSheetExtra(w, el),
+    cat: w => (VS && typeof vsCat === "function" ? vsCat(w, VS.S, false, false, true) : ""), next: w => vsNextMark(w) };
+  // 右键循环（同插件）：本来的颜色 → 将要学习（带框）→ 已掌握（白色）→ 回到本来的颜色；本来就是白色的词只在「白色 / 带框」之间切换
+  function vsNextMark(w) {
+    const lw = String(w).toLowerCase(), mk = vsMarkNow(lw), def = VS && typeof vsCat === "function" ? vsCat(w, VS.S, false, false, true) : "", plain = def === "known" || def === "";
+    return mk === "learn" ? (plain ? "" : "known") : mk === "known" ? (plain ? "learn" : "") : "learn";
+  }
   async function vsData() {
     let it = {}; try { it = (await (await fetch("/api/ext", { cache: "no-store" })).json()).items || {}; } catch (e) {}
     const S = Object.assign({}, VS_DEF), marks = {}, saved = new Set(), sents = [];
@@ -426,6 +434,12 @@
     listEl.addEventListener("touchmove", away, { passive: true }); listEl.addEventListener("wheel", away, { passive: true });
     mask.onclick = closeSheet;
     sheet.addEventListener("click", onSheet);
+    // 右键单词（同插件、同阅读页）：本来的颜色 → 将要学习 → 已掌握 → 回到本来的颜色；手机长按也一样
+    root.addEventListener("contextmenu", e => {
+      const w = e.target.closest(".wt-w[data-w]"); if (!w || !VS) return;
+      e.preventDefault(); e.stopPropagation(); const m = vsNextMark(w.dataset.w);
+      tip(w.dataset.w + " → " + ({ learn: "将要学习", known: "已掌握", ignore: "不学习", "": "恢复默认" })[m]); vsSetMark(w.dataset.w, m);
+    });
     addEventListener("resize", fit);
     paintSet();
     return true;

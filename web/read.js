@@ -206,6 +206,8 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
   #ra-pop.sheet{left:0!important;right:0;top:auto!important;bottom:0;width:auto;max-width:none;max-height:72vh;border-radius:18px 18px 0 0;border-bottom:0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px))}
   #ra-pop .hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap}#ra-pop .hd b{font-size:22px}#ra-pop .hd .ph{color:var(--ui-muted);font-size:14px}
   #ra-pop .hd button{border:0;background:var(--ui-surface-2,#2d2f34);color:var(--ui-ink-2);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:15px}#ra-pop .hd .x{margin-left:auto;background:none;color:var(--ui-muted);font-size:18px}
+  #ra-pop .mk{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}#ra-pop .mk button{flex:1 1 auto;min-height:36px;border-radius:9px;border:1px solid var(--ui-line-2,#454950);background:var(--ui-surface-2,#2d2f34);color:var(--ui-ink,#eee);font:inherit;font-size:13px;cursor:pointer;padding:0 8px}
+  #ra-pop .mk button.on{background:var(--ui-pur,#9C3FD0);border-color:var(--ui-pur,#9C3FD0);color:#fff}#ra-pop .vs-wns{margin-top:8px}
   #ra-pop .zh{margin-top:8px;font-size:16.5px;font-weight:700;line-height:1.5}#ra-pop .en{margin-top:6px;color:var(--ui-ink-2);font-size:14px;line-height:1.55}
   #ra-pop .ld{margin-top:8px;color:var(--ui-muted);font-size:14px}
   #ra-pop .ex{display:flex;gap:8px;align-items:flex-start;margin-top:8px;background:var(--ui-surface-2,#2d2f34);border-radius:10px;padding:8px 10px;font-size:14px;line-height:1.5}#ra-pop .ex small{display:block;color:var(--ui-muted);font-size:13px}
@@ -537,6 +539,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
     pop.addEventListener("click", e => {
       const b = e.target.closest("[data-a]"); if (!b) return; const a = b.dataset.a;
       if (a === "px") closePop(); else if (a === "psay") say(b.dataset.t || popWord); else if (a === "padd") addWord(b);
+      else if (a === "mk") { const m = b.dataset.m; b.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b && !!m)); markWord(popWord, m); }
     });
   }
   function placePop() {
@@ -561,7 +564,8 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
       const zh = (Array.isArray(d.zh) ? d.zh.join("；") : d.zh) + (Array.isArray(d.zhs) && d.zhs.length ? "（" + d.zhs.map(x => (x.pos ? x.pos + " " : "") + (x.terms || []).slice(0, 3).join("、")).join("；") + "）" : ""), en = Array.isArray(d.en) ? d.en.slice(0, 3).map(x => typeof x === "string" ? x : (x.pos ? "(" + x.pos + ") " : "") + (x.def || "")).join("; ") : d.en; // /api/dict：en 是 [{pos, def, ex}]，zhs 是各词性的中文
       if (zh) h += '<div class="zh">' + esc(zh) + "</div>"; if (en) h += '<div class="en">' + esc(en) + "</div>";
       (Array.isArray(d.examples) ? d.examples : []).filter(x => x && x[0]).slice(0, 2).forEach(x => { h += '<div class="ex"><button data-a="psay" data-t="' + esc(x[0]) + '" title="朗读例句">🔊</button><div>' + esc(x[0]) + (x[1] ? "<small>" + esc(x[1]) + "</small>" : "") + "</div></div>"; });
-      if (g.length) h += '<div class="gm">这里的语法：' + esc(g.join(" · ")) + "</div>";
+      const V = window.__vs, extra = V && V.ready && V.ready() && V.sheetExtra ? V.sheetExtra(word, popEl) : ""; // 同看视频的查词卡片：语法、单词注释、📌 将要学习 / ✅ 已掌握 / 不学习
+      if (extra) h += extra; else if (g.length) h += '<div class="gm">这里的语法：' + esc(g.join(" · ")) + "</div>";
     }
     return h + '<div class="act">' + (loading ? "" : addBtn(word)) + '<a href="' + cam + '" target="_blank" rel="noopener">Cambridge 词典 ↗</a></div>';
   }
@@ -575,6 +579,15 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
     const d = await dict(w); if (req !== popReq || !pop.classList.contains("on")) return;
     pop.innerHTML = popHtml(w, d, false); placePop(); // 查不到：只剩单词、朗读、加入生词本、Cambridge 链接
   }
+  // 标记（同看视频 / 插件）：写回 /api/ext 和生词本的掌握状态（watch.js 的 vsSetMark），再重新上色
+  const MK_NAME = { learn: "将要学习", known: "已掌握", ignore: "不学习", "": "恢复默认" };
+  async function markWord(w, m, toastIt) {
+    const V = window.__vs; if (!V || !V.setMark) return;
+    if (!(V.ready && V.ready())) { try { await ensureVs(); } catch (e) {} }
+    if (toastIt) tip(w + " → " + MK_NAME[m || ""]);
+    try { await V.setMark(w, m); } catch (e) {}
+    loadBook(); redrawKeep();
+  }
   function closePop() { if (!pop) return; popReq++; popWord = ""; popEl = null; pop.classList.remove("on", "sheet"); mask.classList.remove("on"); }
   function addWord(b) {
     const d = DC.get(popWord.toLowerCase()), w = String((d && d.word) || popWord).toLowerCase(), f = window.vocabAddWord;
@@ -584,6 +597,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
     Promise.resolve(r).then(res => {
       if (res === false) { b.disabled = false; b.textContent = "＋ 加入生词本"; return; }
       b.className = "ui-btn in"; b.textContent = "已在生词本"; const cb = popOpt && popOpt.onAdd;
+      const V = window.__vs; if (V && V.ready && V.ready() && V.markOf(w) !== "learn") { V.setMark(w, "learn"); const lb = pop && pop.querySelector("[data-m=learn]"); if (lb) lb.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === lb)); } // 同看视频：加进生词本 = 将要学习
       setTimeout(() => { loadBook(); if (book.size && !bookStatus(w)) book.set(w, "lr"); redrawKeep(); if (cb) try { cb(w); } catch (e) {} }, 300); // 重新上色：新加的词换成「在学」
     }).catch(() => { b.disabled = false; b.textContent = "＋ 加入生词本"; tip("加入失败，请再试一次"); });
   }
@@ -602,6 +616,11 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
     if (root) return; root = document.getElementById("reading"); if (!root) return;
     const st = document.createElement("style"); st.textContent = CSS; document.head.append(st);
     loadBook();
+    // 右键单词（同看视频 / 插件）：本来的颜色 → 将要学习（带框）→ 已掌握 → 回到本来的颜色；手机长按也一样
+    root.addEventListener("contextmenu", e => {
+      const w = e.target.closest(".vs-w[data-w]"), V = window.__vs; if (!w || !V || !V.next || !(V.ready && V.ready())) return;
+      e.preventDefault(); e.stopPropagation(); closePop(); markWord(w.dataset.w.replace(/’/g, "'"), V.next(w.dataset.w), true);
+    });
     root.addEventListener("click", e => {
       const t = e.target;
       const w = t.closest("[data-w]"); if (w) { e.stopPropagation(); const s = w.closest(".ra-s"); openPop(w.dataset.w, w, s ? +s.dataset.i : w.dataset.si != null ? +w.dataset.si : null); return; }
