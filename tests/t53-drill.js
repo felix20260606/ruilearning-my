@@ -83,6 +83,22 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
   ok(gaps.every(c => c.s >= b0.range[0] && c.s < b0.range[1]) && picks.every(c => c.s >= b0.range[0] && c.s < b0.range[1]), "questions from this lesson");
   ok(JSON.stringify(D.build(M, 0).cards) === JSON.stringify(b0.cards), "same lesson → same questions");
   ok(D.PROV.en && D.PROV.de && D.PROV.en.dialog && !D.PROV.de.dialog, "en + de sources");
+  // 英语栏目和 📻 听力节目一样（新闻英语没文稿不放）；「🆕 本周更新」= 一直在更新的栏目最近 7 天的合起来
+  const ks = D.PROV.en.series.map(x => x[0]);
+  ok(["new", "bn1", "bn3", "bn5", "bn6", "nup", "nsw", "npm", "vst", "vwd", "vgr", "vnw", "drama", "eau", "ree", "tews", "sme"].every(k => ks.includes(k)) && !ks.includes("news") && ks[0] === "new", "en series " + ks);
+  ok(D.PROV.en.series.every(x => x[2]), "every series has a row");
+  {
+    const day = n => new Date(Date.now() - n * 864e5).toUTCString().slice(5, 16), asked = [];
+    ctx.fetch = async u => { asked.push(u); const s = decodeURIComponent(u.split("s=")[1] || ""); return { json: async () => s === "nup" ? { ok: true, list: [{ id: "nup/a", t: "Up today", d: day(0) }, { id: "nup/b", t: "Up old", d: day(12) }] } : s === "ree" ? { ok: true, list: [{ id: "real-easy-english/x", t: "Ree", d: day(3) }] } : s === "bn1" ? { ok: false } : { ok: true, list: [] } }; };
+    const L = await D.PROV.en.list("new");
+    ok(L.map(x => x.id).join() === "nup/a,real-easy-english/x", "week list " + L.map(x => x.id));
+    ok(/🗞 每日新闻$/.test(L[0].d) && /🐢 慢速对话$/.test(L[1].d), "week list labels " + L.map(x => x.d));
+    ok(!asked.some(u => /s=(vst|vwd|vgr|vnw|drama|eau|news|new)\b/.test(u)), "week list skips VOA / story / news " + asked);
+    ctx.fetch = async () => ({ json: async () => ({ ok: false }) });
+    let e = ""; try { await D.PROV.en.list("new"); } catch (x) { e = x.message; } ok(e === "列表没拿到", "week list all failed → error");
+    ctx.fetch = async () => ({ json: async () => ({ ok: false, error: "no transcript yet" }) });
+    e = ""; try { await D.PROV.en.load("nup/a", () => {}); } catch (x) { e = x.message; } ok(/还没放文稿/.test(e), "npr no transcript message " + e);
+  }
   // 新题型：排词成句、整句听写、看中文说、角色扮演（对话类）
   const Md = Object.assign({}, M, { dialog: true });
   const bd = D.build(Md, 0), kinds = bd.cards.map(c => c.k);

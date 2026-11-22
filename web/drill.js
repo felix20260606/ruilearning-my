@@ -83,12 +83,24 @@
   }
   const PROV = {
     en: {
-      name: "BBC Learning English", dialog: true, // dialog：两个人对话的节目 → 有「🎭 角色扮演」
-      series: [["ree", "🐢 慢速对话"], ["tews", "💬 地道说法"], ["sme", "📻 6 分钟英语"]], // 「新闻英语」没有全文文稿，不能拆句
-      async list(s) { const j = await getJ("/api/sme?s=" + encodeURIComponent(s)); if (!j || !j.ok) throw new Error((j && j.error) || "列表没拿到"); return j.list || []; },
+      name: "「📻 听力节目」里的分级新闻、NPR、VOA、BBC", dialog: true, // dialog：两个人对话的节目 → 有「🎭 角色扮演」（还要文稿里真有两个以上说话人）
+      // 和 listen.js 的栏目一样（[栏目, 按钮, 行]），「新闻英语」没有全文文稿，不能拆句；「本周更新」= 一直在更新的栏目最近 7 天的
+      series: [["new", "🆕 本周更新", "最新"], ["bn1", "📶 L1 初级", "分级"], ["bn3", "📶 L3 中级", "分级"], ["bn5", "📶 L5 中高级", "分级"], ["bn6", "📶 L6 高级", "分级"], ["nup", "🗞 每日新闻", "NPR"], ["nsw", "🔬 科学", "NPR"], ["npm", "💰 经济", "NPR"],
+        ["vst", "📚 美国故事", "VOA"], ["vwd", "🗝 词语故事", "VOA"], ["vgr", "✏️ 每日语法", "VOA"], ["vnw", "🗞 慢速新闻", "VOA"], ["drama", "🎭 广播剧", "BBC"], ["eau", "🎓 大学英语", "BBC"], ["ree", "🐢 慢速对话", "BBC"], ["tews", "💬 地道说法", "BBC"], ["sme", "📻 6 分钟英语", "BBC"]],
+      week: ["bn1", "bn3", "bn5", "bn6", "nup", "nsw", "npm", "ree", "tews", "sme"],
+      async list(s) {
+        if (s === "new") { // 各栏目最近 7 天的合起来，新的在前；小字写是哪个栏目
+          const day = t => { const d = new Date(t); d.setHours(0, 0, 0, 0); return +d; }, cut = day(Date.now()) - 6 * 864e5, lab = Object.fromEntries(this.series.map(x => [x[0], x[1]]));
+          const Ls = await Promise.all(this.week.map(k => this.list(k).catch(() => [])));
+          const out = []; Ls.forEach((L, si) => L.forEach(x => { const t = Date.parse(x.d); if (t && day(t) >= cut) out.push(Object.assign({}, x, { d: x.d + " · " + lab[this.week[si]], _t: day(t), _s: si })); }));
+          if (!out.length && Ls.every(L => !L.length)) throw new Error("列表没拿到");
+          return out.sort((a, b) => b._t - a._t || a._s - b._s);
+        }
+        const j = await getJ("/api/sme?s=" + encodeURIComponent(s)); if (!j || !j.ok) throw new Error((j && j.error) || "列表没拿到"); return j.list || [];
+      },
       async load(id, prog) {
         prog("取文稿…");
-        const ep = await getJ("/api/sme?ep=" + encodeURIComponent(id)); if (!ep || !ep.ok) throw new Error("文稿没拿到（" + ((ep && ep.error) || "网络") + "）");
+        const ep = await getJ("/api/sme?ep=" + encodeURIComponent(id)); if (!ep || !ep.ok) throw new Error(ep && ep.error === "no transcript yet" ? "这一期 NPR 还没放文稿（一般播出后一两天才有），先练别的" : ep && ep.error === "no such level" ? "这篇新闻没有这一级，换个级别" : "文稿没拿到（" + ((ep && ep.error) || "网络") + "）");
         prog("取中文翻译…");
         let zh = null; try { zh = await getJ("/api/sme?ep=" + encodeURIComponent(id) + "&zh=1"); if (!zh || !zh.ok) zh = null; } catch (e) {}
         return finish.call(this, "/api/sme", id, ep, zh, prog);
@@ -196,9 +208,9 @@
   window.DRILL = { split: splitSents, lessons, build, blankOf, chunksOf, shufIdx, rng, PROV, LV };
 
   // ---------- 状态 ----------
-  let root = null, view = "home", ser = LG("drill:ser", "ree"), M = null, LI = 0, C = null, ci = 0, res = {}, busy = "", err = "";
+  let root = null, view = "home", ser = LG("drill:ser", "new"), M = null, LI = 0, C = null, ci = 0, res = {}, busy = "", err = "";
   let RS = {}, ORD = {}, RP = null; // RS 每张卡的录音结果、ORD 排词成句点了哪些、RP 角色扮演
-  const MODELS = {}, LISTS = {}, WHY = {};
+  const MODELS = {}, LISTS = {}, WHY = {}, MORE = {}; // MORE：列表显示到第几期
   const lvl = () => { const v = +LG("drill:lvl", 2); return LV[v] ? v : 2; };
   const opt = () => Object.assign({ rate: LV[lvl()].rate, zh: false }, LG("drill:opt", {}));
   const setOpt = o => LS("drill:opt", Object.assign(opt(), o));
@@ -372,6 +384,7 @@
   #drill{display:none;max-width:960px;margin:0 auto;padding:6px 0 40px;color:var(--ui-ink);font-family:var(--ui-font);overflow-wrap:anywhere}#drill.on{display:block}
   #drill .dr-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:4px 0 6px}#drill .dr-h h2{font-size:20px;margin:0;font-weight:900}#drill .dr-h .sp{flex:1}
   #drill .dr-sub{color:var(--ui-muted);font-size:13.5px;line-height:1.6;margin:0 0 12px}
+  #drill .dr-segs{display:flex;flex-direction:column;gap:6px;margin:0 0 12px}#drill .dr-segs .dr-seg{margin:0;align-items:center}#drill .dr-seg .src{flex:0 0 34px;font-size:11.5px;font-weight:800;letter-spacing:.04em;color:var(--ui-muted)}
   #drill .dr-seg{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}#drill .dr-seg button{border:1px solid var(--ui-line-2);background:var(--ui-surface);color:var(--ui-ink-2);border-radius:999px;padding:6px 13px;font:inherit;font-size:13.5px;cursor:pointer}#drill .dr-seg button.on{background:var(--ui-pur);border-color:var(--ui-pur);color:#fff;font-weight:700}
   #drill .dr-ep{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:var(--ui-surface);border:1px solid var(--ui-line);border-radius:14px;padding:10px;margin:0 0 8px;color:inherit;font:inherit;cursor:pointer}
   #drill .dr-ep:hover{border-color:var(--ui-pur-line)}#drill .dr-ep img{width:84px;height:48px;object-fit:cover;border-radius:8px;flex:0 0 auto;background:var(--ui-surface-2)}
@@ -454,12 +467,17 @@
       s += '<div class="dr-cont"><div class="t"><small style="color:var(--ui-muted)">上次练到</small><br><b>' + esc(m ? m.title : (findEp(last) || {}).t || last) + "</b>" + (done ? " · 做完 " + done + " 节" : "") + '</div><button class="ui-btn pri" data-ep="' + esc(last) + '">继续 →</button></div>';
     }
     const cs = curSer();
-    if (P.series.length > 1) s += '<div class="dr-seg">' + P.series.map(x => '<button data-s="' + x[0] + '" class="' + (x[0] === cs ? "on" : "") + '">' + x[1] + "</button>").join("") + "</div>";
+    const segB = x => '<button data-s="' + x[0] + '" class="' + (x[0] === cs ? "on" : "") + '">' + x[1] + "</button>";
+    if (P.series.length > 1) s += P.series[0][2] ? '<div class="dr-segs">' + [...new Set(P.series.map(x => x[2]))].map(g => '<div class="dr-seg"><span class="src">' + esc(g) + "</span>" + P.series.filter(x => x[2] === g).map(segB).join("") + "</div>").join("") + "</div>" // 栏目多：一个来源一行（同 📻 听力节目）
+      : '<div class="dr-seg">' + P.series.map(segB).join("") + "</div>";
     const L = LISTS[lg.code + "/" + cs];
     if (!L) { loadList(); return s + '<div class="dr-empty">正在取节目列表…</div>'; }
     if (L.err) return s + '<div class="dr-empty">列表没拿到：' + esc(L.err) + '<br><button class="ui-btn" data-a="relist">再试一次</button></div>';
     if (L.loading) return s + '<div class="dr-empty">正在取节目列表…</div>';
-    return s + L.list.slice(0, 30).map(x => { const n = Object.keys(progOf(x.id)).length; return '<button class="dr-ep" data-ep="' + esc(x.id) + '">' + (x.img ? '<img loading="lazy" alt="" src="' + esc(window.NET && NET.src ? NET.src(x.img) : x.img) + '">' : "") + '<span class="t"><b>' + esc(x.t) + "</b><small>" + esc(x.d || "") + "</small></span>" + (n ? '<span class="dr-badge">练过 ' + n + " 节</span>" : "") + "</button>"; }).join("");
+    if (!L.list.length) return s + '<div class="dr-empty">' + (cs === "new" ? "最近 7 天没有新节目" : "这个栏目没有节目") + "</div>";
+    const nShow = MORE[lg.code + "/" + cs] || 30;
+    return s + L.list.slice(0, nShow).map(x => { const n = Object.keys(progOf(x.id)).length; return '<button class="dr-ep" data-ep="' + esc(x.id) + '">' + (x.img ? '<img loading="lazy" alt="" src="' + esc(window.NET && NET.src ? NET.src(x.img) : x.img) + '">' : "") + '<span class="t"><b>' + esc(x.t) + "</b><small>" + esc(x.d || "") + "</small></span>" + (n ? '<span class="dr-badge">练过 ' + n + " 节</span>" : "") + "</button>"; }).join("") +
+      (L.list.length > nShow ? '<div style="text-align:center;margin:12px 0"><button class="ui-btn" data-a="more">显示更多（还有 ' + (L.list.length - nShow) + " 期）</button></div>" : "");
   }
   function findEp(id) { for (const k in LISTS) { const f = (LISTS[k].list || []).find(x => x.id === id); if (f) return f; } return null; }
   async function loadList() {
@@ -676,6 +694,7 @@
     if (a === "en") { if (window.LANG) LANG().set("en"); return; }
     if (a === "home") { view = "home"; hush(); rpStop(); if (REC) recStop(true); return draw(); }
     if (a === "review") return openReview();
+    if (a === "more") { const k = LANG().cur() + "/" + curSer(); MORE[k] = (MORE[k] || 30) + 60; return draw(); }
     if (a === "relist") { delete LISTS[LANG().cur() + "/" + curSer()]; return draw(); }
     if (a === "ep") { if (C && C.review) { view = "home"; hush(); return draw(); } view = "ep"; hush(); rpStop(); if (REC) recStop(true); return draw(); }
     if (a === "prev") return go(ci - 1);
