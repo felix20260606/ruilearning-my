@@ -613,6 +613,12 @@ async function smeAlign(env, u) {
 async function sme(req, env, u) {
   if (req.method === "OPTIONS") return json({ ok: true });
   if (u.searchParams.get("al")) return smeAlign(env, u);
+  if (u.searchParams.get("mp3")) { // 📥 离线下载：BBC 的 mp3 没开跨域，这里转一手（只转打开过的那几期、只转 downloads.bbc.co.uk）
+    const x = await env.CAPTIONS.get("sme/ep/" + u.searchParams.get("mp3"), "json");
+    if (!x || !/^https:\/\/downloads\.bbc\.co\.uk\/[^?#]+\.mp3$/.test(x.mp3 || "")) return json({ ok: false, error: "open the episode first" }, 409);
+    const r = await fetch(x.mp3); if (!r.ok) return json({ ok: false, error: "mp3 " + r.status }, 502);
+    return new Response(r.body, { headers: { "content-type": "audio/mpeg", "cache-control": "private, max-age=86400", ...(r.headers.get("content-length") ? { "content-length": r.headers.get("content-length") } : {}) } });
+  }
   const UA = { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36", "Accept": "text/html" };
   const BASE = "https://www.bbc.co.uk/learningenglish/english/features/", ep = u.searchParams.get("ep") || "", fresh = !!u.searchParams.get("fresh");
   if (ep) {
@@ -731,7 +737,8 @@ const exNorm = s => String(s || "").toLowerCase().replace(/[’']/g, "'").replac
 function examClean(o, mode, text) {
   if (!isObj(o)) return null;
   const T = " " + exNorm(text) + " ", c = (x, n) => clip(x, n).trim(), out = { mode };
-  const gap = x => isObj(x) && /_{2,}/.test(x.s || "") && x.a && exNorm(x.a).split(" ").length <= 3 && T.includes(" " + exNorm(x.a) + " ") ? { s: c(x.s, 300).replace(/_{2,}/, "____"), a: c(x.a, 60), why_zh: c(x.why_zh, 300) } : null;
+  const self = x => (" " + exNorm(String(x.s).replace(/_{2,}/g, " ")) + " ").includes(" " + exNorm(x.a) + " "); // 答案就写在题目里（「Dr. Lee 的姓是 ____ → Lee」）的不要
+  const gap = x => isObj(x) && /_{2,}/.test(x.s || "") && x.a && exNorm(x.a).split(" ").length <= 3 && T.includes(" " + exNorm(x.a) + " ") && !self(x) ? { s: c(x.s, 300).replace(/_{2,}/, "____"), a: c(x.a, 60), why_zh: c(x.why_zh, 300) } : null;
   const mcq = n => x => isObj(x) && x.q && Array.isArray(x.opts) && x.opts.length === n && x.opts.every(y => typeof y === "string" && y.trim()) && Number.isInteger(+x.ans) && +x.ans >= 0 && +x.ans < n ? { q: c(x.q, 300), opts: x.opts.map(y => c(y, 200).replace(/^[A-D][.)]\s+/, "")), ans: +x.ans, why_zh: c(x.why_zh, 300) } : null;
   if (mode === "reading") {
     const L = [...new Set((String(text).match(/^[A-H](?= )/gm) || []))];
@@ -747,31 +754,49 @@ function examClean(o, mode, text) {
 // AI 写一段两个人的对话（A 男声 orion、B 女声 luna，网页逐句用 /api/tts 读）：Section 1 = 生活场景（订房、报名…，里面有拼写的名字、电话、日期、价格、地址），
 // Section 3 = 学术讨论（两个学生 / 学生和导师）。存进 KV「ix/<sec>/<id>」当题库（不过期），家里人共用：先给一套没做过的，都做过了（或 fresh）才让 AI 写新的
 // 出题照常走 task:"exam"（mode listening，kind s1 / s3 让题目偏表格填空 / 观点选择）
+// 🤔 为什么没听出来：学生听写这一句漏 / 错的地方，讲连读、弱读、吞音等（中文）
+const WHYMISS_SYS = `You are an English listening coach for Chinese learners. A learner did dictation of one sentence from a BBC radio programme and missed some words.
+For each missed chunk explain in simple Chinese WHY it is hard to hear in natural British speech: linking (连读), weak forms (弱读), elision (吞音/省音), assimilation (同化), flapped or unreleased t/d (不完全爆破), contractions (缩读), homophones or near-homophones (同音/近音词), fast fixed phrases, or simply an uncommon word / name.
+Rules: "chunk" must be copied exactly from the sentence (2-5 words around the missed word, keep the original case); "sounds" shows how it actually sounds, written in simple English-like spelling (e.g. "wanna", "lemme", "kinda", "a-ni-dea", "ə" for weak vowels); "kind_zh" is the short Chinese name of the phenomenon; "why_zh" is 1-2 short Chinese sentences; at most 4 items, most important first. "tip_zh" is one short Chinese tip for practising this kind of sound.
+Reply with ONLY JSON: {"items":[{"chunk":"...","sounds":"...","kind_zh":"连读","why_zh":"..."}],"tip_zh":"..."}`;
+// 🧩 听后小测：一期节目的文稿 → 5 道四选一（大意、细节、推断、态度、词义）
+const LQUIZ_SYS = `You are an experienced English listening teacher. The text is the transcript of a BBC Learning English radio programme. Write 5 multiple-choice comprehension questions for a learner (CEFR B1-B2) who has just LISTENED to it (without reading).
+Mix: 1 gist question (main topic / purpose), 2 detail questions (facts, numbers, examples that are said clearly), 1 inference or speaker-attitude question, 1 meaning-in-context question about a useful phrase from the programme.
+Each question: plain English, 4 short options, exactly one correct, wrong options plausible (things mentioned but not the answer, or common misunderstandings). Do not ask about the presenters' names. "ans" is the 0-based index of the correct option. "why_zh" is a short Chinese explanation quoting the key words from the transcript.
+Reply with ONLY JSON: {"quiz":[{"q":"...","opts":["...","...","...","..."],"ans":0,"why_zh":"..."}]}`;
 const IELTS_TOPICS = {
   1: ["booking a hotel room for a family trip", "joining a gym", "registering for a library card", "renting a flat near the city centre", "hiring a car for a weekend", "reserving a table for a birthday dinner", "reporting lost property at a train station", "enrolling in an evening cooking course", "booking a guided city tour", "making a dentist appointment", "changing a mobile phone plan", "arranging a removal company to move house", "signing up as a volunteer at a community festival", "ordering a birthday cake from a bakery", "booking swimming lessons for a child"],
+  2: ["a tour guide introducing a historic town centre", "a manager welcoming new volunteers at a wildlife park", "a radio announcement about changes to local bus services", "a talk about facilities at a new community sports centre", "a guide explaining the layout and rules of a museum", "an organiser describing activities at a summer music festival", "a speaker introducing a city cycling scheme", "a recorded message about a farm open day"],
+  4: ["a lecture on the history of paper making", "a lecture on how bees communicate", "a lecture on the design of early railway stations", "a lecture on sleep and memory in students", "a lecture on the effects of noise pollution on birds", "a lecture on traditional food preservation methods", "a lecture on the development of the bicycle", "a lecture on coral reef restoration"],
   3: ["two students planning a group presentation about urban gardens", "a student and tutor discussing feedback on a dissertation about online learning", "two students choosing a topic for a marketing case study", "students comparing research methods for a survey on sleep habits", "two students discussing a field trip report on coastal erosion", "a tutor helping a student plan an essay about renewable energy", "two students reviewing a lecture on animal behaviour", "students dividing tasks for a project on recycling in their university"],
 };
-const ieltsSys = sec => `You write realistic scripts for IELTS Listening practice. Write ONE ${sec === 1 ? "Section 1 conversation: an everyday social situation between two people (one asks for information, the other provides it)" : "Section 3 conversation: an academic discussion between two speakers (students, or a student and a tutor), with opinions, agreement, disagreement and decisions"}.
+const ieltsSys = sec => sec === 2 || sec === 4 ? `You write realistic scripts for IELTS Listening practice. Write ONE ${sec === 2 ? "Section 2 monologue: one speaker talking about an everyday social topic (a guide, organiser or announcer giving practical information: places, times, prices, rules, activities)" : "Section 4 monologue: a university lecture on an academic topic, with a clear structure (introduction, two or three main points with examples, conclusion)"}.
+The speaker is ${sec === 2 ? "a woman" : "a man"}; give a first name. ${sec === 2 ? "450-600" : "550-750"} words, split into 10-24 short paragraphs (each paragraph = one "line", 1-3 sentences), natural spoken style ("OK, so...", "Now, moving on to...").
+${sec === 2 ? "Include specific facts IELTS tests: names of places, days and times, prices, numbers, and at least one detail that is first said and then corrected." : "Include key terms, dates, numbers and causes/effects that could be tested by note completion, and signpost each main point clearly."}
+Write numbers the way they are spoken but keep digits for prices, dates and times.
+Reply with ONLY one JSON object, no markdown:
+{"title":"short English title","scene_zh":"一句中文说明场景","lines":[{"who":"A","name":"${sec === 2 ? "Linda" : "Peter"}","t":"one paragraph of the talk"}]}` : `You write realistic scripts for IELTS Listening practice. Write ONE ${sec === 1 ? "Section 1 conversation: an everyday social situation between two people (one asks for information, the other provides it)" : "Section 3 conversation: an academic discussion between two speakers (students, or a student and a tutor), with opinions, agreement, disagreement and decisions"}.
 Speaker A is a man, speaker B is a woman. Give each a first name. 380-480 words, 16-28 turns, natural spoken English with hesitations and self-corrections.
 ${sec === 1 ? "Include details that IELTS tests: a surname said normally and then spelled with hyphens (e.g. \"It's Thompson, T-H-O-M-P-S-O-N\"), a phone number, a date, a price, a street address or postcode, and at least one distractor (a detail that is first said and then changed)." : "Include at least three clear opinions or decisions, reasons for them, and at least two distractors (an idea first suggested then rejected)."}
 Write numbers the way they are spoken but keep digits for phone numbers, prices, dates and times (e.g. "£45", "07700 900 123", "15th March", "9.30").
 Reply with ONLY one JSON object, no markdown:
 {"title":"short English title","scene_zh":"一句中文说明场景","lines":[{"who":"A","name":"Tom","t":"what he says"},{"who":"B","name":"Sarah","t":"..."}]}`;
-function ieltsClean(o) {
+function ieltsClean(o, sec) {
   if (!isObj(o) || !Array.isArray(o.lines)) return null;
+  const mono = sec === 2 || sec === 4; if (mono) o.lines.forEach(l => { if (isObj(l)) l.who = "A"; }); // 独白：只有一个人
   const lines = o.lines.filter(l => isObj(l) && (l.who === "A" || l.who === "B") && typeof l.t === "string" && /[a-z]/i.test(l.t)).map(l => ({ who: l.who, name: clip(l.name || (l.who === "A" ? "Man" : "Woman"), 20).trim(), t: clip(l.t, 600).replace(/\s+/g, " ").trim() }));
   const words = lines.reduce((n, l) => n + l.t.split(" ").length, 0);
-  return lines.length >= 12 && words >= 250 && words <= 1000 ? { title: clip(o.title || "IELTS Listening", 120), scene_zh: clip(o.scene_zh, 120), lines } : null;
+  return lines.length >= (mono ? 6 : 12) && words >= (mono ? 350 : 250) && words <= 1000 ? { title: clip(o.title || "IELTS Listening", 120), scene_zh: clip(o.scene_zh, 120), lines } : null;
 }
 async function ieltsScript(env, b) {
-  const sec = +b.sec === 3 ? 3 : 1, kv = env.CAPTIONS, pre = "ix/" + sec + "/";
+  const sec = [2, 3, 4].includes(+b.sec) ? +b.sec : 1, kv = env.CAPTIONS, pre = "ix/" + sec + "/";
   if (kv && !b.fresh) {
     const done = new Set((Array.isArray(b.done) ? b.done : []).map(String)), L = (await kv.list({ prefix: pre })).keys.map(k => k.name.slice(pre.length)).filter(id => !done.has(id));
     if (L.length) { const x = await kv.get(pre + L[0], "json"); if (x) return json(Object.assign({ ok: true, cached: true, left: L.length - 1 }, x)); }
   }
   const T = IELTS_TOPICS[sec], topic = T[Math.floor(Math.random() * T.length)];
   let got = null;
-  const r = await aiJson(env, [{ role: "system", content: ieltsSys(sec) }, { role: "user", content: "Topic: " + topic }], o => !!(got = ieltsClean(o)), 2400);
+  const r = await aiJson(env, [{ role: "system", content: ieltsSys(sec) }, { role: "user", content: "Topic: " + topic }], o => !!(got = ieltsClean(o, sec)), 2400);
   if (!r.ok || !got) return json({ ok: false, error: r.error || "bad output" }, 502);
   const x = Object.assign({ id: Date.now().toString(36), sec, topic, at: Date.now() }, got);
   if (kv) await kv.put(pre + x.id, JSON.stringify(x));
@@ -784,6 +809,8 @@ async function examGen(env, b) {
   if (kv && !b.again) { const hit = await kv.get(ck, "json"); if (hit) return json(Object.assign({ ok: true, cached: true }, hit)); }
   let got = null, last = null;
   const hint = mode === "listening" && b.kind === "s1" ? "\nThis is an IELTS Section 1 conversation: make the notes a form to complete (names spelled in the script, numbers, dates, prices, addresses). Answers must be copied exactly from the transcript; for a spelled name use the name as normally written."
+    : mode === "listening" && b.kind === "s2" ? "\nThis is an IELTS Section 2 monologue: make the notes a table or form of practical facts (places, days, times, prices, activities). Answers must be copied exactly from the transcript; never write a gap whose answer appears in the same note sentence."
+    : mode === "listening" && b.kind === "s4" ? "\nThis is an IELTS Section 4 academic lecture: make the notes a lecture outline to complete (key terms, causes, effects, dates); the multiple-choice questions test the main points and the speaker's conclusions. Never write a gap whose answer appears in the same note sentence."
     : mode === "listening" && b.kind === "s3" ? "\nThis is an IELTS Section 3 academic discussion: focus the multiple-choice questions on opinions, reasons and decisions, and the notes on key facts." : "";
   const r = await aiJson(env, [{ role: "system", content: (mode === "reading" ? EXAM_READ_SYS : EXAM_LISTEN_SYS) + hint }, { role: "user", content: (b.title ? "Title: " + clip(b.title, 200) + "\n\n" : "") + text }], o => { last = o; return !!(got = examClean(o, mode, text)); }, 2600);
   if (!r.ok || !got) { // 说清楚哪里不合格，方便查
@@ -833,6 +860,36 @@ async function ai(req, env) {
       const q = clip(b.prompt, 300).trim(), t = clip(b.text, 600).trim(); if (!q || !t) return json({ ok: false, error: "bad body" }, 400);
       const r = await aiJson(env, [{ role: "system", content: JUDGE_SYS }, { role: "user", content: "Question: " + q + "\nLearner's answer: " + t }], o => typeof o.correct === "boolean", 400);
       return json(r, r.ok ? 200 : 502);
+    }
+    if (b.task === "whymiss") {
+      const sent = clip(b.sent, 600).trim(), typed = clip(b.typed, 600).trim(), miss = (Array.isArray(b.missed) ? b.missed : []).map(x => clip(x, 60).trim()).filter(Boolean).slice(0, 12);
+      if (!sent || !miss.length) return json({ ok: false, error: "bad body" }, 400);
+      const kv = env.CAPTIONS, ck = "wm/" + (await sha(sent + "|" + miss.join("|"))).slice(0, 32);
+      if (kv) { const hit = await kv.get(ck, "json"); if (hit) return json(Object.assign({ ok: true, cached: true }, hit)); }
+      const low = sent.toLowerCase(); let got = null;
+      const r = await aiJson(env, [{ role: "system", content: WHYMISS_SYS }, { role: "user", content: "Sentence: " + sent + "\nLearner wrote: " + (typed || "(nothing)") + "\nMissed words: " + miss.join(", ") }], o => {
+        if (!isObj(o) || !Array.isArray(o.items)) return false;
+        const it = o.items.filter(x => isObj(x) && typeof x.chunk === "string" && x.chunk.trim() && low.includes(x.chunk.trim().toLowerCase()) && typeof x.why_zh === "string").slice(0, 4).map(x => ({ chunk: clip(x.chunk, 80).trim(), sounds: clip(x.sounds, 80), kind_zh: clip(x.kind_zh, 20), why_zh: clip(x.why_zh, 300) }));
+        return it.length ? !!(got = { items: it, tip_zh: clip(o.tip_zh, 200) }) : false;
+      }, 900);
+      if (!r.ok || !got) return json({ ok: false, error: r.error || "bad output" }, 502);
+      got.model = r.model; if (kv) await kv.put(ck, JSON.stringify(got), { expirationTtl: 180 * 86400 });
+      return json(Object.assign({ ok: true }, got));
+    }
+    if (b.task === "lquiz") {
+      const t = clip(b.text, 12000).trim(); if (t.split(/\s+/).length < 150) return json({ ok: false, error: "too short" }, 400);
+      const kv = env.CAPTIONS, ck = "lq/" + (await sha(t)).slice(0, 32);
+      if (kv && !b.again) { const hit = await kv.get(ck, "json"); if (hit) return json(Object.assign({ ok: true, cached: true }, hit)); }
+      let got = null;
+      const r = await aiJson(env, [{ role: "system", content: LQUIZ_SYS }, { role: "user", content: (b.title ? "Title: " + clip(b.title, 200) + "\n\n" : "") + t }], o => {
+        if (!isObj(o) || !Array.isArray(o.quiz)) return false;
+        const q = o.quiz.filter(x => isObj(x) && typeof x.q === "string" && Array.isArray(x.opts) && x.opts.length === 4 && x.opts.every(y => typeof y === "string" && y.trim()) && Number.isInteger(+x.ans) && +x.ans >= 0 && +x.ans < 4).slice(0, 5)
+          .map(x => ({ q: clip(x.q, 300), opts: x.opts.map(y => clip(y, 200)), ans: +x.ans, why_zh: clip(x.why_zh, 300) }));
+        return q.length >= 4 ? !!(got = { quiz: q }) : false;
+      }, 1800);
+      if (!r.ok || !got) return json({ ok: false, error: r.error || "bad output" }, 502);
+      got.model = r.model; if (kv) await kv.put(ck, JSON.stringify(got), { expirationTtl: 180 * 86400 });
+      return json(Object.assign({ ok: true }, got));
     }
     if (b.task === "exam") return examGen(env, b);
     if (b.task === "ieltsscript") return ieltsScript(env, b);

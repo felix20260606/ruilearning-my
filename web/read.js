@@ -453,6 +453,10 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
       ((Q.words || []).length ? '<h3 style="margin-top:16px">🆕 原文里的生词</h3><div class="ra-kw">' + Q.words.map(w => "<span>" + esc(w.en) + "<small>" + esc(w.zh || "") + "</small></span>").join("") + '</div><div class="ra-row"><button class="ui-btn" data-a="kw-add">＋ 全部加入生词本</button></div>' : "") +
       '<div class="ra-row"><button class="ui-btn" data-a="sw">' + (isS ? "📰 看原文" : "✨ 看简单版") + "</button></div></div>";
   }
+  // 给别的页面用（📻 BBC 听力的文稿）：点词弹同一个查词框；生词本里这个词的状态（"lr" 在学 / "kn" 已掌握 / ""）；一段文字的生词率
+  window.readPop = (w, el, opt) => { init(); if (!book.size) loadBook(); openPop(w, el, null, opt || {}); };
+  window.readBook = reload => { if (reload || !book.size) loadBook(); return bookStatus; };
+  window.readTextDiff = async text => { init(); loadBook(); await ensureVs(); const sv = P; P = parse(String(text || "")); try { const a = analyze(); return { ready: a.ready, n: a.n, unkN: a.unkN, rate: a.rate, unk: a.unk.length, level: effLevel() }; } finally { P = sv; } };
   window.readingOpen = (text, title, id) => { init(); if (!root) return; openDoc(text, title, id); }; // 别的页面（📻 6 分钟英语的文稿）在阅读里打开一篇
   window.readingNews = () => { newsLoad(); if (NEWS) newsRead(); else newsOpenAfter = true; }; // 还没取到：取到后自动打开 // 「📅 每日一练」的「读」可以直接打开今天这篇
 
@@ -513,7 +517,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
   function firstVisible() { const L = root.querySelectorAll(".ra-s"); for (const el of L) if (el.getBoundingClientRect().bottom > 90) return +el.dataset.i; return 0; }
 
   /* ---------- 点词弹窗 ---------- */
-  let pop = null, mask = null, popReq = 0, popWord = "", popSent = "", popEl = null;
+  let pop = null, mask = null, popReq = 0, popWord = "", popSent = "", popEl = null, popOpt = null;
   const DC = new Map();
   async function dict(w) {
     const k = w.toLowerCase(); if (DC.has(k)) return DC.get(k);
@@ -557,13 +561,13 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
     }
     return h + '<div class="act">' + (loading ? "" : addBtn(word)) + '<a href="' + cam + '" target="_blank" rel="noopener">Cambridge 词典 ↗</a></div>';
   }
-  async function openPop(w, el, si) {
+  async function openPop(w, el, si, opt) { // opt（别的页面用）：{ sent: 例句, quiet: 不自动读, onAdd(词) }
     buildPop(); w = String(w || "").replace(/’/g, "'"); if (!w) return;
-    const req = ++popReq; popWord = w; popEl = el;
+    const req = ++popReq; popWord = w; popEl = el; popOpt = opt || null;
     const re = new RegExp("(^|[^\\p{L}])" + reEsc(w) + "(?![\\p{L}])", "iu");
-    popSent = si != null && P.sents[si] && re.test(P.sents[si]) ? P.sents[si] : P.sents.find(s => re.test(s)) || "";
+    popSent = opt && opt.sent != null ? String(opt.sent) : si != null && P.sents[si] && re.test(P.sents[si]) ? P.sents[si] : P.sents.find(s => re.test(s)) || "";
     pop.innerHTML = popHtml(w, null, true); pop.classList.add("on"); placePop();
-    if (!tts) say(w);
+    if (!tts && !(opt && opt.quiet)) say(w);
     const d = await dict(w); if (req !== popReq || !pop.classList.contains("on")) return;
     pop.innerHTML = popHtml(w, d, false); placePop(); // 查不到：只剩单词、朗读、加入生词本、Cambridge 链接
   }
@@ -575,8 +579,8 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
     let r; try { r = f(w, popSent); } catch (e) { r = Promise.reject(e); }
     Promise.resolve(r).then(res => {
       if (res === false) { b.disabled = false; b.textContent = "＋ 加入生词本"; return; }
-      b.className = "ui-btn in"; b.textContent = "已在生词本";
-      setTimeout(() => { loadBook(); if (book.size && !bookStatus(w)) book.set(w, "lr"); redrawKeep(); }, 300); // 重新上色：新加的词换成「在学」
+      b.className = "ui-btn in"; b.textContent = "已在生词本"; const cb = popOpt && popOpt.onAdd;
+      setTimeout(() => { loadBook(); if (book.size && !bookStatus(w)) book.set(w, "lr"); redrawKeep(); if (cb) try { cb(w); } catch (e) {} }, 300); // 重新上色：新加的词换成「在学」
     }).catch(() => { b.disabled = false; b.textContent = "＋ 加入生词本"; tip("加入失败，请再试一次"); });
   }
 
@@ -628,7 +632,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
     root.addEventListener("keydown", e => { if (e.target.id === "ra-url" && e.key === "Enter") { e.preventDefault(); urlDraft = e.target.value; fromUrl(urlDraft); } });
     root.addEventListener("change", e => { if (e.target.id !== "ra-lv") return; lvSel = e.target.value; LS("reading:lv", lvSel); redrawKeep(); });
     // 点弹窗外面关掉；Esc 先关弹窗，再停朗读
-    document.addEventListener("click", e => { if (pop && pop.classList.contains("on") && !pop.contains(e.target) && !e.target.closest("#reading [data-w]")) closePop(); });
+    document.addEventListener("click", e => { if (pop && pop.classList.contains("on") && !pop.contains(e.target) && !e.target.closest("#reading [data-w]") && !(popEl && popEl.contains(e.target))) closePop(); }); // popEl：别的页面（听力文稿）刚点开的那个词
     document.addEventListener("keydown", e => { if (e.key !== "Escape" || !root.classList.contains("on")) return; if (pop && pop.classList.contains("on")) closePop(); else if (tts) stopAll(); });
     let sT = 0;
     window.addEventListener("scroll", () => {

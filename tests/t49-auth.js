@@ -98,6 +98,37 @@ const path = require("path");
   r = await call("/api/ai", "POST", { task: "ieltsscript", sec: 3 }); ok(r.j.ok && r.j.sec === 3 && kv.has("ix/3/" + r.j.id), "section 3 separate bank");
   aiOut = { title: "x", lines: [{ who: "A", t: "too short" }] }; r = await call("/api/ai", "POST", { task: "ieltsscript", sec: 1, fresh: true }); ok(r.status === 502, "short script rejected");
 
+  // ---- 答案就写在题目里的填空不要 ----
+  aiOut = { notes: [{ s: "Oslo scientists were based in ____.", a: "Oslo" }, { s: "Topic: ____", a: "sleep" }, { s: "Number ____", a: "12" }, { s: "They found something ____.", a: "interesting" }, { s: "Speakers talk about ____.", a: "sleep" }], mcq: [{ q: "Who?", opts: ["Neil", "Beth", "Both"], ans: 2 }, { q: "Where?", opts: ["Oslo", "Paris", "Rome"], ans: 0 }, { q: "What?", opts: ["sleep", "food", "work"], ans: 0 }, { q: "How many?", opts: ["7", "8", "9"], ans: 0 }] };
+  r = await call("/api/ai", "POST", { task: "exam", mode: "listening", text: tr, kind: "s2" });
+  ok(r.j.ok && r.j.notes.length === 4 && !r.j.notes.some(x => x.a === "Oslo"), "self-answer gap dropped " + JSON.stringify(r.j.notes || r.j));
+
+  // ---- Section 2 / 4 独白：只有一个人，段落少一些也行 ----
+  const para = i => ({ who: i % 2 ? "B" : "A", name: "Linda", t: "OK so now let me tell you about the museum, which opens at 9.30 every day except Monday, and the ticket costs £12 for adults, which includes the guided tour of the old library and the garden behind it." });
+  aiOut = { title: "Museum talk", scene_zh: "博物馆介绍", lines: Array.from({ length: 9 }, (_, i) => para(i)) };
+  r = await call("/api/ai", "POST", { task: "ieltsscript", sec: 2, fresh: true });
+  ok(r.j.ok && r.j.sec === 2 && r.j.lines.length === 9 && r.j.lines.every(l => l.who === "A") && kv.has("ix/2/" + r.j.id), "section 2 monologue " + JSON.stringify(r.j).slice(0, 160));
+  r = await call("/api/ai", "POST", { task: "ieltsscript", sec: 4, fresh: true }); ok(r.j.ok && r.j.sec === 4, "section 4");
+  aiOut = { title: "x", lines: Array.from({ length: 3 }, (_, i) => para(i)) }; r = await call("/api/ai", "POST", { task: "ieltsscript", sec: 4, fresh: true }); ok(r.status === 502, "too short monologue rejected");
+
+  // ---- 🤔 为什么没听出来 ----
+  const sent = "I wanted to get a bit of fresh air, you know.";
+  aiOut = { items: [{ chunk: "wanted to", sounds: "wan-ta", kind_zh: "连读", why_zh: "t 被吞掉" }, { chunk: "not in sentence", sounds: "x", why_zh: "x" }, { chunk: "a bit of", sounds: "ə-bi-də", kind_zh: "弱读", why_zh: "of 弱读" }], tip_zh: "多跟读" };
+  calls0 = aiCalls; r = await call("/api/ai", "POST", { task: "whymiss", sent, typed: "I want to get fresh air", missed: ["wanted", "a", "bit", "of"] });
+  ok(r.j.ok && r.j.items.length === 2 && r.j.items[0].chunk === "wanted to" && r.j.tip_zh, "whymiss " + JSON.stringify(r.j).slice(0, 200));
+  r = await call("/api/ai", "POST", { task: "whymiss", sent, typed: "other", missed: ["wanted", "a", "bit", "of"] }); ok(r.j.ok && r.j.cached && aiCalls === calls0 + 1, "whymiss cached");
+  r = await call("/api/ai", "POST", { task: "whymiss", sent, missed: [] }); ok(r.status === 400, "whymiss needs missed words");
+
+  // ---- 🧩 听后小测 ----
+  const q4 = (q, ans) => ({ q, opts: ["a", "b", "c", "d"], ans, why_zh: "原文…" });
+  aiOut = { quiz: [q4("Main topic?", 0), q4("Detail?", 3), q4("Bad?", 7), q4("Attitude?", 1), q4("Meaning?", 2), { q: "three opts", opts: ["a", "b", "c"], ans: 0 }] };
+  calls0 = aiCalls; r = await call("/api/ai", "POST", { task: "lquiz", title: "Sleep", text: tr });
+  ok(r.j.ok && r.j.quiz.length === 4 && r.j.quiz[1].ans === 3, "lquiz " + JSON.stringify(r.j).slice(0, 200));
+  r = await call("/api/ai", "POST", { task: "lquiz", title: "Sleep", text: tr }); ok(r.j.ok && r.j.cached && aiCalls === calls0 + 1, "lquiz cached");
+  r = await call("/api/ai", "POST", { task: "lquiz", text: "too short" }); ok(r.status === 400, "lquiz too short");
+  // ---- 📥 离线下载转 mp3：只转打开过（KV 里有）的那期 ----
+  r = await call("/api/sme?mp3=" + encodeURIComponent("6-minute-english_2026/ep-999999")); ok(r.status === 409, "mp3 proxy needs a known episode");
+
   console.log(fail ? fail + " FAILED" : "t49 auth + exam: all passed");
   process.exit(fail ? 1 : 0);
 })();

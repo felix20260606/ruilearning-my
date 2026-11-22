@@ -3,9 +3,9 @@
      AI 按雅思 Academic Reading 出 13 题：5 道 TRUE / FALSE / NOT GIVEN、3 道「哪一段讲了…」、3 道摘要填空（原文里 1–3 个词）、2 道四选一；限时 20 分钟（真考 3 篇 60 分钟）
    - 🎧 听力：材料 = BBC Learning English 的节目原声和文稿（/api/sme：6 分钟英语、慢速对话）；AI 出 10 题：6 道笔记填空、4 道三选一，按听到的顺序；
      先给 30 秒看题，然后原声只放一遍（「练习模式」可以拖动、重放）；放完或点「交卷」打分
-   - 🎙 雅思对话（听力的另外两种材料）：AI 写的 Section 1 生活对话（订房、报名…：拼名字、电话、日期、价格、地址）/ Section 3 学术讨论，
+   - 🎙 雅思对话 / 独白（听力的另外四种材料）：AI 写的 Section 1 生活对话（订房、报名…：拼名字、电话、日期、价格、地址）/ Section 2 生活独白（导游、活动介绍）/ Section 3 学术讨论 / Section 4 学术讲座，
      POST /api/ai {task:"ieltsscript", sec, done}（后台存成题库，先给没做过的）；A 男声 orion、B 女声 luna，逐句用 /api/tts 读（看题的 30 秒里先把每句的声音预取好）
-     选哪种材料记在本机「exam:lsrc」（bbc | s1 | s3）
+     选哪种材料记在本机「exam:lsrc」（bbc | s1 | s2 | s3 | s4；Section 2 生活独白 = 女声 luna，Section 4 学术讲座 = 男声 orion）
    - 出题：POST /api/ai {task:"exam", mode, text, title}（后台检查每道题、填空答案确实在原文里；同一篇出过的题存 KV，再做不花额度）
    - 打分：按答对比例换算成 40 题的原始分，再按雅思官方的原始分 → 分数对照表给一个估分（只有一篇 / 一段，仅供参考）
    - 做错的题收进「❌ 错题本」（errbook.js 的 window.ERR）；成绩存本机「exam:hist」（最多 50 次），同步到后台 /api/mine k=exam
@@ -60,9 +60,10 @@
   window.examSections = sections; // 测试用
 
   /* ---------- 状态 ---------- */
-  const LSRC = { bbc: "📻 BBC 节目", s1: "🎙 Section 1 生活对话", s3: "🎙 Section 3 学术讨论" };
+  const LSRC = { bbc: "📻 BBC 节目", s1: "🎙 S1 生活对话", s2: "🎙 S2 生活独白", s3: "🎙 S3 学术讨论", s4: "🎙 S4 学术讲座" };
+  const secOf = () => +String(S.lsrc).slice(1) || 1;
   const VOICE = { A: "orion", B: "luna" };
-  const ttsUrl = l => "/api/tts?v=" + (VOICE[l.who] || "asteria") + "&t=" + encodeURIComponent(String(l.t).replace(/[{}]/g, "").replace(/\s+/g, " ").trim());
+  const ttsUrl = l => "/api/tts?v=" + (S.src && S.src.sec === 2 ? "luna" : VOICE[l.who] || "asteria") + "&t=" + encodeURIComponent(String(l.t).replace(/[{}]/g, "").replace(/\s+/g, " ").trim());
   const S = { lsrc: LG("exam:lsrc", "bbc") in LSRC ? LG("exam:lsrc", "bbc") : "bbc", mode: "reading", view: "home", src: null, busy: "", err: "", Q: null, ans: {}, t0: 0, left: 0, res: null, practice: false, phase: "" };
   let root = null, timer = 0, audio = null;
   const CSS = `
@@ -141,13 +142,13 @@
     S.busy = ""; draw();
   }
   async function loadScript(fresh) {
-    const sec = S.lsrc === "s3" ? 3 : 1;
-    S.busy = fresh ? "AI 在写一段新的雅思对话（半分钟左右）…" : "取一段雅思对话…"; S.err = ""; draw();
+    const sec = secOf();
+    S.busy = fresh ? "AI 在写一段新的雅思" + (sec % 2 ? "对话" : "独白") + "（半分钟左右）…" : "取一段雅思" + (sec % 2 ? "对话" : "独白") + "…"; S.err = ""; draw();
     try {
       const done = hist().filter(x => /^i:/.test(x.src || "")).map(x => x.src.slice(2));
       const j = await getJson("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "ieltsscript", sec, done, fresh: !!fresh }) });
       if (!j || !j.ok || !(j.lines || []).length) throw new Error(j && j.error === "noai" ? "AI 没开" : "AI 没写好，再试一次（也可能今天的免费额度用完了）");
-      S.src = { kind: "ai", sec, id: "i:" + j.id, title: (sec === 1 ? "Section 1 · " : "Section 3 · ") + j.title, scene: j.scene_zh || "", lines: j.lines.map(l => ({ who: l.who, name: l.name, t: l.t })), left: j.left || 0, words: j.lines.reduce((n, l) => n + words(l.t), 0) };
+      S.src = { kind: "ai", sec, id: "i:" + j.id, title: "Section " + sec + " · " + j.title, scene: j.scene_zh || "", lines: j.lines.map(l => ({ who: l.who, name: l.name, t: l.t })), left: j.left || 0, words: j.lines.reduce((n, l) => n + words(l.t), 0) };
     } catch (e) { S.err = e.message || String(e); }
     S.busy = ""; draw();
   }
@@ -239,13 +240,13 @@
     const H = hist().filter(x => x.mode === S.mode), isR = S.mode === "reading";
     let s = "<h2>" + (isR ? "📄 雅思阅读模考" : "🎧 雅思听力模考") + "</h2><div class=\"ex-sub\">" + (isR
       ? "用今天的真实新闻当文章，AI 按雅思 Academic Reading 出 13 题（判断对错 / 段落信息 / 摘要填空 / 选择），限时 20 分钟。交卷后按雅思原始分对照表估分，做错的自动进「❌ 错题本」。"
-      : "材料三选一：BBC 节目原声（像 Section 2 / 4 的独白、访谈），或者 AI 写的雅思 Section 1 生活对话（拼名字、电话、日期、地址——最容易丢分）/ Section 3 学术讨论，两种 AI 真人声来读。出 10 题（填空 / 选择），先给 30 秒看题，只放一遍，和真考一样。做错的自动进「❌ 错题本」。") + "</div>";
+      : "材料五选一：BBC 节目原声，或者 AI 写的雅思四个 Section：S1 生活对话（拼名字、电话、日期、地址——最容易丢分）/ S2 生活独白（导游、活动介绍）/ S3 学术讨论 / S4 学术讲座，AI 真人声来读。出 10 题（填空 / 选择），先给 30 秒看题，只放一遍，和真考一样。做错的自动进「❌ 错题本」。") + "</div>";
     if (!isR) s += '<div class="ex-ch" style="margin:0 0 12px">' + Object.keys(LSRC).map(k => '<button data-lsrc="' + k + '" class="' + (S.lsrc === k ? "on" : "") + '">' + LSRC[k] + "</button>").join("") + "</div>";
     if (S.err) s += '<div class="ex-err">' + esc(S.err) + "</div>";
     if (S.busy) s += '<div class="ex-box">' + esc(S.busy) + "</div>";
-    else if (S.src && S.src.kind === (isR ? "news" : S.lsrc === "bbc" ? "sme" : "ai") && (S.src.kind !== "ai" || S.src.sec === (S.lsrc === "s3" ? 3 : 1))) {
+    else if (S.src && S.src.kind === (isR ? "news" : S.lsrc === "bbc" ? "sme" : "ai") && (S.src.kind !== "ai" || S.src.sec === secOf())) {
       const ai = S.src.kind === "ai";
-      s += '<div class="ex-box ex-src"><small>' + (isR ? "今天的文章" + (S.src.from ? " · " + esc(S.src.from) : "") : ai ? "雅思对话 · " + esc(S.src.scene) : "这期节目") + "</small><b>" + esc(S.src.title) + "</b><small>" + S.src.words + " 词" + (isR ? " · 分成 " + S.src.secs.length + " 段" : ai ? " · 约 " + Math.max(2, Math.round(S.src.words / 150)) + " 分钟 · 题库里还有 " + S.src.left + " 套没做过" : " · 约 6 分钟") + "</small>" +
+      s += '<div class="ex-box ex-src"><small>' + (isR ? "今天的文章" + (S.src.from ? " · " + esc(S.src.from) : "") : ai ? "雅思" + (S.src.sec % 2 ? "对话" : "独白") + " · " + esc(S.src.scene) : "这期节目") + "</small><b>" + esc(S.src.title) + "</b><small>" + S.src.words + " 词" + (isR ? " · 分成 " + S.src.secs.length + " 段" : ai ? " · 约 " + Math.max(2, Math.round(S.src.words / 150)) + " 分钟 · 题库里还有 " + S.src.left + " 套没做过" : " · 约 6 分钟") + "</small>" +
         '<div class="ex-row"><button class="ui-btn pri" data-a="start">开始' + (isR ? "（20 分钟）" : "") + "</button>" + (isR ? "" : '<label style="font-size:13.5px;color:var(--ui-ink-2)"><input type="checkbox" data-a="prac"' + (S.practice ? " checked" : "") + "> 练习模式（可以暂停、重放）</label>") + '<span class="sp"></span>' + (S.src.kind === "ai" ? '<button class="ui-btn" data-a="fresh" title="让 AI 现写一段（每段约 3,000 neurons 的朗读额度）">✨ 写一段新的</button>' : '<button class="ui-btn" data-a="other">🎲 换一' + (isR ? "篇" : "期") + "</button>") + "</div></div>";
     } else s += '<div class="ex-box">准备材料…</div>';
     if (S.pick) s += S.pick;
@@ -309,7 +310,7 @@
   }
   async function firstSource() {
     if (S.mode === "reading") { if (!S.src || S.src.kind !== "news") await loadNews(); return; }
-    if (S.lsrc !== "bbc") { if (!(S.src && S.src.kind === "ai" && S.src.sec === (S.lsrc === "s3" ? 3 : 1))) await loadScript(false); return; }
+    if (S.lsrc !== "bbc") { if (!(S.src && S.src.kind === "ai" && S.src.sec === secOf())) await loadScript(false); return; }
     if (S.src && S.src.kind === "sme") return;
     S.busy = "取节目…"; draw();
     const L = await loadEpList(), done = new Set(hist().map(x => x.src)), x = L.find(e => e.s === "sme" && !done.has("l:" + e.id)) || L[0];
