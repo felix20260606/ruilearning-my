@@ -14,7 +14,7 @@ for (const f of PAGES) {
   ok(!/fetch\("\/api\/media\?/.test(s), f + ": 读配图 / 原声用 CLOUD.media");
 }
 const h = W("index.html");
-ok(/<script src="media\.js\?v=\d+"><\/script>\s*<script src="keys\.js\?v=\d+"><\/script>/.test(h), "keys.js loaded after media.js");
+ok(/<script src="media\.js\?v=\w+"><\/script>\s*<script src="keys\.js\?v=\w+"><\/script>/.test(h), "keys.js loaded after media.js");
 ok(/const ymdLocal=\(\)=>U\.day\(\)/.test(h), "vocab entry dates use U.day");
 ok(!/[^.\w]confirm\(|[^.\w]prompt\(|[^.\w]alert\("没/.test(h.slice(h.indexOf("<script src=\"util.js"))), "index.html after util.js: no confirm / prompt");
 

@@ -18,7 +18,7 @@ for (const f of PAGES) {
   ok(!/sendBeacon\("\/api\/mine"/.test(s), f + ": 关页面发送在 cloud.js");
 }
 const h = W("index.html");
-ok(/<script src="util\.js\?v=\d+"><\/script>\s*<script src="nav\.js\?v=\d+"><\/script>\s*<script src="word\.js\?v=\d+"><\/script>\s*<script src="ai\.js\?v=\d+"><\/script>\s*<script src="tr\.js\?v=\d+"><\/script>\s*<script src="cloud\.js\?v=\d+"><\/script>\s*<script src="media\.js\?v=\d+"><\/script>/.test(h), "shared modules load first, in order");
+ok(/<script src="util\.js\?v=\w+"><\/script>\s*<script src="nav\.js\?v=\w+"><\/script>\s*<script src="word\.js\?v=\w+"><\/script>\s*<script src="ai\.js\?v=\w+"><\/script>\s*<script src="tr\.js\?v=\w+"><\/script>\s*<script src="cloud\.js\?v=\w+"><\/script>\s*<script src="media\.js\?v=\w+"><\/script>/.test(h), "shared modules load first, in order");
 ok(/const g=await TR\.word\(word\)/.test(h), "index dictGet uses TR.word");
 
 // ---------- ② 跑起来 ----------

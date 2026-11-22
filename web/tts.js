@@ -98,7 +98,7 @@
     if (!o.sys && en && play(t, { who: o.who, rate: o.rate || 1, end: function () { if (my === sayId && o.end) o.end(); }, fallback: function () { if (my === sayId) sysSay(t, o, my); } })) return;
     sysSay(t, o, my);
   }
-  function realLoad() { if (!realLoading) realLoading = fetch("pron-real.json?v=1").then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }).then(function (j) { REAL = j || {}; return REAL; }); return realLoading; }
+  function realLoad() { if (!realLoading) realLoading = fetch("pron-real.json?v=b6ceb67b").then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }).then(function (j) { REAL = j || {}; return REAL; }); return realLoading; }
   function realOf(w) { return (REAL && REAL[String(w || "").toLowerCase().trim()]) || null; }
   function word(w, o) { // 真人录音（upload.wikimedia.org 打不开时 NET 换后台中转）；没有 / 播不了就 say()
     o = o || {}; var x = realOf(w); if (!x) { if (!REAL) realLoad(); say(w, o); return; }

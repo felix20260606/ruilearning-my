@@ -15,7 +15,7 @@ for (const f of ["speak.js", "drill.js", "pump.js", "listen.js", "read.js"]) {
 ok(/REC\.toggle\(/.test(W("speak.js")) && /REC\.toggle\(/.test(W("drill.js")) && /REC\.toggle\(/.test(W("pump.js")) && /REC\.toggle\(/.test(W("listen.js")), "pages record via REC");
 ok(/TTS\.sys\(P\.sents\[i\]/.test(W("read.js")), "read-all uses TTS.sys");
 const h = W("index.html");
-ok(/<script src="tts\.js\?v=\d+"><\/script>\s*<script src="rec\.js\?v=\d+"><\/script>/.test(h), "rec.js loaded right after tts.js");
+ok(/<script src="tts\.js\?v=\w+"><\/script>\s*<script src="rec\.js\?v=\w+"><\/script>/.test(h), "rec.js loaded right after tts.js");
 ok(/function speak\(text,o\)\{\s*o=o\|\|\{\};\s*if\(window\.TTS&&TTS\.say\)\{TTS\.say\(/.test(h), "index speak() → TTS.say");
 ok(/function sysSpeak\(text,o\)\{\s*o=o\|\|\{\};\s*if\(window\.TTS&&TTS\.sys\)\{TTS\.sys\(/.test(h), "index sysSpeak() → TTS.sys");
 

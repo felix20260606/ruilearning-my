@@ -36,7 +36,7 @@ const n = stack.length; history.back(); NAV.mark(); flush(); ok(stack.length ===
 let before = JSON.stringify(page); L.popstate({ state: null }); ok(JSON.stringify(page) === before, "foreign popstate ignored");
 // 接进各模块：index.html 的标签、口语 / 听力 / 练习课 / 阅读 / 写作 / 视频 / 背单词
 const h = W("index.html");
-ok(/<script src="util\.js\?v=\d+"><\/script>\s*<script src="nav\.js\?v=\d+"><\/script>\s*<script src="word\.js\?v=\d+"><\/script>/.test(h), "util.js + nav.js load before everything else");
+ok(/<script src="util\.js\?v=\w+"><\/script>\s*<script src="nav\.js\?v=\w+"><\/script>\s*<script src="word\.js\?v=\w+"><\/script>/.test(h), "util.js + nav.js load before everything else");
 ok(/NAV\.reg\('tab'/.test(h) && /NAV\.reg\('ielts'/.test(h) && /NAV\.reg\('life'/.test(h), "tabs registered");
 for (const [f, k] of [["speak.js", "speak"], ["listen.js", "sme"], ["drill.js", "drill"], ["read.js", "read"], ["write.js", "write"], ["watch.js", "video"], ["pump.js", "pump"]]) {
   const s = W(f); ok(s.includes('NAV.reg("' + k + '"') && /NAV\.mark\(\)/.test(s) && /NAV\.back\(/.test(s), f + " wired (reg + mark + back button)");

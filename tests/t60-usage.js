@@ -44,7 +44,7 @@ const path = require("path");
   global.fetch = of; delete env.CF_API_TOKEN; delete env.CF_ACCOUNT_ID;
   // 「📅 每日」最上面的额度面板
   const fs = require("fs"), R = f => fs.readFileSync(path.join(__dirname, "..", "web", f), "utf8"), h = R("index.html"), dj = R("daily.js"), q = R("quota.js");
-  ok(/<script src="quota\.js\?v=\d+"><\/script>\s*<script src="daily\.js/.test(h), "quota.js loaded before daily.js");
+  ok(/<script src="quota\.js\?v=\w+"><\/script>\s*<script src="daily\.js/.test(h), "quota.js loaded before daily.js");
   ok(/'<div class="dy">' \+\s*'<div id="dy-quota">' \+ \(window\.quotaHtml/.test(dj), "panel is first thing on the daily page");
   ok(/let opened = false; const isOpen = \(\) => opened;/.test(q) && !/quota:open/.test(q), "panel always starts collapsed (not remembered)");
   ok(["ai:write", "ai:newsimp", "ai:chat", "ai:chatsum", "ai:speak", "ai:judge", "ai:howto", "ai:useword", "ai:coach", "ai:exam", "ai:ieltsscript", "ai:lquiz", "ai:whymiss", "sme:al", "dw:al", "tts", "stt"].every(k => q.includes('["' + k + '"')), "every AI feature has an entry card");

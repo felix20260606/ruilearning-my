@@ -15,7 +15,9 @@
      先用剪贴板，不行用老办法（选中再复制）；都不行弹出文字让你手动复制
    ⬇️ U.download(文件名, 文字或 Blob, 类型)：存成文件（类型默认看后缀：.csv 带 BOM 让 Excel 认中文、.json、.html、.ics、其它当纯文本）
    ✂️ U.sents(文字) → 句子数组：. ! ? … 后面跟空格、下一个字不是小写才断；缩写（Mr.）、人名首字母（J. K.）、e.g. / U.S.、No. 5、小数都不断；有换行先按行分
-   🐞 排查：U.log(模块, 事情, 详情) 记一条（只在内存里，最多 300 条）；在浏览器控制台打 U.logs() 看全部，U.logs("ai") 只看一个模块
+   🐞 排查：U.log(模块, 事情, 详情) 记一条（内存里最多 300 条，最近 200 条存进这台设备）；在浏览器控制台打 U.logs() 看全部，U.logs("ai") 只看一个模块
+     页面上的报错（代码出错、没处理的 Promise 失败）自动记成 "error"；手机上看：生词本「⚙ 设置」→「🐞 问题记录」，或者网址加 ?debug
+     U.showLogs() 打开问题记录（能一键复制发给 Claude）；U.clearLogs() 清空
      AI、翻译、同步、录音、朗读这些公用模块出错都会记在这里，有问题先看这个 */
 (function () {
   "use strict";
@@ -24,14 +26,37 @@
   const LG = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
   const LS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { log("store", "存不进本机：" + k, String(e && e.name || e)); return false; } };
   const tip = m => { try { if (typeof window.toast === "function") window.toast(m); else if (typeof toast === "function") toast(m); else console.log("[tip]", m); } catch (e) {} };
-  const LOG = [];
+  // 🐞 记录：内存里最多 300 条；最近 200 条也存进这台设备（localStorage「debug:log」），手机上刷新 / 关掉再开也看得到（设置里「🐞 问题记录」）
+  const LOG = [], KEEP = 200, LKEY = "debug:log";
+  const stamp = () => { const d = new Date(), p = n => String(n).padStart(2, "0"); return p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + d.toTimeString().slice(0, 8); };
+  try { const old = JSON.parse(localStorage.getItem(LKEY) || "[]"); if (Array.isArray(old)) old.slice(-KEEP).forEach(x => { if (x && x.msg) LOG.push(Object.assign({}, x, { old: 1 })); }); } catch (e) {}
+  let saveT = 0;
+  const persist = () => { clearTimeout(saveT); saveT = 0; try { localStorage.setItem(LKEY, JSON.stringify(LOG.slice(-KEEP).map(x => { const y = Object.assign({}, x); delete y.old; return y; }))); } catch (e) {} };
   function log(mod, msg, data) {
-    const x = { t: new Date().toTimeString().slice(0, 8), mod: String(mod), msg: String(msg) };
-    if (data !== undefined) x.data = data;
+    const x = { t: stamp(), mod: String(mod), msg: String(msg).slice(0, 300) };
+    if (data !== undefined) x.data = typeof data === "string" ? data.slice(0, 500) : data;
     LOG.push(x); if (LOG.length > 300) LOG.splice(0, LOG.length - 300);
+    if (!saveT) saveT = setTimeout(persist, 1500);
     try { if (window.localStorage && localStorage.getItem("debug") === "1") console.debug("[" + x.mod + "]", x.msg, data === undefined ? "" : data); } catch (e) {}
   }
   function logs(mod) { const L = mod ? LOG.filter(x => x.mod === mod) : LOG.slice(); try { console.table(L.map(x => ({ 时间: x.t, 模块: x.mod, 事情: x.msg, 详情: x.data === undefined ? "" : typeof x.data === "string" ? x.data : JSON.stringify(x.data) }))); } catch (e) {} return L; }
+  // 页面上的报错（代码出错、没处理的 Promise 失败）也记下来；图片 / 脚本加载失败不冒泡到 window，不会进来
+  const NOISE = /ResizeObserver loop|^Script error\.?$/;
+  try {
+    window.addEventListener("error", e => { const m = String((e && e.message) || ""); if (!m || NOISE.test(m)) return; log("error", m, String(e.filename || "").split("/").pop().replace(/\?.*$/, "") + ":" + (e.lineno || 0) + ":" + (e.colno || 0)); });
+    window.addEventListener("unhandledrejection", e => { const r = e && e.reason, m = String((r && (r.message || r.name)) || r || ""); if (!m || NOISE.test(m) || /AbortError/.test(m)) return; log("error", "没处理的失败：" + m, r && r.stack ? String(r.stack).split("\n").slice(0, 3).join(" | ") : undefined); });
+    window.addEventListener("pagehide", () => { if (saveT) persist(); });
+  } catch (e) {}
+  function report() { // 给人看 / 复制发给 Claude 的文字：最新的在上面
+    const L = LOG.slice().reverse(), err = L.filter(x => x.mod === "error").length;
+    const head = "🐞 问题记录 · " + stamp() + " · " + location.pathname + location.search + "\n" + navigator.userAgent + "\n共 " + L.length + " 条（报错 " + err + " 条）；「·」开头的是这次打开以前的\n";
+    return head + "\n" + L.map(x => (x.old ? "· " : "") + x.t + " [" + x.mod + "] " + x.msg + (x.data === undefined ? "" : " — " + (typeof x.data === "string" ? x.data : JSON.stringify(x.data)))).join("\n");
+  }
+  async function showLogs() {
+    const text = report();
+    if (await dialog(LOG.length ? "最近的记录（最新的在上面）。遇到问题时点「复制全部」发给 Claude。" : "还没有记录。用的时候出了问题（AI、翻译、同步没成功，或者页面报错）会记在这里。", { ok: "复制全部", cancel: "关掉", pre: LOG.length ? text : "" })) copy(text, { ok: "已复制，粘贴发给 Claude 就行" });
+  }
+  function clearLogs() { LOG.length = 0; try { localStorage.removeItem(LKEY); } catch (e) {} }
   async function json(url, opt) {
     let r;
     try { r = await fetch(url, opt); } catch (e) { const ab = e && e.name === "AbortError"; return { ok: false, error: ab ? "abort" : "net", status: 0 }; }
@@ -50,6 +75,8 @@
   const ASK_CSS = `#u-ask{position:fixed;inset:0;z-index:99990;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);padding:16px}#u-ask.on{display:flex}
   #u-ask .bx{width:100%;max-width:420px;background:var(--ui-surface,#26282c);border:1px solid var(--ui-line-2,#454950);border-radius:16px;padding:20px 18px 16px;box-shadow:0 18px 50px rgba(0,0,0,.5);color:var(--ui-ink,#E6E8EB)}
   #u-ask .q{font-size:15.5px;line-height:1.65;white-space:pre-wrap;word-break:break-word}
+  #u-ask .pre{margin:12px 0 0;max-height:50vh;overflow:auto;background:var(--ui-surface-2,#2d2f34);border-radius:10px;padding:10px 12px;font:12px/1.55 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-all;color:var(--ui-ink-2,#cfd2d6)}
+  #u-ask .bx:has(.pre){max-width:640px}
   #u-ask input{width:100%;box-sizing:border-box;margin-top:12px;min-height:40px;padding:0 12px;border-radius:10px;border:1px solid var(--ui-line-2,#454950);background:var(--ui-surface-2,#2d2f34);color:inherit;font:inherit;font-size:16px}
   #u-ask .bt{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}#u-ask .bt .ui-btn.dg{background:var(--ui-red-deep,#a8443a);border-color:var(--ui-red-deep,#a8443a);color:#fff}
   @media(max-width:600px){#u-ask{align-items:flex-end;padding:0}#u-ask .bx{max-width:none;border-radius:18px 18px 0 0;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}#u-ask .bt .ui-btn{flex:1}}`;
@@ -68,7 +95,7 @@
         else if (!/^(INPUT|TEXTAREA)$/.test((e.target && e.target.tagName) || "")) e.stopPropagation();
       }, true);
     }
-    askBox.innerHTML = '<div class="bx"><div class="q">' + esc(q) + "</div>" + (withInput ? '<input type="text" value="' + esc(def || "") + '" placeholder="' + esc(o.placeholder || "") + '">' : "") +
+    askBox.innerHTML = '<div class="bx"><div class="q">' + esc(q) + "</div>" + (o.pre ? '<pre class="pre">' + esc(o.pre) + "</pre>" : "") + (withInput ? '<input type="text" value="' + esc(def || "") + '" placeholder="' + esc(o.placeholder || "") + '">' : "") +
       '<div class="bt"><button type="button" class="ui-btn" data-r="0">' + esc(o.cancel || "取消") + '</button><button type="button" class="ui-btn pri' + (o.danger ? " dg" : "") + '" data-r="1">' + esc(o.ok || "确定") + "</button></div></div>";
     askBox.classList.add("on");
     const inp = askBox.querySelector("input"), okb = askBox.querySelector('[data-r="1"]');
@@ -118,5 +145,5 @@
   const sents = t => String(t == null ? "" : t).split(/\n\s*/).flatMap(sentsOf); // 有换行先按行分（每行各自分句）
   const ask = (q, o) => dialog(q, o, false);
   const input = (q, def, o) => dialog(q, o, true, def);
-  window.U = { esc, LG, LS, tip, log, logs, json, day, dayStart, dayAgo, daysBetween, streak, ask, input, copy, download, sents };
+  window.U = { esc, LG, LS, tip, log, logs, json, day, dayStart, dayAgo, daysBetween, streak, ask, input, copy, download, sents, showLogs, clearLogs, report };
 })();

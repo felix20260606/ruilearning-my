@@ -78,14 +78,18 @@
   };
 })();
 </script>
-<script src="util.js?v=3"></script>
-<script src="nav.js?v=1"></script>
-<script src="word.js?v=3"></script>
-<script src="ai.js?v=1"></script>
-<script src="tr.js?v=2"></script>
-<script src="cloud.js?v=2"></script>
-<script src="media.js?v=1"></script>
-<script src="keys.js?v=1"></script>
+<script src="util.js?v=0b79e0c6"></script>
+<script src="nav.js?v=95059b59"></script>
+<script src="word.js?v=16e4cc25"></script>
+<script src="ai.js?v=53f96086"></script>
+<script src="tr.js?v=16d20079"></script>
+<script src="cloud.js?v=118b0477"></script>
+<script src="media.js?v=90149a34"></script>
+<script src="keys.js?v=c6892e48"></script>
+<script>/* 🐞 问题记录：生词本「⚙ 设置」里的入口，网址带 ?debug 直接打开（util.js 的 U.showLogs） */
+document.addEventListener("click",function(e){var t=e.target;if(!t||!t.closest)return;if(t.closest("#dbg-open"))U.showLogs();else if(t.closest("#dbg-clear"))U.ask("清空这台设备上的问题记录？",{ok:"清空",danger:true}).then(function(ok){if(ok){U.clearLogs();U.tip("已清空");}});});
+if(/[?&]debug\b/.test(location.search))setTimeout(function(){U.showLogs();},800);
+</script>
 <script>
 /* 🇨🇳 在中国大陆也能用：谷歌、BBC、维基百科、YouTube 这些在大陆打不开（或者一直卡着不回）。
    window.NET：
@@ -170,9 +174,9 @@
 <meta name="apple-mobile-web-app-title" content="Ray's Life">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="format-detection" content="telephone=no">
-<link rel="icon" href="/icon.svg?v=ban" type="image/svg+xml">
-<link rel="icon" href="/favicon.ico?v=ban" sizes="48x48">
-<link rel="apple-touch-icon" href="/icon-192.png?v=ban">
+<link rel="icon" href="/icon.svg?v=c523a8a0" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico?v=c615e9d4" sizes="48x48">
+<link rel="apple-touch-icon" href="/icon-192.png?v=aa949b6f">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -461,7 +465,7 @@
   .ans .tspk{margin-left:8px;margin-right:0}
   @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
-<link rel="stylesheet" href="theme.css?v=1">
+<link rel="stylesheet" href="theme.css?v=0e9010dd">
 </head>
 <body>
 
@@ -694,6 +698,11 @@
     </div>
     <h3 style="margin-top:20px">📤 导出</h3>
     <div id="exp-box"></div>
+    <h3 style="margin-top:20px">🐞 问题记录</h3>
+    <div class="voicebox">
+      <p class="vhint" style="margin-top:0">页面出错、AI / 翻译 / 同步没成功都会记在这里（只存在这台设备上，最近 200 条）。遇到问题打开看看，点「复制全部」发给 Claude。也可以在网址后面加 <b>?debug</b> 直接打开。</p>
+      <div class="vrow"><button id="dbg-open" class="vtest">🐞 打开问题记录</button><button id="dbg-clear" class="vtest">清空</button></div>
+    </div>
   </div>
 </div>
 </div><!-- /view-en -->
@@ -2061,24 +2070,24 @@ refresh(); // show seed words immediately, no waiting on storage
   sw(/^(basics|notes|lexam|rexam)$/.test(s)?s:'lexam'); // 新加的「听力模考」排最前、第一次打开默认它
 })();
 </script>
-<script src="lang.js?v=3"></script>
-<script src="tts.js?v=3"></script>
-<script src="rec.js?v=1"></script>
-<script src="watch.js?v=25"></script>
-<script src="channels.js?v=4"></script>
-<script src="pump.js?v=37"></script>
-<script src="speak.js?v=18"></script>
-<script src="basic.js?v=2"></script>
-<script src="quota.js?v=5"></script>
-<script src="daily.js?v=13"></script>
-<script src="read.js?v=21"></script>
-<script src="listen.js?v=23"></script>
-<script src="drill.js?v=9"></script>
-<script src="errbook.js?v=4"></script>
-<script src="exam.js?v=7"></script>
-<script src="import.js?v=3"></script>
-<script src="write.js?v=7"></script>
-<script src="stats.js?v=5"></script>
+<script src="lang.js?v=2bb1b9c7"></script>
+<script src="tts.js?v=1b2c97a8"></script>
+<script src="rec.js?v=1d9e2fd7"></script>
+<script src="watch.js?v=3c21dda4"></script>
+<script src="channels.js?v=15afafd3"></script>
+<script src="pump.js?v=3e888929"></script>
+<script src="speak.js?v=ac400399"></script>
+<script src="basic.js?v=01d9f433"></script>
+<script src="quota.js?v=7290511e"></script>
+<script src="daily.js?v=2181f50e"></script>
+<script src="read.js?v=636a891e"></script>
+<script src="listen.js?v=65c37cad"></script>
+<script src="drill.js?v=4b728e8f"></script>
+<script src="errbook.js?v=2292d6bc"></script>
+<script src="exam.js?v=c0953f36"></script>
+<script src="import.js?v=cc745a23"></script>
+<script src="write.js?v=a24c6659"></script>
+<script src="stats.js?v=5877e709"></script>
 <script>
 /* 个人学习资料换设备也在：阅读的文章（reading:docs）、作文批改历史（writing:history）、词汇量测试（vocab:test）
    这三页照旧存本机；这里在本机存储这一层盯着：哪一条变了就传到后台 /api/mine（按人分开），删掉的传删除记号；
@@ -2132,9 +2141,9 @@ refresh(); // show seed words immediately, no waiting on storage
 })();
 </script>
 <script>if('serviceWorker' in navigator&&location.protocol!=='file:'){navigator.serviceWorker.register('/sw.js').catch(function(){});} // 装到手机桌面后离线也能打开（sw.js：网络优先，断网用上次的）</script>
-<script src="export.js?v=5"></script>
-<script src="saved-web.js?v=8"></script>
-<script src="reader.js?v=5"></script>
-<script src="grammar.js?v=7"></script>
+<script src="export.js?v=2c2ba2ab"></script>
+<script src="saved-web.js?v=e92710f9"></script>
+<script src="reader.js?v=61343108"></script>
+<script src="grammar.js?v=19e2e8e7"></script>
 </body>
 </html>

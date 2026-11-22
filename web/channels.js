@@ -65,7 +65,7 @@
   async function mount() {
     const home = document.querySelector("#watch .wt-home"), hint = home && home.querySelector(".wt-hint");
     if (!home || !hint || document.getElementById("ch-map")) return !!home;
-    try { const r = await fetch("yt-channels.json?v=2"); data = await r.json(); } catch (e) { return true; }
+    try { const r = await fetch("yt-channels.json?v=ef879b89"); data = await r.json(); } catch (e) { return true; }
     if (!document.getElementById("ch-css")) { const st = document.createElement("style"); st.id = "ch-css"; st.textContent = CSS; document.head.append(st); }
     const d = document.createElement("details"); d.className = "ch-map"; d.id = "ch-map"; d.open = LS.get("wt:ch:open", true);
     d.innerHTML = '<summary><span>📺</span><b>频道通关地图</b><small>' + data.channels.length + ' 个英文频道 · 由易到难，像过关一样升级</small><i>▾</i></summary><div class="ch-in">' +

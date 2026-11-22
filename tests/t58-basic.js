@@ -13,7 +13,7 @@ ok(/basic:\[\['start','🧭 从这开始'\],\['speak','🗣 口语入门'\],\['p
 ok(!/write:\[\[/.test(h), "write has no sub tabs any more");
 ok(/m==='grammar'\)\{if\(CUR!=='basic'/.test(h), "grammar mode syncs to 入门");
 ok(/L2_OWNER=\{[^}]*basic:'en'/.test(h) && /tBasic\.onclick/.test(h), "tab wired");
-ok(/<div id="view-basic"><\/div>/.test(h) && /<script src="speak\.js\?v=\d+"><\/script>\s*<script src="basic\.js\?v=\d+"><\/script>/.test(h), "container + script after speak.js");
+ok(/<div id="view-basic"><\/div>/.test(h) && /<script src="speak\.js\?v=\w+"><\/script>\s*<script src="basic\.js\?v=\w+"><\/script>/.test(h), "container + script after speak.js");
 ok(/g==='basic'/.test(h), "?go=basic");
 ok(/saved==='write'&&localStorage\.getItem\('en_sub_write'\)==='grammar'\)saved='basic'/.test(h), "old 写→语法 lands on 入门→语法");
 // 口语页：入门 / 发音不在「说」里列，嵌在入门里时只显示那一栏

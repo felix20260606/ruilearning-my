@@ -1,6 +1,8 @@
 # 自动测试：每次 push 改到网站代码（web/、tests/、tools/）时跑一遍，坏了在 GitHub 的 Actions 页和提交旁边显示红叉
 # ① 语法检查：web/ 下所有 .js 和各页面里的内联脚本（tools/check-syntax.js）
-# ② 后台和纯函数测试：tests/t41 以后的（假 KV、假网络，不联网、不碰线上数据；t40 以前的要浏览器，不在这里跑）
+# ② 代码检查（tools/eslint.config.mjs）：用了没定义的变量、变量和全站公用模块重名
+# ③ 版本号（tools/bump-versions.js --check）：网页里引用本站文件的 ?v= 要等于文件内容的哈希，改了文件忘了更新就报错
+# ④ 后台和纯函数测试：tests/t41 以后的（假 KV、假网络，不联网、不碰线上数据；早期要浏览器的旧测试在 tests/old/，不在这里跑）
 name: 自动测试
 on:
   push:
@@ -22,6 +24,10 @@ jobs:
           node-version: 22
       - name: 语法检查
         run: node tools/check-syntax.js
+      - name: 代码检查（没定义的变量、和公用模块重名）
+        run: sh tools/lint.sh
+      - name: 版本号跟上文件内容
+        run: node tools/bump-versions.js --check
       - name: 后台和纯函数测试
         run: |
           fail=0

@@ -13,6 +13,6 @@ ok(/live-verb/.test(R.live.f) && /lead-guide/.test(R.lead.f), "one-word-two-soun
 ok(/data-word="/.test(sp) && /const wd = t\.closest\("\[data-word\]"\); if \(wd\) \{ sayWord\(/.test(sp), "pair buttons play real audio");
 ok(/setTimeout\(\(\) => sayWord\(w\[ans\]/.test(sp) && /qz-again"\) \{ if \(QZ && QZ\.cur\) sayWord\(/.test(sp), "quiz uses real audio");
 ok(/realOf\(w\[0\]\) && realOf\(w\[1\]\)/.test(sp), "quiz avoids real-vs-AI giveaway pairs");
-{ const tt = W("tts.js"); ok(/fetch\("pron-real\.json\?v=\d+"\)/.test(tt) && /NET\.audio\(a\)/.test(tt) && /TTS\.word\(w,/.test(sp), "loads map, China fallback via NET（真人录音的播放挪到全站共用的 tts.js：TTS.word）"); }
+{ const tt = W("tts.js"); ok(/fetch\("pron-real\.json\?v=\w+"\)/.test(tt) && /NET\.audio\(a\)/.test(tt) && /TTS\.word\(w,/.test(sp), "loads map, China fallback via NET（真人录音的播放挪到全站共用的 tts.js：TTS.word）"); }
 ok(/录音来源：维基词典 \/ Wikimedia Commons/.test(sp), "credits shown");
 console.log(fail ? fail + " FAILED" : "t59 pron real: all ok"); process.exit(fail ? 1 : 0);

@@ -1,4 +1,4 @@
-// 同步到生词本网站（/api/vocab）：词条生成、去重、并发写入不丢
+// （原 t38）同步到生词本网站（/api/vocab）：词条生成、去重、并发写入不丢
 const fs=require('fs'),vm=require('vm'),path=require('path');
 // 服务器端的合并逻辑直接取自 web/_worker.js，测试和线上保持一致
 const W=fs.readFileSync(path.join(__dirname,'..','web','_worker.js'),'utf8');

@@ -14,7 +14,6 @@
 (function () {
   "use strict";
   const { esc, LG, LS, tip } = U; // 全站共用的小工具（util.js）
-  const V = "2";
   const SECS = [["start", "🌱 入门"], ["daily", "📅 每日一练"], ["chat", "🤖 AI 陪练"], ["tools", "🧰 AI 工具"], ["dialog", "🎭 情景对话"], ["func", "💬 表达和俚语"], ["drill", "🔁 句型操练"], ["pron", "🔊 发音"], ["shadow", "🎯 跟读"], ["clip", "🎬 原声跟读"], ["quick", "⚡ 快问快答"], ["topic", "🗣 话题"], ["mine", "📼 我的录音"]];
 
   const CSS = `
@@ -113,7 +112,7 @@
 
   function loadData() {
     if (window.SPEAK_DATA) { D = window.SPEAK_DATA; return Promise.resolve(); }
-    if (!loading) loading = new Promise(res => { const s = document.createElement("script"); s.src = "speak-data.js?v=" + V; s.onload = s.onerror = res; document.head.append(s); }).then(() => { D = window.SPEAK_DATA || null; });
+    if (!loading) loading = new Promise(res => { const s = document.createElement("script"); s.src = "speak-data.js?v=f592f75f"; /* ?v= 由 tools/bump-versions.js 按文件内容自动改 */ s.onload = s.onerror = res; document.head.append(s); }).then(() => { D = window.SPEAK_DATA || null; });
     return loading;
   }
 
