@@ -14,7 +14,7 @@
    德语素材：德国之声 DW 的慢速德语新闻（_worker.js 的 /api/dw：列表、文稿、中文、Whisper 德语对时间）
    ── 记录 ──
    localStorage「drill:prog」{语言: {期号: {节号: {sc 最好的正确率 0–100, last 最近一次, n 做了几遍, at}}}}、「drill:rev」「drill:log」「drill:lvl」、「drill:last」{语言: 期号}：按家人分开（index.html 的 MINE）；「drill:opt」{rate, zh} 本机
-   做错的选择题 / 填空收进「❌ 错题本」（window.ERR，来源「🎧 精听」）
+   做错的选择题 / 填空收进「❌ 错题本」（window.ERR，来源「🎧 精听」；德语的进德语那本）
    键盘：A / ← 上一张，D / → 下一张，S 再听一遍，E 显示 / 隐藏中文，R 录音 / 停，1–9 选选项、点词块；填空框里回车 = 检查 / 下一张
    入口：window.drillShow()（index.html 点「🧩 练习课」时调）、drillReview()（直接开今日复习）、drillToday()（每日页用）；测试用 window.DRILL = {split, lessons, build, blankOf, chunksOf, shufIdx, LV} */
 (function () {
@@ -43,6 +43,7 @@
     (lines || []).forEach((l, li) => (String(l.t || "").match(/[^.!?]+[.!?]+["'”’)]*|[^.!?]+$/g) || []).forEach(t => { t = t.trim(); if (/\p{L}/u.test(t)) out.push({ who: l.who || "", t, li }); }));
     return out;
   }
+  const within = (ms, p) => Promise.race([p, new Promise(res => setTimeout(() => res(null), ms))]);
   // 一句一句翻成中文：每批 1500 字左右，一行一句；对不上行数的那批不要（还用整段的中文）
   async function trSents(arr) {
     const out = arr.map(() => ""), sl = LANG().cur(), B = []; let cur = [], len = 0;
@@ -101,7 +102,7 @@
         prog("取文稿…");
         const ep = await getJ("/api/dw?ep=" + encodeURIComponent(id)); if (!ep || !ep.ok) throw new Error("文稿没拿到（" + ((ep && ep.error) || "网络") + "）");
         prog("取中文翻译…（第一次打开这期要十几秒）");
-        let zh = null; try { zh = await getJ("/api/dw?ep=" + encodeURIComponent(id) + "&zh=1"); if (!zh || !zh.ok) zh = null; } catch (e) {}
+        let zh = null; try { zh = await within(12000, getJ("/api/dw?ep=" + encodeURIComponent(id) + "&zh=1")); if (!zh || !zh.ok) zh = null; } catch (e) {} // 后台第一次翻要很久：最多等 12 秒（它在后台接着翻完存起来），没等到就用下面每句单独翻的
         return finish.call(this, "/api/dw", id, ep, zh, prog);
       },
     },
@@ -642,7 +643,7 @@
     const inp = root.querySelector("#dr-in"), typed = give ? "" : (inp ? inp.value.trim() : "");
     if (!give && !typed) return tip("先写一个词，或者点「不会，看答案」");
     const r = give ? { ok: false, note: "" } : LANG().check(typed, c.word);
-    if (!r.ok && !c.rv && !c.redo && window.ERR && LANG().cur() === "en") window.ERR.add([{ src: "listen", kind: "gap", q: "练习课 · 听写填空（" + M.title + "）", ctx: c.shown.replace("\u0000", "____"), right: c.word, wrong: typed }], true);
+    if (!r.ok && !c.rv && !c.redo && window.ERR) window.ERR.add([{ src: "listen", kind: "gap", q: "练习课 · 听写填空（" + M.title + "）", ctx: c.shown.replace("\u0000", "____"), right: c.word, wrong: typed }], true);
     judged(c, r.ok, { typed, note: r.note });
   }
   function answerDict(give) {
