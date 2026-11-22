@@ -76,7 +76,7 @@
   const CSS = `
   #errbox{max-width:820px;margin:0 auto;padding:6px 0 60px;color:var(--ui-ink);font-family:var(--ui-font);overflow-wrap:anywhere}
   #errbox .eb-top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:2px 0 12px}#errbox .eb-top .sp{flex:1}
-  #errbox .eb-n{display:flex;gap:8px;flex-wrap:wrap}#errbox .eb-n span{background:var(--ui-surface);border:1px solid var(--ui-line);border-radius:999px;padding:5px 12px;font-size:13px;color:var(--ui-ink-2)}#errbox .eb-n b{color:var(--ui-ink)}
+  #errbox .eb-n{display:flex;gap:8px;flex-wrap:wrap}#errbox .eb-n span[data-ebv]{cursor:pointer}#errbox .eb-n span[data-ebv]:hover{border-color:var(--ui-pur)}#errbox .eb-n span{background:var(--ui-surface);border:1px solid var(--ui-line);border-radius:999px;padding:5px 12px;font-size:13px;color:var(--ui-ink-2)}#errbox .eb-n b{color:var(--ui-ink)}
   #errbox .eb-card{background:var(--ui-surface);border:1px solid var(--ui-line);border-radius:16px;padding:16px 18px;margin:0 0 12px}
   #errbox .eb-src{font-size:12.5px;color:var(--ui-pur-text);font-weight:800;margin-bottom:6px}
   #errbox .eb-q{font-size:17px;line-height:1.6;margin:0 0 10px;font-weight:700}
@@ -147,7 +147,7 @@
   function draw() {
     if (!root) return; ensureCss();
     const L = live(), D = due().length, M = L.filter(x => x.done).length;
-    let s = '<div class="eb-top"><div class="eb-n"><span>今天要复习 <b>' + D + "</b></span><span>在复习 <b>" + (L.length - M) + "</b></span><span>已掌握 <b>" + M + '</b></span></div><span class="sp"></span><button class="ui-btn" data-a="view">' + (view === "do" ? "📋 全部错题" : "← 去复习") + "</button></div>";
+    let s = '<div class="eb-top"><div class="eb-n"><span data-ebv="do" title="去复习">今天要复习 <b>' + D + '</b></span><span data-ebv="list" data-f="all" title="看全部错题">在复习 <b>' + (L.length - M) + '</b></span><span data-ebv="list" data-f="done" title="看已掌握的">已掌握 <b>' + M + '</b></span></div><span class="sp"></span><button class="ui-btn" data-a="view">' + (view === "do" ? "📋 全部错题" : "← 去复习") + "</button></div>";
     if (view === "list") s += listHtml();
     else {
       if (!cur || cur.del || cur.done || cur.due > Date.now()) nextCard();
@@ -158,7 +158,8 @@
     const inp = root.querySelector("#eb-in"); if (inp) { inp.oninput = () => (typed = inp.value); inp.onkeydown = e => { if (e.key === "Enter") { typed = inp.value; shown = true; draw(); } }; }
   }
   function onClick(e) {
-    const b = e.target.closest("button"); if (!b || !root.contains(b)) return;
+    const b = e.target.closest("button, [data-ebv]"); if (!b || !root.contains(b)) return;
+    if (b.dataset.ebv) { view = b.dataset.ebv; if (b.dataset.f) filt = b.dataset.f; return draw(); } // 顶上的数字：点了看对应的那些
     const a = b.dataset.a;
     if (a === "view") { view = view === "do" ? "list" : "do"; return draw(); }
     if (b.dataset.f) { filt = b.dataset.f; return draw(); }

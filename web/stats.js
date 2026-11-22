@@ -298,17 +298,17 @@
 
   // ---------- 各块 ----------
   function tilesHtml(d) {
-    const t = (cls, big, unit, lab) => '<div class="st-tile' + (cls ? " " + cls : "") + '"><b>' + big + (unit ? "<small>" + unit + "</small>" : "") + "</b><span>" + lab + "</span></div>";
+    const t = (cls, big, unit, lab, to) => '<div class="st-tile' + (cls ? " " + cls : "") + '"' + (to ? ' data-to="' + to + '" tabindex="0" role="link"' : "") + '><b>' + big + (unit ? "<small>" + unit + "</small>" : "") + "</b><span>" + lab + "</span></div>"; // to：点了跳到哪（util.js 的 data-to）
     return '<div class="st-tiles">' +
-      t("fire", "🔥 " + d.streak, "天", d.streak ? "连续学习" : "今天练一下就开始连续") +
-      t("", d.today || d.todayEst, d.today ? "张" : d.todayEst ? "个词" : "张", d.today ? "今天的卡片" : d.todayEst ? "今天练过的词（推算）" : "今天还没练") +
-      t("", d.mastered, "个", "🏆 已掌握") +
-      t("", d.learning, "个", "学习中" + (d.untouched ? " · 还有 " + d.untouched + " 个没练过" : "")) +
-      t("", d.days, "天", "总练习天数") + "</div>";
+      t("fire", "🔥 " + d.streak, "天", d.streak ? "连续学习" : "今天练一下就开始连续", "daily") +
+      t("", d.today || d.todayEst, d.today ? "张" : d.todayEst ? "个词" : "张", d.today ? "今天的卡片" : d.todayEst ? "今天练过的词（推算）" : "今天还没练", "notebook/pump") +
+      t("", d.mastered, "个", "🏆 已掌握", "notebook/list?f=known&amp;c=all") +
+      t("", d.learning, "个", "学习中" + (d.untouched ? ' · 还有 <u data-to="notebook/list?f=fresh&amp;c=all">' + d.untouched + " 个没练过</u>" : ""), "notebook/list?f=practicing&amp;c=all") +
+      t("", d.days, "天", "总练习天数", "daily") + "</div>";
   }
   function forecastHtml(d) {
     const f = forecastOf(d.L, d.S, d.now, pumpTypes()), sum = f.days.reduce((a, x) => a + x.n, 0) + f.over;
-    return '<div class="st-card"><h3>📅 未来 14 天要复习</h3><p class="sub">按每个词的记忆模型：回忆率降到 50%（过了半衰期）就该复习。现在已到期 <b style="color:var(--ui-orange)">' + f.over + "</b> 个，14 天内共 " + sum + " 个</p>" +
+    return '<div class="st-card"><h3>📅 未来 14 天要复习</h3><p class="sub">按每个词的记忆模型：回忆率降到 50%（过了半衰期）就该复习。现在已到期 <b style="color:var(--ui-orange)"' + (f.over ? ' data-to="notebook/pump" title="去练习"' : "") + ">" + f.over + "</b> 个，14 天内共 " + sum + " 个</p>" +
       (sum ? forecastSvg(f) : '<div class="st-empty">14 天内没有要复习的词</div>') +
       '<div class="st-legend"><span><i style="background:var(--ui-orange)"></i>已到期</span><span><i style="background:var(--ui-pur-text)"></i>当天到期</span></div>' +
       (f.over ? '<div class="st-row"><button class="ui-btn pri" id="st-go-pump">🔊 去练习</button></div>' : "") + "</div>";
@@ -318,7 +318,7 @@
     const cell = n => "<td" + (n ? "" : ' class="z"') + ">" + n + "</td>";
     return '<div class="st-card"><h3>📈 掌握度分布</h3><p class="sub">掌握度 = 半衰期换算（到 42 天算 🏆 已掌握），和列表里的进度条同一个算法</p>' + distSvg(ds.all) +
       '<div class="st-scroll"><table class="st-tbl"><thead><tr><th>类型</th>' + BUCKETS.map(b => "<th>" + b + "</th>").join("") + "<th>合计</th></tr></thead><tbody>" +
-      rows.map(([t, nm]) => "<tr><td>" + nm + "</td>" + ds.by[t].map(cell).join("") + cell(ds.by[t].reduce((a, b) => a + b, 0)) + "</tr>").join("") +
+      rows.map(([t, nm]) => '<tr><td data-to="notebook/list?f=all&amp;c=' + t + '">' + nm + "</td>" + ds.by[t].map((n, i) => (i === ds.by[t].length - 1 && n ? '<td data-to="notebook/list?f=known&amp;c=' + t + '">' + n + "</td>" : cell(n))).join("") + (ds.by[t].reduce((a, b) => a + b, 0) ? '<td data-to="notebook/list?f=all&amp;c=' + t + '">' + ds.by[t].reduce((a, b) => a + b, 0) + "</td>" : cell(0)) + "</tr>").join("") + // 点类型 / 合计 → 列表按类型；点 🏆 那格 → 这类里已掌握的
       '<tr class="sum"><td>全部</td>' + ds.all.map(n => "<td>" + n + "</td>").join("") + "<td>" + ds.all.reduce((a, b) => a + b, 0) + "</td></tr></tbody></table></div></div>";
   }
   function curveHtml(d) {

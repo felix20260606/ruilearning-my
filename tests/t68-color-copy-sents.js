@@ -52,7 +52,7 @@ function utilCtx(extra) {
   {
     const st = { head: [] };
     const document = { head: { append: x => st.head.push(x) }, documentElement: { append() {} }, body: { append() {} }, createElement: () => ({ style: {}, classList: { add() {}, remove() {}, toggle() {} }, addEventListener() {}, append() {}, setAttribute() {} }), addEventListener() {}, dispatchEvent: e => (c.__ev = (c.__ev || []).concat(e.detail)), readyState: "complete", getElementById: () => null, querySelector: () => null };
-    const c = vm.createContext({ document, console: Object.assign({}, console, { table() {} }), JSON, Math, Promise, String, Object, Array, Date, Set, Map, setTimeout, clearTimeout, CustomEvent: function (t, o) { this.type = t; this.detail = o.detail; } });
+    const c = vm.createContext({ document, console: Object.assign({}, console, { table() {} }), JSON, Math, Promise, String, Object, Array, Date, Set, Map, setTimeout, clearTimeout, addEventListener() {}, CustomEvent: function (t, o) { this.type = t; this.detail = o.detail; } });
     c.window = c; vm.runInContext(W("util.js"), c);
     c.words = [{ word: "apple", status: "learning" }, { word: "cat", status: "known" }];
     let loaded = 0; c.__vs = { ready: () => false, load: () => { loaded++; return Promise.resolve(); } };

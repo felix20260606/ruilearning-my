@@ -8,6 +8,7 @@
      WORD.bind(容器, { sent(el) → 这个词所在的句子, quiet() → true 时点词不自动朗读, onOpen(w, el) 打开卡片前（比如暂停视频）, onAdd(w) })
        容器里带 data-w="词" 的元素都按这一套处理（点词 + 右键）；一个容器只 bind 一次
      WORD.open(词, 元素, { sent, quiet, onAdd })、WORD.close()、WORD.mark(词, "learn"|"known"|"ignore"|"")
+     WORD.hover(容器) 只加「停留出小气泡」（bind 已经自带）；鼠标停在词上出两三个意思 + 语法 + 注释 + 词频（同插件），手机上没有
      WORD.html(英文, {level, settings, gram}) → 能点、按水平上色的 html（全站单词颜色都用它）
      WORD.add(词, {sent, silent, learn, from}) 加进生词本（全站加词都用它）→ true 加了 / false 本来就有 / null 失败
      WORD.status(词) → "kn" 已掌握 / "lr" 在学 / ""（按原形匹配生词本，收了 go，went / goes 也算）；WORD.loadBook() 生词本变了以后重读
@@ -52,6 +53,16 @@
   .vs-w.g-pa{text-decoration:underline solid #5BB0FF 2px}.vs-w.g-pf{text-decoration:underline double #35D0BA 2px}.vs-w.g-pg{text-decoration:underline wavy #8EE05A 2px}.vs-w.g-md{text-decoration:underline dashed #FF8FC7 2px}.vs-w.g-pv{text-decoration:underline solid #FF7A59 3.5px}.vs-w.g-s3{text-decoration:underline dotted #5BB0FF 2.5px}.vs-w.g-pl{text-decoration:underline dotted #B0B7C0 2.5px}.vs-w.g-art{text-decoration:underline dotted #E8D36B 2.5px}.vs-w.g-cmp{text-decoration:underline dashed #C9A0FF 2px}.vs-w.g-neg{box-shadow:inset 0 2px 0 #FF5C5C}
   .vs-w.vs-ph{background:rgba(255,226,140,.13);box-shadow:inset 0 1.5px 0 #E9CF8A,inset 0 -1.5px 0 #E9CF8A;border-radius:0;padding:0 2px}.vs-w.vs-ph.ph-s{border-radius:5px 0 0 5px;box-shadow:inset 0 1.5px 0 #E9CF8A,inset 0 -1.5px 0 #E9CF8A,inset 1.5px 0 0 #E9CF8A}.vs-w.vs-ph.ph-e{border-radius:0 5px 5px 0;box-shadow:inset 0 1.5px 0 #E9CF8A,inset 0 -1.5px 0 #E9CF8A,inset -1.5px 0 0 #E9CF8A}
   .vs-w.wd-lr{background:var(--ui-pur-soft,rgba(156,63,208,.18));box-shadow:0 0 0 2px var(--ui-pur-soft,rgba(156,63,208,.18));border-radius:4px}
+
+  /* 🫧 鼠标停在词上的小气泡（和插件看视频时一样：两三个意思 + 这里的语法 + 单词注释 + 词频条），只在有鼠标的电脑上 */
+  #wd-mini{position:fixed;z-index:9001;transform:translate(-50%,-100%);background:#2A5F99;color:#fff;border-radius:10px;padding:8px 14px 9px;text-align:center;font:500 15px/1.35 system-ui,"PingFang SC",sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.4);pointer-events:none;max-width:320px}
+  #wd-mini::after{content:"";position:absolute;left:var(--ax,50%);top:100%;margin-left:-7px;border:7px solid transparent;border-top-color:#2A5F99}
+  #wd-mini.dn{transform:translate(-50%,0)}#wd-mini.dn::after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:#2A5F99}
+  #wd-mini .ms div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#wd-mini .m1{opacity:.85}#wd-mini .m2{opacity:.7}
+  #wd-mini .lm{font-size:.82em;opacity:.85;margin-top:3px;border-top:1px solid rgba(255,255,255,.2);padding-top:3px}
+  #wd-mini .gm{font-size:.8em;opacity:.9;margin-top:4px;color:#CFE6FF}
+  #wd-mini .fb{display:inline-block;width:52px;height:5px;border-radius:3px;background:rgba(0,0,0,.35);overflow:hidden;vertical-align:middle;margin-top:6px}#wd-mini .fb i{display:block;height:100%;background:#C9A7E8;border-radius:3px}
+  #wd-mini .vs-wns{text-align:left;font-size:12.5px;margin-top:5px}
 `;
   { const st = document.createElement("style"); st.id = "wd-color-css"; st.textContent = COLOR_CSS; (document.head || document.documentElement).append(st); } // 颜色一加载就要有（不等查词卡片）
 
@@ -133,7 +144,7 @@
   }
   async function open(w, el, opt) { // opt：{ sent 例句, zh 例句的中文, quiet 不自动读, onAdd(词), showCtx 卡片里显示这句 }
     build(); w = String(w || "").replace(/’/g, "'").trim(); if (!w) return;
-    const my = ++req; pWord = w; pEl = el || null; pOpt = opt || {}; pSent = pOpt.sent ? String(pOpt.sent) : "";
+    hideMini(); const my = ++req; pWord = w; pEl = el || null; pOpt = opt || {}; pSent = pOpt.sent ? String(pOpt.sent) : "";
     pop.innerHTML = html(w, null, true); pop.classList.add("on"); place();
     if (!pOpt.quiet) say(w);
     const [d] = await Promise.all([dict(w), vsLoad()]); if (my !== req || !pop.classList.contains("on")) return;
@@ -177,8 +188,49 @@
   }
 
   /* ---------- 绑到页面上：容器里带 data-w 的都按这一套 ---------- */
+  /* ---------- 🫧 停留：鼠标停在词上 0.09 秒，词上方出小气泡（同插件看视频）；移开 0.25 秒后消失；点了就换成完整的查词卡片 ---------- */
+  const canHover = () => { try { return matchMedia("(hover: hover) and (pointer: fine)").matches; } catch (e) { return false; } };
+  let mini = null, hT = 0, xT = 0;
+  function hideMini() { clearTimeout(hT); clearTimeout(xT); if (mini) { mini.remove(); mini = null; } }
+  function showMini(el) {
+    hideMini(); if (!el.isConnected || (pop && pop.classList.contains("on"))) return;
+    const w = el.dataset.w, lw = String(w).toLowerCase().replace(/’/g, "'");
+    const g = typeof VS_GRAM_NAME !== "undefined" ? [...el.classList].filter(c => /^g-/.test(c)).map(c => VS_GRAM_NAME[c.slice(2)] && VS_GRAM_NAME[c.slice(2)] + (typeof VS_GRAM_ABBR !== "undefined" && VS_GRAM_ABBR[c.slice(2)] ? " " + VS_GRAM_ABBR[c.slice(2)] : "")).filter(Boolean) : [];
+    let notes = ""; try { const S = V() && V().settings ? V().settings() : null; if ((!S || S.n_word !== false) && typeof vsWordNotesHtml === "function" && !/\s/.test(w)) notes = vsWordNotesHtml(w, true) || ""; } catch (e) {}
+    let fb = ""; try { if (typeof vsRank === "function") { const r = vsRank(lw), f = r === Infinity ? 1 : Math.max(0.16, Math.min(1, r / 6000)); fb = '<span class="fb" title="词频（越长越少见）"><i style="width:' + Math.round(f * 100) + '%"></i></span>'; } } catch (e) {}
+    const my = mini = document.createElement("div"); my.id = "wd-mini"; my._el = el;
+    my.innerHTML = '<div class="ms">…</div>' + (g.length ? '<div class="gm">语法：' + esc(g.join(" · ")) + "</div>" : "") + notes + fb;
+    document.body.append(my);
+    const fix = () => {
+      if (mini !== my) return;
+      const r = el.getBoundingClientRect(), H = my.offsetHeight, W = my.offsetWidth;
+      const cx = Math.max(W / 2 + 6, Math.min(r.left + r.width / 2, innerWidth - W / 2 - 6));
+      my.style.left = cx + "px"; my.style.setProperty("--ax", Math.max(14, Math.min(W - 14, r.left + r.width / 2 - (cx - W / 2))) + "px");
+      const up = r.top - 10 - H >= 6; my.classList.toggle("dn", !up); my.style.top = (up ? r.top - 10 : r.bottom + 10) + "px";
+    };
+    fix();
+    const lem = typeof VS_IRR !== "undefined" && VS_IRR[lw]; // 不规则变化：went → go 的意思也给
+    if (lem && window.TR) TR.word(lem).then(r => { if (mini !== my || !r.zh.length) return; const d = document.createElement("div"); d.className = "lm"; d.textContent = lem + "：" + r.zh[0]; my.insertBefore(d, my.querySelector(".gm") || my.querySelector(".fb")); fix(); });
+    (window.TR ? TR.word(w) : Promise.resolve({ zh: [] })).then(r => {
+      if (mini !== my) return; const m = (r.zh || []).slice(0, 3);
+      my.querySelector(".ms").innerHTML = m.length ? m.map((x, i) => '<div class="m' + i + '">' + esc(x) + "</div>").join("") : "<div>—</div>"; fix();
+    });
+  }
+  function hover(box, o) { // 给一个容器里的词（data-w）加上停留气泡；bind 会自动加，只要停留不要点词的页面（视频字幕自己管点击）单独调
+    if (!box || box.__wdHover) return; box.__wdHover = 1; o = o || {};
+    box.addEventListener("mouseover", e => {
+      if (!canHover()) return; const el = e.target.closest && e.target.closest("[data-w]"); if (!el || !box.contains(el) || (o.skip && o.skip(el))) return;
+      clearTimeout(xT); if (mini && mini._el === el) return; clearTimeout(hT); hT = setTimeout(() => showMini(el), 90);
+    });
+    box.addEventListener("mouseout", e => {
+      const el = e.target.closest && e.target.closest("[data-w]"); if (!el || (e.relatedTarget && el.contains(e.relatedTarget))) return;
+      clearTimeout(hT); xT = setTimeout(hideMini, 250);
+    });
+  }
+  window.addEventListener("scroll", () => { if (mini) hideMini(); }, { passive: true });
   function bind(box, o) {
     if (!box || box.__word) return; box.__word = 1; o = o || {};
+    hover(box, o);
     box.addEventListener("click", e => {
       const el = e.target.closest("[data-w]"); if (!el || !box.contains(el) || (o.skip && o.skip(el))) return;
       if (String(window.getSelection ? getSelection() : "").trim()) return; // 拖选文字不算点词
@@ -221,7 +273,7 @@
     });
     return unprotect(h);
   }
-  window.WORD = { html: colorHtml, bind, open, close, mark, cycle, status, loadBook, dict, add, get openWord() { return pWord; } };
+  window.WORD = { html: colorHtml, bind, hover, open, close, mark, cycle, status, loadBook, dict, add, get openWord() { return pWord; } };
   // 旧接口（read.js / listen.js 以前用的）
   window.readPop = (w, el, opt) => open(w, el, opt || {});
   window.readBook = reload => { if (reload || !book.size) loadBook(); if (typeof vsKeys !== "function") vsLoad(); return status; };

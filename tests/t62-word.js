@@ -4,7 +4,7 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
 const W = f => fs.readFileSync(path.join(__dirname, "..", "web", f), "utf8");
 const w = W("word.js"), h = require("./lib/page").html();
 ok(/<script src="nav\.js\?v=\w+"><\/script>\s*<script src="word\.js\?v=\w+"><\/script>/.test(h), "word.js loads early (before every page module)");
-ok(/window\.WORD = \{ html: colorHtml, bind, open, close, mark, cycle, status, loadBook, dict/.test(w) && /window\.readPop = /.test(w) && /window\.readBook = /.test(w), "API + old aliases");
+ok(/window\.WORD = \{ html: colorHtml, bind, hover, open, close, mark, cycle, status, loadBook, dict/.test(w) && /window\.readPop = /.test(w) && /window\.readBook = /.test(w), "API + old aliases");
 ok(/data-m="learn"|sheetExtra/.test(w) && /V\(\)\.next\(w\)/.test(w) && /"contextmenu"/.test(w), "card has the plugin mark buttons; right-click cycles like the plugin");
 ok(/word-change/.test(w), "pages are told to recolor");
 for (const f of ["read.js", "listen.js", "pump.js"]) ok(/WORD\.bind\(root/.test(W(f)) && /word-change/.test(W(f)), f + " uses the shared word handling");

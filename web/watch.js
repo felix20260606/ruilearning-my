@@ -412,6 +412,7 @@
     // 离开页面 / 切到后台时记下看到哪里
     document.addEventListener("visibilitychange", () => { if (document.hidden) savePos(true); });
     addEventListener("pagehide", () => savePos(true));
+    if (window.WORD && WORD.hover) { WORD.hover(subEl); WORD.hover(listEl); } // 🫧 鼠标停在字幕的词上出小气泡（全站共用的 word.js，同插件）
     listEl.addEventListener("click", e => { if (e.target.closest(".wt-back")) { follow = true; listEl.classList.remove("away"); scrollCur(true); return; } const w = e.target.closest(".wt-w"), row = e.target.closest(".wt-row"); if (!row) return; const i = +row.dataset.i; if (w) { lookup(w.dataset.w, i, w); return; } seek(i); });
     const away = () => { userScroll = Date.now(); follow = false; listEl.classList.add("away"); };
     listEl.addEventListener("touchmove", away, { passive: true }); listEl.addEventListener("wheel", away, { passive: true });

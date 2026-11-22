@@ -11,13 +11,13 @@
   "use strict";
   if (window.LAZY) return;
   const MODS = {
-    speak: { src: "speak.js?v=ac400399", fns: ["speakShow"], el: { speakShow: "#view-speak" }, quiet: ["speakHide"] },
+    speak: { src: "speak.js?v=0577af77", fns: ["speakShow"], el: { speakShow: "#view-speak" }, quiet: ["speakHide"] },
     basic: { src: "basic.js?v=80195e90", deps: ["speak"], fns: ["basicShow"], el: { basicShow: "#view-basic" } },
-    read: { src: "read.js?v=aa5f1314", fns: ["readingShow", "readingNews", "readingOpen", "readTextDiff"], el: { readingShow: "#reading" }, quiet: ["readingRefresh"] },
-    listen: { src: "listen.js?v=2dd67d9d", fns: ["smeShow"], el: { smeShow: "#sme" }, quiet: ["smePause"] },
+    read: { src: "read.js?v=53955424", fns: ["readingShow", "readingNews", "readingOpen", "readTextDiff"], el: { readingShow: "#reading" }, quiet: ["readingRefresh"] },
+    listen: { src: "listen.js?v=157041be", fns: ["smeShow"], el: { smeShow: "#sme" }, quiet: ["smePause"] },
     drill: { src: "drill.js?v=d33beba8", deps: ["listen"], fns: ["drillShow", "drillReview"], el: { drillShow: "#drill" }, quiet: ["drillHide"] },
     exam: { src: "exam.js?v=c0953f36", fns: ["examShow"], el: { examShow: 0 } },
-    write: { src: "write.js?v=a24c6659", fns: ["writingShow"], el: { writingShow: 0 } },
+    write: { src: "write.js?v=c2de1813", fns: ["writingShow"], el: { writingShow: 0 } },
     grammar: { src: "grammar.js?v=19e2e8e7", fns: ["grammarShow"], el: { grammarShow: "#grammar" }, quiet: ["grammarRefresh"] },
   };
   const log = (m, d) => { if (window.U) U.log("lazy", m, d); };

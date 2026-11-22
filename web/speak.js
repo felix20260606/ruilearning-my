@@ -85,7 +85,7 @@
   .sk-empty{color:var(--ui-muted);text-align:center;padding:40px 0}
   .sk-note{color:var(--ui-muted);font-size:12.5px;margin-top:10px;line-height:1.6}
   .sk-stat{display:grid;grid-template-columns:1fr auto;gap:10px 18px;align-items:end;background:var(--ui-surface);border:1px solid var(--ui-line);border-radius:14px;padding:12px 14px;margin:0 0 14px}
-  .sk-stat .tls{display:flex;flex-wrap:wrap;gap:6px 18px}.sk-stat .tl b{display:block;font-size:20px;font-weight:900;color:var(--ui-ink);line-height:1.2}.sk-stat .tl span{font-size:12px;color:var(--ui-muted)}
+  .sk-stat .tl[data-sec],.sk-stat .bars{cursor:pointer}.sk-stat .tls{display:flex;flex-wrap:wrap;gap:6px 18px}.sk-stat .tl b{display:block;font-size:20px;font-weight:900;color:var(--ui-ink);line-height:1.2}.sk-stat .tl span{font-size:12px;color:var(--ui-muted)}
   .sk-stat .bars{display:flex;gap:5px;height:58px;align-items:flex-end}.sk-stat .bars i{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;width:18px;height:100%;font-style:normal}
   .sk-stat .bars u{display:block;width:100%;min-height:3px;border-radius:4px 4px 2px 2px;background:var(--ui-pur);opacity:.55}.sk-stat .bars i.td u{opacity:1}.sk-stat .bars em{font-style:normal;font-size:11px;color:var(--ui-muted);margin-top:3px}
   .sk-stat .by{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12.5px;color:var(--ui-muted);border-top:1px solid var(--ui-line);padding-top:8px}.sk-stat .by b{color:var(--ui-ink)}
@@ -195,10 +195,11 @@
     const wk = Array.from({ length: 7 }, (_, i) => dayAgo(t, 6 - i)), mx = Math.max(1, ...wk.map(v)), w7 = wk.reduce((a, d) => a + v(d), 0);
     const days = Object.keys(L).filter(d => v(d) > 0).length, total = Object.keys(L).reduce((a, d) => a + v(d), 0), punch = Object.keys(K).filter(d => K[d]).length;
     const WD = "日一二三四五六", bars = wk.map(d => '<i title="' + d + "：" + v(d) + ' 次" class="' + (d === t ? "td" : "") + '"><u style="height:' + Math.round(v(d) / mx * 40) + 'px"></u><em>' + WD[new Date(d + "T12:00:00Z").getUTCDay()] + "</em></i>").join("");
-    const tile = (n, l) => '<div class="tl"><b>' + n + "</b><span>" + l + "</span></div>";
-    const sub = [["d:", "对话", (D && D.dialogs || []).length], ["s:", "跟读句", 0], ["t:", "话题", (D && D.topics || []).length], ["f:", "表达", (D && D.functions || []).length + (D && D.slang || []).length], ["p:", "发音", (D && D.pron && D.pron.pairs || []).length]];
-    return '<div class="sk-stat"><div class="tls">' + tile(v(t), "今天练习") + tile("🔥 " + run, "连续天数") + tile(w7, "近 7 天") + tile(days, "练习天数") + tile(punch, "每日一练打卡") + tile(total, "累计次数") + '</div><div class="bars">' + bars + "</div>" +
-      '<div class="by">' + sub.map(([p, l, n]) => "<span>" + l + " <b>" + doneCount(p) + "</b>" + (n ? " / " + n : "") + "</span>").join("") + "</div></div>";
+    // 点了跳到对应的栏目（data-sec，下面的点击处理认）：今天 / 打卡 → 每日一练；天数、次数、柱图 → 我的录音（有分数曲线）；各栏练过多少 → 那一栏
+    const tile = (n, l, sc) => '<div class="tl" data-sec="' + sc + '" title="去看看"><b>' + n + "</b><span>" + l + "</span></div>";
+    const sub = [["d:", "对话", (D && D.dialogs || []).length, 'data-sec="dialog"'], ["s:", "跟读句", 0, 'data-sec="shadow"'], ["t:", "话题", (D && D.topics || []).length, 'data-sec="topic"'], ["f:", "表达", (D && D.functions || []).length + (D && D.slang || []).length, 'data-sec="func"'], ["p:", "发音", (D && D.pron && D.pron.pairs || []).length, 'data-basic="pron"']];
+    return '<div class="sk-stat"><div class="tls">' + tile(v(t), "今天练习", "daily") + tile("🔥 " + run, "连续天数", "mine") + tile(w7, "近 7 天", "mine") + tile(days, "练习天数", "mine") + tile(punch, "每日一练打卡", "daily") + tile(total, "累计次数", "mine") + '</div><div class="bars" data-sec="mine" title="看我的录音和分数曲线">' + bars + "</div>" +
+      '<div class="by">' + sub.map(([p, l, n, at]) => "<span " + at + ' style="cursor:pointer">' + l + " <b>" + doneCount(p) + "</b>" + (n ? " / " + n : "") + "</span>").join("") + "</div></div>";
   }
   function head() {
     const n = counts();

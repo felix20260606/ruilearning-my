@@ -703,7 +703,7 @@
       s += '<div class="wr-lv">' + b.map((x, i) => '<i class="b' + i + '" style="width:' + (x / tt) * 100 + '%" title="' + BANDS[i].t + " " + x + '"></i>').join("") + "</div>";
       s += '<div class="wr-leg">' + b.map((x, i) => '<span><em class="b' + i + '"></em>' + BANDS[i].t + (i < 3 ? "（前 " + BANDS[i].max + "）" : "") + " " + pc(x) + "%</span>").join("") + "</div>";
       s += '<div class="wr-note">中高级 + 高级词占 <b style="color:var(--ui-pur-text)">' + Math.round(adv * 100) + "%</b>（" + (b[2] + b[3]) + " / " + tt + "）。" + aN + "</div>";
-      if (L.level.advWords.length) s += '<div class="wr-words">' + L.level.advWords.slice(0, 24).map(w => '<span class="ui-tag">' + esc(w) + "</span>").join("") + "</div>";
+      if (L.level.advWords.length) s += '<div class="wr-words">' + L.level.advWords.slice(0, 24).map(w => '<span class="ui-tag" data-to="word:' + esc(w) + '" title="查这个词">' + esc(w) + "</span>").join("") + "</div>";
     }
     // 重复词
     const O = L.overused;
@@ -768,7 +768,7 @@
     if (!h.length) return '<div class="wr-empty">还没有批改记录。写完点「批改」，结果会自动存在这里（最多 ' + HMAX + " 条）。</div>";
     return '<div class="wr-note" style="margin-bottom:8px">存在这台设备的浏览器里，最多 ' + HMAX + ' 条，新的在前。</div><div class="wr-hist">' + h.map(x => {
       const sc = x.ai && x.ai.band && x.ai.band.overall != null ? bandStr(x.ai.band.overall) : "—";
-      return '<div class="wr-hi"><div class="t" data-a="hopen" data-id="' + esc(x.id) + '"><b>' + esc((x.prompt || "（没有题目）").split("\n")[0]) + "</b><span>" + esc(new Date(x.at).toLocaleString("zh-CN", { hour12: false })) + " · " + esc(TYPES[x.type] ? TYPES[x.type].s : "") + " · " + x.words + " 词 · " + (x.ltErr ? "语法检查失败" : x.issues + " 个问题") + (x.est ? " · 粗估 LR " + bandStr(x.est.LR) + " / GRA " + bandStr(x.est.GRA) : "") + '</span></div><div class="sc">' + sc + '<small>AI 分</small></div><button class="ui-btn sm" data-a="hdel" data-id="' + esc(x.id) + '" title="删除这条">🗑</button></div>';
+      return '<div class="wr-hi"><div class="t" data-a="hopen" data-id="' + esc(x.id) + '"><b>' + esc((x.prompt || "（没有题目）").split("\n")[0]) + "</b><span>" + esc(new Date(x.at).toLocaleString("zh-CN", { hour12: false })) + " · " + esc(TYPES[x.type] ? TYPES[x.type].s : "") + " · " + x.words + " 词 · " + (x.ltErr ? "语法检查失败" : x.issues + " 个问题") + (x.est ? " · 粗估 LR " + bandStr(x.est.LR) + " / GRA " + bandStr(x.est.GRA) : "") + '</span></div><div class="sc" data-a="hopen" data-id="' + esc(x.id) + '" style="cursor:pointer">' + sc + '<small>AI 分</small></div><button class="ui-btn sm" data-a="hdel" data-id="' + esc(x.id) + '" title="删除这条">🗑</button></div>';
     }).join("") + "</div>";
   }
   function toHist(r) {

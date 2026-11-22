@@ -87,7 +87,7 @@
     const W = sentWords(), S = sentDay();
     if (!W.length) return '<div class="dy-sent"><div class="s">生词本里还没有可以造句的词。</div></div>';
     return '<div class="dy-sent">' + W.map((w, i) => { const x = S[w.word], r = x && x.r;
-      return '<div class="row1"><b>' + esc(w.word) + "</b><small>" + esc(w.zh) + "</small>" +
+      return '<div class="row1"><b data-to="word:' + esc(w.word) + '" title="查这个词">' + esc(w.word) + "</b><small>" + esc(w.zh) + "</small>" +
         (x ? '<div class="mine">' + esc(x.t) + "</div>" + (r ? '<div class="' + (r.correct ? "good" : "bad") + '">' + (r.correct ? "✅ 用对了" : "✏️ 改一下：" + esc(r.fixed)) + (r.why_zh ? "<br><small>" + esc(r.why_zh) + "</small>" : "") + (r.better ? '<br><small>更地道：' + esc(r.better) + (r.better_zh ? "（" + esc(r.better_zh) + "）" : "") + "</small>" : "") + "</div>" : '<div class="s">（AI 没看到，算你写过了）</div>') + '<button class="dy-chk" data-sredo="' + i + '">重写</button>'
           : '<div class="in"><input data-sin="' + i + '" placeholder="用 ' + esc(w.word) + ' 造一个句子" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="ui-btn" data-scheck="' + i + '"' + (sentBusy[w.word] ? " disabled" : "") + ">" + (sentBusy[w.word] ? "检查中…" : "检查") + "</button></div>") + "</div>"; }).join("") + "</div>";
   }
@@ -155,16 +155,17 @@
     const md = d => +d.slice(5, 7) + "月" + +d.slice(8) + "日";
     const tip1 = w.act === 0 ? "这周还没开始，今天先做一项也好。" : w.weak.length && w.area[w.weak[0]] <= 3 ? "下周多安排「" + w.weak[0] + "」：这周只练了 " + w.area[w.weak[0]] + " 天。" : w.full7 >= 5 ? "这周很稳，下周可以把单词目标提高一档。" : "保持住，争取每天把清单做完。";
     return '<div class="dy-wkbox"><div class="h"><b>📊 本周小结</b><small>' + md(w.from) + " – " + md(w.to) + '</small><span style="flex:1"></span><button class="dy-chk" data-act="wk">收起</button></div>' +
-      '<div class="nums"><div><b>' + w.act + "</b><span>天有练习</span></div><div><b>" + w.full7 + "</b><span>天全勤</span></div><div><b>" + w.cards + '</b><span>张卡片 <em class="' + (diff >= 0 ? "up" : "dn") + '">' + (w.cardsP || diff ? (diff >= 0 ? "↑" : "↓") + Math.abs(diff) : "") + "</em></span></div><div><b>" + (acc ? acc + "%" : "—") + "</b><span>记得率</span></div><div><b>" + w.nw + "</b><span>个新词</span></div><div><b>" + w.mins + "</b><span>分钟背词</span></div></div>" +
-      '<div class="areas">' + Object.keys(w.area).map(k => '<span><b>' + k + "</b> " + w.area[k] + " 天</span>").join("") + "</div>" +
-      '<div class="more">' + ["读了 " + w.docsN + " 篇文章", "听了 " + w.smeN + " 期听力节目", "批改了 " + w.wr + " 篇作文" + (w.band ? "（最高 " + w.band + " 分）" : "")].join(" · ") + "</div>" +
-      (w.hard.length ? '<div class="more">🔥 最难的词：' + w.hard.map(h => "<b>" + esc(h.word) + "</b>" + (h.f ? "（忘了 " + h.f + " 次）" : "")).join("、") + "</div>" : "") +
+      '<div class="nums"><div data-to="notebook/stats" title="看热力日历"><b>' + w.act + '</b><span>天有练习</span></div><div data-to="notebook/stats" title="看热力日历"><b>' + w.full7 + '</b><span>天全勤</span></div><div data-to="notebook/stats" title="看统计"><b>' + w.cards + '</b><span>张卡片 <em class="' + (diff >= 0 ? "up" : "dn") + '">' + (w.cardsP || diff ? (diff >= 0 ? "↑" : "↓") + Math.abs(diff) : "") + "</em></span></div><div><b>" + (acc ? acc + "%" : "—") + "</b><span>记得率</span></div><div><b>" + w.nw + "</b><span>个新词</span></div><div><b>" + w.mins + "</b><span>分钟背词</span></div></div>" +
+      '<div class="areas">' + Object.keys(w.area).map(k => '<span' + (AREA_TO[k] ? ' data-to="' + AREA_TO[k] + '" title="去练「' + k + '」"' : "") + "><b>" + k + "</b> " + w.area[k] + " 天</span>").join("") + "</div>" +
+      '<div class="more">' + ['<span data-to="read">读了 ' + w.docsN + " 篇文章</span>", '<span data-to="listen/sme">听了 ' + w.smeN + " 期听力节目</span>", '<span data-to="write">批改了 ' + w.wr + " 篇作文" + (w.band ? "（最高 " + w.band + " 分）" : "") + "</span>"].join(" · ") + "</div>" +
+      (w.hard.length ? '<div class="more">🔥 最难的词：' + w.hard.map(h => '<b data-to="word:' + esc(h.word) + '" title="查这个词">' + esc(h.word) + "</b>" + (h.f ? "（忘了 " + h.f + " 次）" : "")).join("、") + "</div>" : "") +
       '<div class="adv">💡 ' + esc(tip1) + "</div></div>";
   }
+  const AREA_TO = { 词: "notebook/pump", 听: "listen/sme", 说: "speak", 读: "read", 写: "write" }; // 本周小结「词 / 听 / 说 / 读 / 写 N 天」点了去练
   function weekBrief() { // 收起时：一行简略的（几天有练习、几天全勤、卡片数和正确率），点「展开」看全部
     const w = week(), acc = w.ok + w.fail ? Math.round(w.ok / (w.ok + w.fail) * 100) : 0, diff = w.cards - w.cardsP;
     const md = d => +d.slice(5, 7) + "/" + +d.slice(8);
-    return '<div class="dy-wkbox sm"><div class="h"><b>📊 本周小结</b><small>' + md(w.from) + "–" + md(w.to) + '</small><span class="brief">练了 <b>' + w.act + "</b> 天 · 全勤 <b>" + w.full7 + "</b> 天 · <b>" + w.cards + "</b> 张卡" +
+    return '<div class="dy-wkbox sm"><div class="h"><b>📊 本周小结</b><small>' + md(w.from) + "–" + md(w.to) + '</small><span class="brief" data-act="wk" title="展开看全部" style="cursor:pointer">练了 <b>' + w.act + "</b> 天 · 全勤 <b>" + w.full7 + "</b> 天 · <b>" + w.cards + "</b> 张卡" +
       (w.cardsP || diff ? '<em class="' + (diff >= 0 ? "up" : "dn") + '">' + (diff >= 0 ? "↑" : "↓") + Math.abs(diff) + "</em>" : "") + (w.ok + w.fail ? " · 正确率 <b>" + acc + "%</b>" : "") +
       '</span><span style="flex:1"></span><button class="dy-chk" data-act="wk">展开 ▾</button></div></div>';
   }
@@ -229,7 +230,7 @@
       '<div class="dy-hd"><h1>📅 每日一练</h1><p>每天按顺序做完这几项：词 → 听 → 说 → 读 → 写。点「去练」直接跳过去，做完回来会自动打勾。</p><button class="ui-btn" data-act="wk">📊 本周小结</button><button class="ui-btn" data-act="set">⚙ 设置</button></div>' + set +
       (showWk ? weekHtml() : weekBrief()) +
       '<div class="dy-top"><div class="dy-ring" style="--p:' + (L.length ? Math.round(n / L.length * 100) : 0) + '"><div><div><b>' + n + "/" + L.length + '</b><span>今天</span></div></div></div>' +
-      '<div class="dy-meta"><b>' + (!L.length ? "在 ⚙ 设置里选几项开始" : n >= L.length ? "🎉 今天全部完成" : "还剩 " + (L.length - n) + " 项，约 " + left + " 分钟") + "</b><div>" + exTxt + "🔥 连续全勤 " + st + " 天" + (Object.keys(D).length ? " · 共练了 " + Object.keys(D).filter(k => D[k][0] > 0).length + " 天" : "") + (!o.exam ? ' · <a href="javascript:void 0" data-act="set" style="color:var(--ui-muted)">设考试日期</a>' : "") + "</div></div>" +
+      '<div class="dy-meta"><b>' + (!L.length ? "在 ⚙ 设置里选几项开始" : n >= L.length ? "🎉 今天全部完成" : "还剩 " + (L.length - n) + " 项，约 " + left + " 分钟") + "</b><div>" + exTxt + '<span data-to="notebook/stats" title="看热力日历和统计">🔥 连续全勤 ' + st + " 天" + (Object.keys(D).length ? " · 共练了 " + Object.keys(D).filter(k => D[k][0] > 0).length + " 天" : "") + "</span>" + (!o.exam ? ' · <a href="javascript:void 0" data-act="set" style="color:var(--ui-muted)">设考试日期</a>' : "") + "</div></div>" +
       '<div class="dy-wk">' + wk.map(d => { const x = D[d]; return '<i class="' + (d === lday() ? "td" : "") + '" title="' + d + (x ? "：" + x[0] + " / " + x[1] : "") + '"><u class="' + (full(x) ? "f" : x && x[0] ? "h" : "") + '"></u><em>' + WD[new Date(d + "T12:00:00").getDay()] + "</em></i>"; }).join("") + "</div>" +
       (next ? '<div class="dy-go"><button class="ui-btn pri" data-go="' + next.id + '">▶ ' + (n ? "继续" : "开始") + "：" + next.ic + " " + next.t + "</button></div>" : "") + "</div>" +
       '<div class="dy-list">' + L.map(x => '<div class="dy-it' + (x.ok ? " ok" : "") + '"><div class="dy-ic">' + (x.ok ? "✅" : x.ic) + '</div><div class="dy-t"><b>' + x.ic + " " + esc(x.t) + "</b><small>约 " + x.min + " 分钟</small>" +
@@ -258,7 +259,7 @@
     back = document.createElement("button"); back.id = "dy-back"; back.type = "button"; document.body.append(back);
     back.onclick = () => { if (!en("daily")) click($("tab-daily")); };
     root.addEventListener("click", e => {
-      const t = e.target.closest("button, a[data-act]"); if (!t) return;
+      const t = e.target.closest("button, a[data-act], span[data-act]"); if (!t) return;
       if (t.dataset.go) return go(t.dataset.go);
       if (t.dataset.hard) { went = true; toHard(); paintBack(); return; }
       if (t.dataset.drillrv) { went = true; en("listen", "drill"); setTimeout(() => { if (window.drillReview) window.drillReview(); }, 150); paintBack(); return; }
