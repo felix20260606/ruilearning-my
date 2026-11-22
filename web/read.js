@@ -489,7 +489,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
       '<button id="ra-fab" data-a="all">⏹ 停止朗读</button>';
     syncTts(); fillTr();
   }
-  function draw() { if (!root) return; if (view === "read" && doc) drawRead(); else { view = "home"; drawHome(); } }
+  function draw() { if (!root) return; if (view === "read" && doc) drawRead(); else { view = "home"; drawHome(); } if (window.NAV) NAV.mark(); } // 🔙 打开 / 关上文章：记一条页面历史（nav.js）
 
   /* ---------- 朗读：单句、全文逐句（高亮当前句） ---------- */
   let tts = null;
@@ -628,7 +628,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
         showMsg(""); openDoc(v); if (view === "read") draft = ""; return;
       }
       if (a === "link") { const u = location.origin + "/#article/" + encodeURIComponent(doc.id); (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(() => tip("已复制这篇文章的链接（换设备打开也能直接读到这篇）"), () => prompt("复制这个链接：", u)); return; }
-      if (a === "home") { stopAll(); closePop(); view = "home"; draw(); setHash(""); try { root.scrollIntoView({ block: "start" }); } catch (er) {} return; }
+      if (a === "home") { stopAll(); closePop(); const home = () => { view = "home"; draw(); setHash(""); try { root.scrollIntoView({ block: "start" }); } catch (er) {} }; if (window.NAV) NAV.back(home); else home(); return; } // 回到上一个页面
       if (a === "all") { if (tts) stopAll(); else readAll(firstVisible()); }
       if (a === "tr") { trOn = !trOn; LS("reading:trOn", trOn); root.classList.toggle("tr-on", trOn); b.classList.toggle("on", trOn); b.textContent = "文 译文" + (trOn ? "：显示" : "：隐藏"); fillTr(); }
     });
@@ -648,7 +648,8 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
   }
 
   // 直达链接：地址 #article/文章id（文章会同步到后台，换设备也能打开）
-  function setHash(id) { try { const h = id ? "#article/" + encodeURIComponent(id) : ""; if (location.hash !== h && (id || /^#article\//.test(location.hash))) history.replaceState(null, "", location.pathname + location.search + h); } catch (e) {} }
+  // 有页面历史（nav.js）时晚一点改地址：等它先记下新的一条，改的是新的那条（保留 history.state）
+  function setHash(id) { const f = () => { try { const h = id ? "#article/" + encodeURIComponent(id) : ""; if (location.hash !== h && (id || /^#article\//.test(location.hash))) history.replaceState(history.state, "", location.pathname + location.search + h); } catch (e) {} }; if (window.NAV) setTimeout(f, 380); else f(); }
   async function fromHash() {
     const m = location.hash.match(/^#article\/(.+)$/); if (!m) return false; const id = decodeURIComponent(m[1]);
     let d = docs().find(x => x.id === id);
@@ -656,6 +657,13 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
     if (d) { if (!(view === "read" && doc && doc.id === id)) openDoc(d.text, d.title, d.id); return true; }
     tip("没找到这篇文章（可能已经删掉了）"); setHash(""); return false;
   }
+  // 🔙 页面历史：打开的是哪篇文章（看不到这一页时不记）
+  if (window.NAV) NAV.reg("read", () => root && root.getClientRects().length ? { doc: view === "read" && doc ? doc.id : null } : undefined, x => {
+    if (!x || !root) return;
+    if (!x.doc) { if (view !== "home") { stopAll(); closePop(); view = "home"; draw(); setHash(""); } return; }
+    if (view === "read" && doc && doc.id === x.doc) return;
+    const d = docs().find(y => y.id === x.doc); if (d) openDoc(d.text, d.title, d.id); else { view = "home"; draw(); }
+  });
   window.readingShow = () => { init(); if (!root) return; loadBook(); draw(); ensureVs().then(() => redrawKeep()); fromHash(); }; // 先画出来（不上色），vs 模块加载完再上色
   window.readingRefresh = () => { if (!root) return; loadBook(); if (root.classList.contains("on")) redrawKeep(); }; // 生词本变了（加词、标记已掌握）时调用
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();

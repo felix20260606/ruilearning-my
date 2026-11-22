@@ -577,6 +577,7 @@
     else body += drawWrite();
     host.innerHTML = body + "</div>";
     if (st.view === "write") { updCount(); updTimer(); }
+    if (window.NAV) NAV.mark(); // 🔙 写作 / 历史记录 / 打开某条记录：记一条页面历史（nav.js）
   }
 
   function bankOptions() {
@@ -974,9 +975,9 @@
       else if (A === "reai" && res) callAI(res).then(() => recordHist(res));
       else if (A === "say" && cur && cur.ai) talk(cur.ai.rewrite);
       else if (A === "copy" && cur && cur.ai) { try { navigator.clipboard.writeText(cur.ai.rewrite).then(() => say("已复制范文"), () => say("复制失败")); } catch (er) { say("复制失败"); } }
-      else if (A === "hopen") { const x = hist().find(y => y.id === b.dataset.id); if (x) { histView = fromHist(x); draw(); loadVocab().then(() => { if (histView) { runLocal(histView); redrawRes(); } }); } }
+      else if (A === "hopen") { const x = hist().find(y => y.id === b.dataset.id); if (x) { histId = x.id; histView = fromHist(x); draw(); loadVocab().then(() => { if (histView) { runLocal(histView); redrawRes(); } }); } }
       else if (A === "hdel") { if (typeof confirm === "function" && !confirm("删除这条批改记录？")) return; saveHist(hist().filter(y => y.id !== b.dataset.id)); draw(); }
-      else if (A === "hback") { histView = null; draw(); }
+      else if (A === "hback") { const up = () => { histView = null; draw(); }; if (window.NAV) NAV.back(up); else up(); } // 回到上一个页面
       else if (A === "hload" && histView) {
         if (st.text.trim() && st.text !== histView.text && typeof confirm === "function" && !confirm("载入会替换写作区现在的正文和题目，继续？")) return;
         const r = histView; timer(false);
@@ -1006,6 +1007,15 @@
   }
 
   // 入口：把整个写作批改界面画进 el（重复调用没关系，状态会保留）
+  // 🔙 页面历史：在「写作」还是「历史记录」、打开了哪条记录（看不到这一页时不记）
+  let histId = null;
+  if (window.NAV) NAV.reg("write", () => host && host.getClientRects().length ? { v: st.view, h: histView ? histId : null } : undefined, x => {
+    if (!x || !host) return;
+    const want = x.h ? hist().find(y => y.id === x.h) : null;
+    if (x.v === st.view && (want ? histView && histId === x.h : !histView)) return;
+    if (x.v) st.view = x.v;
+    if (want) { histId = want.id; histView = fromHist(want); draw(); loadVocab().then(() => { if (histView) { runLocal(histView); redrawRes(); } }); } else { histView = null; draw(); }
+  });
   window.writingShow = function (el) {
     if (!el) return;
     initGlobal();

@@ -204,7 +204,9 @@
     const fin = l => { listBusy[s] = false; LISTS[s] = l; if (view === "home" && (ser === s || (ser === "new" && WKS().includes(s)))) draw(); };
     fetch("/api/sme?s=" + s).then(r => r.json()).then(j => fin(j && j.ok ? j.list : [])).catch(() => fin([]));
   }
+  let openId = null; // 正在打开的那一期（加载完之前 EP 还是空的，页面历史要用）
   function openEp(id) {
+    openId = id;
     if (OFF()[id] && !(id in BLOB) && "caches" in window) { offBlob(id).then(() => openEp(id)); return; } // 下载过的：先拿到本机的音频再画
     view = "ep"; trShow = false; EP = EPS[id] || null; epBusy = !EP; draw(); if (root && root.getClientRects().length) window.scrollTo(0, 0);
     if (EP) { if (zhOn) loadZh(id); return; }
@@ -676,6 +678,7 @@
     sync(); stickTop(); curK = -1; curW = null; hl(true); hlWord();
     if (view === "ep" && EP && !EP.err && autoNext === EP.id && AU.dataset.id === EP.id) { autoNext = null; AU.play().catch(() => {}); }
     if (view === "ep" && EP && !EP.err && !DIFF()[EP.id] && navigator.onLine !== false) diffCalc(EP.id);
+    if (window.NAV) NAV.mark(); // 🔙 换栏目 / 打开一期：记一条页面历史（nav.js）
   }
   function stickTop() { // 顶上固定的几条（标签栏、子标签、栏目条）下面
     if (!root) return; let b = 0;
@@ -729,7 +732,7 @@
       const ad = t.closest("[data-add]"); if (ad && EP) { const v = EP.vocab[+ad.dataset.add], w = String(v[0]).replace(/\s*\(.*?\)\s*/g, " ").trim(), re = new RegExp("\\b" + w.split(/\s+/)[0].replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"), line = (EP.lines || []).find(l => re.test(l.t)); if (window.vocabAddWord) { ad.disabled = true; window.vocabAddWord(w, v[2] || (line ? line.t : "")).then(ok => { ad.textContent = ok ? "✓ 已加" : "已在本里"; }); } return; }
       const b = t.closest("[data-a]"); if (!b) return; const a = b.dataset.a;
       if (a === "more") { MORE[ser] = (MORE[ser] || 40) + 80; draw(); return; }
-      if (a === "home") { view = "home"; if (EP && !EP.err && ser !== "new") ser = serOf(EP.id); loadList(ser); draw(); return; }
+      if (a === "home") { const home = () => { view = "home"; if (EP && !EP.err && ser !== "new") ser = serOf(EP.id); loadList(ser); draw(); }; if (window.NAV) NAV.back(home); else home(); return; } // 回到上一个页面
       if (a === "dk" && EP && !EP.err) { dkLoad(EP.id); return; }
       if (/^dk-/.test(a) && EP && DK[EP.id] && DK[EP.id].sents) {
         const d = DK[EP.id], inp = root.querySelector("#dk-in"); if (inp) d.typed = inp.value;
@@ -762,6 +765,13 @@
       }
     });
   }
+  // 🔙 页面历史：哪个栏目、打开了哪一期（看不到这一页时不记）
+  if (window.NAV) NAV.reg("sme", () => root && root.getClientRects().length ? { ser, ep: view === "ep" ? (EP && EP.id) || openId : null } : undefined, x => {
+    if (!x || !root) return;
+    if (x.ser && x.ser !== ser && (SM[x.ser] || x.ser === "new")) { ser = x.ser; LS("sme:s", ser); }
+    if (x.ep) { if (!(view === "ep" && ((EP && EP.id) || openId) === x.ep)) openEp(x.ep); return; }
+    if (view !== "home") { view = "home"; loadList(ser); draw(); } else { loadList(ser); draw(); }
+  });
   window.smeShow = () => { init(); if (!root) return; pull(); loadList(ser); draw(); };
   window.smeDoneToday = () => { const D = done(), t = new Date().toDateString(); return Object.keys(D).filter(id => new Date(D[id]).toDateString() === t); }; // 「📅 每日」的「听」用
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();

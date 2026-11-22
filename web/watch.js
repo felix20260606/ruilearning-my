@@ -402,7 +402,7 @@
       const m = e.target.closest(".wt-more"); if (m) { menu(m.dataset.v, false); return; }
       const it = e.target.closest(".wt-item,.wt-cont"); if (it) open(it.dataset.v);
     });
-    $("#wt-back").onclick = closePlay;
+    $("#wt-back").onclick = () => { if (window.NAV) NAV.back(closePlay); else closePlay(); }; // 回到上一个页面
     $("#wt-prev").onclick = () => jump(-1); $("#wt-next").onclick = () => jump(1); $("#wt-rep").onclick = () => jump(0);
     $("#wt-loop").onclick = toggleLoop; $("#wt-ab").onclick = toggleAB;
     $("#wt-ap").onclick = () => { set.autoPause = !set.autoPause; saveSet(); };
@@ -579,7 +579,9 @@
   function openUrl(s) { const v = vid(s); if (!v) { tip("没认出这个链接，请粘贴 YouTube 视频地址"); return; } open(v); }
 
   /* ---------- 打开视频 ---------- */
+  let curV = null; // 🔙 正在看的视频（页面历史用）
   async function open(v, at) { // at：从第几秒开始（频道地图里的样片用）
+    curV = v; if (window.NAV) NAV.mark();
     root.classList.add("playing"); document.documentElement.classList.add("wt-playing");
     closeSheet();
     doc = { v, title: "", cues: [] }; cues = []; cur = -1; pausedFor = -1; lock = false; follow = true; listEl.classList.remove("away");
@@ -603,7 +605,7 @@
       listEl.innerHTML = '<div class="wt-empty">这个视频还没有字幕。<br>在电脑上用插件打开它看约 20 秒，字幕会自动同步过来；视频本身现在就可以播放。</div>';
     }
   }
-  function closePlay() { document.documentElement.classList.remove("wt-float"); savePos(true); closeSheet(); loop = null; abA = -1; stopTick(); try { player && player.destroy && player.destroy(); } catch (e) {} player = null; ready = false; doc = null; root.classList.remove("playing"); document.documentElement.classList.remove("wt-playing"); $(".wt-video", root).innerHTML = '<div id="wt-yt"></div>'; loadList(); }
+  function closePlay() { curV = null; if (window.NAV) NAV.mark(); document.documentElement.classList.remove("wt-float"); savePos(true); closeSheet(); loop = null; abA = -1; stopTick(); try { player && player.destroy && player.destroy(); } catch (e) {} player = null; ready = false; doc = null; root.classList.remove("playing"); document.documentElement.classList.remove("wt-playing"); $(".wt-video", root).innerHTML = '<div id="wt-yt"></div>'; loadList(); }
   function drawCues() {
     listEl.innerHTML = cues.map((c, i) => '<div class="wt-row" data-i="' + i + '"><i>' + fmt(c.s) + '</i><span class="t">' + markup(c.t) + '</span><span class="r">' + esc(c.r || "") + "</span></div>").join("") + '<button class="wt-back">↓ 回到当前</button>';
     paintLoop();
@@ -765,6 +767,12 @@
     }
   }
 
-  function init() { if (!build()) return; { const q = new URLSearchParams(location.search).get("v"); if (q && /^[\w-]{11}$/.test(q)) { try { history.replaceState(null, "", location.pathname); } catch (e) {} enter(); open(q); window.__wt = { open, enter: () => enter(), state: () => ({ cur, n: cues.length, lock, follow, set }) }; return; } } if (window.__wantVideo && !document.documentElement.classList.contains("collect-mode")) window.videoCore.enter(); window.__wt = { open, enter: () => enter(), state: () => ({ cur, n: cues.length, lock, follow, set }) }; }
+  // 🔙 页面历史：在列表还是在看哪个视频（看不到视频页时不记）
+  if (window.NAV) NAV.reg("video", () => root && root.getClientRects().length ? { v: curV } : undefined, x => {
+    if (!x || !root) return;
+    if (!x.v) { if (curV) closePlay(); return; }
+    if (curV !== x.v) open(x.v);
+  });
+  function init() { if (!build()) return; { const q = new URLSearchParams(location.search).get("v"); if (q && /^[\w-]{11}$/.test(q)) { try { history.replaceState(history.state, "", location.pathname); } catch (e) {} enter(); open(q); window.__wt = { open, enter: () => enter(), state: () => ({ cur, n: cues.length, lock, follow, set }) }; return; } } if (window.__wantVideo && !document.documentElement.classList.contains("collect-mode")) window.videoCore.enter(); window.__wt = { open, enter: () => enter(), state: () => ({ cur, n: cues.length, lock, follow, set }) }; }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();

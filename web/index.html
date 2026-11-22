@@ -78,6 +78,7 @@
   };
 })();
 </script>
+<script src="nav.js?v=1"></script>
 <script>
 /* 🇨🇳 在中国大陆也能用：谷歌、BBC、维基百科、YouTube 这些在大陆打不开（或者一直卡着不回）。
    window.NET：
@@ -1821,6 +1822,7 @@ refresh(); // show seed words immediately, no waiting on storage
       if(tf){tf.style.display='block';tf.setAttribute('src',d==='tnav'?TNAV_FILE:(d==='lk'?LK_FILE:(d==='pg'?PG_FILE:(d==='sg2'?SG2_FILE:(d==='sg'?SG_FILE:(d==='mel1'?MELAKA1_FILE:MELAKA_FILE))))));}
     }
     try{localStorage.setItem('trip_dest',d);}catch(e){}
+    if(window.NAV)NAV.mark();
   }
   function setFatRegion(r){
     if(fatNav)fatNav.classList.toggle('on',r==='nav');
@@ -1833,6 +1835,7 @@ refresh(); // show seed words immediately, no waiting on storage
     if(fatBkk)fatBkk.classList.toggle('on',r==='bkk');
     if(fr)fr.setAttribute('src',FAT_FILES[r]||FAT_FILES.wrap);
     try{localStorage.setItem('fat_region',r);}catch(e){}
+    if(window.NAV)NAV.mark();
   }
   // 英语八个二级标签：📅 每日 | 📖 词汇 | 🎧 听 | 🗣 说 | 📰 读 | ✍️ 写 | 🎓 雅思 | 🌱 入门
   //   入门 → 🧭 从这开始（basic.js）/ 🗣 口语入门、🔊 发音（speak.js 只显示这一栏：speakShow("start" / "pron")）/ 📐 语法（生词本页的语法模式，原来在「✍️ 写」下面）
@@ -1915,8 +1918,21 @@ refresh(); // show seed words immediately, no waiting on storage
       else if(which==='listen'){if(wantVideo){if(window.videoCore)videoCore.enter();else window.__wantVideo=1;}else clickMode(sub==='sme'||sub==='drill'?sub:'pump');}
     }finally{busy=false;}
     try{localStorage.setItem('vocab_tab',which);}catch(e){}
+    if(window.NAV)NAV.mark();
   }
   window.enShow=show;
+  // 🔙 页面历史（nav.js）：标签、小标签、生词本的模式；生活里减脂 / 旅行选的是哪一页
+  if(window.NAV){
+    NAV.reg('tab',function(){return CUR?{w:CUR,sub:SECS[CUR]?getSub(CUR):'',m:CUR==='notebook'?(root.getAttribute('data-mode')||''):''}:undefined;},function(s){
+      if(!s||!L2_OWNER[s.w])return;
+      if(s.w!==CUR||(SECS[s.w]&&s.sub!==getSub(s.w)))show(s.w,s.sub);
+      if(s.m&&s.w==='notebook'&&s.m!==root.getAttribute('data-mode'))clickMode(s.m);
+    });
+    NAV.reg('life',function(){var f='',t='';try{f=localStorage.getItem('fat_region')||'';t=localStorage.getItem('trip_dest')||'';}catch(e){}return CUR==='fat'?{f:f}:CUR==='trip'?{t:t}:undefined;},function(s){
+      if(s.f&&FAT_FILES[s.f]){var c='';try{c=localStorage.getItem('fat_region');}catch(e){}if(c!==s.f)setFatRegion(s.f);}
+      if(s.t){var d='';try{d=localStorage.getItem('trip_dest');}catch(e){}if(d!==s.t)setDest(s.t);}
+    });
+  }
   // 生词本的模式按钮被点了（包括每日一练、统计页、#article 链接直接点模式按钮跳过来）：上面的标签跟着变
   window.enSync=function(m){
     if(CUR==='basic'&&getSub('basic')!=='grammar'&&m!=='grammar'&&!busy)return; // 入门的其它小标签不用生词本页：网页启动时恢复的模式别把标签切走
@@ -1927,7 +1943,7 @@ refresh(); // show seed words immediately, no waiting on storage
     if(m==='grammar'){if(CUR!=='basic'||getSub('basic')!=='grammar')show('basic','grammar');return;}
     if(m==='writing'){if(CUR!=='write')show('write');return;}
     if(m==='pump'&&CUR==='listen')return;
-    if(CUR!=='notebook')show('notebook');
+    if(CUR!=='notebook')show('notebook');else if(window.NAV)NAV.mark(); // 生词本里换模式也算换页
   };
   document.getElementById('en-secbar').addEventListener('click',function(e){var b=e.target.closest('button[data-sub]');if(b&&SECS[CUR])show(CUR,b.dataset.sub);});
   buildTripRow();
@@ -1989,11 +2005,13 @@ refresh(); // show seed words immediately, no waiting on storage
     if(exV){exV.style.display=isEx?'block':'none';if(isEx&&window.examShow)examShow(exV,which==='lexam'?'listening':'reading');}
     if(isNotes&&ifr&&!ifr.getAttribute('src'))ifr.setAttribute('src','ielts-notes.html');
     try{localStorage.setItem('ielts_sub',which);}catch(e){}
+    if(window.NAV)NAV.mark();
   }
   bBtn.onclick=function(){sw('basics');};
   nBtn.onclick=function(){sw('notes');};
   if(lBtn)lBtn.onclick=function(){sw('lexam');};
   if(rBtn)rBtn.onclick=function(){sw('rexam');};
+  if(window.NAV)NAV.reg('ielts',function(){if(!document.documentElement.classList.contains('show-ielts'))return undefined;var v='';try{v=localStorage.getItem('ielts_sub')||'';}catch(e){}return v;},function(v){var c='';try{c=localStorage.getItem('ielts_sub')||'';}catch(e){}if(v&&v!==c)sw(v);});
   window.ieltsSub=sw; // 别的模块跳到雅思某个小标签：ieltsSub('lexam' | 'rexam' | 'notes' | 'basics')
   if(wBtn)wBtn.onclick=function(){if(window.enShow)enShow('write','writing');}; // 旧的跳转（每日一练「写」）点这个隐藏按钮 → 「✍️ 写 → 📝 写作批改」
   var s='';try{s=localStorage.getItem('ielts_sub')||'';}catch(e){}
@@ -2002,20 +2020,20 @@ refresh(); // show seed words immediately, no waiting on storage
 </script>
 <script src="lang.js?v=3"></script>
 <script src="tts.js?v=2"></script>
-<script src="watch.js?v=18"></script>
+<script src="watch.js?v=19"></script>
 <script src="channels.js?v=3"></script>
-<script src="pump.js?v=30"></script>
-<script src="speak.js?v=13"></script>
+<script src="pump.js?v=31"></script>
+<script src="speak.js?v=14"></script>
 <script src="basic.js?v=1"></script>
 <script src="quota.js?v=4"></script>
 <script src="daily.js?v=11"></script>
-<script src="read.js?v=13"></script>
-<script src="listen.js?v=17"></script>
-<script src="drill.js?v=4"></script>
+<script src="read.js?v=14"></script>
+<script src="listen.js?v=18"></script>
+<script src="drill.js?v=5"></script>
 <script src="errbook.js?v=2"></script>
 <script src="exam.js?v=5"></script>
 <script src="import.js?v=1"></script>
-<script src="write.js?v=3"></script>
+<script src="write.js?v=4"></script>
 <script src="stats.js?v=1"></script>
 <script>
 /* 个人学习资料换设备也在：阅读的文章（reading:docs）、作文批改历史（writing:history）、词汇量测试（vocab:test）

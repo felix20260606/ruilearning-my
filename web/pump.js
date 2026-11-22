@@ -56,6 +56,8 @@
     return fetch("/api/sent?w=" + encodeURIComponent(k)).then(r => r.json()).then(j => { SENT[k] = (j && j.items) || []; }).catch(() => { delete SENT[k]; }); };
   let day = LG("pump:day", { d: "", n: 0 }); if (day.d !== today()) day = { d: today(), n: 0 };
   let cards = [], at = 0, bad = 0, playing = false, root = null;
+  // 🔙 页面历史：在首页还是在练（练到一半没法恢复，所以只支持「后退 = 停下回首页」）
+  if (window.NAV) NAV.reg("pump", () => root && root.classList.contains("on") ? { p: playing ? 1 : 0 } : undefined, x => { if (x && !x.p && playing) { stopAudio(); home(); } });
   // 插件保存时录下的原声和两张截图（存在 Cloudflare：/api/ext 里有索引，/api/media 一条一条取），哪台设备都能用
   let MED = null, medP = null, player = null, EXT = null; const SUGZH = {}; const medRec = {}, medPr = {};
   const nrm = s => String(s || "").toLowerCase().replace(/[{}]/g, "").replace(/[^a-z0-9']+/g, " ").trim();
@@ -270,7 +272,7 @@
   }
   const html = en => esc(en).replace(/\{([^}]+)\}/g, '<span class="t">$1</span>');
   function home() {
-    playing = false; root.classList.remove("pp-known"); const p = plan(), S = srs();
+    playing = false; root.classList.remove("pp-known"); if (window.NAV) NAV.mark(); // 🔙 页面历史（nav.js） const p = plan(), S = srs();
     const VS = window.vocabStats ? window.vocabStats() : null; // 学习中 / 已掌握：和顶部、统计页同一个口径（index.html 的 vocabStats）
     const lrn = VS ? VS.learning : p.P.filter(w => S[w.id] && w.status !== "known").length, done = VS ? VS.known : p.P.filter(w => w.status === "known").length;
     const rs = p.live.filter(w => S[w.id] && S[w.id].at).map(w => rNow(S[w.id])), avgR = rs.length ? Math.round(rs.reduce((a, x) => a + x, 0) / rs.length * 100) : 0;
@@ -327,7 +329,7 @@
   }
   // only = "shadow" / "dict"：只练跟读 / 只练听写（练习页左边的快捷按钮），这一轮每个词只出这一种卡
   function start(only, hard) {
-    hardOnly = !!hard; const p = plan(); hardOnly = false; if (!p.queue.length) { if (hard) toast("现在没有难词 👍"); return; } const S = srs(); cards = []; at = 0; bad = 0; playing = true;
+    hardOnly = !!hard; const p = plan(); hardOnly = false; if (!p.queue.length) { if (hard) toast("现在没有难词 👍"); return; } const S = srs(); cards = []; at = 0; bad = 0; playing = true; if (window.NAV) NAV.mark();
     medMap().then(() => { prefetch(0); const c = cards[at]; if (c && playing) medFor(c.w).then(() => { if (playing && cards[at] === c && medOf(c)) show(); }); }); // 原声截图在后台取，取到之前先用朗读；取到了重画当前卡片
     p.list.forEach(w => {
       const r = S[w.id], wasNew = !r, x0 = seen(r), sp = spec(w), base = { w, wasNew, x0, m0: mastery(r, w), rev: 0 }; // x0：这一轮开始前练过几轮；m0：开始前的掌握进度
@@ -449,7 +451,7 @@
       const g0 = root.querySelector("#pp-gap"); g0.onclick = () => revealQuiz(c); g0.parentNode.onmouseenter = () => revealQuiz(c);
       if (!c.done) { root.querySelector("#pp-fail").onclick = () => rate(c, false); root.querySelector("#pp-ok").onclick = () => rate(c, true); }
     }
-    root.querySelector("#pp-back").onclick = () => { stopAudio(); home(); };
+    root.querySelector("#pp-back").onclick = () => { stopAudio(); if (window.NAV) NAV.back(home); else home(); }; // 回到上一个页面
     root.querySelector("#pp-gear2").onclick = () => window.openVocabSettings && window.openVocabSettings();
     root.querySelector("#pp-speed").onclick = () => { opt.speed = opt.speed === 1 ? 0.75 : opt.speed === 0.75 ? 0.5 : 1; LS("pump:opt", opt); show(); say(c); }; // 同 RL：1x → 0.75x → 0.5x
     root.querySelector("#pp-keys").onclick = () => { const k = root.querySelector(".pp-keyhelp"); if (k) return k.remove(); const d = document.createElement("div"); d.className = "pp-keyhelp"; d.innerHTML = "<b>快捷键</b>" + [["A / ←", "上一个"], ["S / ↓ / 空格", "播放"], ["E", "显示（听力：先原文、再翻译）/ 看答案（测验）"], ["D / →", "下一个"], ["Z / C", "测验：忘了 / 记得"], ["Z / X / C", "建议：已知 / 学习 / 跳过"], ["R", "收藏这句（☆）"]].map(x => "<div><kbd>" + x[0] + "</kbd>" + x[1] + "</div>").join(""); d.onclick = () => d.remove(); root.querySelector(".pp-top").after(d); };
@@ -599,6 +601,7 @@
   }
   let lastSum = "";
   function finish() { // 练完一组：回到首页（同 PhrasePump）；这一组每个词的掌握进度放在首页最上面（我们加的）
+    if (window.NAV && playing) NAV.back(); // 🔙 练完：退掉「练习中」那条历史，不然后退一次什么也不变
     playing = false; root.classList.remove("pp-known");
     const S = srs(), seenW = new Map(); cards.forEach(c => { if (!c.w.sg && !c.w.pump && !seenW.has(c.w.id)) seenW.set(c.w.id, c); });
     const rows = [...seenW.values()].map(c => ({ w: c.w, a: c.m0 || 0, b: mastery(S[c.w.id], c.w), k: !!c.w.justKnown })).sort((x, y) => y.k - x.k || (y.b - y.a) - (x.b - x.a));

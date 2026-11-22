@@ -586,9 +586,10 @@
   function draw() {
     if (!root) return;
     if (busy) { root.innerHTML = '<div class="dr-empty">⏳ ' + esc(busy) + "</div>"; return; }
-    if (err) { const e = err; err = ""; root.innerHTML = '<div class="dr-empty">没打开：' + esc(e) + '<br><br><button class="ui-btn" data-a="home">← 回到列表</button></div>'; return; }
+    if (err) { const e = err; err = ""; root.innerHTML = '<div class="dr-empty">没打开：' + esc(e) + '<br><br><button class="ui-btn" data-a="errhome">← 回到列表</button></div>'; return; }
     root.innerHTML = view === "lesson" && C ? lessonView() : view === "ep" && M ? epView() : home();
     const inp = root.querySelector("#dr-in"); if (inp) try { inp.focus({ preventScroll: true }); } catch (e) {}
+    if (window.NAV) NAV.mark(); // 🔙 换栏目 / 打开一期 / 开始一节：记一条页面历史（nav.js）；一节课里翻卡片不算换页
   }
   function go(i, auto) {
     if (!C) return; rpStop(); if (REC) recStop(true);
@@ -614,8 +615,9 @@
     saveProg(M.id, LI, S.sc, first);
     if (first) logAdd(o => { o.n++; o.q += S.done; o.ok += S.right; });
   }
+  let navEp = null; // 🔙 正在打开的那一期（加载完之前 M 还是旧的，页面历史要用）
   async function openEp(id) {
-    const lg = LANG().cur(), P = PROV[lg]; if (!P) return;
+    const lg = LANG().cur(), P = PROV[lg]; if (!P) return; navEp = id;
     setLast(id);
     if (!MODELS[lg + "/" + id]) {
       busy = "打开中…"; draw();
@@ -692,11 +694,12 @@
     const ro = t.closest("[data-role]"); if (ro) return rpStart(ro.dataset.role);
     const b = t.closest("[data-a]"); if (!b) return; const a = b.dataset.a, c = C && C.cards[ci];
     if (a === "en") { if (window.LANG) LANG().set("en"); return; }
-    if (a === "home") { view = "home"; hush(); rpStop(); if (REC) recStop(true); return draw(); }
+    if (a === "home") { hush(); rpStop(); if (REC) recStop(true); const home = () => { view = "home"; draw(); }; return window.NAV ? NAV.back(home) : home(); } // 回到上一个页面
+    if (a === "errhome") { view = "home"; return draw(); } // 没打开那一期：直接回列表（没有新的一页可退）
     if (a === "review") return openReview();
     if (a === "more") { const k = LANG().cur() + "/" + curSer(); MORE[k] = (MORE[k] || 30) + 60; return draw(); }
     if (a === "relist") { delete LISTS[LANG().cur() + "/" + curSer()]; return draw(); }
-    if (a === "ep") { if (C && C.review) { view = "home"; hush(); return draw(); } view = "ep"; hush(); rpStop(); if (REC) recStop(true); return draw(); }
+    if (a === "ep") { hush(); rpStop(); if (REC) recStop(true); const up = () => { view = C && C.review ? "home" : "ep"; draw(); }; return window.NAV ? NAV.back(up) : up(); } // 回到上一个页面
     if (a === "prev") return go(ci - 1);
     if (a === "next") return go(ci + 1);
     if (a === "play") { if (c && c.k === "voc") return sayWord(M.vocab[c.v].w); if (c && c.s != null && c.k !== "role") play(c.s); return; }
@@ -731,6 +734,16 @@
     else if (/^[1-9]$/.test(k) && c.k === "ord") { e.preventDefault(); ordPick(+k - 1); }
   }
 
+  // 🔙 页面历史：哪个栏目、打开了哪一期、在做第几节（看不到这一页时不记）
+  if (window.NAV) NAV.reg("drill", () => root && root.getClientRects().length ? { ser, ep: busy ? navEp : view !== "home" && M ? M.id : null, li: !busy && view === "lesson" && C ? (C.review ? -1 : LI) : null } : undefined, async x => {
+    if (!x || !root) return; const stop = () => { hush(); rpStop(); if (REC) recStop(true); };
+    if (x.ser && x.ser !== ser) { ser = x.ser; LS("drill:ser", ser); }
+    if (!x.ep) { if (view !== "home") { stop(); view = "home"; } return draw(); }
+    if (x.li === -1) { if (!(view === "lesson" && C && C.review)) { stop(); openReview(); } return; }
+    if (!(M && M.id === x.ep)) { stop(); await openEp(x.ep); if (!(M && M.id === x.ep)) return; }
+    if (x.li == null) { if (view !== "ep") { stop(); view = "ep"; C = null; draw(); } return; }
+    if (!(view === "lesson" && LI === x.li)) { stop(); openLesson(x.li); }
+  });
   window.drillShow = function () {
     root = document.getElementById("drill"); if (!root) return;
     if (!root.dataset.init) {

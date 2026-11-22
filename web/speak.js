@@ -273,6 +273,7 @@
     root.innerHTML = head() + '<div class="' + (opt.zh ? "" : "sk-hide") + '">' + body + "</div>";
     if (view && view.t === "pair") quizPaint();
     if (view && view.t === "topic") timerPaint();
+    if (window.NAV) NAV.mark(); // 🔙 换了栏目 / 打开了条目：记一条页面历史（nav.js）
   }
   const back = '<button class="ui-btn" data-act="back">← 返回</button>';
   const card = (act, id, title, sub, pv, ok, tags) => '<button class="sk-card" data-act="' + act + '" data-id="' + esc(id) + '"><div class="t"><b>' + (tags || "") + esc(title) + "</b>" + (sub ? "<span>" + esc(sub) + "</span>" : "") + (pv ? '<div class="pv">' + esc(pv) + "</div>" : "") + "</div>" + (ok ? '<span class="ok">✓ 练过</span>' : "") + "<i>›</i></button>";
@@ -934,7 +935,7 @@
       if (a === "qk-again") { if (QK && QK.list[QK.i]) say(QK.list[QK.i].q); return; }
       if (a === "chat-hist") { const c = items("chat:").find(x => x.id === b.dataset.id); if (c) { stopAll(); CH = { sid: c.id, title: c.title, scene: c.scene, msgs: (c.msgs || []).map(m => Object.assign({}, m)), sum: c.sum || null }; draw(); window.scrollTo(0, 0); } return; }
       if (a === "chat-book") { if (CH) chatFixesToBook(CH); return; }
-      if (a === "back") { stopAll(); view = null; draw(); window.scrollTo(0, 0); return; }
+      if (a === "back") { stopAll(); const home = () => { view = null; draw(); window.scrollTo(0, 0); }; if (window.NAV) NAV.back(home); else home(); return; } // 回到上一个页面（不一定是这一栏的列表）
       if (["dialog", "func", "pair", "conn", "topic"].includes(a)) { open(a, b.dataset.id); return; }
       if (a === "mark") { markDone(b.dataset.k); draw(); return; }
       if (a === "play") { if (RP && RP.mode === "play") { stopAll(); draw(); } else { stopAll(); RP = { id: view.id, i: 0, mode: "play" }; rpStep(); } return; }
@@ -958,6 +959,12 @@
     root.addEventListener("change", e => { if (e.target.id === "sk-auto") { chatAuto = e.target.checked; LS("speak:chatAuto", chatAuto); } });
     document.addEventListener("keydown", e => { if (e.key === "Escape" && document.documentElement.classList.contains("show-speak")) { stopAll(); draw(); } });
   }
+  // 🔙 页面历史：口语在哪一栏、打开了哪个条目（看不到口语页时不记）
+  if (window.NAV) NAV.reg("speak", () => document.documentElement.classList.contains("show-speak") ? { sec, v: view ? { t: view.t, id: view.id } : null } : undefined, x => {
+    if (!x) return; const v = x.v && x.v.t ? { t: x.v.t, id: x.v.id } : null;
+    if (x.sec === sec && JSON.stringify(v) === JSON.stringify(view && { t: view.t, id: view.id })) return;
+    stopAll(); if (x.sec && SECS.some(s2 => s2[0] === x.sec) && !MOVED.includes(x.sec)) { sec = x.sec; LS("speak:sec", sec); } view = v; QZ = null; draw(); window.scrollTo(0, 0);
+  });
   window.speakShow = o => { init(); if (!root) return; const was = only; only = MOVED.includes(o) ? o : null; if (was !== only) { stopAll(); view = null; } draw(); if (!D) loadData().then(draw); syPull().then(ch => { if (root && document.documentElement.classList.contains("show-speak")) draw(); }); };
   window.speakHide = () => { if (root) { stopAll(); } };
   // 直达链接（?go=speak）或上次停在口语页：切换标签的代码比本文件先跑，那时还没有 speakShow，这里补画一次
