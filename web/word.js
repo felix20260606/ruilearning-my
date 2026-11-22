@@ -8,6 +8,7 @@
      WORD.bind(容器, { sent(el) → 这个词所在的句子, quiet() → true 时点词不自动朗读, onOpen(w, el) 打开卡片前（比如暂停视频）, onAdd(w) })
        容器里带 data-w="词" 的元素都按这一套处理（点词 + 右键）；一个容器只 bind 一次
      WORD.open(词, 元素, { sent, quiet, onAdd })、WORD.close()、WORD.mark(词, "learn"|"known"|"ignore"|"")
+     WORD.bind(容器, {hover: "rl"}) 停留出 Language Reactor 练习那种小卡片（• 意思 + ✓ 已掌握 + 📖 词典），「🔊 练习」用
      WORD.hover(容器) 只加「停留出小气泡」（bind 已经自带）；鼠标停在词上出两三个意思 + 语法 + 注释 + 词频（同插件），手机上没有
      WORD.html(英文, {level, settings, gram}) → 能点、按水平上色的 html（全站单词颜色都用它）
      WORD.add(词, {sent, silent, learn, from}) 加进生词本（全站加词都用它）→ true 加了 / false 本来就有 / null 失败
@@ -63,6 +64,16 @@
   #wd-mini .gm{font-size:.8em;opacity:.9;margin-top:4px;color:#CFE6FF}
   #wd-mini .fb{display:inline-block;width:52px;height:5px;border-radius:3px;background:rgba(0,0,0,.35);overflow:hidden;vertical-align:middle;margin-top:6px}#wd-mini .fb i{display:block;height:100%;background:#C9A7E8;border-radius:3px}
   #wd-mini .vs-wns{text-align:left;font-size:12.5px;margin-top:5px}
+
+  /* 「🔊 练习」卡片上的停留小卡片（同 Language Reactor 练习）：深色，列两三个意思，下面 ✓ 标已掌握、📖 打开完整词典；鼠标能移进去点按钮 */
+  #wd-mini.rl{transform:translate(-50%,-100%);background:#2f3136;border:1px solid #4a4d53;color:#eef0f2;border-radius:8px;padding:10px 12px 8px;text-align:left;font-size:18px;line-height:1.55;box-shadow:0 8px 24px rgba(0,0,0,.45);pointer-events:auto;min-width:120px}
+  #wd-mini.rl::after{display:none}#wd-mini.rl.dn{transform:translate(-50%,0)}
+  #wd-mini.rl .ms div{white-space:nowrap;opacity:1;padding-left:18px;position:relative}#wd-mini.rl .ms div::before{content:"";position:absolute;left:4px;top:.62em;width:7px;height:7px;border-radius:50%;background:#6b6f76}
+  #wd-mini.rl .bt{display:flex;gap:6px;margin-top:8px}
+  #wd-mini.rl .bt button{flex:1;display:flex;align-items:center;justify-content:center;height:34px;min-width:58px;border-radius:9px;border:0;background:#45484e;cursor:pointer;padding:0}
+  #wd-mini.rl .bt button:hover{background:#55585f}
+  #wd-mini.rl .bt .kn{background:transparent;outline:2px dotted #7CE3B8;outline-offset:-3px}#wd-mini.rl .bt .kn.on{background:#2f6b52;outline:0}
+  .vs-w.wd-hl{background:#3a3d43!important;border-radius:4px}
 `;
   { const st = document.createElement("style"); st.id = "wd-color-css"; st.textContent = COLOR_CSS; (document.head || document.documentElement).append(st); } // 颜色一加载就要有（不等查词卡片）
 
@@ -191,9 +202,12 @@
   /* ---------- 🫧 停留：鼠标停在词上 0.09 秒，词上方出小气泡（同插件看视频）；移开 0.25 秒后消失；点了就换成完整的查词卡片 ---------- */
   const canHover = () => { try { return matchMedia("(hover: hover) and (pointer: fine)").matches; } catch (e) { return false; } };
   let mini = null, hT = 0, xT = 0;
-  function hideMini() { clearTimeout(hT); clearTimeout(xT); if (mini) { mini.remove(); mini = null; } }
-  function showMini(el) {
+  function hideMini() { clearTimeout(hT); clearTimeout(xT); if (mini) { if (mini._el) mini._el.classList.remove("wd-hl"); mini.remove(); mini = null; } }
+  const ICON_OK = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7CE3B8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  const ICON_BOOK = '<svg width="24" height="22" viewBox="0 0 24 22"><path d="M2 3.5C5 2 8.5 2 12 4v15c-3.5-2-7-2-10-.5z" fill="#F2A93B"/><path d="M22 3.5C19 2 15.5 2 12 4v15c3.5-2 7-2 10-.5z" fill="#E8962A"/><path d="M14.5 7.5h5M14.5 10.5h5M14.5 13.5h5" stroke="#7a4a0c" stroke-width="1.3"/></svg>';
+  function showMini(el, style) {
     hideMini(); if (!el.isConnected || (pop && pop.classList.contains("on"))) return;
+    if (style === "rl") return showRl(el);
     const w = el.dataset.w, lw = String(w).toLowerCase().replace(/’/g, "'");
     const g = typeof VS_GRAM_NAME !== "undefined" ? [...el.classList].filter(c => /^g-/.test(c)).map(c => VS_GRAM_NAME[c.slice(2)] && VS_GRAM_NAME[c.slice(2)] + (typeof VS_GRAM_ABBR !== "undefined" && VS_GRAM_ABBR[c.slice(2)] ? " " + VS_GRAM_ABBR[c.slice(2)] : "")).filter(Boolean) : [];
     let notes = ""; try { const S = V() && V().settings ? V().settings() : null; if ((!S || S.n_word !== false) && typeof vsWordNotesHtml === "function" && !/\s/.test(w)) notes = vsWordNotesHtml(w, true) || ""; } catch (e) {}
@@ -216,11 +230,30 @@
       my.querySelector(".ms").innerHTML = m.length ? m.map((x, i) => '<div class="m' + i + '">' + esc(x) + "</div>").join("") : "<div>—</div>"; fix();
     });
   }
+  function showRl(el) { // 同 Language Reactor 练习：• 意思（最多 3 个）+ ✓ 已掌握 / 📖 完整词典
+    const w = el.dataset.w, lw = String(w).toLowerCase().replace(/’/g, "'"), known = () => vsOk() && V().markOf && V().markOf(lw) === "known";
+    const my = mini = document.createElement("div"); my.id = "wd-mini"; my.className = "rl"; my._el = el; el.classList.add("wd-hl");
+    my.innerHTML = '<div class="ms"><div>…</div></div><div class="bt"><button type="button" class="kn' + (known() ? " on" : "") + '" data-m="known" title="已掌握（再点取消）">' + ICON_OK + '</button><button type="button" data-m="dict" title="完整词典">' + ICON_BOOK + "</button></div>";
+    document.body.append(my);
+    const fix = () => {
+      if (mini !== my) return;
+      const r = el.getBoundingClientRect(), H = my.offsetHeight, W = my.offsetWidth, cx = Math.max(W / 2 + 6, Math.min(r.left + r.width / 2, innerWidth - W / 2 - 6));
+      my.style.left = cx + "px"; const up = r.top - 8 - H >= 6; my.classList.toggle("dn", !up); my.style.top = (up ? r.top - 8 : r.bottom + 8) + "px";
+    };
+    fix();
+    my.addEventListener("mouseenter", () => clearTimeout(xT)); my.addEventListener("mouseleave", () => { xT = setTimeout(hideMini, 250); });
+    my.addEventListener("click", e => {
+      const b = e.target.closest("button"); if (!b) return; e.stopPropagation();
+      if (b.dataset.m === "dict") { hideMini(); open(w, el, { sent: el.closest("[data-sent]") ? el.closest("[data-sent]").dataset.sent : "" }); return; }
+      const on = !b.classList.contains("on"); b.classList.toggle("on", on); mark(lw, on ? "known" : "", true);
+    });
+    (window.TR ? TR.word(w) : Promise.resolve({ zh: [] })).then(r => { if (mini !== my) return; const m = (r.zh || []).slice(0, 3); my.querySelector(".ms").innerHTML = m.length ? m.map(x => "<div>" + esc(x) + "</div>").join("") : "<div>—</div>"; fix(); });
+  }
   function hover(box, o) { // 给一个容器里的词（data-w）加上停留气泡；bind 会自动加，只要停留不要点词的页面（视频字幕自己管点击）单独调
     if (!box || box.__wdHover) return; box.__wdHover = 1; o = o || {};
     box.addEventListener("mouseover", e => {
       if (!canHover()) return; const el = e.target.closest && e.target.closest("[data-w]"); if (!el || !box.contains(el) || (o.skip && o.skip(el))) return;
-      clearTimeout(xT); if (mini && mini._el === el) return; clearTimeout(hT); hT = setTimeout(() => showMini(el), 90);
+      clearTimeout(xT); if (mini && mini._el === el) return; clearTimeout(hT); hT = setTimeout(() => showMini(el, o.hover), 90);
     });
     box.addEventListener("mouseout", e => {
       const el = e.target.closest && e.target.closest("[data-w]"); if (!el || (e.relatedTarget && el.contains(e.relatedTarget))) return;

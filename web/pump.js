@@ -609,7 +609,7 @@
     root = document.getElementById("pump"); if (!root) return;
     const st = document.createElement("style"); st.textContent = CSS; document.head.append(st);
     // 卡片上英文句子里的词：全站共用的 word.js（点词查词卡片、右键循环标记，同看视频 / 插件）；标记 / 加词以后重新上色
-    if (window.WORD) WORD.bind(root, { skip: el => !el.closest("#pp-en") || el.closest(".hid"), sent: () => (cards[at] && cards[at].s ? plain(cards[at].s.en) : ""), quiet: () => false, onOpen: () => stopAudio() });
+    if (window.WORD) WORD.bind(root, { skip: el => !el.closest("#pp-en") || el.closest(".hid"), sent: () => (cards[at] && cards[at].s ? plain(cards[at].s.en) : ""), quiet: () => false, onOpen: () => stopAudio(), hover: "rl" }); /* 停留：同 Language Reactor 练习的小卡片（• 意思 + ✓ 已掌握 + 📖 词典） */
     document.addEventListener("word-change", () => { if (playing && cards[at]) colorEn(cards[at]); });
     // 生词本的模式：新加的「⭐ 已保存」排最前，第一次打开默认进它；之后记住上次选的模式
     // ?go=pump / ?go=saved：插件里的「复习」「已保存」按钮直接打开这里
