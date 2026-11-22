@@ -2,7 +2,7 @@
    🐢 慢速对话 Real Easy English / 💬 地道说法 The English We Speak / 📰 新闻英语 Learning English from the News / 📻 6 分钟英语 6 Minute English
    - 顶上一排切换栏目（记住上次选的 sme:s）；每个栏目：最新（或还没听的最新）一期 + 列表
    - 一期页面：播放器（慢 / 正常 / 快）、简介、本期问题、新闻标题、生词表（＋ 加生词本，例句取节目里那一句）、文稿按说话人分行（默认折起来，先盲听）
-     「🀄 中文」开关（sme:zh）：所有英文下面加中文（一层层兜底：本机存的 sme:zhc → 后台 KV / 谷歌 / Workers AI → 浏览器直接问谷歌 → 后台 AI 补缺的句子；还缺就显示「还有 N 句没翻出来 · 重试」，20 秒后自动再试一次）
+     「🀄 中文」开关（sme:zh）：所有英文下面加中文（一层层兜底：本机存的 sme:zhc → 后台存好的（KV，全家共用）→ 浏览器直接问谷歌 → 后台补缺的句子（谷歌没被拦就谷歌，不然 Workers AI）；还缺就显示「还有 N 句没翻出来 · 重试」，20 秒后自动再试一次）
      「📰 在阅读里打开文稿」= 用阅读页打开（按水平上色、点词查词、译文）
    - 播放中切到别的页面：播放器变成底部悬浮条继续播（↩ 回到节目 / ✕ 关掉）；同一个 <audio> 元素在页面和悬浮条之间挪，不会断
    - 听完（播放到 90% 以上，或点「✓ 听完了」）记进 sme:done {期号: 时间}，同步到后台 /api/mine k=sme；「📅 每日」的「听」今天听完一期就自动打勾
@@ -193,7 +193,7 @@
   async function loadZh(id, retry) {
     if (zhBusy[id] || (ZH[id] && !retry && !zhMiss(id))) return; zhBusy[id] = true; zhSt[id] = ""; if (EP && EP.id === id) draw();
     let j = ZH[id] || (ZHC()[id] || {}).j || null;
-    if (!j || zhMissOf(j, id)) { try { const r = await (await fetch("/api/sme?zh=1&ep=" + encodeURIComponent(id))).json(); if (r && r.ok && (!j || zhMissOf(r, id) < zhMissOf(j, id))) j = r; } catch (e) {} }
+    if (!j || zhMissOf(j, id)) { try { const r = await (await fetch("/api/sme?zh=1&co=1&ep=" + encodeURIComponent(id))).json(); if (r && r.ok && (!j || zhMissOf(r, id) < zhMissOf(j, id))) j = r; } catch (e) {} }
     const ep = EPS[id];
     if (ep) {
       const all = zhAll(ep), zh = j ? zhFlat(j, ep) : all.map(() => ""), miss = () => all.map((t, i) => (t && !zh[i] ? i : -1)).filter(i => i >= 0);

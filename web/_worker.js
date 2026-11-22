@@ -567,18 +567,19 @@ function smeIndex(html, slug) {
   return out;
 }
 // 一批英文句子 → 一样多的中文：按行拼起来（每段不超过 1500 字）交给谷歌翻译，行数对不上就拆小再试
-// Workers AI 翻译（不靠谷歌）：先用专门的翻译模型 m2m100 一句一句翻，还没出来的再让大模型成批翻
+// Workers AI 翻译（不靠谷歌）：大模型一次翻 20 句（一次请求最多 50 个外部调用，一句一句翻会超）；没翻出来的再用翻译模型 m2m100 单句补（最多 20 句）
 async function aiTrans(env, arr, idx) {
   const out = {}; if (!env.AI || !idx.length) return out;
-  const one = async i => { try { const r = await env.AI.run("@cf/meta/m2m100-1.2b", { text: clip(arr[i], 1000), source_lang: "en", target_lang: "zh" }); const t = r && String(r.translated_text || "").trim(); if (t && t !== arr[i].trim()) out[i] = t; } catch (e) {} };
-  for (let k = 0; k < idx.length; k += 8) await Promise.all(idx.slice(k, k + 8).map(one));
-  const left = idx.filter(i => !out[i]);
-  for (let k = 0; k < left.length && k < 120; k += 15) {
-    const part = left.slice(k, k + 15); let got = null;
+  const B = []; for (let k = 0; k < idx.length && k < 200; k += 20) B.push(idx.slice(k, k + 20));
+  for (let k = 0; k < B.length; k += 4) await Promise.all(B.slice(k, k + 4).map(async part => {
+    let got = null;
     await aiJson(env, [{ role: "system", content: 'Translate each English text into natural Simplified Chinese. Reply with ONLY JSON {"zh":[...]} with exactly one Chinese string per input, same order.' }, { role: "user", content: JSON.stringify(part.map(i => clip(arr[i], 800))) }],
-      o => Array.isArray(o && o.zh) && o.zh.length === part.length && o.zh.every(x => typeof x === "string") && !!(got = o.zh), 2500).catch(() => null);
-    if (got) part.forEach((i, n) => { if (got[n].trim()) out[i] = got[n].trim(); });
-  }
+      o => Array.isArray(o && o.zh) && o.zh.length === part.length && o.zh.every(x => typeof x === "string") && !!(got = o.zh), 3000).catch(() => null);
+    if (got) part.forEach((i, n) => { if (got[n].trim() && /[\u4e00-\u9fff]/.test(got[n])) out[i] = got[n].trim(); });
+  }));
+  const left = idx.filter(i => !out[i]).slice(0, 20);
+  const one = async i => { try { const r = await env.AI.run("@cf/meta/m2m100-1.2b", { text: clip(arr[i], 1000), source_lang: "en", target_lang: "zh" }); const t = r && String(r.translated_text || "").trim(); if (t && t !== arr[i].trim()) out[i] = t; } catch (e) {} };
+  for (let k = 0; k < left.length; k += 5) await Promise.all(left.slice(k, k + 5).map(one));
   return out;
 }
 async function smeZh(arr, env) {
@@ -652,6 +653,7 @@ async function sme(req, env, u) {
     }
     if (!u.searchParams.get("zh")) return json(x);
     const zk = "sme/zh/" + ep; if (!fresh) { const c = await env.CAPTIONS.get(zk, "json"); if (c) return json(c); }
+    if (u.searchParams.get("co")) return json({ ok: false, error: "not cached" }); // 只要存好的：网页先自己在浏览器里翻（快、不花额度）
     const q = x.q || [], V = x.vocab || [], H = x.heads || [], Ls = x.lines || [];
     const all = [x.intro || "", ...q, ...V.map(v => v[1] || ""), ...V.map(v => v[2] || ""), ...H.map(h => h[0]), ...Ls.map(l => l.t)];
     const zh = await smeZh(all, env); let i = 1; const take = n => { const r = zh.slice(i, i + n); i += n; return r; };
