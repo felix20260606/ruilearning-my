@@ -120,86 +120,35 @@
     return loading;
   }
 
-  /* ---------- 朗读：两个声音（A 用另一个英语声音，B 和其它用「⚙ 设置」里选的） ---------- */
-  let sayId = 0;
-  function voicesEn() { try { return speechSynthesis.getVoices().filter(v => /^en[-_]/i.test(v.lang)); } catch (e) { return []; } }
-  function voiceFor(who) {
-    const main = (typeof chosenVoice !== "undefined" && chosenVoice) || null, L = voicesEn();
-    if (who !== "A") return main;
-    const other = L.find(v => (!main || v.name !== main.name) && /en[-_]US/i.test(v.lang)) || L.find(v => !main || v.name !== main.name);
-    return other || main;
-  }
-  // AI 真人声交给全站共用的 tts.js（window.TTS）：固定句子播预先生成的 /tts/*.mp3，其它现场生成，播不了退回 sysSay（系统语音）
-  const clean = t => String(t).replace(/[{}]/g, "").replace(/\s+/g, " ").trim();
-  function sysSay(t, o, my) {
-    try {
-      speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(t);
-      const v = voiceFor(o.who); if (v) { u.voice = v; u.lang = v.lang; } else u.lang = "en-US";
-      u.rate = (o.rate || opt.rate) * (o.slow ? 0.75 : 1); u.pitch = o.who === "A" ? 1.05 : 1;
-      u.onend = () => { if (my === sayId && o.end) o.end(); }; u.onerror = () => { if (my === sayId && o.end) o.end(true); };
-      speechSynthesis.speak(u);
-    } catch (e) { tip("这个浏览器不能朗读"); if (o.end) o.end(true); }
-  }
-  function say(text, o) {
-    o = o || {}; const my = ++sayId, t = clean(text);
-    realStop(); if (window.TTS) TTS.stop();
-    try { speechSynthesis.cancel(); } catch (e) {}
-    if (window.TTS && TTS.play(t, { who: o.who, rate: (o.rate || opt.rate) * (o.slow ? 0.75 : 1), end: () => { if (my === sayId && o.end) o.end(); }, fallback: () => { if (my === sayId) sysSay(t, o, my); } })) return;
-    sysSay(t, o, my);
-  }
-  function hush() { sayId++; realStop(); if (window.TTS) TTS.stop(); try { speechSynthesis.cancel(); } catch (e) {} }
-  /* 「🔊 发音」最小对立词的真人录音：web/pron-real.json（tools/gen-pron.mjs 从维基词典找的 Wikimedia Commons 录音，CC BY-SA 等授权）
-     点词、听音辨词优先播真人录音；没有录音的词（少数几个）才用 AI 声音。upload.wikimedia.org 在大陆打不开时 NET 会换成后台中转 */
-  let REAL = null, realLoading = null, realA = null;
-  function realLoad() { if (!realLoading) realLoading = fetch("pron-real.json?v=1").then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => { REAL = j || {}; if (view && view.t === "pair") draw(); }); return realLoading; }
-  const realOf = w => (REAL && REAL[String(w || "").toLowerCase().trim()]) || null;
-  function realStop() { if (realA) { try { realA.pause(); } catch (e) {} realA = null; } }
-  function sayWord(w, o) { // 真人录音；没有 / 播不了就用 say()
-    o = o || {}; const x = realOf(w); if (!x) { say(w, o); return; }
-    hush(); const my = sayId, a = new Audio(window.NET ? NET.src(x.u) : x.u); realA = a;
-    a.playbackRate = Math.max(0.7, Math.min(1, (o.rate || 1) * (o.slow ? 0.75 : 1)));
-    let fell = false; const fall = () => { if (fell || my !== sayId || realA !== a) return; fell = true; realA = null; say(w, o); };
-    a.onended = () => { if (my === sayId && realA === a) realA = null; };
-    a.addEventListener("error", () => { if (!window.NET || /\/api\/px\?/.test(a.src)) fall(); }); // 直连出错 NET 会换成中转再试；中转也不行才用 AI 声音
-    if (window.NET) NET.audio(a); // 要在上面那个监听之后加：NET 换地址前，上面先看到的还是直连地址
-    a.play().catch(e => { if (e && e.name === "NotAllowedError") fall(); });
-  }
+  /* ---------- 朗读：全站共用的 tts.js（TTS.say 先 AI 真人声、不行系统语音；TTS.word 单词先放真人录音；A 用另一个声音） ---------- */
+  const rateOf = o => (o.rate || opt.rate) * (o.slow ? 0.75 : 1);
+  function say(text, o) { o = o || {}; if (window.TTS) TTS.say(text, { who: o.who, rate: rateOf(o), base: 1, lang: "en", end: o.end }); else if (o.end) o.end(true); }
+  function hush() { if (window.TTS) TTS.hush(); }
+  /* 「🔊 发音」最小对立词的真人录音：web/pron-real.json（tools/gen-pron.mjs 从维基词典找的 Wikimedia Commons 录音，CC BY-SA 等授权），播放在 tts.js 的 TTS.word */
+  let REAL = null;
+  function realLoad() { return TTS.realLoad().then(j => { if (!REAL) { REAL = j; if (view && view.t === "pair") draw(); } }); }
+  const realOf = w => (window.TTS && TTS.realOf(w)) || null;
+  function sayWord(w, o) { o = o || {}; TTS.word(w, { rate: rateOf(o), base: 1, lang: "en" }); }
 
-  /* ---------- 录音和打分（同「🔊 练习」的跟读卡） ---------- */
-  const toks = t => String(t || "").toLowerCase().replace(/[’‘]/g, "'").replace(/[^a-z0-9'\s-]+/g, " ").split(/[\s-]+/).map(x => x.replace(/^'+|'+$/g, "")).filter(Boolean);
-  function align(target, said) {
-    const a = toks(target), b = toks(said), n = a.length, m = b.length, T = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
-    for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) T[i][j] = a[i] === b[j] ? T[i + 1][j + 1] + 1 : Math.max(T[i + 1][j], T[i][j + 1]);
-    const hit = new Array(n).fill(false), extra = []; let i = 0, j = 0;
-    while (i < n && j < m) { if (a[i] === b[j]) { hit[i] = true; i++; j++; } else if (T[i + 1][j] >= T[i][j + 1]) i++; else extra.push(b[j++]); }
-    while (j < m) extra.push(b[j++]);
-    return { a, hit, extra, score: n ? hit.filter(Boolean).length / n : 0 };
-  }
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const RES = {}; // key → {url, said, res, best, busy, noai}
-  let rec = null;
-  function recStop(cancel) { if (!rec) return; const r = rec; rec = null; r.cancel = !!cancel; try { if (r.sr) r.sr.stop(); } catch (e) {} try { if (r.mr && r.mr.state !== "inactive") r.mr.stop(); else if (r.stream) { r.stream.getTracks().forEach(t => t.stop()); if (!r.cancel) recDone(r); } } catch (e) {} clearTimeout(r.t); paintRec(r.key); }
+  /* ---------- 录音和打分：全站共用的 rec.js（REC），同「🔊 练习」的跟读卡 ---------- */
+  const toks = t => REC.toks(t, "en"), align = (target, said) => REC.score(target, said, { lang: "en" });
+  const SR = REC.SR;
+  const RES = {}; // key → {url, said, res, best, busy, noai, on}
+  const recOn = () => REC.cur() != null;
+  function recStop(cancel) { if (recOn()) REC.stop(cancel); }
   // key：这条的编号；target：要读的句子（话题卡没有目标句，只录音、转文字）；max：最长秒数；after：录完以后要做的事
-  async function recStart(key, target, max, after) {
-    if (rec) { const same = rec.key === key; recStop(false); if (same) return; }
-    hush(); let stream;
-    try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { tip("没拿到麦克风：请在浏览器地址栏允许使用麦克风"); return; }
-    const r = rec = { key, target, after, stream, chunks: [], srText: "" };
-    try { r.mr = new MediaRecorder(stream); } catch (e) { r.mr = null; }
-    if (SR) { try { const sr = r.sr = new SR(); sr.lang = "en-US"; sr.interimResults = false; sr.continuous = true; sr.onresult = e => { r.srText = [...e.results].map(x => x[0].transcript).join(" "); }; sr.onerror = () => {}; sr.start(); } catch (e) { r.sr = null; } }
-    if (r.mr) { r.mr.ondataavailable = e => { if (e.data && e.data.size) r.chunks.push(e.data); }; r.mr.onstop = () => { stream.getTracks().forEach(t => t.stop()); if (!r.cancel) recDone(r); }; r.mr.start(); }
-    else if (!r.sr) { stream.getTracks().forEach(t => t.stop()); rec = null; tip("这个浏览器不能录音"); return; }
-    (RES[key] = RES[key] || {}).on = true; paintRec(key);
-    r.t = setTimeout(() => { if (rec === r) recStop(false); }, (max || 20) * 1000);
+  function recStart(key, target, max, after) {
+    const x = () => (RES[key] = RES[key] || {});
+    REC.toggle(key, { lang: "en", max: max || 20, before: hush,
+      start: () => { x().on = true; paintRec(key); },
+      cancel: () => { x().on = false; paintRec(key); },
+      busy: () => { x().on = false; x().busy = true; paintRec(key); },
+      done: y => recDone({ key, target, after }, y) });
   }
-  async function recDone(r) {
-    const x = RES[r.key] = RES[r.key] || {}; x.on = false; x.busy = true; paintRec(r.key);
-    const blob = r.chunks.length ? new Blob(r.chunks, { type: r.chunks[0].type || "audio/webm" }) : null;
-    if (blob) { try { if (x.url) URL.revokeObjectURL(x.url); } catch (e) {} x.url = URL.createObjectURL(blob); }
-    let text = "";
-    if (blob) { try { const j = await (await fetch("/api/stt", { method: "POST", headers: { "Content-Type": blob.type }, body: blob })).json(); if (j && j.ok) text = j.text || ""; else if (j && j.error === "noai") x.noai = true; } catch (e) {} }
-    if (!text) { await new Promise(res => setTimeout(res, 600)); text = r.srText; }
+  function recDone(r, y) {
+    const x = RES[r.key] = RES[r.key] || {}, blob = y.blob, text = y.text; x.on = false;
+    if (y.url) { try { if (x.url) URL.revokeObjectURL(x.url); } catch (e) {} x.url = y.url; }
+    if (y.noai) x.noai = true;
     x.busy = false; x.said = text;
     if (r.target) { x.res = text ? align(r.target, text) : null; if (x.res) x.best = Math.max(x.best || 0, x.res.score); }
     if (blob && (r.target || r.key.indexOf("t:") === 0)) archive(r.key, x, r.target, blob); // 存进「📼 我的录音」
@@ -870,7 +819,7 @@
   }
 
   /* ---------- 事件 ---------- */
-  function stopAll() { hush(); RP = null; SH = null; QK = null; if (TM) { clearInterval(TM.t); TM = null; } if (rec) recStop(true); }
+  function stopAll() { hush(); RP = null; SH = null; QK = null; if (TM) { clearInterval(TM.t); TM = null; } recStop(true); }
   function open(t, id) { stopAll(); view = { t, id }; QZ = null; draw(); window.scrollTo(0, 0); }
   function init() {
     if (root) return; const host = document.getElementById("view-speak"); if (!host) return;
@@ -923,7 +872,7 @@
       if (a === "coach") { coachRun(); return; }
       if (a === "how-go") { const i = root.querySelector("#sk-how"); howGo(i && i.value); return; }
       if (a === "uw-new") { uwPick(); draw(); return; }
-      if (a === "mk-next") { if (rec) recStop(false); MK.i++; draw(); window.scrollTo(0, 0); const q = MK.qs[MK.i]; if (q) setTimeout(() => say(q.q), 300); else mockRate(); return; }
+      if (a === "mk-next") { recStop(false); MK.i++; draw(); window.scrollTo(0, 0); const q = MK.qs[MK.i]; if (q) setTimeout(() => say(q.q), 300); else mockRate(); return; }
       if (a === "mk-rate") { mockRate(); return; }
       if (a === "mk-again") { mockNew(); draw(); return; }
       if (a === "dr-show") { SHOWN[b.dataset.k] = 1; draw(); const d = (D.drills || []).find(x => view && x.id === view.id), i = +b.dataset.k.split(":").pop(); if (d && d.items[i]) say(d.items[i].en); return; }
@@ -941,7 +890,7 @@
       if (a === "play") { if (RP && RP.mode === "play") { stopAll(); draw(); } else { stopAll(); RP = { id: view.id, i: 0, mode: "play" }; rpStep(); } return; }
       if (a === "rp") { if (RP && RP.mode === "rp") { stopAll(); draw(); } else { stopAll(); RP = { id: view.id, i: 0, mode: "rp", shown: {} }; rpStep(); } return; }
       if (a === "rp-show") { if (RP) { (RP.shown = RP.shown || {})[+b.dataset.i] = true; draw(); const d = D.dialogs.find(x => x.id === RP.id); if (d) say(d.lines[RP.i].en); } return; }
-      if (a === "rp-next") { if (RP) { if (rec) recStop(true); RP.i++; rpStep(); } return; }
+      if (a === "rp-next") { if (RP) { recStop(true); RP.i++; rpStep(); } return; }
       if (a === "sh") { if (SH) { stopAll(); draw(); } else { stopAll(); SH = { g: shadowGroup, i: 0 }; shStep(); } return; }
       if (a === "qz-go") { QZ = null; quizNew(); return; }
       if (a === "qz-next") { quizNew(); return; }

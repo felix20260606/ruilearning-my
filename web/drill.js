@@ -257,23 +257,15 @@
 
   // ---------- 放音：原声的一段（[s, e]），没时间就用浏览器朗读；onEnd = 这段放完（角色扮演用） ----------
   const AU = new Audio(); AU.preload = "auto"; if (window.NET && NET.audio) try { NET.audio(AU); } catch (e) {}
-  let stopAt = 0, raf = 0, endCb = null, ttsTok = 0; window.DRILL.au = AU; // 测试用
+  let stopAt = 0, raf = 0, endCb = null; window.DRILL.au = AU; // 测试用
   const fire = () => { const f = endCb; endCb = null; if (f) f(); };
   function tick() { if (!AU.paused && stopAt && AU.currentTime >= stopAt) { AU.pause(); stopAt = 0; fire(); } if (!AU.paused) raf = requestAnimationFrame(tick); }
   AU.addEventListener("ended", fire);
   AU.addEventListener("timeupdate", () => { if (stopAt && AU.currentTime >= stopAt) { AU.pause(); stopAt = 0; fire(); } }); // 后台标签页里没有帧：靠这个停
-  function hush() { endCb = null; ttsTok++; try { AU.pause(); } catch (e) {} stopAt = 0; try { speechSynthesis.cancel(); } catch (e) {} }
+  function hush() { endCb = null; try { AU.pause(); } catch (e) {} stopAt = 0; if (window.TTS) TTS.hush(); else try { speechSynthesis.cancel(); } catch (e) {} }
   function others() { try { if (window.smePause) smePause(); } catch (e) {} try { if (window.videoCore && videoCore.pause) videoCore.pause(); } catch (e) {} }
-  function sayTTS(t, rate, onEnd) {
-    try {
-      if (!("speechSynthesis" in window)) return tip("这个浏览器不能朗读");
-      speechSynthesis.cancel(); const tok = ++ttsTok;
-      const u = new SpeechSynthesisUtterance(t), bcp = LANG().cfg().bcp; u.lang = bcp;
-      const v = speechSynthesis.getVoices().find(x => x.lang && x.lang.replace("_", "-").toLowerCase().startsWith(bcp.slice(0, 2))); if (v) u.voice = v;
-      u.rate = 0.95 * (rate || 1); if (onEnd) u.onend = () => { if (tok === ttsTok) onEnd(); };
-      speechSynthesis.speak(u);
-    } catch (e) {}
-  }
+  // 没有原声时间的句子：全站共用的朗读（tts.js：英语先 AI 真人声，其它语言 / 播不了用系统语音）
+  function sayTTS(t, rate, onEnd) { if (window.TTS) TTS.say(t, { lang: LANG().cur(), rate: rate || 1, base: 0.95, end: onEnd ? () => onEnd() : null }); else tip("这个浏览器不能朗读"); }
   function play(si, slow, onEnd) {
     const x = M && M.sents[si]; if (!x) return; others(); hush();
     const rate = slow ? 0.75 : opt().rate;
@@ -284,61 +276,31 @@
     const go = () => { try { AU.currentTime = x.s; } catch (e) {} AU.playbackRate = rate; stopAt = x.e; AU.play().then(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(tick); }).catch(() => tip("原声放不出来，点一下 🔊 再试")); };
     if (AU.readyState >= 1) go(); else AU.addEventListener("loadedmetadata", go, { once: true });
   }
-  function sayWord(w) { others(); hush(); if (LANG().cur() === "en" && typeof window.speak === "function") window.speak(w); else sayTTS(w); }
+  function sayWord(w) { others(); hush(); if (window.TTS) TTS.say(w, { lang: LANG().cur() }); }
 
-  // ---------- 🎙 录音打分（跟读、看中文说外语）：录下来交给 /api/stt（Whisper），和原句逐词比 ----------
-  const fold = w => { let t = String(w).toLowerCase(); if (LANG().cur() === "de") t = t.replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss"); return t; };
-  const ntokL = t => LANG().words(t).map(fold);
-  function near(a, b) { // 一样，或者长词只差一个字母
-    if (a === b) return true; if (a.length < 5 || Math.abs(a.length - b.length) > 1) return false;
-    let i = 0, j = 0, d = 0; while (i < a.length && j < b.length) { if (a[i] === b[j]) { i++; j++; continue; } if (++d > 1) return false; if (a.length > b.length) i++; else if (b.length > a.length) j++; else { i++; j++; } }
-    return d + (a.length - i) + (b.length - j) <= 1;
-  }
-  function lcsHit(a, b, eq) { // a 的每个词在 b 里有没有（按顺序最长公共子序列）
-    eq = eq || ((x, y) => x === y);
-    const n = a.length, m = b.length, W = m + 1, T = new Uint16Array((n + 1) * (m + 1));
-    for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) T[i * W + j] = eq(a[i], b[j]) ? T[(i + 1) * W + j + 1] + 1 : Math.max(T[(i + 1) * W + j], T[i * W + j + 1]);
-    const hit = new Array(n).fill(false); let i = 0, j = 0;
-    while (i < n && j < m) { if (eq(a[i], b[j]) && T[i * W + j] === T[(i + 1) * W + j + 1] + 1) { hit[i] = true; i++; j++; } else if (T[(i + 1) * W + j] >= T[i * W + j + 1]) i++; else j++; }
-    return hit;
-  }
-  function markHtml(t, hit) { // 原句：对的词绿、没对上的红
-    let k = 0;
-    return String(t).split(/(\s+)/).map(w => { if (!w || /^\s+$/.test(w)) return w; const n = LANG().words(w).length; if (!n) return esc(w); const good = hit.slice(k, k + n).every(Boolean); k += n; return '<span class="' + (good ? "hk" : "hm") + '">' + esc(w) + "</span>"; }).join("");
-  }
-  let REC = null;
-  async function recToggle() {
+  // ---------- 🎙 录音打分（跟读、看中文说外语）：全站共用的 rec.js（REC）录音 → /api/stt 转文字（不行用浏览器语音识别）→ 和原句逐词比（长词差一个字母也算对；德语 ä→ae 也算对） ----------
+  const markHtml = (t, hit) => REC.mark(t, hit, { lang: LANG().cur(), ok: "hk", no: "hm" }); // 原句：对的词绿、没对上的红
+  let RC = null; // 正在录的那张卡 {key, t, cards, k}
+  function recToggle() {
     const c = C && C.cards[ci]; if (!c || c.s == null) return;
-    if (REC) { recStop(false); return; }
-    hush(); rpStop();
-    let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { tip("没拿到麦克风：请在浏览器地址栏允许使用麦克风"); return; }
-    const x = M.sents[c.s], r = REC = { stream, chunks: [], srText: "", key: ci, t: x.t, cards: C, k: c.k };
-    try { r.mr = new MediaRecorder(stream); r.mr.ondataavailable = e => { if (e.data && e.data.size) r.chunks.push(e.data); }; r.mr.onstop = () => { stream.getTracks().forEach(t => t.stop()); recDone(r); }; r.mr.start(); } catch (e) { r.mr = null; }
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SR) try { const sr = r.sr = new SR(); sr.lang = LANG().cfg().bcp; sr.continuous = true; sr.onresult = e => { r.srText = [...e.results].map(y => y[0].transcript).join(" "); }; sr.onerror = () => {}; sr.start(); } catch (e) { r.sr = null; }
-    if (!r.mr && !r.sr) { stream.getTracks().forEach(t => t.stop()); REC = null; tip("这个浏览器不能录音"); return; }
-    RS[ci] = { on: true }; draw();
+    if (RC) { recStop(false); return; }
+    const x = M.sents[c.s], r = { key: ci, t: x.t, cards: C, k: c.k };
     const dur = x.s != null && x.e != null ? x.e - x.s : LANG().words(x.t).length * 0.45;
-    r.timer = setTimeout(() => { if (REC === r) recStop(false); }, Math.min(30, dur * 2 + 3) * 1000);
+    REC.toggle("drill:" + ci, { lang: LANG().cur(), max: Math.min(30, dur * 2 + 3), before: () => { hush(); rpStop(); },
+      start: () => { RC = r; RS[r.key] = { on: true }; draw(); },
+      cancel: () => { if (RC === r) RC = null; if (r.cards === C && RS[r.key] && RS[r.key].on) { delete RS[r.key]; draw(); } },
+      busy: () => { if (RC === r) RC = null; RS[r.key] = { busy: true }; if (C === r.cards) draw(); },
+      done: y => recDone(r, y) });
   }
-  function recStop(cancel) {
-    const r = REC; if (!r) return; REC = null; clearTimeout(r.timer); r.cancel = !!cancel;
-    try { if (r.sr) r.sr.stop(); } catch (e) {}
-    if (r.mr && r.mr.state !== "inactive") r.mr.stop(); else { r.stream.getTracks().forEach(t => t.stop()); recDone(r); }
-  }
-  async function recDone(r) {
-    if (r.cancel) { if (r.cards === C && RS[r.key] && RS[r.key].on) { delete RS[r.key]; draw(); } return; }
-    RS[r.key] = { busy: true }; if (C === r.cards) draw();
-    const blob = r.chunks.length ? new Blob(r.chunks, { type: r.chunks[0].type || "audio/webm" }) : null; let text = "";
-    if (blob) try { const j = await (await fetch("/api/stt?lang=" + LANG().cur(), { method: "POST", headers: { "Content-Type": blob.type }, body: blob })).json(); if (j && j.ok) text = j.text || ""; } catch (e) {}
-    if (!text) { await new Promise(res => setTimeout(res, 500)); text = r.srText; }
-    const a = ntokL(r.t), hit = lcsHit(a, ntokL(text), near);
-    const o = { said: text, hit, score: a.length ? Math.round(hit.filter(Boolean).length / a.length * 100) : 0, url: blob ? URL.createObjectURL(blob) : "" };
+  function recStop(cancel) { if (!RC) return; REC.stop(cancel); }
+  function recDone(r, y) {
     if (r.cards !== C) return;
-    RS[r.key] = o; if (r.k === "zh" && !res[r.key]) res[r.key] = { seen: true }; // 看中文说：说完就给看原句
+    const R = REC.score(r.t, y.text, { lang: LANG().cur() });
+    RS[r.key] = { said: y.text, hit: R.hit, score: Math.round(R.score * 100), url: y.url };
+    if (r.k === "zh" && !res[r.key]) res[r.key] = { seen: true }; // 看中文说：说完就给看原句
     draw();
   }
-  function recReset() { if (REC) recStop(true); Object.values(RS).forEach(x => { if (x && x.url) try { URL.revokeObjectURL(x.url); } catch (e) {} }); RS = {}; }
+  function recReset() { recStop(true); Object.values(RS).forEach(x => { if (x && x.url) try { URL.revokeObjectURL(x.url); } catch (e) {} }); RS = {}; }
 
   // ---------- 🎭 角色扮演：原声放别人的台词，轮到你的停下来等你说 ----------
   function rpStart(role) { rpStop(); RP = { ci, role, i: 0, on: false, done: false }; rpGo(); }
@@ -496,7 +458,7 @@
   }
   function zhLine(x, show) { if (!x.zh) return ""; return '<div class="dr-zh"' + (show ? "" : ' style="display:none"') + ">" + esc(x.zh) + (x.zhAll ? " <small>（整段的翻译）</small>" : "") + "</div>"; }
   function recBtns() {
-    const R = RS[ci], on = REC && REC.key === ci && REC.cards === C;
+    const R = RS[ci], on = RC && RC.key === ci && RC.cards === C;
     return '<button class="ui-btn' + (on ? " rec" : "") + '" data-a="rec" title="录音（R）">' + (on ? "⏹ 停" : R && R.score != null ? "🎙 再录一遍" : "🎙 录音") + "</button>" + (R && R.url ? '<button class="ui-btn" data-a="myrec">▶ 我的录音</button>' : "");
   }
   function recHtml(x) {
@@ -592,7 +554,7 @@
     if (window.NAV) NAV.mark(); // 🔙 换栏目 / 打开一期 / 开始一节：记一条页面历史（nav.js）；一节课里翻卡片不算换页
   }
   function go(i, auto) {
-    if (!C) return; rpStop(); if (REC) recStop(true);
+    if (!C) return; rpStop(); recStop(true);
     i = Math.max(0, Math.min(C.cards.length - 1, i));
     if (C.cards[i].k === "end" && !C.redo && !C.review) { // 到小结前：做错的当场再来一遍（不改分）
       const wrong = C.cards.map((c, j) => ({ c, r: res[j] })).filter(o => GRADED.has(o.c.k) && o.r && !o.r.ok);
@@ -670,7 +632,7 @@
     const c = C.cards[ci]; if (!c || c.k !== "dict" || res[ci]) return;
     const inp = root.querySelector("#dr-in"), typed = give ? "" : (inp ? inp.value.trim() : "");
     if (!give && !typed) return tip("先把听到的写下来，或者点「不会，看答案」");
-    const a = ntokL(M.sents[c.s].t), hit = lcsHit(a, ntokL(typed), near), n = hit.filter(Boolean).length;
+    const SC = REC.score(M.sents[c.s].t, typed, { lang: LANG().cur() }), a = SC.a, hit = SC.hit, n = hit.filter(Boolean).length;
     judged(c, a.length > 0 && n === a.length, { typed, hit, sc: a.length ? Math.round(n / a.length * 100) : 0 });
   }
   function ordPick(j) {
@@ -694,12 +656,12 @@
     const ro = t.closest("[data-role]"); if (ro) return rpStart(ro.dataset.role);
     const b = t.closest("[data-a]"); if (!b) return; const a = b.dataset.a, c = C && C.cards[ci];
     if (a === "en") { if (window.LANG) LANG().set("en"); return; }
-    if (a === "home") { hush(); rpStop(); if (REC) recStop(true); const home = () => { view = "home"; draw(); }; return window.NAV ? NAV.back(home) : home(); } // 回到上一个页面
+    if (a === "home") { hush(); rpStop(); recStop(true); const home = () => { view = "home"; draw(); }; return window.NAV ? NAV.back(home) : home(); } // 回到上一个页面
     if (a === "errhome") { view = "home"; return draw(); } // 没打开那一期：直接回列表（没有新的一页可退）
     if (a === "review") return openReview();
     if (a === "more") { const k = LANG().cur() + "/" + curSer(); MORE[k] = (MORE[k] || 30) + 60; return draw(); }
     if (a === "relist") { delete LISTS[LANG().cur() + "/" + curSer()]; return draw(); }
-    if (a === "ep") { hush(); rpStop(); if (REC) recStop(true); const up = () => { view = C && C.review ? "home" : "ep"; draw(); }; return window.NAV ? NAV.back(up) : up(); } // 回到上一个页面
+    if (a === "ep") { hush(); rpStop(); recStop(true); const up = () => { view = C && C.review ? "home" : "ep"; draw(); }; return window.NAV ? NAV.back(up) : up(); } // 回到上一个页面
     if (a === "prev") return go(ci - 1);
     if (a === "next") return go(ci + 1);
     if (a === "play") { if (c && c.k === "voc") return sayWord(M.vocab[c.v].w); if (c && c.s != null && c.k !== "role") play(c.s); return; }
@@ -736,7 +698,7 @@
 
   // 🔙 页面历史：哪个栏目、打开了哪一期、在做第几节（看不到这一页时不记）
   if (window.NAV) NAV.reg("drill", () => root && root.getClientRects().length ? { ser, ep: busy ? navEp : view !== "home" && M ? M.id : null, li: !busy && view === "lesson" && C ? (C.review ? -1 : LI) : null } : undefined, async x => {
-    if (!x || !root) return; const stop = () => { hush(); rpStop(); if (REC) recStop(true); };
+    if (!x || !root) return; const stop = () => { hush(); rpStop(); recStop(true); };
     if (x.ser && x.ser !== ser) { ser = x.ser; LS("drill:ser", ser); }
     if (!x.ep) { if (view !== "home") { stop(); view = "home"; } return draw(); }
     if (x.li === -1) { if (!(view === "lesson" && C && C.review)) { stop(); openReview(); } return; }
@@ -754,7 +716,7 @@
     }
     draw();
   };
-  window.drillHide = () => { hush(); rpStop(); if (REC) recStop(true); };
+  window.drillHide = () => { hush(); rpStop(); recStop(true); };
   // 「📅 每日」用：今天做完几节（n）、复习了几句（rv）、现在这门语言有几句该复习（due）
   window.drillToday = () => {
     const A = LG("drill:log", {}) || {}, d = lday(); let n = 0, rv = 0;

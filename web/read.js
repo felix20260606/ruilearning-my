@@ -468,27 +468,21 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
 
   /* ---------- 朗读：单句、全文逐句（高亮当前句） ---------- */
   let tts = null;
-  function voiceOf(u) { // 和 index.html 的 speak() 用同一个声音、语速
-    try { if (typeof chosenVoice !== "undefined" && chosenVoice) { u.voice = chosenVoice; u.lang = chosenVoice.lang; } else u.lang = "en-US"; } catch (e) { u.lang = "en-US"; }
-    try { u.rate = (typeof state !== "undefined" && state && state.rate) || 0.95; } catch (e) { u.rate = 0.95; }
-  }
   function hiSent(i) { if (!root) return; root.querySelectorAll(".ra-s.cur").forEach(x => x.classList.remove("cur")); const el = i >= 0 && root.querySelector('.ra-s[data-i="' + i + '"]'); if (!el) return; el.classList.add("cur"); const r = el.getBoundingClientRect(); if (r.top < 70 || r.bottom > innerHeight - 110) el.scrollIntoView({ block: "center", behavior: "smooth" }); }
   function syncTts() { if (!root) return; root.querySelectorAll('[data-a="all"]').forEach(b => { if (b.id === "ra-fab") b.classList.toggle("on", !!tts); else b.textContent = tts ? "⏹ 停止朗读" : "▶ 全文朗读"; }); }
-  function stopAll() { if (!tts) return; clearTimeout(tts.t); tts = null; try { speechSynthesis.cancel(); } catch (e) {} hiSent(-1); syncTts(); }
+  function stopAll() { if (!tts) return; clearTimeout(tts.t); tts = null; if (window.TTS) TTS.hush(); hiSent(-1); syncTts(); }
   function readAll(from) {
     if (!("speechSynthesis" in window)) { tip("此环境不支持朗读，可在手机浏览器打开"); return; }
-    stopAll(); if (window.TTS) TTS.stop(); const run = {}; tts = run; syncTts(); // 全文朗读用系统语音（整篇用 AI 声音太费额度）；点单句才用 AI 真人声
+    stopAll(); if (window.TTS) TTS.hush(); const run = {}; tts = run; syncTts(); // 全文朗读用系统语音（整篇用 AI 声音太费额度）；点单句才用 AI 真人声
     const step = i => {
       if (tts !== run) return;
       if (i >= P.sents.length || !root.classList.contains("on") || view !== "read") { stopAll(); if (i >= P.sents.length) tip("读完了"); return; }
       hiSent(i); setPos(i);
-      const u = new SpeechSynthesisUtterance(P.sents[i]); voiceOf(u); let done = false;
+      let done = false;
       const next = () => { if (done || tts !== run) return; done = true; clearTimeout(run.t); run.t = setTimeout(() => step(i + 1), 220); };
-      u.onend = next; u.onerror = e => { if (e && (e.error === "interrupted" || e.error === "canceled")) return; next(); };
+      TTS.sys(P.sents[i], { lang: "en", end: next }); // 全站共用的朗读（tts.js），声音、语速和「⚙ 设置」里选的一样
       run.t = setTimeout(next, 5000 + P.sents[i].length * 140); // 有些浏览器偶尔不触发 onend：超时也往下读
-      try { speechSynthesis.speak(u); } catch (e) { stopAll(); }
     };
-    try { speechSynthesis.cancel(); } catch (e) {}
     setTimeout(() => step(Math.max(0, Math.min(from || 0, P.sents.length - 1))), 80);
   }
   function sayOne(i) { stopAll(); const el = root.querySelector('.ra-s[data-i="' + i + '"]'); if (el) { el.classList.add("flash"); setTimeout(() => el.classList.remove("flash"), 1500); } say(P.sents[i]); setPos(i); }

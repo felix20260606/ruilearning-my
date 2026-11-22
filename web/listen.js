@@ -172,7 +172,7 @@
     for (const k in H) try { M.setActionHandler(k, H[k]); } catch (e) {}
   }
   AU.addEventListener("play", msSet);
-  AU.addEventListener("play", () => { flClosed = false; try { if (window.TTS && TTS.stop) TTS.stop(); speechSynthesis.cancel(); } catch (e) {} try { if (window.videoCore && videoCore.pause) videoCore.pause(); } catch (e) {} sync(); });
+  AU.addEventListener("play", () => { flClosed = false; try { if (window.TTS && TTS.hush) TTS.hush(); else speechSynthesis.cancel(); } catch (e) {} try { if (window.videoCore && videoCore.pause) videoCore.pause(); } catch (e) {} sync(); });
   AU.addEventListener("pause", () => sync());
   AU.addEventListener("timeupdate", () => { if (AU.duration && AU.currentTime / AU.duration > 0.9 && AU.dataset.id) markDone(AU.dataset.id); });
   window.smePause = () => { try { AU.pause(); } catch (e) {} };
@@ -551,38 +551,25 @@
     draw(); step();
   }
   // 🎙 跟读：录这一句（最长 = 句子时长 × 2 + 3 秒），转文字（/api/stt，不行用浏览器语音识别）后逐词打分
-  let rec = null;
-  function recStop(cancel) { if (!rec) return; const r = rec; rec = null; r.cancel = !!cancel; clearTimeout(r.t); try { if (r.sr) r.sr.stop(); } catch (e) {} try { if (r.mr && r.mr.state !== "inactive") r.mr.stop(); else r.stream.getTracks().forEach(t => t.stop()); } catch (e) {} }
-  async function recStart() {
+  const RK = "listen";
+  function recStop(cancel) { if (REC.cur() === RK) REC.stop(cancel); } // 全站共用的 rec.js（REC）
+  function recStart() {
     const d = EP && DK[EP.id], x = d && d.sents && d.sents[d.i]; if (!x) return;
-    if (rec) { recStop(false); return; }
-    autoTok++; d.auto = false; AU.pause();
-    let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { tip("没拿到麦克风：请在浏览器地址栏允许使用麦克风"); return; }
-    const r = rec = { stream, chunks: [], srText: "", id: EP.id, i: d.i }, SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    try { r.mr = new MediaRecorder(stream); r.mr.ondataavailable = e => { if (e.data && e.data.size) r.chunks.push(e.data); }; r.mr.onstop = () => { stream.getTracks().forEach(t => t.stop()); if (!r.cancel) recDone(r); }; r.mr.start(); } catch (e) { r.mr = null; }
-    if (SR) try { const sr = r.sr = new SR(); sr.lang = "en-US"; sr.continuous = true; sr.onresult = e => { r.srText = [...e.results].map(y => y[0].transcript).join(" "); }; sr.onerror = () => {}; sr.start(); } catch (e) { r.sr = null; }
-    if (!r.mr && !r.sr) { stream.getTracks().forEach(t => t.stop()); rec = null; tip("这个浏览器不能录音"); return; }
-    d.rec = { on: true }; draw();
-    r.t = setTimeout(() => { if (rec === r) recStop(false); }, Math.min(30, (x.e - x.s) * 2 + 3) * 1000);
-  }
-  async function recDone(r) {
-    const d = DK[r.id]; if (!d) return; const x = d.sents[r.i]; d.rec = { busy: true }; if (EP && EP.id === r.id) draw();
-    const blob = r.chunks.length ? new Blob(r.chunks, { type: r.chunks[0].type || "audio/webm" }) : null; let text = "";
-    if (blob) try { const j = await (await fetch("/api/stt", { method: "POST", headers: { "Content-Type": blob.type }, body: blob })).json(); if (j && j.ok) text = j.text || ""; } catch (e) {}
-    if (!text) { await new Promise(res => setTimeout(res, 500)); text = r.srText; }
-    const a = ntok(x.t), hit = lcsHit(a, ntok(text));
-    d.rec = { said: text, hit, score: a.length ? hit.filter(Boolean).length / a.length : 0, url: blob ? URL.createObjectURL(blob) : "", i: r.i }; statAdd(o => { o.sh++; });
-    if (EP && EP.id === r.id) draw();
-  }
-  function lcsHit(a, b) {
-    const n = a.length, m = b.length, M = m + 1, T = new Uint16Array((n + 1) * (m + 1));
-    for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) T[i * M + j] = a[i] === b[j] ? T[(i + 1) * M + j + 1] + 1 : Math.max(T[(i + 1) * M + j], T[i * M + j + 1]);
-    const hit = new Array(n).fill(false); let i = 0, j = 0; while (i < n && j < m) { if (a[i] === b[j]) { hit[i] = true; i++; j++; } else if (T[(i + 1) * M + j] >= T[i * M + j + 1]) i++; else j++; }
-    return hit;
+    if (REC.cur() === RK) { recStop(false); return; }
+    const id = EP.id, i = d.i;
+    REC.toggle(RK, { lang: "en", max: Math.min(30, (x.e - x.s) * 2 + 3), before: () => { autoTok++; d.auto = false; AU.pause(); },
+      start: () => { d.rec = { on: true }; draw(); },
+      cancel: () => { if (d.rec && d.rec.on) d.rec = null; },
+      busy: () => { d.rec = { busy: true }; if (EP && EP.id === id) draw(); },
+      done: y => {
+        const dd = DK[id]; if (!dd) return; const R = REC.score(dd.sents[i].t, y.text, { lang: "en" });
+        dd.rec = { said: y.text, hit: R.hit, score: R.score, url: y.url, i }; statAdd(o => { o.sh++; });
+        if (EP && EP.id === id) draw();
+      } });
   }
   function dkCheck() {
     const d = EP && DK[EP.id], x = d && d.sents && d.sents[d.i]; if (!x) return;
-    const a = ntok(x.t), hit = lcsHit(a, ntok(d.typed)), n = a.length;
+    const SC = REC.score(x.t, d.typed, { lang: "en", near: false }), a = SC.a, hit = SC.hit, n = a.length; // 听写是打字：不放宽
     d.res = { hit, score: n ? hit.filter(Boolean).length / n : 0 }; d.show = true; d.why = null;
     statAdd(o => { o.dk++; o.dks += Math.round(d.res.score * 100); });
     if (d.res.score < 0.8 && window.ERR) { const miss = a.filter((w, k) => !hit[k]); window.ERR.add([{ src: "listen", kind: "say", q: "精听时没听出来：听一遍，再跟着读", ctx: x.t, right: x.t, why: "没听出来的词：" + miss.slice(0, 12).join(", ") + "（出自 " + EP.title + "）" }], true); }
@@ -594,15 +581,15 @@
     if (!d) return s + '<div class="sm-intro">整期听完一两遍以后，用这个一句一句抠：每句能单独重复、放慢，也可以先听写再对答案（没听出来的句子会进「❌ 错题本」）。</div><div class="dk-b"><button class="ui-btn pri" data-a="dk">开始逐句精听</button></div></div>';
     if (d.busy) return s + '<div class="sm-intro">正在给每一句对时间（这期第一次用要一两分钟，以后打开就不用等）… <span class="dk-prog">' + esc(d.prog) + "</span></div></div>";
     if (d.err) return s + '<div class="sm-intro">' + esc(d.err) + '</div><div class="dk-b"><button class="ui-btn" data-a="dk">重试</button></div></div>';
-    const x = d.sents[d.i], R = d.res, toks = String(x.t).split(/\s+/);
+    const x = d.sents[d.i], R = d.res;
     let shown = esc(x.t);
-    if (R) { let k = 0; shown = toks.map(w => { const n = ntok(w).length; if (!n) return esc(w); const ok = R.hit.slice(k, k + n).every(Boolean); k += n; return '<span class="' + (ok ? "h" : "m") + '">' + esc(w) + "</span>"; }).join(" "); }
+    if (R) shown = REC.mark(x.t, R.hit, { lang: "en", ok: "h", no: "m" });
     s += '<div class="dk-n">第 ' + (d.i + 1) + " / " + d.sents.length + " 句" + (x.who ? " · " + esc(x.who) : "") + "</div>";
     s += '<div class="dk-t' + (d.show ? "" : " hid") + '">' + (d.show ? shown + (Z && (Z.lines || [])[x.li] ? '<span class="zh">' + esc(Z.lines[x.li]) + "</span>" : "") : "（先别看原文：听几遍，把听到的写下来）") + "</div>";
     const RC = d.rec && (d.rec.i == null || d.rec.i === d.i) ? d.rec : null, reps = +LG("sme:dkreps", 2) || 2, gap = +LG("sme:dkgap", 2) || 2;
     s += '<div class="dk-b"><button class="ui-btn" data-a="dk-prev" title="上一句（←）">⏮</button><button class="ui-btn pri" data-a="dk-play" title="播放这句（空格；R 重放）">▶ 这句</button><button class="ui-btn" data-a="dk-slow" title="慢放（S）">🐢 慢放</button><button class="ui-btn" data-a="dk-next" title="下一句（→）">⏭</button><button class="ui-btn" data-a="dk-show">' + (d.show ? "🙈 藏起原文" : "👀 看原文") + '</button><button class="ui-btn' + (RC && RC.on ? " on" : "") + '" data-a="dk-rec" title="跟着读这一句，逐词打分">' + (RC && RC.on ? "⏹ 读完了" : RC && RC.busy ? "打分中…" : "🎙 跟读") + "</button></div>";
     s += '<div class="dk-b" style="font-size:13px;color:var(--ui-muted);align-items:center"><button class="ui-btn' + (d.auto ? " on" : "") + '" data-a="dk-auto">' + (d.auto ? "⏸ 停止连播" : "🔁 自动连播") + "</button>每句 " + [1, 2, 3].map(n => '<button class="ui-btn' + (reps === n ? " on" : "") + '" data-reps="' + n + '">' + n + " 遍</button>").join("") + " 停 " + [1, 2, 4].map(n => '<button class="ui-btn' + (gap === n ? " on" : "") + '" data-gap="' + n + '">' + n + " 秒</button>").join("") + "</div>";
-    if (RC && RC.hit) { let k = 0; const sh = toks.map(w => { const n = ntok(w).length; if (!n) return esc(w); const ok = RC.hit.slice(k, k + n).every(Boolean); k += n; return '<span class="' + (ok ? "h" : "m") + '">' + esc(w) + "</span>"; }).join(" "); s += '<div class="dk-sc" style="margin:0 0 10px">🎙 跟读 <b>' + Math.round(RC.score * 100) + "%</b>" + (RC.score >= 0.9 ? " 👍" : " 红色的没读出来") + (RC.url ? ' <button class="ui-btn" data-a="dk-me">▶ 听我读的</button>' : "") + '<div class="dk-t" style="font-size:15.5px;margin:6px 0 0">' + sh + "</div>" + (RC.said ? '<div style="color:var(--ui-muted);font-size:13px">识别到：' + esc(RC.said) + "</div>" : "") + "</div>"; }
+    if (RC && RC.hit) { const sh = REC.mark(x.t, RC.hit, { lang: "en", ok: "h", no: "m" }); s += '<div class="dk-sc" style="margin:0 0 10px">🎙 跟读 <b>' + Math.round(RC.score * 100) + "%</b>" + (RC.score >= 0.9 ? " 👍" : " 红色的没读出来") + (RC.url ? ' <button class="ui-btn" data-a="dk-me">▶ 听我读的</button>' : "") + '<div class="dk-t" style="font-size:15.5px;margin:6px 0 0">' + sh + "</div>" + (RC.said ? '<div style="color:var(--ui-muted);font-size:13px">识别到：' + esc(RC.said) + "</div>" : "") + "</div>"; }
     s += '<div style="color:var(--ui-muted);font-size:12px;margin:-4px 0 8px">快捷键：空格 播放这句 · ← → 上一句 / 下一句 · R 重放 · S 慢放；手机锁屏、耳机的「上一首 / 下一首」也能换句</div>';
     s += '<div class="dk-in"><input id="dk-in" placeholder="听写：把这句写下来，回车对答案" autocomplete="off" autocapitalize="off" spellcheck="false" value="' + esc(d.typed) + '"><button class="ui-btn" data-a="dk-check">对答案</button></div>';
     if (R) s += '<div class="dk-sc">听对 <b>' + Math.round(R.score * 100) + "%</b>" + (R.score >= 0.95 ? " 🎉 全对" : R.score >= 0.8 ? " 不错，红色的再听一遍" : " 红色的词没听出来，点 🐢 慢放多听几遍（已收进错题本）") + "</div>" + whyHtml(d);

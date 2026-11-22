@@ -1412,11 +1412,12 @@ function loadVoices(){
 // 全站朗读入口：先交给 AI 真人声（tts.js），播不了再用系统语音；o.rate 是相对正常速度的倍数（练习页的慢速用）
 function speak(text,o){
   o=o||{};
-  if(VLX==="en"&&window.TTS&&TTS.play(text,{rate:o.rate||1,end:o.end,fallback:()=>sysSpeak(text,o)}))return;
+  if(window.TTS&&TTS.say){TTS.say(text,{rate:o.rate||1,end:o.end,lang:VLX});return;} // 全站共用的朗读：tts.js 的 TTS.say（声音、语速按「⚙ 设置」）
   sysSpeak(text,o);
 }
 function sysSpeak(text,o){
   o=o||{};
+  if(window.TTS&&TTS.sys){TTS.sys(text,{rate:o.rate||1,end:o.end,lang:VLX});return;}
   try{
     if(window.TTS)TTS.stop();
     if(!("speechSynthesis" in window)){toast("此环境不支持朗读，可在手机浏览器打开");return;}
@@ -2058,17 +2059,18 @@ refresh(); // show seed words immediately, no waiting on storage
 })();
 </script>
 <script src="lang.js?v=3"></script>
-<script src="tts.js?v=2"></script>
+<script src="tts.js?v=3"></script>
+<script src="rec.js?v=1"></script>
 <script src="watch.js?v=22"></script>
 <script src="channels.js?v=3"></script>
-<script src="pump.js?v=33"></script>
-<script src="speak.js?v=15"></script>
+<script src="pump.js?v=34"></script>
+<script src="speak.js?v=16"></script>
 <script src="basic.js?v=1"></script>
 <script src="quota.js?v=4"></script>
 <script src="daily.js?v=11"></script>
-<script src="read.js?v=17"></script>
-<script src="listen.js?v=19"></script>
-<script src="drill.js?v=5"></script>
+<script src="read.js?v=18"></script>
+<script src="listen.js?v=20"></script>
+<script src="drill.js?v=6"></script>
 <script src="errbook.js?v=3"></script>
 <script src="exam.js?v=5"></script>
 <script src="import.js?v=1"></script>

@@ -395,7 +395,7 @@
     if (!silent) toast("已收进生词本：" + w);
   }
   const sayText = t => { try { speak(t, { rate: opt.speed }); } catch (e) {} }; // speak() 在 index.html：先 AI 真人声（tts.js），不行再系统语音
-  const say = c => { try { if (window.TTS) TTS.stop(); if (player) { player.pause(); player = null; } const m = medOf(c); if (m && m.aud) { try { speechSynthesis.cancel(); } catch (e) {} player = new Audio(m.aud); player.playbackRate = opt.speed; player.play().catch(() => sayText(plain(c.s.en))); return; } sayText(plain(c.s.en)); } catch (e) {} };
+  const say = c => { try { if (window.TTS) TTS.hush(); if (player) { player.pause(); player = null; } const m = medOf(c); if (m && m.aud) { player = new Audio(m.aud); player.playbackRate = opt.speed; player.play().catch(() => sayText(plain(c.s.en))); return; } sayText(plain(c.s.en)); } catch (e) {} };
   const imgs = c => { const m = medOf(c), L = m ? [m.img, m.img2].filter(Boolean) : []; return L.length ? '<div class="pp-img">' + L.map(u => '<img src="' + esc(u) + '" alt="">').join("") + "</div>" : ""; };
   function show() {
     if (at >= cards.length) return finish();
@@ -505,7 +505,7 @@
   const lab2 = { known: "已知", learn: "学习", skip: "跳过（不学习）" };
   function flip(c) { if (c.flip) return; c.flip = true; show(); if (c.s.en) say(c); } // 翻开认词卡，顺便念一下
   function reveal(c) { if (c.k !== "listen") return; c.rev = Math.min(2, c.rev + 1); show(); }
-  const stopAudio = () => { try { if (window.TTS) TTS.stop(); speechSynthesis.cancel(); if (player) player.pause(); } catch (e) {} recStop(true); };
+  const stopAudio = () => { try { if (window.TTS) TTS.hush(); else speechSynthesis.cancel(); if (player) player.pause(); } catch (e) {} recStop(true); };
   function enter() { // 进入当前卡：重新盖上，非测验卡自动播放（同 PhrasePump：换卡时 blur 回到 HIDE_BOTH、测验回到 SHOW_GAP）
     const c = cards[at]; if (!c) return finish(); c.rev = 0; c.spoken = true; c.medSaid = !!medOf(c);
     if (c.k === "recall") c.flip = c.done ? c.flip : false;
@@ -523,15 +523,9 @@
     stopAudio(); at += d; enter();
   }
   // ---------- 听写 / 语法填空 / 跟读（我们加的）----------
-  const toks = t => String(t || "").toLowerCase().replace(/[’‘]/g, "'").replace(/[^a-z0-9'\s-]+/g, " ").split(/[\s-]+/).map(x => x.replace(/^'+|'+$/g, "")).filter(Boolean);
-  function align(target, said) { // 逐词对比（最长公共子序列）：返回目标句每个词有没有对上，以及多出来的词
-    const a = toks(target), b = toks(said), n = a.length, m = b.length, D = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
-    for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) D[i][j] = a[i] === b[j] ? D[i + 1][j + 1] + 1 : Math.max(D[i + 1][j], D[i][j + 1]);
-    const hit = new Array(n).fill(false), extra = []; let i = 0, j = 0;
-    while (i < n && j < m) { if (a[i] === b[j]) { hit[i] = true; i++; j++; } else if (D[i + 1][j] >= D[i][j + 1]) i++; else extra.push(b[j++]); }
-    while (j < m) extra.push(b[j++]);
-    return { a, hit, extra, score: n ? hit.filter(Boolean).length / n : 0 };
-  }
+  // 逐词对比、分词：全站共用的 rec.js（REC.score / REC.toks）；听写是打字，不放宽（near:false）
+  const toks = t => REC.toks(t);
+  const align = (target, said, speech) => REC.score(target, said, { near: !!speech });
   const diffHtml = r => r.a.map((w, i) => '<span class="' + (r.hit[i] ? "ok" : "no") + '">' + esc(w) + "</span>").join(" ") + (r.extra.length ? '<div class="x">多了：' + r.extra.map(esc).join(" ") + "</div>" : "");
   const gans = c => (String(c.s.en).match(/\{([^}]+)\}/) || [])[1] || "";
   const same = (x, y) => { const f = t => toks(t).join(" "); return String(y).split(/\s*\/\s*/).some(alt => f(x) === f(alt)); }; // 语法填空：大小写、标点不算；答案里有 a / b 的都算对
@@ -542,30 +536,21 @@
     show(); say(c);
   }
   function giveUp(c) { if (c.done) return; c.typed = c.typed || ""; if (c.k === "dict") c.res = align(plain(c.s.en), ""); grade(c, false); show(); say(c); }
-  // 跟读：录音（MediaRecorder）→ 后台 /api/stt（Workers AI 的 Whisper）转文字；后台没开 AI 时用浏览器自带的语音识别（Chrome / Edge / Safari；Brave 不行）
-  let rec = null;
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  function recStop(cancel) { if (!rec) return; const r = rec; rec = null; r.cancel = !!cancel; try { if (r.sr) r.sr.stop(); } catch (e) {} try { if (r.mr && r.mr.state !== "inactive") r.mr.stop(); else if (r.stream) r.stream.getTracks().forEach(t => t.stop()); } catch (e) {} }
-  async function recStart(c) {
-    if (rec) return recStop(false);
-    stopAudio(); let stream;
-    try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { toast("没拿到麦克风：请在浏览器地址栏允许使用麦克风"); return; }
-    const r = rec = { c, stream, chunks: [], srText: "" };
-    try { r.mr = new MediaRecorder(stream); } catch (e) { r.mr = null; }
-    if (SR) { try { const sr = r.sr = new SR(); sr.lang = window.VL === "de" ? "de-DE" : "en-US"; sr.interimResults = false; sr.continuous = true; sr.onresult = e => { r.srText = [...e.results].map(x => x[0].transcript).join(" "); }; sr.onerror = () => {}; sr.start(); } catch (e) { r.sr = null; } }
-    if (r.mr) { r.mr.ondataavailable = e => { if (e.data && e.data.size) r.chunks.push(e.data); }; r.mr.onstop = () => { stream.getTracks().forEach(t => t.stop()); if (!r.cancel) recDone(r); }; r.mr.start(); }
-    else if (!r.sr) { stream.getTracks().forEach(t => t.stop()); rec = null; toast("这个浏览器不能录音"); return; }
-    c.recOn = true; c.said = null; show();
-    setTimeout(() => { if (rec === r) recStop(false); }, 20000); // 最长 20 秒
+  // 跟读：全站共用的 rec.js（REC）。录音 → 后台 /api/stt（Workers AI 的 Whisper）转文字；后台没开 AI 时用浏览器自带的语音识别（Chrome / Edge / Safari；Brave 不行）
+  const SR = REC.SR, PK = "pump";
+  function recStop(cancel) { if (REC.cur() === PK) REC.stop(cancel); }
+  function recStart(c) {
+    REC.toggle(PK, { max: 20, before: stopAudio, // 最长 20 秒
+      start: () => { c.recOn = true; c.said = null; show(); },
+      cancel: () => { c.recOn = false; },
+      busy: () => { c.recOn = false; c.busy = true; if (cards[at] === c) show(); },
+      done: y => recDone(c, y) });
   }
-  async function recDone(r) {
-    const c = r.c; c.recOn = false; c.busy = true; if (cards[at] === c) show();
-    const blob = r.chunks.length ? new Blob(r.chunks, { type: r.chunks[0].type || "audio/webm" }) : null;
-    if (blob) { try { if (c.myUrl) URL.revokeObjectURL(c.myUrl); } catch (e) {} c.myUrl = URL.createObjectURL(blob); }
-    let text = "";
-    if (blob) { try { const j = await (await fetch("/api/stt" + (window.VL && window.VL !== "en" ? "?lang=" + window.VL : ""), { method: "POST", headers: { "Content-Type": blob.type }, body: blob })).json(); if (j && j.ok) text = j.text || ""; else if (j && j.error === "noai") c.noai = true; } catch (e) {} }
-    if (!text) { await new Promise(res => setTimeout(res, 600)); text = r.srText; } // 浏览器语音识别的结果稍晚一点才到
-    c.busy = false; c.said = text; c.res = align(plain(c.s.en), text);
+  function recDone(c, y) {
+    if (y.url) { try { if (c.myUrl) URL.revokeObjectURL(c.myUrl); } catch (e) {} c.myUrl = y.url; }
+    if (y.noai) c.noai = true;
+    const text = y.text;
+    c.busy = false; c.said = text; c.res = align(plain(c.s.en), text, true);
     c.best = Math.max(c.best || 0, c.res.score);
     if (cards[at] === c) show();
     if (!text) toast(c.noai && !SR ? "转文字没开：在 Cloudflare 打开 Workers AI，或换 Chrome / Safari" : "没听清，再读一次");
