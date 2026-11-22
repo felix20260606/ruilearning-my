@@ -46,7 +46,7 @@ const path = require("path");
   const fs = require("fs"), R = f => fs.readFileSync(path.join(__dirname, "..", "web", f), "utf8"), h = R("index.html"), dj = R("daily.js"), q = R("quota.js");
   ok(/<script src="quota\.js\?v=\d+"><\/script>\s*<script src="daily\.js/.test(h), "quota.js loaded before daily.js");
   ok(/'<div class="dy">' \+\s*'<div id="dy-quota">' \+ \(window\.quotaHtml/.test(dj), "panel is first thing on the daily page");
-  ok(/localStorage\.getItem\("quota:open"\) === "1"/.test(q), "panel collapsed by default");
+  ok(/let opened = false; const isOpen = \(\) => opened;/.test(q) && !/quota:open/.test(q), "panel always starts collapsed (not remembered)");
   ok(["ai:write", "ai:newsimp", "ai:chat", "ai:chatsum", "ai:speak", "ai:judge", "ai:howto", "ai:useword", "ai:coach", "ai:exam", "ai:ieltsscript", "ai:lquiz", "ai:whymiss", "sme:al", "dw:al", "tts", "stt"].every(k => q.includes('["' + k + '"')), "every AI feature has an entry card");
   ok(/data-qgo="/.test(q) && /function goTo\(g\)/.test(q), "cards jump to the feature");
   ok(["llama-3.3-70b-instruct-fp8-fast", "llama-4-scout-17b-16e-instruct", "aura-1", "whisper-large-v3-turbo", "whisper", "m2m100-1.2b"].every(m => q.includes('"' + m + '"')), "panel lists every model the worker uses");

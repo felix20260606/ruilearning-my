@@ -3,7 +3,7 @@
    否则是 _worker.js 每次调用 AI 后按官方价格表折算的估算（why 说明为什么没读到 Cloudflare）。功能分布（哪个功能花了多少）一直是网站自己记的。
    显示：今天用了多少 / 还剩多少、多久重置、每个模型用了多少、最近 7 天；所有用到 AI 的功能按「听 · 说 · 读写 · 雅思入门」列出来，
    每张卡写着剩下的额度还能做几次（单次花费优先用最近 7 天实际平均），点一下直接跳到那个功能。
-   用法：daily.js 画页面时放 '<div id="dy-quota">' + quotaHtml() + '</div>'；数据回来后这里自己重画那个格子。本机只存 quota:open（默认收起，"1" = 展开） */
+   用法：daily.js 画页面时放 '<div id="dy-quota">' + quotaHtml() + '</div>'；数据回来后这里自己重画那个格子。每次打开页面都是收起的；点「展开」只在这次打开时有效（不记住，不存本机） */
 (function () {
   "use strict";
   if (window.quotaHtml) return;
@@ -100,7 +100,7 @@
   @media(max-width:640px){.qa-grid{grid-template-columns:1fr}.qa-big{font-size:34px}.qa-hero{grid-template-columns:1fr}.qa-side{text-align:left}}`;
 
   let J = null, at = 0, busy = false, err = "";
-  const isOpen = () => { try { return localStorage.getItem("quota:open") === "1"; } catch (e) { return false; } }; // 默认收起
+  let opened = false; const isOpen = () => opened; // 默认收起，不记住
   function load(force) {
     if (busy || (!force && Date.now() - at < 60e3)) return; busy = true;
     fetch("/api/usage").then(r => r.json()).then(j => { if (j && j.ok) { J = j; err = ""; } else err = "读不到用量"; }).catch(() => { err = "读不到用量（网络不通）"; })
@@ -157,7 +157,7 @@
   document.addEventListener("click", e => {
     const b = e.target.closest("[data-qa],[data-qgo]"); if (!b) return;
     if (b.dataset.qgo) { goTo(b.dataset.qgo); return; }
-    if (b.dataset.qa === "tg") { try { localStorage.setItem("quota:open", isOpen() ? "0" : "1"); } catch (x) {} paint(); }
+    if (b.dataset.qa === "tg") { opened = !opened; paint(); }
   });
   setInterval(() => { if (!document.hidden && document.getElementById("dy-quota") && document.documentElement.classList.contains("show-daily")) { load(); paint(); } }, 60e3);
   window.quotaHtml = html;
