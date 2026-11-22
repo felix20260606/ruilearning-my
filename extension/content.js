@@ -72,8 +72,11 @@
   chrome.storage.local.get({ saved: [], savedSents: [], marks: {}, savedCtx: {}, showCtx: false, wtipOff: false, panelMin: false, tags: {} }, v => { wtags = v.tags || {}; panelMin = !!v.panelMin; if (panel) panel.classList.toggle("min", panelMin); savedCtx = v.savedCtx || {}; showCtx = !!v.showCtx; wtip = !v.wtipOff; savedSet = new Set(v.saved.map(w => w.toLowerCase())); VS_SAVED = savedSet; VS_MARKS = v.marks || {}; savedSents = v.savedSents; cur = -1; });
 
   // ---------- 字幕获取 ----------
+  // 开发用的 dev-* / reload-ext：网页里任何脚本都能发这种消息，所以默认不认；要用先在插件后台控制台执行 chrome.storage.local.set({ devHooks: true })
+  let DEV = false; chrome.storage.local.get({ devHooks: false }, v => { DEV = !!(v && v.devHooks); });
   window.addEventListener("message", e => {
     if (e.source !== window || !e.data || e.data.src !== "VS") return;
+    if (/^(dev-|reload-ext$)/.test(e.data.type || "") && !DEV) return;
     if (e.data.type === "dev-level" && e.data.level >= 0) { chrome.storage.sync.set({ level: +e.data.level, ratio: +e.data.ratio || 1.5 }); return; } // 开发用：只允许改词汇水平和比率
     if (e.data.type === "dev-state") { window.postMessage({ src: "VS-R", level: S.level, ratio: S.ratio, merge: S.merge, engine: S.engine, hideMode: S.hideMode, showHuman: S.showHuman, target: S.target }, "*"); return; }
     if (e.data.type === "dev-tts") { send({ type: "tts", text: e.data.text, lang: S.srcLang }).then(r => window.postMessage({ src: "VS-T", text: e.data.text, kb: Math.round((r.a || "").length / 1024), head: (r.a || "").slice(0, 22) }, "*")); return; }
@@ -877,12 +880,15 @@
     saveMedia("med:w:" + k, ci);
     return ci >= 0 ? { t: cues[ci].t, tr: trans[ci] || "" } : null;
   }
+  // 取消标记的记录 unmk = { 小写词: 时间 }：生词本里有这个词时，同步（nbApply）就不再把它标回「将要学习 / 已掌握」；再标一次就去掉
+  function unmk(k, on) { chrome.storage.local.get({ unmk: {} }, v => { const u = (v && v.unmk) || {}; if (on) u[k] = Date.now(); else if (k in u) delete u[k]; else return; chrome.storage.local.set({ unmk: u }); }); }
   function markMany(words) {
-    words.forEach(w => { const k = w.toLowerCase(); delete VS_MARKS[k]; savedSet.add(k); send({ type: "add", word: w, tl: S.target, ctx: noteCtx(k) }); });
+    words.forEach(w => { const k = w.toLowerCase(); delete VS_MARKS[k]; savedSet.add(k); unmk(k, false); send({ type: "add", word: w, tl: S.target, ctx: noteCtx(k) }); });
     chrome.storage.local.set({ marks: VS_MARKS, savedCtx }); refreshMarks(); toast("已标记 " + words.length + " 个词为正在学习");
   }
   function setMark(word, m) { // m: known | ignore | learn | ""
     const k = word.toLowerCase();
+    if (m) unmk(k, false); else if (savedSet.has(k) || VS_MARKS[k] === "known") unmk(k, true);
     if (m === "learn") { Object.keys(VS_MARKS).forEach(x => { if (vsSame(x, k)) delete VS_MARKS[x]; }); savedSet.add(k); send({ type: "add", word, tl: S.target, ctx: noteCtx(k) }); chrome.storage.local.set({ savedCtx }); }
     else {
       // 按原形取消：标 wrote 为已掌握时，之前保存的 write / written 也一起移出“正在学习”

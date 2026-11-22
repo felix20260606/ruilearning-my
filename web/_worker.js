@@ -43,6 +43,12 @@
 const API_PATHS = ["/api/cap"], VOCAB_PATH = "/api/vocab", VOCAB_KEY = "vocab", EXT_PATH = "/api/ext", EXT_KEY = "ext", MEDIA_PATH = "/api/media", SENT_PATH = "/api/sent";
 const json = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", "access-control-allow-origin": "*", "access-control-allow-headers": "content-type,x-key", "access-control-allow-methods": "GET,POST,DELETE,OPTIONS" } });
 const okId = v => /^[\w-]{11}$/.test(v || "");
+// 缓存类写入：KV 当天写入额度（1000 次）用完时 put 会抛错，缓存存不进去不该让这次请求失败（AI / Whisper 已经花了额度）
+const cput = (kv, k, v, o) => kv.put(k, v, o).catch(() => {});
+// 设备发上来的改动时间不能比服务器现在还晚（时钟快的设备会永远赢、项目被「冻住」）；已存的未来时间也按现在算
+const atOk = t => Math.min(+t || 0, Date.now() + 5000);
+// ?fresh=1（跳过缓存重新抓）只给带对口令的人用（还没设口令时谁都能用），免得被人用 GET 刷光 KV 写入额度
+const freshOf = async (req, u, kv) => !!u.searchParams.get("fresh") && (!kv || (await authOf(req, kv)) !== "bad");
 // ---------- 家人（多用户） ----------
 const USERS_KEY = "users", DEF_USERS = [{ id: "", name: "Ray" }];
 let usersMem = null, usersAt = 0;
@@ -118,7 +124,7 @@ async function users(req, env) {
       const name = nm(b.add); if (!name) return json({ ok: false, error: "name" }, 400);
       if (L.some(x => x.name === name)) return json({ ok: false, error: "这个名字已经有了" }, 409);
       if (L.length >= 20) return json({ ok: false, error: "too many" }, 400);
-      let n = 2; while (L.some(x => x.id === "u" + n)) n++;
+      let n = 2; while (L.some(x => x.id === "u" + n) || (await kv.list({ prefix: "u/u" + n + "/", limit: 1 })).keys.length) n++; // 删掉的人留下的数据还在（KV 列表有延迟）：编号不重复用
       const user = { id: "u" + n, name }; L.push(user);
       await kv.put(USERS_KEY, JSON.stringify(L)); usersMem = L; usersAt = Date.now();
       return json({ ok: true, user, users: L });
@@ -137,9 +143,10 @@ async function users(req, env) {
       for (const lp of ["", "l/de/"]) { // 每种学习语言都要是空的
         const v = vnorm(await kv.get(pre + lp + VOCAB_KEY, "json")), e = await kv.get(pre + lp + EXT_KEY, "json");
         if (v.custom.length || v.pending.length || Object.keys(v.srs || {}).length || Object.keys(live((e && e.items) || {})).filter(k => !k.startsWith("set|")).length) return json({ ok: false, error: "这个人已经有生词或保存的内容，不能删" }, 409);
+        for (const mk of MINE_LIST) { const m = await kv.get(pre + lp + "mine:" + mk, "json"); if (m && Object.values(m.items || {}).some(x => x && !x.del)) return json({ ok: false, error: "这个人已经有错题本、阅读或练习记录，不能删" }, 409); }
       }
       const left = L.filter(y => y !== x); await kv.put(USERS_KEY, JSON.stringify(left)); usersMem = left; usersAt = Date.now();
-      const keys = (await kv.list({ prefix: pre })).keys; for (const k of keys) await kv.delete(k.name);
+      let cur; do { const r = await kv.list({ prefix: pre, cursor: cur }); for (const k of r.keys) await kv.delete(k.name); cur = r.list_complete ? null : r.cursor; } while (cur);
       return json({ ok: true, users: left });
     }
     return json({ ok: false, error: "bad body" }, 400);
@@ -176,6 +183,8 @@ async function cap(req, env, u) {
       const raw = await req.text(); if (raw.length > 2000000) return json({ ok: false, error: "too large" }, 413);
       const b = JSON.parse(raw); if (!okId(b.v) || !Array.isArray(b.cues) || !b.cues.length) return json({ ok: false, error: "bad body" }, 400);
       const doc = clean(b); if (!doc.cues.length) return json({ ok: false, error: "bad body" }, 400);
+      const old = kv.getWithMetadata ? await kv.getWithMetadata("v/" + doc.v) : null, on = (old && old.metadata && +old.metadata.n) || 0;
+      if (on >= 20 && doc.cues.length < on * 0.5 && (await authOf(req, kv)) === "bad") return needKey("cap"); // 用少得多的字幕盖掉已有的 = 变相删除：要口令
       await put(kv, doc);
       return json({ ok: true, n: doc.cues.length });
     }
@@ -184,11 +193,15 @@ async function cap(req, env, u) {
 }
 
 // ---------- 生词本 ----------
-const vdef = () => ({ custom: [], progress: {}, deleted: [], pending: [], srs: {} });
+const vdef = () => ({ custom: [], progress: {}, deleted: [], pending: [], srs: {}, progAt: {}, pendAdd: {}, pendDel: {} });
 const isObj = x => x && typeof x === "object" && !Array.isArray(x);
-const vnorm = s => ({ custom: Array.isArray(s && s.custom) ? s.custom : [], progress: isObj(s && s.progress) ? s.progress : {}, deleted: Array.isArray(s && s.deleted) ? s.deleted : [], pending: Array.isArray(s && s.pending) ? s.pending : [], srs: isObj(s && s.srs) ? s.srs : {} });
+// progAt = 掌握状态的修改时间 { 词条id: 毫秒 }；pendAdd / pendDel = 待整理队列里每个词最近一次加入 / 拿掉的时间 { 小写词: 毫秒 }（「清空」才不会被别的设备的旧缓存并回来）
+const vnorm = s => ({ custom: Array.isArray(s && s.custom) ? s.custom : [], progress: isObj(s && s.progress) ? s.progress : {}, deleted: Array.isArray(s && s.deleted) ? s.deleted : [], pending: Array.isArray(s && s.pending) ? s.pending : [], srs: isObj(s && s.srs) ? s.srs : {},
+  progAt: isObj(s && s.progAt) ? s.progAt : {}, pendAdd: isObj(s && s.pendAdd) ? s.pendAdd : {}, pendDel: isObj(s && s.pendDel) ? s.pendDel : {} });
+const tmax = (a, b) => { const o = Object.assign({}, a), cut = Date.now() - 90 * 86400e3; for (const k in b) if (atOk(b[k]) > (+o[k] || 0)) o[k] = atOk(b[k]); for (const k in o) if (!(+o[k] > cut)) delete o[k]; return o; }; // 每个键取较新的时间；90 天前的丢掉
+const pendKeep = (w, add, del) => { const k = (w + "").toLowerCase(); return !del[k] || (+add[k] || 0) > del[k]; };
 // 复习进度（网站「🔊 练习」和插件复习页共用）：{ 词条id: { b 级别, n 次数, due 下次复习时间, at 最近练习时间 } }；同一个词以 at 新的为准
-function srsMerge(a, b) { const o = Object.assign({}, a); for (const k in b) { const x = b[k]; if (!isObj(x)) continue; if (!o[k] || (+x.at || 0) >= (+o[k].at || 0)) o[k] = x; } return o; }
+function srsMerge(a, b) { const o = Object.assign({}, a); for (const k in b) { const x = b[k]; if (!isObj(x)) continue; if (+x.at > Date.now() + 5000) x.at = Date.now(); if (!o[k] || (+x.at || 0) >= atOk(o[k].at)) o[k] = x; } return o; }
 // 2026-11-20 在线上测试「🔊 练习」时误写进生词本的 3 条复习记录（按精确的 at 认）：任何设备再推上来都不收，possessions 跟着带上来的「已掌握」也不收
 const POISON = { v_possessions: 1795107503971, v_motion: 1795106191839, v_guys: 1795104545153 };
 function unpoison(st) {
@@ -199,6 +212,7 @@ function unpoison(st) {
 }
 // 和网页里的 mergeState 一样：两份取并集；同一个 id 以 b 为准（除非 a 的修改时间 u 更新）；删除会传播
 function vmerge(a, b) {
+  const bNew = isObj(b && b.progAt), bPend = isObj(b && b.pendDel) || isObj(b && b.pendAdd); // 新版网页才带时间；旧版照旧（推上来的赢、队列取并集）
   a = vnorm(a); b = vnorm(b);
   const byId = {};
   a.custom.forEach(e => { if (e && e.id) byId[e.id] = e; });
@@ -206,22 +220,30 @@ function vmerge(a, b) {
   const deleted = Array.from(new Set([...a.deleted, ...b.deleted]));
   const del = new Set(deleted);
   const custom = Object.values(byId).filter(e => !del.has(e.id));
-  const progress = Object.assign({}, a.progress, b.progress);
-  const pend = {}; [...a.pending, ...b.pending].forEach(w => { if (w) pend[(w + "").toLowerCase()] = w; });
-  return { custom, progress, deleted, pending: Object.values(pend), srs: srsMerge(a.srs, b.srs) };
+  // 掌握状态：两边都有时间就按新的为准（插件里标的「已掌握」不会被别的标签页的旧缓存改回去）；没时间的按以前的规矩
+  const progress = {}, progAt = tmax(a.progAt, bNew ? b.progAt : {});
+  if (!bNew) Object.assign(progress, a.progress, b.progress);
+  else for (const k of new Set([...Object.keys(a.progress), ...Object.keys(b.progress)])) {
+    const ta = atOk(a.progAt[k]), tb = atOk(b.progAt[k]), w = ta > tb ? a : tb > ta ? b : (k in b.progress ? b : a);
+    if (k in w.progress) progress[k] = w.progress[k];
+  }
+  const pendAdd = tmax(a.pendAdd, bPend ? b.pendAdd : {}), pendDel = tmax(a.pendDel, bPend ? b.pendDel : {});
+  const pend = {}; [...a.pending, ...b.pending].forEach(w => { if (w && pendKeep(w, pendAdd, pendDel)) pend[(w + "").toLowerCase()] = w; });
+  return { custom, progress, deleted, pending: Object.values(pend), srs: srsMerge(a.srs, b.srs), progAt, pendAdd, pendDel };
 }
-// 和插件原来的 cloudAdd 一样：同名词已存在就跳过；加入时从待整理队列、已删除列表里去掉
+// 和插件原来的 cloudAdd 一样：同名词已存在就跳过；加入时从待整理队列里去掉
+// 删过的词再加回来：换一个新 id（删除记录只增不减，别的设备缓存里还有旧 id 的删除记录，用旧 id 会被它再删一次）
 function vadd(d, entries) {
-  d = vnorm(d); let n = 0;
+  d = vnorm(d); let n = 0; const del = new Set(d.deleted), ids = [];
   for (const e of entries) {
     if (!e || !e.id || !e.word) continue;
     const lw = String(e.word).toLowerCase();
     d.pending = d.pending.filter(w => (w + "").toLowerCase() !== lw);
-    d.deleted = d.deleted.filter(x => x !== e.id);
     if (d.custom.some(x => x && (x.id === e.id || (x.word || "").toLowerCase() === lw))) continue;
+    if (del.has(e.id)) { const old = e.id; e.id = String(old).slice(0, 80) + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5); ids.push([old, e.id]); }
     d.custom.push(e); n++;
   }
-  return { d, n };
+  return { d, n, ids };
 }
 async function vocab(req, env) {
   if (req.method === "OPTIONS") return json({ ok: true });
@@ -244,7 +266,8 @@ async function vocab(req, env) {
     const b = JSON.parse(raw || "{}");
     let next, added = 0;
     if (typeof b.untrash === "string") { const tk = VK + ":trash", L = ((await kv.get(tk, "json")) || []).filter(t => t && t.e && t.e.id !== b.untrash); await kv.put(tk, JSON.stringify(L)); return json({ ok: true, items: L }); } // 恢复后从回收站拿掉（恢复本身由网页用新 id 加回去：删除记录只增不减）
-    if (Array.isArray(b.add)) { const r = vadd(stored, b.add.slice(0, 2000)); next = r.d; added = r.n; }
+    let ids = [];
+    if (Array.isArray(b.add)) { const r = vadd(stored, b.add.slice(0, 2000)); next = r.d; added = r.n; ids = r.ids; }
     else if (b.state && typeof b.state === "object") {
       // 旧版网页（词条写死在页面里）会把搬进来的词当成重复草稿删掉，所以只接受新版网页（v:2）的整份同步
       if (b.v !== 2) return json({ ok: false, error: "page outdated, please reload" }, 409);
@@ -255,7 +278,7 @@ async function vocab(req, env) {
       unpoison(b.patch);
       if (isObj(b.patch.progress) && b.patch.progress.v_possessions === "known" && Date.now() < Date.UTC(2026, 11, 1) && !(stored.srs.v_possessions && (stored.srs.v_possessions.s >= 42 || stored.srs.v_possessions.h >= 42)) && !(isObj(b.patch.srs) && b.patch.srs.v_possessions && (b.patch.srs.v_possessions.s >= 42 || b.patch.srs.v_possessions.h >= 42))) delete b.patch.progress.v_possessions; // 插件里测试时误标的「已知」写回来的：12 月前不收（真练到已掌握会带着稳定度 ≥ 42）
       next = vnorm(JSON.parse(before)); next.srs = srsMerge(next.srs, isObj(b.patch.srs) ? b.patch.srs : {});
-      if (isObj(b.patch.progress)) for (const k in b.patch.progress) { const v = b.patch.progress[k]; if (v === "known" || v === "learning") next.progress[k] = v; }
+      if (isObj(b.patch.progress)) for (const k in b.patch.progress) { const v = b.patch.progress[k]; if ((v === "known" || v === "learning") && next.progress[k] !== v) { next.progress[k] = v; next.progAt[k] = Date.now(); } }
       if (Array.isArray(b.patch.deleted) && b.patch.deleted.length) { const del = new Set(next.deleted.concat(b.patch.deleted.filter(x => typeof x === "string").slice(0, 500))); next.deleted = [...del]; next.custom = next.custom.filter(e => !del.has(e.id)); } // 插件「已保存」页里删除生词本词条
     }
     else return json({ ok: false, error: "bad body" }, 400);
@@ -280,7 +303,7 @@ async function vocab(req, env) {
       if (!(await kv.get(day))) await kv.put(day, before, { expirationTtl: 30 * 86400 }); // 当天第一次改动前，存一份改动前的样子
       await kv.put(VK, JSON.stringify(next));
     }
-    return json(isObj(b.patch) ? { ok: true, changed } : { ok: true, changed, added, total: next.custom.length, state: next });
+    return json(isObj(b.patch) ? { ok: true, changed } : Object.assign({ ok: true, changed, added, total: next.custom.length, state: next }, ids.length ? { ids } : {}));
   } catch (e) { return json({ ok: false, error: String(e && e.message || e) }, 500); }
 }
 
@@ -318,20 +341,21 @@ async function ext(req, env) {
     let changed = false; const gone = [];
     for (const k in b.changes) {
       const x = b.changes[k]; if (!isObj(x) || typeof k !== "string" || k.length > 600 || !k.includes("|")) continue;
-      const at = +x.at || 0, old = doc.items[k];
-      if (old && (+old.at || 0) > at) continue;
+      const at = atOk(x.at), old = doc.items[k];
+      if (old && atOk(old.at) > at) continue;
       if (x.del) { if (!old || !old.del) { doc.items[k] = { del: 1, at }; changed = true; } if (k.startsWith("med|")) gone.push(k.slice(4)); }
       else if (!old || old.del || JSON.stringify(old.v) !== JSON.stringify(x.v)) { doc.items[k] = { v: x.v, at }; changed = true; }
     }
     if (changed && A === "bad") { // 写入保护：一次删太多、当天累计删太多 → 要口令
       const prev = (raw0 && JSON.parse(raw0).items) || {}, rm = Object.keys(b.changes).filter(k => isObj(b.changes[k]) && b.changes[k].del && isObj(prev[k]) && !prev[k].del).length;
-      if (rm > 30) return needKey("big");
+      const rw = Object.keys(b.changes).filter(k => isObj(b.changes[k]) && !b.changes[k].del && isObj(prev[k]) && !prev[k].del && !k.startsWith("med|") && JSON.stringify(prev[k].v) !== JSON.stringify(b.changes[k].v)).length; // 改写已有的项（改写很多 = 变相删除）
+      if (rm > 30 || rw > 300) return needKey("big");
       if (rm && !(await guardDay(kv, pre + "ext", { rm }, { rm: 80 }))) return needKey("day");
     }
     if (changed) {
       const cut = Date.now() - 120 * 86400e3; for (const k in doc.items) if (doc.items[k].del && doc.items[k].at < cut) delete doc.items[k];
       const day = EK + "@" + bjDay(); if (raw0 && !(await kv.get(day))) await kv.put(day, raw0, { expirationTtl: 30 * 86400 });
-      doc.ver = Date.now(); await kv.put(EK, JSON.stringify(doc));
+      doc.ver = Math.max(Date.now(), (+doc.ver || 0) + 1); await kv.put(EK, JSON.stringify(doc)); // 同一毫秒里改两次也要换版本号（设备靠它判断云端变没变）
     }
     for (const m of gone) if (m.startsWith("med:")) await kv.delete(pre + "m:" + m);
     return json({ ok: true, changed, ver: doc.ver, items: live(doc.items) });
@@ -382,7 +406,7 @@ async function sent(req, env, u) {
     const re = new RegExp("\\b" + stem.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/ /g, "\\s+"), "i");
     const items = (j.results || []).map(x => { const ts = (x.translations || []).flat().filter(t => t && t.lang === "cmn"), t = ts.find(t => t.script === "Hans") || ts[0]; return { en: String(x.text || ""), zh: t ? String(t.text || "") : "" }; })
       .filter(x => x.en && x.zh && x.en.length <= 100 && re.test(x.en)).slice(0, 12);
-    if (kv) await kv.put(key, JSON.stringify(items), { expirationTtl: 30 * 86400 });
+    if (kv) await cput(kv, key, JSON.stringify(items), { expirationTtl: 30 * 86400 });
     return json({ ok: true, w, items });
   } catch (e) { return json({ ok: false, error: String(e && e.message || e) }, 500); }
 }
@@ -390,21 +414,32 @@ async function sent(req, env, u) {
 // ---------- 个人的学习资料 /api/mine（按人分开，换设备也在）：阅读的文章、作文批改历史、词汇量测试 ----------
 // GET  ?k=reading|writing|vtest → { ok, items:{ id:{v, at} | {del:1, at} } }（删除记号保留 60 天）
 // POST {k, changes:{ id:{v,at}|{del:1,at} }} → 同一项以 at 新的为准，返回合并后的 { ok, items }
-const MINE_K = /^(reading|writing|vtest|speak|daily|sme|err|exam)$/; // err：「❌ 错题本」（errbook.js）；exam：雅思听力 / 阅读模考的成绩（exam.js） // daily：「📅 每日」的设置、手动打勾、每天完成几项；sme：「📻 6 分钟英语」听过哪几期 // speak：口语页的练习记录、每日打卡、AI 陪练记录、录音存档索引（speak.js）
+const MINE_LIST = ["reading", "writing", "vtest", "speak", "daily", "sme", "err", "exam"], MINE_K = new RegExp("^(" + MINE_LIST.join("|") + ")$"); // err：「❌ 错题本」（errbook.js）；exam：雅思听力 / 阅读模考的成绩（exam.js） // daily：「📅 每日」的设置、手动打勾、每天完成几项；sme：「📻 6 分钟英语」听过哪几期 // speak：口语页的练习记录、每日打卡、AI 陪练记录、录音存档索引（speak.js）
 async function mine(req, env, u) {
   if (req.method === "OPTIONS") return json({ ok: true });
   const kv = env.CAPTIONS; if (!kv) return json({ ok: false, error: "KV binding CAPTIONS is missing" }, 500);
   try {
     const pre = await userPre(req, kv); if (pre === null) return noUser();
-    if (req.method === "GET") { const k = u.searchParams.get("k") || ""; if (!MINE_K.test(k)) return json({ ok: false, error: "bad k" }, 400); return json({ ok: true, items: ((await kv.get(pre + "mine:" + k, "json")) || {}).items || {} }); }
+    if (req.method === "GET") {
+      const k = u.searchParams.get("k") || ""; if (!MINE_K.test(k)) return json({ ok: false, error: "bad k" }, 400);
+      if (u.searchParams.get("history")) { const l = await kv.list({ prefix: pre + "mine:" + k + "@" }); return json({ ok: true, days: l.keys.map(x => x.name.split("@").pop()).sort().reverse() }); } // 每天的存档（30 天）
+      const at = u.searchParams.get("at"); if (at) { if (!/^\d{4}-\d{2}-\d{2}$/.test(at)) return json({ ok: false, error: "bad date" }, 400); const d = await kv.get(pre + "mine:" + k + "@" + at, "json"); return d ? json({ ok: true, at, items: d.items || {} }) : json({ ok: false, error: "not found" }, 404); }
+      return json({ ok: true, items: ((await kv.get(pre + "mine:" + k, "json")) || {}).items || {} });
+    }
     if (req.method !== "POST") return json({ ok: false, error: "method" }, 405);
     const raw = await req.text(); if (raw.length > 3000000) return json({ ok: false, error: "too large" }, 413);
     const b = JSON.parse(raw || "{}"); if (!MINE_K.test(b.k || "") || !isObj(b.changes)) return json({ ok: false, error: "bad body" }, 400);
-    const key = pre + "mine:" + b.k, cur = ((await kv.get(key, "json")) || {}).items || {}, now = Date.now(); let changed = false;
-    if (Object.keys(b.changes).filter(id => isObj(b.changes[id]) && b.changes[id].del && cur[id] && !cur[id].del).length > 30 && (await authOf(req, kv)) === "bad") return needKey("big");
-    for (const id in b.changes) { const x = b.changes[id]; if (!isObj(x) || !(+x.at) || String(id).length > 200) continue; if (!cur[id] || +x.at > +cur[id].at) { cur[id] = x.del ? { del: 1, at: +x.at } : { v: x.v, at: +x.at }; changed = true; } }
+    const key = pre + "mine:" + b.k, raw0 = await kv.get(key), cur = ((raw0 && JSON.parse(raw0)) || {}).items || {}, now = Date.now(); let changed = false;
+    // 写入保护（同 /api/ext）：一次删 > 30 项、当天不带口令累计删 > 80 项 → 要口令
+    const rm = Object.keys(b.changes).filter(id => isObj(b.changes[id]) && b.changes[id].del && cur[id] && !cur[id].del).length;
+    if (rm && (await authOf(req, kv)) === "bad") { if (rm > 30) return needKey("big"); if (!(await guardDay(kv, pre + "mine", { rm }, { rm: 80 }))) return needKey("day"); }
+    for (const id in b.changes) { const x = b.changes[id]; if (!isObj(x) || !(+x.at) || String(id).length > 200) continue; const at = atOk(x.at); if (x.del && now - at > 60 * 86400e3) continue; /* 过期的删除记号（后台已经清掉了）不再收 */ if (!cur[id] || at > atOk(cur[id].at)) { const nx = x.del ? { del: 1, at } : { v: x.v, at }; if (!cur[id] || JSON.stringify(cur[id]) !== JSON.stringify(nx)) changed = true; cur[id] = nx; } }
     for (const id in cur) if (cur[id].del && now - cur[id].at > 60 * 86400e3) { delete cur[id]; changed = true; }
-    if (changed) { const out = JSON.stringify({ items: cur }); if (out.length > 20000000) return json({ ok: false, error: "too large" }, 413); await kv.put(key, out); }
+    if (changed) {
+      const out = JSON.stringify({ items: cur }); if (out.length > 20000000) return json({ ok: false, error: "too large" }, 413);
+      const day = key + "@" + bjDay(); if (raw0 && !(await kv.get(day))) await kv.put(day, raw0, { expirationTtl: 30 * 86400 }); // 当天第一次改动前存一份（30 天），误删了能找回
+      await kv.put(key, out);
+    }
     return json({ ok: true, items: cur });
   } catch (e) { return json({ ok: false, error: String(e && e.message || e) }, 500); }
 }
@@ -435,12 +470,12 @@ async function dict(req, env, u) {
   if (!w || w.length > 80 || !/^[A-Za-z][A-Za-z0-9' .,?!-]*$/.test(w)) return json({ ok: false, error: "bad word" }, 400);
   const kv = env.CAPTIONS, key = "d/" + w.toLowerCase();
   try {
-    const hit = kv && (await kv.get(key, "json")); if (hit && !u.searchParams.get("fresh")) return json(Object.assign({ ok: true, cached: true }, hit));
-    const one = w.split(" ").length <= 3;
+    const hit = kv && (await kv.get(key, "json")); if (hit && !(await freshOf(req, u, kv))) return json(Object.assign({ ok: true, cached: true }, hit));
+    const one = w.split(" ").length <= 3, exOn = /^[a-z][a-z' -]{0,40}$/i.test(w);
     const [g, d, ex] = await Promise.all([
       gtrans(w, "zh-CN", one).catch(() => null),
-      one ? fetch("https://api.dictionaryapi.dev/api/v2/entries/en/" + encodeURIComponent(w.toLowerCase()), { headers: UA }).then(r => r.ok ? r.json() : null).catch(() => null) : null,
-      /^[a-z][a-z' -]{0,40}$/i.test(w) ? sent(new Request("https://x/"), env, new URL("https://x/api/sent?w=" + encodeURIComponent(w.toLowerCase()))).then(r => r.json()).catch(() => null) : null,
+      one ? fetch("https://api.dictionaryapi.dev/api/v2/entries/en/" + encodeURIComponent(w.toLowerCase()), { headers: UA }).then(r => r.ok ? r.json() : r.status === 404 ? [] : null).catch(() => null) : null, // 404 = 词典里真没有；其它失败 = null
+      exOn ? sent(new Request("https://x/"), env, new URL("https://x/api/sent?w=" + encodeURIComponent(w.toLowerCase()))).then(r => r.json()).catch(() => null) : null,
     ]);
     const out = { word: w, phon: "", audio: "", zh: "", zhs: [], en: [], examples: [] };
     if (g) { out.zh = (g.sentences || []).map(x => x.trans || "").join(""); out.zhs = (g.dict || []).slice(0, 4).map(x => ({ pos: x.pos || "", terms: (x.terms || []).slice(0, 6) })); }
@@ -452,7 +487,8 @@ async function dict(req, env, u) {
     }
     if (ex && ex.ok) out.examples = (ex.items || []).slice(0, 5).map(x => [x.en, x.zh]);
     if (!out.zh && !out.en.length) return json({ ok: false, error: "not found", word: w }, 404);
-    if (kv && out.zh) await kv.put(key, JSON.stringify(out), { expirationTtl: 30 * 86400 }); // 中文没取到的不缓存，下次再试
+    const full = (!one || d !== null) && (!exOn || (ex && ex.ok)); // 词典、例句有一个没连上：只存 1 天，过后再补全
+    if (kv && out.zh) await cput(kv, key, JSON.stringify(out), { expirationTtl: (full ? 30 : 1) * 86400 }); // 中文没取到的不缓存，下次再试
     return json(Object.assign({ ok: true }, out));
   } catch (e) { return json({ ok: false, error: String(e && e.message || e) }, 500); }
 }
@@ -508,8 +544,9 @@ function rssItems(xml, src) {
 const newsDay = () => new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10);
 async function news(req, env, u) {
   if (req.method === "OPTIONS") return json({ ok: true });
-  const d = /^\d{4}-\d{2}-\d{2}$/.test(u.searchParams.get("d") || "") ? u.searchParams.get("d") : newsDay(), key = "news/" + d;
-  if (!u.searchParams.get("fresh")) { const c = await env.CAPTIONS.get(key, "json"); if (c) return json(c); }
+  const qd = u.searchParams.get("d") || "", today = newsDay(), lo = new Date(Date.now() + 8 * 3600e3 - 30 * 86400e3).toISOString().slice(0, 10);
+  const d = /^\d{4}-\d{2}-\d{2}$/.test(qd) && qd >= lo && qd <= today ? qd : today, key = "news/" + d; // 只认最近 30 天（随便写个日期就多存一条，会被刷写入额度）
+  if (!(await freshOf(req, u, env.CAPTIONS))) { const c = await env.CAPTIONS.get(key, "json"); if (c) return json(c); }
   const UA = { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36" };
   const got = await Promise.all(NEWS_FEEDS.map(([s, f]) => fetch(f, { headers: UA }).then(r => (r.ok ? r.text() : "")).then(x => rssItems(x, s)).catch(() => [])));
   const now = Date.now(), seen = new Set(); let all = [];
@@ -528,7 +565,7 @@ async function news(req, env, u) {
   }
   if (!pick) return json({ ok: false, error: "no article" }, 502);
   const out = { ok: true, date: d, ...pick, list: all.filter(i => i.u !== pick.url).slice(0, 15).map(({ t, u, s, p }) => ({ t, u, s, p })) };
-  await env.CAPTIONS.put(key, JSON.stringify(out), { expirationTtl: 3 * 86400 });
+  await cput(env.CAPTIONS, key, JSON.stringify(out), { expirationTtl: 3 * 86400 });
   return json(out);
 }
 
@@ -661,8 +698,8 @@ function voaParse(html) {
 // NPR：RSS 有好几 MB，边下边找，够 n 期就停（Workers 的 CPU 时间有限）
 async function nprFeed(pid, n) {
   const r = await fetch("https://feeds.npr.org/" + pid + "/podcast.xml", { headers: { "User-Agent": "Mozilla/5.0", Accept: "application/rss+xml,text/xml" } }); if (!r.ok || !r.body) return "";
-  const rd = r.body.getReader(), dec = new TextDecoder(); let x = "", k = 0;
-  for (;;) { const { done, value } = await rd.read(); if (done) break; x += dec.decode(value, { stream: true }); let i = -1, c = 0; while ((i = x.indexOf("</item>", i + 1)) >= 0 && c <= n) c++; if (c > n) { try { await rd.cancel(); } catch (e) {} break; } if (++k > 400) break; }
+  const rd = r.body.getReader(), dec = new TextDecoder(); let x = "", k = 0, pos = 0, c = 0;
+  for (;;) { const { done, value } = await rd.read(); if (done) break; x += dec.decode(value, { stream: true }); let i; while (c <= n && (i = x.indexOf("</item>", pos)) >= 0) { c++; pos = i + 7; } if (c > n) { try { await rd.cancel(); } catch (e) {} break; } pos = Math.max(pos, x.length - 7); if (++k > 400) break; } // 每次只从上次找到的地方往后找（整份从头找，长的节目单很费 CPU）
   return x;
 }
 const nprMp3 = u => { u = String(u || "").replace(/&amp;/g, "&"); const m = u.match(/(npr\.simplecastaudio\.com|[a-z0-9-]+\.npr\.org)\/[^?"]+?\.mp3/); return m ? "https://" + m[0] : /^https:\/\//.test(u) ? u : ""; }; // 去掉 podtrac / spotify 这些广告追踪的跳转
@@ -710,10 +747,10 @@ async function bneArts(env, UA) {
   for (const a of arts) { // 存档页没写是简单篇还是进阶篇：有没有 Level 0 页面（结果长期存着，一篇只问一次）
     if (a.k) continue; const c = await kv.get("bne/k/" + a.base); if (c) { a.k = c; continue; } if (++n > 30) continue;
     const r = await fetch(BNE + a.base + "-0.html", { method: "HEAD", headers: UA }).catch(() => null); if (!r) continue;
-    a.k = r.ok ? "e" : r.status === 403 || r.status === 404 ? "h" : ""; if (a.k) await kv.put("bne/k/" + a.base, a.k);
+    a.k = r.ok ? "e" : r.status === 403 || r.status === 404 ? "h" : ""; if (a.k) await cput(kv, "bne/k/" + a.base, a.k, r.status === 403 ? { expirationTtl: 7 * 86400 } : undefined); // 403 也可能是临时被拦：只记 7 天
   }
   if (!arts.length) return hit ? hit.arts : [];
-  await kv.put("bne/arts", JSON.stringify({ at: Date.now(), arts })); return arts;
+  await cput(kv, "bne/arts", JSON.stringify({ at: Date.now(), arts })); return arts;
 }
 // 一篇的某一级：<article> 里的正文（两段，<br><br> 分开）→ 按句子分行
 function bneParse(html) {
@@ -793,7 +830,7 @@ async function alignPart(env, key, epKey, part, lang) {
     if (!words.length) return json({ ok: false, error: "no words" }, 502);
     const out = { part, parts, total, words: words.filter(w => w[0]) };
     if (part === 0 && buf[0] === 73 && buf[1] === 68 && buf[2] === 51) out.id3 = 10 + ((buf[6] & 127) << 21 | (buf[7] & 127) << 14 | (buf[8] & 127) << 7 | (buf[9] & 127)); // 文件开头的 ID3 标签（封面图等）不是声音：换算时间时要扣掉
-    await kv.put(key, JSON.stringify(out), { expirationTtl: 180 * 86400 });
+    await cput(kv, key, JSON.stringify(out), { expirationTtl: 180 * 86400 });
     return json(Object.assign({ ok: true }, out));
   } catch (e) { return json({ ok: false, error: String(e && e.message || e) }, 502); }
 }
@@ -826,7 +863,7 @@ async function dw(req, env, u) {
       for (const m of h.matchAll(/href="\/de\/(\d{2})(\d{2})(\d{4})-langsam-gesprochene-nachrichten\/a-(\d+)"/g)) { if (seen[m[4]]) continue; seen[m[4]] = 1; list.push({ id: m[4], t: "Nachrichten vom " + m[1] + "." + m[2] + "." + m[3], d: m[3] + "-" + m[2] + "-" + m[1], img: "" }); }
       list.sort((a, b) => (a.d < b.d ? 1 : -1));
       if (!list.length) return json({ ok: false, error: "no episodes" }, 502);
-      await kv.put("dw/list", JSON.stringify({ at: Date.now(), list }));
+      await cput(kv, "dw/list", JSON.stringify({ at: Date.now(), list }));
       return json({ ok: true, list });
     }
     if (!id) return json({ ok: false, error: "need list / ep / al" }, 400);
@@ -834,12 +871,12 @@ async function dw(req, env, u) {
     if (!ep) {
       const r = await fetch("https://learngerman.dw.com/de/x/a-" + id, { headers: DW_UA }); if (!r.ok) return json({ ok: false, error: "dw " + r.status }, 502);
       ep = dwParse(id, await r.text()); if (!ep.mp3 || !ep.lines.length) return json({ ok: false, error: "这一期不是慢速新闻（没有音频或文稿）" }, 404);
-      await kv.put("dw/ep/" + id, JSON.stringify(ep), { expirationTtl: 365 * 86400 });
+      await cput(kv, "dw/ep/" + id, JSON.stringify(ep), { expirationTtl: 365 * 86400 });
     }
     if (q("zh")) {
       const hit = await kv.get("dw/zh/" + id, "json"); if (hit) return json({ ok: true, lines: hit, cached: true });
       const zh = await smeZh(ep.lines.map(l => l.t), env, "de");
-      if (zh.every(Boolean)) await kv.put("dw/zh/" + id, JSON.stringify(zh), { expirationTtl: 365 * 86400 });
+      if (zh.every(Boolean)) await cput(kv, "dw/zh/" + id, JSON.stringify(zh), { expirationTtl: 365 * 86400 });
       return json({ ok: zh.some(Boolean), lines: zh });
     }
     return json(Object.assign({ ok: true }, ep));
@@ -855,7 +892,7 @@ async function sme(req, env, u) {
     return new Response(r.body, { headers: { "content-type": "audio/mpeg", "cache-control": "private, max-age=86400", ...(r.headers.get("content-length") ? { "content-length": r.headers.get("content-length") } : {}) } });
   }
   const UA = { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36", "Accept": "text/html" };
-  const BASE = "https://www.bbc.co.uk/learningenglish/english/features/", ep = u.searchParams.get("ep") || "", fresh = !!u.searchParams.get("fresh");
+  const BASE = "https://www.bbc.co.uk/learningenglish/english/features/", ep = u.searchParams.get("ep") || "", fresh = await freshOf(req, u, env.CAPTIONS);
   if (ep) {
     const s = smeOf(ep); if (!s) return json({ ok: false, error: "bad ep" }, 400);
     const key = "sme/ep/" + ep; let x = fresh ? null : await env.CAPTIONS.get(key, "json");
@@ -879,7 +916,7 @@ async function sme(req, env, u) {
           const p = S.voa ? voaParse(await r.text()) : smeParse(await r.text()); if (!p.mp3 || (p.lines.length < 6 && !(s === "news" && (p.intro || p.vocab.length)))) return json({ ok: false, error: "no transcript" }, 502);
           x = { ok: true, id: ep, s, url: S.voa ? r.url || src : BASE + ep, ...p };
         }
-        await env.CAPTIONS.put(key, JSON.stringify(x), { expirationTtl: 90 * 86400 });
+        await cput(env.CAPTIONS, key, JSON.stringify(x), { expirationTtl: 90 * 86400 });
       } catch (e) { return json({ ok: false, error: String(e && e.message || e) }, 502); }
     }
     if (!u.searchParams.get("zh")) return json(x);
@@ -890,7 +927,7 @@ async function sme(req, env, u) {
     const zh = await smeZh(all, env); let i = 1; const take = n => { const r = zh.slice(i, i + n); i += n; return r; };
     const out = { ok: true, id: ep, intro: zh[0], q: take(q.length), vocab: take(V.length), vex: take(V.length), heads: take(H.length), lines: take(Ls.length) };
     const got = zh.filter(Boolean).length; if (!got) return json({ ok: false, error: "translate failed" }, 502);
-    if (got >= all.filter(Boolean).length * 0.9) await env.CAPTIONS.put(zk, JSON.stringify(out), { expirationTtl: 180 * 86400 }); // 大部分翻好了才存，没翻全的下次再试
+    if (got >= all.filter(Boolean).length * 0.9) await cput(env.CAPTIONS, zk, JSON.stringify(out), { expirationTtl: 180 * 86400 }); // 大部分翻好了才存，没翻全的下次再试
     return json(out);
   }
   const s = SME_S[u.searchParams.get("s") || "sme"] ? (u.searchParams.get("s") || "sme") : "", S = SME_S[s]; if (!S) return json({ ok: false, error: "bad s" }, 400);
@@ -908,7 +945,7 @@ async function sme(req, env, u) {
   if (S.story) { const st = storySort(list); list.length = 0; list.push(...st); }
   else if (S.voa || S.npr || S.bne != null) list.sort((p, q) => (Date.parse(q.d) || 0) - (Date.parse(p.d) || 0));
   else list.sort((p, q) => (q.id.match(/\d{6}$/) || [""])[0].localeCompare((p.id.match(/\d{6}$/) || [""])[0])); // 期号 = 年月日，新的在前
-  const out = { ok: true, s, list: list.slice(0, 300) }; await env.CAPTIONS.put(lk, JSON.stringify(out), { expirationTtl: S.story || S.voa ? 7 * 86400 : S.npr || S.bne != null ? 6 * 3600 : 12 * 3600 }); return json(out); // 不再更新的栏目（广播剧、大学英语、VOA）存一周；NPR、分级新闻 6 小时
+  const out = { ok: true, s, list: list.slice(0, 300) }; await cput(env.CAPTIONS, lk, JSON.stringify(out), { expirationTtl: S.story || S.voa ? 7 * 86400 : S.npr || S.bne != null ? 6 * 3600 : 12 * 3600 }); return json(out); // 不再更新的栏目（广播剧、大学英语、VOA）存一周；NPR、分级新闻 6 小时
 }
 
 // ---------- AI（Cloudflare Workers AI，免费额度每天 1 万 neurons；要在 Pages 项目「设置 → 绑定」里加 Workers AI，变量名 AI）----------
@@ -1057,7 +1094,7 @@ async function ieltsScript(env, b) {
   const r = await aiJson(env, [{ role: "system", content: ieltsSys(sec) }, { role: "user", content: "Topic: " + topic }], o => !!(got = ieltsClean(o, sec)), 2400);
   if (!r.ok || !got) return json({ ok: false, error: r.error || "bad output" }, 502);
   const x = Object.assign({ id: Date.now().toString(36), sec, topic, at: Date.now() }, got);
-  if (kv) await kv.put(pre + x.id, JSON.stringify(x));
+  if (kv) await cput(kv, pre + x.id, JSON.stringify(x));
   return json(Object.assign({ ok: true, left: 0 }, x));
 }
 async function examGen(env, b) {
@@ -1075,7 +1112,7 @@ async function examGen(env, b) {
     const n = k => Array.isArray(last && last[k]) ? last[k].length : 0, T = " " + exNorm(text) + " ", miss = ((last && (last.notes || last.gaps)) || []).filter(x => x && x.a && !T.includes(" " + exNorm(x.a) + " ")).map(x => x.a).slice(0, 4);
     return json({ ok: false, error: r.error || "bad output", detail: last ? Object.keys(last).map(k => k + ":" + n(k)).join(" ") + (miss.length ? " | 答案不在原文：" + miss.join(", ") : "") : "" }, 502);
   }
-  got.model = r.model; if (kv) await kv.put(ck, JSON.stringify(got), { expirationTtl: 60 * 86400 });
+  got.model = r.model; if (kv) await cput(kv, ck, JSON.stringify(got), { expirationTtl: 60 * 86400 });
   return json(Object.assign({ ok: true }, got));
 }
 async function ai(req, env) {
@@ -1090,7 +1127,7 @@ async function ai(req, env) {
       let hh = 2166136261; const hs = String(b.url || title || t.slice(0, 200)); for (let i = 0; i < hs.length; i++) { hh ^= hs.charCodeAt(i); hh = Math.imul(hh, 16777619); }
       const key = "news/simp/" + (hh >>> 0).toString(36), c = env.CAPTIONS && !b.fresh ? await env.CAPTIONS.get(key, "json") : null; if (c) return json(Object.assign(c, { cached: 1 }));
       const r = await aiJson(env, [{ role: "system", content: NEWSIMP_SYS }, { role: "user", content: "Title: " + title + "\n\n" + t }], o => typeof o.simple === "string" && o.simple.split(/\s+/).length > 80 && Array.isArray(o.quiz), 3800); // 输出要放得下改写稿 + 题目，太小会被截断
-      if (r.ok) { r.quiz = (r.quiz || []).filter(q => q && q.q && Array.isArray(q.opts) && q.opts.length >= 2 && +q.ans >= 0 && +q.ans < q.opts.length).slice(0, 5); r.words = (Array.isArray(r.words) ? r.words : []).filter(w => w && w.en).slice(0, 10); if (env.CAPTIONS) await env.CAPTIONS.put(key, JSON.stringify(r), { expirationTtl: 7 * 86400 }); }
+      if (r.ok) { r.quiz = (r.quiz || []).filter(q => q && q.q && Array.isArray(q.opts) && q.opts.length >= 2 && +q.ans >= 0 && +q.ans < q.opts.length).slice(0, 5); r.words = (Array.isArray(r.words) ? r.words : []).filter(w => w && w.en).slice(0, 10); if (env.CAPTIONS) await cput(env.CAPTIONS, key, JSON.stringify(r), { expirationTtl: 7 * 86400 }); }
       return json(r, r.ok ? 200 : 502);
     }
     // 口语：chat（陪练回一句）、chatsum（聊完总结）、speak（话题回答点评）
@@ -1132,7 +1169,7 @@ async function ai(req, env) {
         return it.length ? !!(got = { items: it, tip_zh: clip(o.tip_zh, 200) }) : false;
       }, 900);
       if (!r.ok || !got) return json({ ok: false, error: r.error || "bad output" }, 502);
-      got.model = r.model; if (kv) await kv.put(ck, JSON.stringify(got), { expirationTtl: 180 * 86400 });
+      got.model = r.model; if (kv) await cput(kv, ck, JSON.stringify(got), { expirationTtl: 180 * 86400 });
       return json(Object.assign({ ok: true }, got));
     }
     if (b.task === "tr") { // 浏览器翻不了（谷歌连不上）时最后一道：后台翻一批句子（谷歌 → Workers AI）
@@ -1140,7 +1177,7 @@ async function ai(req, env) {
       if (!T.length || T.join("").length > 40000) return json({ ok: false, error: "bad body" }, 400);
       const kv = env.CAPTIONS, ck = T.length <= 3 ? "trc/" + (await sha(T.join("\n"))).slice(0, 32) : ""; // 查词这种一两个词的存起来（KV 每天写入有限，长的不存）
       if (kv && ck) { const hit = await kv.get(ck, "json"); if (hit) return json({ ok: true, zh: hit, cached: true }); }
-      const zh = await smeZh(T, env); if (kv && ck && zh.every((x, i) => x || !T[i])) await kv.put(ck, JSON.stringify(zh), { expirationTtl: 180 * 86400 });
+      const zh = await smeZh(T, env); if (kv && ck && zh.every((x, i) => x || !T[i])) await cput(kv, ck, JSON.stringify(zh), { expirationTtl: 180 * 86400 });
       return json({ ok: zh.some(Boolean), zh });
     }
     if (b.task === "lquiz") {
@@ -1155,7 +1192,7 @@ async function ai(req, env) {
         return q.length >= 4 ? !!(got = { quiz: q }) : false;
       }, 1800);
       if (!r.ok || !got) return json({ ok: false, error: r.error || "bad output" }, 502);
-      got.model = r.model; if (kv) await kv.put(ck, JSON.stringify(got), { expirationTtl: 180 * 86400 });
+      got.model = r.model; if (kv) await cput(kv, ck, JSON.stringify(got), { expirationTtl: 180 * 86400 });
       return json(Object.assign({ ok: true }, got));
     }
     if (b.task === "exam") return examGen(env, b);

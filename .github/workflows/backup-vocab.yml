@@ -1,6 +1,7 @@
 # 每 6 小时把线上生词本存进仓库 data/vocab.json、插件数据存进 data/ext.json、视频字幕存进 data/captions/（有变化才提交）。
 # 原声和截图存成普通文件放进 data/media/（.webm / .jpg，只下载新增或改过的），在 GitHub 上能直接看、直接听。
 # 生词本不设口令，被乱改时从这里的历史版本还原；data/ 不在 web/ 里，不会触发网站重新部署。
+# 个人学习资料（/api/mine：错题本、阅读写作口语记录…）：仓库设成私有后才备份进 data/mine/（家人 data/users/<id>/mine/）。
 # 家人（多用户）：名单存进 data/users.json，每个人的生词本、插件数据、原声截图存进 data/users/<id>/（vocab.json、ext.json、media/）。
 name: 备份生词本和字幕
 on:
@@ -50,6 +51,23 @@ jobs:
               mkdir -p "$d"; jq 'del(.ok)' /tmp/v.json > "$d/vocab.json"; jq '{ver, items}' /tmp/e.json > "$d/ext.json"
             done
           done
+      - name: 下载个人学习资料 /api/mine（错题本、阅读 / 写作 / 口语记录、每日、模考成绩…；只在仓库设成私有后才备份，公开仓库谁都能看）
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$(gh api "repos/${{ github.repository }}" --jq .private)" != "true" ]; then echo "仓库是公开的：个人资料不备份到这里（网站后台每天有存档，30 天内能找回）"; exit 0; fi
+          for lg in "" de; do
+            for u in "" $(jq -r '.users[].id | select(. != "")' /tmp/users.json); do
+              d="data"; q=""
+              [ -n "$u" ] && { d="data/users/$u"; q="u=$u&"; }
+              [ -n "$lg" ] && { d="$d/lang/$lg"; q="${q}lang=$lg&"; }
+              for k in reading writing vtest speak daily sme err exam; do
+                curl -fsS --retry 3 "https://ruilearning-my.pages.dev/api/mine?${q}k=$k" -o /tmp/m.json && jq -e '.ok == true and (.items | type == "object")' /tmp/m.json > /dev/null || continue
+                if [ "$(jq '.items | length' /tmp/m.json)" = "0" ] && [ ! -f "$d/mine/$k.json" ]; then continue; fi
+                mkdir -p "$d/mine"; jq '.items' /tmp/m.json > "$d/mine/$k.json"
+              done
+            done
+          done
       - name: 下载视频字幕（只下新增或有变化的）
         run: |
           mkdir -p data/captions
@@ -70,6 +88,7 @@ jobs:
           git add data/vocab.json data/ext.json data/media data/captions data/users.json
           [ -d data/users ] && git add data/users
           [ -d data/lang ] && git add data/lang
+          [ -d data/mine ] && git add data/mine
           if git diff --cached --quiet; then echo "没有变化"; exit 0; fi
           git commit -m "备份生词本、插件数据、原声截图和字幕 $(TZ=Asia/Shanghai date '+%F %H:%M')"
           git push

@@ -256,7 +256,8 @@ async function addWord(word, queueOnly, m) {
 }
 
 // ---------- 同步到生词本网站：直接生成完整词条（释义、音标、原句），手机上打开就能复习 ----------
-const entryId = w => "v_" + w.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 70);
+// 只有英文字母数字的词：v_单词（和以前一样）；带重音字母、日文、俄文等：后面再加一段按原词算的编号，免得不同的词撞成同一个 id（año / ano、所有日文词都变成 v_）
+const entryId = w => { const lw = String(w).toLowerCase(), slug = lw.replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 70); if (!/[^\x00-\x7f]/.test(lw) && slug) return "v_" + slug; let h = 5381; for (const c of lw) h = (h * 33 + c.codePointAt(0)) >>> 0; return "v_" + (slug ? slug + "_" : "") + h.toString(36); };
 async function makeEntry(word, m) {
   if (m.kind === "sentence") { // 整句：不查词典，只要译文
     const t = word.replace(/\s+/g, " ").trim(); let zh = m.zh || "";
@@ -286,10 +287,20 @@ function cloudAdd(entries) { // 网站后台负责合并（同名词跳过、移
 }
 // 把本机已保存的单词 / 短语，以及云端待整理队列里的词，一次补齐成完整词条
 // 复习进度写回生词本（和网站「🔊 练习」共用）；发不出去就先存着，下次再补发
-async function vocabPatch(patch) {
+// 「已保存」页里删除生词本词条（deleted）也走这里：以前只带 srs / progress，删除根本没传上去，词过一会儿又回来了
+let patchChain = Promise.resolve();
+function vocabPatch(patch) { const run = () => vocabPatch1(patch); const p = patchChain.then(run, run); patchChain = p.catch(() => {}); return p; } // 一个一个发：队列读改写不会互相覆盖
+async function vocabPatch1(patch) {
   const q = (await chrome.storage.local.get({ srsQueue: { srs: {}, progress: {} } })).srsQueue;
+  q.srs = q.srs || {}; q.progress = q.progress || {};
   Object.assign(q.srs, patch.srs || {}); Object.assign(q.progress, patch.progress || {});
-  try { const r = await fetch(VOCAB, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ patch: q }) }); if (!r.ok) throw 0; await chrome.storage.local.set({ srsQueue: { srs: {}, progress: {} } }); return { ok: true }; }
+  if (Array.isArray(patch.deleted) && patch.deleted.length) q.deleted = [...new Set((q.deleted || []).concat(patch.deleted.filter(x => typeof x === "string")))];
+  try {
+    const r = await fetch(VOCAB, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ patch: q }) }); if (!r.ok) throw 0;
+    await chrome.storage.local.set({ srsQueue: { srs: {}, progress: {} } });
+    if (q.deleted && q.deleted.length) { const nb = (await chrome.storage.local.get({ vocabCache: null })).vocabCache; if (nb && Array.isArray(nb.deleted)) { const del = new Set(nb.deleted.concat(q.deleted)); nb.deleted = [...del]; nb.custom = (nb.custom || []).filter(e => !e || !del.has(e.id)); await chrome.storage.local.set({ vocabCache: nb }); } }
+    return { ok: true };
+  }
   catch (e) { await chrome.storage.local.set({ srsQueue: q }); return { ok: false, queued: true }; }
 }
 // 在插件里把某个词标为已掌握 / 将要学习（视频字幕、已保存页、复习页）：生词本里有这个词，就同步它的掌握状态
@@ -310,13 +321,26 @@ async function reviewNext(word) {
   const id = e ? e.id : "v_" + k.replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
   return vocabPatch({ srs: { [id]: Object.assign({ b: 0, n: 0 }, (nb && nb.srs && nb.srs[id]) || {}, { due: 1, at: Date.now() }) } });
 }
-async function flushSrs() { const q = (await chrome.storage.local.get({ srsQueue: null })).srsQueue; if (q && (Object.keys(q.srs || {}).length || Object.keys(q.progress || {}).length)) vocabPatch({}); }
+const queued = q => q && (Object.keys(q.srs || {}).length || Object.keys(q.progress || {}).length || (q.deleted || []).length);
+async function flushSrs() { const q = (await chrome.storage.local.get({ srsQueue: null })).srsQueue; if (queued(q)) vocabPatch({}); }
+// 网站上删掉的词（回收站里，30 天内）：{ 小写词: 删除时间 }。插件本机还留着、而且是在删除之前保存的，就跟着删掉，不再传上去把它加回来
+async function trashWords() {
+  try { const r = await fetch(VOCAB + "?trash=1"); if (!r.ok) return null; const j = await r.json(), o = {}; (j.items || []).forEach(t => { if (t && t.e && t.e.word) { const k = String(t.e.word).toLowerCase().trim(); o[k] = Math.max(o[k] || 0, +t.at || 0); } }); return o; } catch (e) { return null; }
+}
+async function dropTrashed(nb, have) {
+  const T = await trashWords(), del = new Set((nb && nb.deleted) || []);
+  const st = await chrome.storage.local.get({ saved: [], savedCtx: {} }), gone = [];
+  st.saved.forEach(w => { const k = String(w).toLowerCase(); if (have.has(k)) return; const at = (st.savedCtx[k] && +st.savedCtx[k].at) || 0; if (T ? T[k] && T[k] > at : del.has(entryId(k)) && !at) gone.push(k); });
+  if (gone.length) await chrome.storage.local.set({ saved: st.saved.filter(w => !gone.includes(String(w).toLowerCase())) });
+  return new Set(gone);
+}
 async function syncAll(tl) {
   const st = await chrome.storage.local.get({ saved: [], savedSents: [], savedCtx: {} });
-  let pend = [], have = new Set();
-  try { const d = await vocabGet(); pend = d.pending || []; (d.custom || []).forEach(x => x && have.add((x.word || "").toLowerCase())); } catch (e) { return { ok: false, cloud: false }; }
+  let pend = [], have = new Set(), nb = null;
+  try { nb = await vocabGet(); pend = nb.pending || []; (nb.custom || []).forEach(x => x && have.add((x.word || "").toLowerCase())); } catch (e) { return { ok: false, cloud: false }; }
+  const gone = await dropTrashed(nb, have);
   const items = new Map();
-  st.saved.forEach(w => items.set(w.toLowerCase(), { word: w }));
+  st.saved.forEach(w => { if (!gone.has(w.toLowerCase())) items.set(w.toLowerCase(), { word: w }); });
   st.savedSents.filter(x => x.ph).forEach(x => items.set(x.t.toLowerCase(), { word: x.t, zh: x.tr, ctx: x.ctx ? { t: x.ctx } : null }));
   pend.forEach(w => { w = String(w); if (!items.has(w.toLowerCase())) items.set(w.toLowerCase(), { word: w }); });
   const out = [];
@@ -372,7 +396,7 @@ chrome.runtime.onMessage.addListener((m, _s, send) => {
   else if (m.type === "reviewNext") reviewNext(m.word).then(send);
   else if (m.type === "extSync") fullSync().then(send);
   else if (m.type === "setSiteUser") setSiteUser(m.id).then(send).catch(e => send({ ok: false, error: String(e && e.message || e) }));
-  else if (m.type === "pageSync") { if (Date.now() - fullAt > 120000) fullSync(); send({}); } // 打开 YouTube 页面：两分钟内最多同步一次
+  else if (m.type === "pageSync") { lastFull().then(t => { if (Date.now() - Math.max(t, fullAt) > 120000) fullSync(); }); send({}); } // 打开 YouTube 页面：两分钟内最多同步一次（时间记在 storage.session，后台睡醒也算数）
   else return false;
   return true;
 });
@@ -383,7 +407,7 @@ chrome.runtime.onMessage.addListener((m, _s, send) => {
 // 录音截图很大，每条单独存（/api/media），整份数据里只放它的索引；本机没有的从云端下载
 const EXT = SITE + "/api/ext", MEDIA = SITE + "/api/media";
 const SY_ARR = { saved: w => String(w || "").toLowerCase(), savedSents: x => x && x.k }; // 列表：按小写词 / 句子的 k 区分
-const SY_MAP = ["savedCtx", "marks", "tags", "sugg"];                                           // 对象：按里面的键区分
+const SY_MAP = ["savedCtx", "marks", "tags", "sugg", "unmk"];                                  // unmk：取消标记的时间（nbApply 不再把它标回来）                                           // 对象：按里面的键区分
 const SY_ONE = ["reviewOpt", "reviewRate", "dictHist", "showCtx", "wtipOff"];             // 整个值一起
 const syHash = x => { const s = JSON.stringify(x); let h = 5381; for (let i = 0; i < s.length; i++) h = (h * 33 + s.charCodeAt(i)) | 0; return s.length + ":" + (h >>> 0).toString(36); };
 const medSig = r => r ? [r.at || 0, (r.aud || "").length, (r.img || "").length, (r.img2 || "").length].join(":") : "";
@@ -417,7 +441,12 @@ async function syRead() {
   return { v, f, med };
 }
 // 把云端合并结果写回本机：只写有变化的；列表保留本机原来的顺序，新来的按时间接在后面
-async function syApply(items, L) {
+// bs = 上次同步后的样子（签名）：本机有、云端没有的录音截图，只有「上次云端还有、这次没了」（别的设备删的）才删；
+//   还没传上去的（一次最多传 60 条、传到一半断网）不删
+// L0 = 这次同步开始时读的本机数据；写回前再读一次，同步期间本机又改过的项（又保存了词、改了标记…）保留本机的，下次再传
+async function syApply(items0, L0, bs) {
+  const L = await syRead(), skip = new Set(), items = Object.assign({}, items0);
+  for (const k of new Set([...Object.keys(L0.f), ...Object.keys(L.f)])) if (JSON.stringify(L0.f[k]) !== JSON.stringify(L.f[k])) { skip.add(k); if (k in L.f) items[k] = { v: L.f[k], at: Date.now() }; else delete items[k]; }
   const want = { saved: [], savedSents: [] }, maps = {}, ones = {}, wimg = {}, sets = {}, meds = {};
   SY_MAP.forEach(n => (maps[n] = {}));
   for (const k in items) {
@@ -436,7 +465,7 @@ async function syApply(items, L) {
   SY_ONE.forEach(n => { if (n in ones) { if (!same(ones[n], L.v[n])) put[n] = ones[n]; } else if (L.v[n] !== undefined) del.push(n); });
   for (const k in wimg) if (!same(wimg[k], L.v[k])) put[k] = wimg[k];
   for (const k in L.v) if (k.startsWith("wimg:") && !(k in wimg)) del.push(k);
-  for (const k in L.med) if (!(k in meds)) del.push(k); // 别的设备删掉的录音截图
+  for (const k in L.med) if (!(k in meds) && bs && bs["med|" + k] !== undefined && !skip.has("med|" + k)) del.push(k); // 别的设备删掉的录音截图
   if (Object.keys(put).length) await chrome.storage.local.set(put);
   if (del.length) await chrome.storage.local.remove(del);
   const sv = await chrome.storage.sync.get(null), sput = {}, sdel = [];
@@ -450,16 +479,19 @@ async function syApply(items, L) {
     if (L.med[k] === meds[k]) continue;
     try { const r = await fetch(MEDIA + "?k=" + encodeURIComponent(k)); if (!r.ok) continue; const j = await r.json(); if (j && j.rec) { await chrome.storage.local.set({ [k]: j.rec }); await medIdxUpdate({ [k]: { newValue: j.rec } }); got++; } } catch (e) {}
   }
-  return { got, wrote: Object.keys(put).length + del.length };
+  return { got, wrote: Object.keys(put).length + del.length, skip };
 }
 // 生词本里的掌握状态 → 插件的颜色标记（网站上标为已掌握 / 练到已掌握：字幕里这个词变白、移出「正在学习」；插件里标过已掌握的写回生词本）
 async function nbApply() {
   let nb; try { nb = await vocabGet(); await chrome.storage.local.set({ vocabCache: nb }); } catch (e) { return { ok: false }; }
-  const st = await chrome.storage.local.get({ saved: [], marks: {} }), del = new Set(nb.deleted || []), P = nb.progress || {}, seen = new Set(), toKnown = {};
+  const have = new Set((nb.custom || []).map(x => x && String(x.word || "").toLowerCase()));
+  await dropTrashed(nb, have).catch(() => {});
+  const st = await chrome.storage.local.get({ saved: [], marks: {}, unmk: {} }), del = new Set(nb.deleted || []), P = nb.progress || {}, PA = nb.progAt || {}, U = st.unmk || {}, seen = new Set(), toKnown = {};
   let saved = st.saved, marks = st.marks, ch = false; const has = k => saved.some(x => String(x).toLowerCase() === k);
   (nb.custom || []).forEach(e => {
     if (!e || !e.id || !e.word || del.has(e.id) || (e.type || "word") !== "word") return;
     const k = String(e.word).toLowerCase().trim(); if (!/^[a-z][a-z'’-]*$/.test(k) || seen.has(k)) return; seen.add(k);
+    if (U[k] && !((+PA[e.id] || 0) > U[k])) return; // 插件里「恢复默认」取消过：生词本那边之后没再改过它的状态，就不把它标回来
     if (P[e.id] === "known") { if (marks[k] !== "known") { marks[k] = "known"; ch = true; } if (has(k)) { saved = saved.filter(x => String(x).toLowerCase() !== k); ch = true; } }
     else if (marks[k] === "known") toKnown[e.id] = "known";
     else if (!has(k) && marks[k] !== "ignore") { saved.push(k); ch = true; }
@@ -480,8 +512,11 @@ async function repair1120() {
   if (marks.possessions === "known") { delete marks.possessions; if (!saved.some(x => String(x).toLowerCase() === "possessions")) saved.push("possessions"); await chrome.storage.local.set({ marks, saved }); }
   await chrome.storage.local.set({ repair1120: true });
 }
-const fullSync = () => { fullAt = Date.now(); return repair1120().catch(() => {}).then(() => nbApply()).catch(() => {}).then(() => extSync(true)); };
+const lastFull = () => (chrome.storage.session ? chrome.storage.session.get({ fullAt: 0 }).then(v => +v.fullAt || 0).catch(() => 0) : Promise.resolve(0));
+const fullSync = () => { fullAt = Date.now(); try { chrome.storage.session && chrome.storage.session.set({ fullAt }); } catch (e) {} return repair1120().catch(() => {}).then(() => nbApply()).catch(() => {}).then(() => extSync(true)); };
 let syBusy = null, syAgain = false, syLast = 0, syT = 0;
+// 录音截图没传完：半分钟后再试（用 alarm，后台睡着了也会叫醒；setTimeout 跟着后台一起没了）
+function retrySoon() { try { chrome.alarms.create("extRetry", { delayInMinutes: 0.5 }); } catch (e) { extSyncSoon(30000); } }
 function extSyncSoon(ms) { clearTimeout(syT); syT = setTimeout(() => extSync(), ms == null ? 4000 : ms); }
 function extSync(force) {
   if (userSwitching) return Promise.resolve({ ok: false, switching: true });
@@ -508,7 +543,7 @@ async function extSyncOnce(force) {
     const ok = await fetch(MEDIA, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ k, rec }) }).then(r => r.ok).catch(() => false);
     if (!ok) break; changes["med|" + k] = { v: medSig(rec), at: now }; up++;
   }
-  if (medUp.length > up) extSyncSoon(30000);
+  if (medUp.length > up) retrySoon();
   let doc;
   if (Object.keys(changes).length) {
     const r = await fetch(EXT, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ changes }) });
@@ -520,10 +555,11 @@ async function extSyncOnce(force) {
   syLast = Date.now();
   if (!doc.ok) return { ok: false };
   const items = doc.items || {};
-  const ap = (base && base.ver === doc.ver && !Object.keys(changes).length) ? { got: 0, wrote: 0 } : await syApply(items, L);
-  // 记下这次同步后的样子（下载失败的录音截图不记，下次再下）
+  const ap = (base && base.ver === doc.ver && !Object.keys(changes).length) ? { got: 0, wrote: 0, skip: new Set() } : await syApply(items, L, base ? bs : null);
+  // 记下这次同步后的样子（下载失败的录音截图不记，下次再下；同步期间本机又改过的不记，下次再传）
   const L2 = await syRead(), sig = {};
-  for (const k in items) { if (!(k in L2.f)) continue; sig[k] = k.startsWith("med|") ? L2.f[k] : syHash(L2.f[k]); }
+  for (const k in items) { if (ap.skip.has(k)) { sig[k] = "~"; continue; } if (!(k in L2.f)) continue; sig[k] = k.startsWith("med|") ? L2.f[k] : syHash(L2.f[k]); } // "~"：和本机对不上，下次一定会传（改了就传新的，删了就传删除）
+  if (ap.skip.size) extSyncSoon();
   await chrome.storage.local.set({ extBase: { ver: doc.ver, sig, at: Date.now() } });
   return { ok: true, sent: Object.keys(changes).length, up, got: ap.got, wrote: ap.wrote, total: Object.keys(items).length, pendingUp: medUp.length - up };
 }
@@ -538,7 +574,7 @@ async function setSiteUser1(id) {
   const r = await extSync(true); if (!r || !r.ok) return { ok: false, error: "当前用户的数据没传完（网络问题？），没有切换" };
   await cloudChain.catch(() => {});
   const q = (await chrome.storage.local.get({ srsQueue: null })).srsQueue;
-  if (q && (Object.keys(q.srs || {}).length || Object.keys(q.progress || {}).length)) { const p = await vocabPatch({}); if (!p.ok) return { ok: false, error: "复习进度没传完（网络问题？），没有切换" }; }
+  if (queued(q)) { const p = await vocabPatch({}); if (!p.ok) return { ok: false, error: "复习进度没传完（网络问题？），没有切换" }; }
   userSwitching = true;
   try {
     if (syBusy) await syBusy.catch(() => {});
@@ -559,6 +595,9 @@ chrome.storage.onChanged.addListener((c, area) => {
   if (Object.keys(med).length) medIdxUpdate(med);
   if (hit) extSyncSoon();
 });
-chrome.runtime.onStartup.addListener(() => setTimeout(fullSync, 3000));
+// 每 15 分钟同步一次：浏览器重启后定时器可能没了，每次后台醒来都检查一下，没有就补上
+const ensureAlarm = () => { try { Promise.resolve(chrome.alarms.get("extSync")).then(a => { if (!a) chrome.alarms.create("extSync", { periodInMinutes: 15 }); }).catch(() => {}); } catch (e) {} };
+ensureAlarm();
+chrome.runtime.onStartup.addListener(() => { ensureAlarm(); setTimeout(fullSync, 3000); });
 chrome.runtime.onInstalled.addListener(() => { chrome.alarms.create("extSync", { periodInMinutes: 15 }); setTimeout(fullSync, 3000); });
-chrome.alarms.onAlarm.addListener(a => { if (a.name === "extSync") fullSync(); });
+chrome.alarms.onAlarm.addListener(a => { if (a.name === "extSync") fullSync(); else if (a.name === "extRetry") extSync(); });

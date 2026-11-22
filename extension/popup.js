@@ -16,7 +16,10 @@ function show() {
   paint();
 }
 function val(el) { if (el.type === "checkbox") return el.dataset.inv ? !el.checked : el.checked; if (el.type === "range" || el.dataset.num) return +el.value; return el.value; }
-els.forEach(el => { const h = () => { V[el.dataset.k] = val(el); chrome.storage.sync.set({ [el.dataset.k]: V[el.dataset.k] }); paint(); }; el.addEventListener(el.type === "range" || el.type === "color" || el.tagName === "TEXTAREA" ? "input" : "change", h); });
+// storage.sync 每分钟最多写 120 次：拖滑块、打字时先只改界面，停 400ms 再存（不然超了额度，最后的值反而存不上）
+const syT = {}; const sySet = k => { clearTimeout(syT[k]); syT[k] = setTimeout(() => chrome.storage.sync.set({ [k]: V[k] }), 400); };
+addEventListener("pagehide", () => { for (const k in syT) { clearTimeout(syT[k]); chrome.storage.sync.set({ [k]: V[k] }); } });
+els.forEach(el => { const h = e => { V[el.dataset.k] = val(el); if (e && e.type === "input") sySet(el.dataset.k); else chrome.storage.sync.set({ [el.dataset.k]: V[el.dataset.k] }); paint(); }; el.addEventListener(el.type === "range" || el.type === "color" || el.tagName === "TEXTAREA" ? "input" : "change", h); if (el.type === "range" || el.type === "color" || el.tagName === "TEXTAREA") el.addEventListener("change", () => { clearTimeout(syT[el.dataset.k]); chrome.storage.sync.set({ [el.dataset.k]: V[el.dataset.k] }); }); }); // 松手 / 离开输入框：马上存
 $("sizePreset").onchange = e => { if (!e.target.value) return; V.origSize = V.trSize = +e.target.value; chrome.storage.sync.set({ origSize: V.origSize, trSize: V.trSize }); show(); };
 $("rst").onclick = () => { const o = {}; LOOK.forEach(k => (o[k] = V[k] = D[k])); chrome.storage.sync.set(o); show(); };
 $("lv").onclick = () => chrome.runtime.openOptionsPage();

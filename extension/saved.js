@@ -2,6 +2,7 @@
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const send = m => new Promise(res => { try { chrome.runtime.sendMessage(m, r => res(r || {})); } catch (e) { res({}); } });
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const imgSafe = u => (/^data:image\/[a-z+]+;base64,[A-Za-z0-9+/=]+$/.test(String(u || "")) || /^https:\/\/[^"'<>\s]+$/.test(String(u || "")) ? esc(u) : ""); // 截图来自云端，接口不要口令：只认图片数据 / https 地址
 const IC = {
   mark: '<path class="f" d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/>', star: '<path class="f" d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z"/>', list: '<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>',
   search: '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/>', play: '<path class="f" d="M8 5.2v13.6a1 1 0 0 0 1.5.86l11.3-6.8a1 1 0 0 0 0-1.72L9.5 4.34A1 1 0 0 0 8 5.2z"/>',
@@ -12,7 +13,7 @@ const IC = {
 };
 const I = n => '<svg class="vi" viewBox="0 0 24 24">' + IC[n] + "</svg>";
 const DAY = 864e5, PER = 50, DONE = 5;
-let S = { level: -1, ratio: 1.5, target: "zh-CN", srcLang: "en" }, saved = [], ctx = {}, srs = {}, marks = {}, sents = [], med = {};
+let UNMK = {}, S = { level: -1, ratio: 1.5, target: "zh-CN", srcLang: "en" }, saved = [], ctx = {}, srs = {}, marks = {}, sents = [], med = {};
 let NBW = {}, nbSents = [], nbSynced = false; // 网站生词本：NBW 单词词条（按小写的词），nbSents 短语 / 句子词条（「短语和句子」页显示，不存进插件本地）
 let tab = "words", q = "", sort = "date", filt = "learn", src = "", page = 0, picked = new Set(), player = null, allShown = 1e9, tags = {}, tagF = new Set(), allSort = "freq", allView = "cell", allF = new Set(), dictW = "", miniT = null, miniW = null, hist = [];
 const TAGS = [["g", "#8EE05A", "绿色"], ["y", "#F1E46B", "黄色"], ["r", "#FF6B5E", "红色"], ["b", "#6FD3FF", "蓝色"]];
@@ -38,6 +39,7 @@ function mergeNotebook(cb) {
     });
     let changed = false; const toKnown = {};
     Object.keys(NBW).forEach(k => { const e = NBW[k];
+      if (UNMK[k] && !((+((nb.progAt || {})[e.id]) || 0) > UNMK[k])) return; // 取消标记过、生词本之后没再改过：不标回来
       if (P[e.id] === "known") { if (marks[k] !== "known") { marks[k] = "known"; changed = true; } if (saved.includes(k)) { saved = saved.filter(x => x !== k); changed = true; } }
       else if (marks[k] === "known") toKnown[e.id] = "known";
       else if (!saved.includes(k) && marks[k] !== "ignore") { saved.push(k); changed = true; }
@@ -54,7 +56,7 @@ const nbId = k => (String(k).startsWith("nb:") ? k.slice(3) : NBW[k] ? NBW[k].id
 function load(cb) {
   chrome.storage.sync.get({ level: -1, ratio: 1.5, target: "zh-CN", srcLang: "en", greenKnown: false, fadeRare: true, showMarks: true }, s => { S = s;
     chrome.storage.local.get(null, v => {
-      saved = [...new Set((v.saved || []).map(w => w.toLowerCase()))]; ctx = v.savedCtx || {}; srs = v.srs || {}; marks = v.marks || {}; sents = v.savedSents || []; tags = v.tags || {}; hist = v.dictHist || [];
+      saved = [...new Set((v.saved || []).map(w => w.toLowerCase()))]; ctx = v.savedCtx || {}; srs = v.srs || {}; marks = v.marks || {}; sents = v.savedSents || []; tags = v.tags || {}; hist = v.dictHist || []; UNMK = v.unmk || {};
       med = {}; Object.keys(v).forEach(k => { if (k.startsWith("med:")) med[k] = v[k]; });
       VS_SAVED = new Set(saved); VS_MARKS = marks; mergeNotebook(cb);
     });
@@ -69,7 +71,7 @@ function say(text, m) {
 function srcCell(m, c) {
   const o = m || c; if (!o || !o.v) return '<span class="no">—</span>';
   const url = vsVidUrl(o.v, o.s), title = (m && m.title) || (vsVidSite(o.v) === "bili" ? "哔哩哔哩" : "YouTube"); // 出处：YouTube 或 B 站，从这句开始播
-  return '<a href="' + url + '" target="_blank" rel="noopener" title="' + esc(title + (m && m.ch ? " · " + m.ch : "") + " · " + tm(o.s || 0)) + '">' + (m && m.img ? '<img src="' + m.img + '" alt="">' : '<span class="yt' + (vsVidSite(o.v) === "bili" ? " bl" : "") + '">' + I("play") + "</span>") + '<span class="ti">' + esc(title) + "</span></a>";
+  return '<a href="' + url + '" target="_blank" rel="noopener" title="' + esc(title + (m && m.ch ? " · " + m.ch : "") + " · " + tm(o.s || 0)) + '">' + (m && m.img ? '<img src="' + imgSafe(m.img) + '" alt="">' : '<span class="yt' + (vsVidSite(o.v) === "bili" ? " bl" : "") + '">' + I("play") + "</span>") + '<span class="ti">' + esc(title) + "</span></a>";
 }
 // 掌握进度：和网站「🔊 练习」、列表同一个算法——Ebisu 半衰期到 42 天（6 周，同 Language Reactor）= 100 % 已掌握，中间按对数换算
 const mastOf = w => { const r = srs[w]; if (marks[w] === "known" || (r && ((r.h || r.s) ? (r.h || r.s) >= 42 : r.b >= DONE))) return 1; if (!r || !(r.h || r.s || r.b)) return 0; const h = r.h || r.s || [0.5, 1, 3, 7, 16, 35, 90][r.b || 0] || 0.5; return Math.min(1, Math.log(1 + h) / Math.log(43)); };
@@ -165,8 +167,11 @@ function drawAll() {
   $("#aview").onclick = e => { const b = e.target.closest("b"); if (b) { allView = b.dataset.v; drawAll(); } };
   $$(".jump a").forEach(a => (a.onclick = () => { const el = document.getElementById("r" + a.dataset.a); if (el) el.scrollIntoView(); }));
 }
+// 取消标记的记录（同 content.js）：生词本里有这个词时，同步不再把它标回来
+function unmk(k, on) { chrome.storage.local.get({ unmk: {} }, v => { const u = (v && v.unmk) || {}; if (on) u[k] = Date.now(); else if (k in u) delete u[k]; else return; chrome.storage.local.set({ unmk: u }); }); }
 function setMark(w, m) { // learn | known | ignore | ""
   w = w.toLowerCase();
+  if (m) unmk(w, false); else if (saved.includes(w) || marks[w] === "known") unmk(w, true);
   if (m === "known" || m === "learn") send({ type: "vocabMark", word: w, st: m === "known" ? "known" : "learning" }); // 生词本里的掌握状态跟着变
   Object.keys(marks).forEach(x => { if (vsSame(x, w)) delete marks[x]; });
   if (m === "learn") { if (vsMarkOf(w) !== "learn") { saved.push(w); ctx[w] = ctx[w] || { at: Date.now() }; send({ type: "add", word: w }); } }
@@ -203,7 +208,7 @@ function removeKeys(keys) { fresh(() => removeKeys0(keys)); }
 function removeKeys0(keys) {
   const inNb = keys.filter(k => nbId(k)).length && (tab !== "words" || filt === "learn");
   if ((keys.length > 1 || inNb) && !confirm("确定要" + (tab === "words" && filt !== "learn" ? "取消标记" : "删除") + "这 " + keys.length + " 项吗？保存的原声和画面也会一起删除。" + (inNb ? "\n其中有网站生词本里的词条，生词本里也会删除（可以从备份还原）。" : ""))) return;
-  if (tab === "words") { keys.forEach(w => { if (filt === "learn") { saved = saved.filter(x => x !== w); delete ctx[w]; delete srs[w]; delete med["med:w:" + w]; } else delete marks[w]; }); if (filt === "learn") chrome.storage.local.remove(keys.map(w => "med:w:" + w)); }
+  if (tab === "words") { keys.forEach(w => { if (filt === "learn") { saved = saved.filter(x => x !== w); delete ctx[w]; delete srs[w]; delete med["med:w:" + w]; } else { if (marks[w] === "known" && NBW[w]) unmk(w, true); delete marks[w]; } }); if (filt === "learn") chrome.storage.local.remove(keys.map(w => "med:w:" + w)); }
   else { sents = sents.filter(x => !keys.includes(x.k)); nbSents = nbSents.filter(x => !keys.includes(x.k)); chrome.storage.local.remove(keys.map(k => "med:s:" + k)); }
   const gone = (tab === "words" ? (filt === "learn" ? keys : []) : keys).map(nbId).filter(Boolean); // 删除的是生词本词条：生词本里也删（仓库和后台都有备份）
   if (gone.length) { send({ type: "vocabPatch", patch: { deleted: gone } }); gone.forEach(id => Object.keys(NBW).forEach(k => { if (NBW[k].id === id) delete NBW[k]; })); }
@@ -267,7 +272,7 @@ function drawDict(w, res) {
       '<button class="bigm nx" id="dnext">' + I("bolt") + '下次学习</button><div class="hint">下一次复习从这个词开始。</div></div>' : "") +
     '<div class="card"><div class="zh">' + (res ? esc(ms.slice(0, 4).join("，")) || "（无翻译）" : "…") + (dd && dd.phonetic ? '<span class="ph">' + esc(dd.phonetic) + "</span>" : "") + (dd && dd.lemma ? '<span class="ph">原形 ' + esc(dd.lemma) + "</span>" : "") + "</div>" +
       (g && g.zh && g.zh.length ? g.zh.map(z => '<div class="ln"><i>' + esc(z.pos) + "</i>" + esc(z.words.join("，")) + "</div>").join("") : "") + "</div>" +
-    (m && m.t ? '<div class="card"><div class="ct">你保存时的句子</div><div class="eg">' + (m.img ? '<img src="' + m.img + '" alt="">' : "") + "<div>" + ctxHtml(m.t, w) + (m.tr ? '<div class="tr">' + esc(m.tr) + "</div>" : "") + '<div class="so">' + srcCell(mOf(w), ctx[w]) + (m.aud ? '<button id="dorig" class="rnd sm" title="播放原声">' + I("play") + "</button>" : "") + "</div></div></div></div>" : "") +
+    (m && m.t ? '<div class="card"><div class="ct">你保存时的句子</div><div class="eg">' + (m.img ? '<img src="' + imgSafe(m.img) + '" alt="">' : "") + "<div>" + ctxHtml(m.t, w) + (m.tr ? '<div class="tr">' + esc(m.tr) + "</div>" : "") + '<div class="so">' + srcCell(mOf(w), ctx[w]) + (m.aud ? '<button id="dorig" class="rnd sm" title="播放原声">' + I("play") + "</button>" : "") + "</div></div></div></div>" : "") +
     (dd && dd.meanings && dd.meanings.length ? '<div class="card"><div class="ct">英文释义</div>' + dd.meanings.map(mm => mm.defs.map((x, i) => '<div class="ln en"><i>' + (i ? "" : esc(mm.pos)) + "</i><div>" + vsMark(esc(x.def), S) + (x.example ? '<div class="eq">“' + vsMark(esc(x.example), S) + "”</div>" : "") + "</div></div>").join("")).join("") + "</div>" : "") +
     (drawDict.sent && drawDict.sent.length ? '<div class="card"><div class="ct">例句</div>' + drawDict.sent.slice(0, 6).map(x => '<div class="sx">' + ctxHtml(x.en, w) + (x.tr ? '<div class="tr">' + esc(x.tr) + "</div>" : "") + "</div>").join("") + "</div>" : "") +
     '<div class="card lk">' + EXT.map(e => '<a target="_blank" rel="noopener" title="' + e[1] + '" href="' + e[2].replace("WORD", encodeURIComponent(w)) + '">' + e[0] + "</a>").join("") + "</div></div>";

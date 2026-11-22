@@ -81,6 +81,7 @@ function vsClass(w, S, first, capAdj) {
 var VS_WORD_RE = /[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu;
 function vsMark(escaped, S, cls) {
   return escaped.replace(VS_WORD_RE, function (w, off, str) {
+    if (off > 0 && str.charAt(off - 1) === "&" && str.charAt(off + w.length) === ";") return w; // 已经转义过的 &amp; &lt; &quot; 里的字母不是词（以前会显示成 R&amp;D、amp 还能点）
     var prev = str.slice(0, off).replace(/\s+$/, ""), first = !prev || /[.?!…“‘"'(\[:;—–\-]$/.test(prev), capAdj = false;
     if (/^[A-Z]/.test(w)) {
       if (/^\s+[A-Z][a-z]/.test(str.slice(off + w.length))) capAdj = true;

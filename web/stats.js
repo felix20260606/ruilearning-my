@@ -42,7 +42,7 @@
     for (const k in local || {}) put(k, local[k]);
     for (const k in server || {}) put(k, server[k]);
     const tk = dayKey(now);
-    if (pumpDay && pumpDay.d === new Date(now).toISOString().slice(0, 10) && num(pumpDay.n) > 0) { // pump:day 是 UTC 日期，只在和「现在」同一天时当今天的卡片数下限
+    if (pumpDay && pumpDay.d === tk && num(pumpDay.n) > 0) { // pump:day 的日期和本地今天相同才当今天的卡片数下限（以前按 UTC 比，北京时间 0–8 点会把昨天的卡数算到今天）
       if (!out[tk]) out[tk] = { n: 0, ok: 0, fail: 0, nw: 0, sec: 0 };
       if (pumpDay.n > out[tk].n) out[tk].n = pumpDay.n;
     }
@@ -500,7 +500,7 @@
       else if (id === "st-go-pump") { const b = document.querySelector('.modes button[data-mode="pump"]'); if (b) b.click(); else location.href = "/?go=pump"; }
     });
     document.addEventListener("keydown", e => {
-      if (!vt || vt.done || !root.classList.contains("on") || /input|textarea|select/i.test((e.target && e.target.tagName) || "")) return;
+      if (!vt || vt.done || !root.classList.contains("on") || !root.offsetParent || /input|textarea|select/i.test((e.target && e.target.tagName) || "")) return;
       if (e.key === "ArrowLeft") { e.preventDefault(); vtAnswer(true); } else if (e.key === "ArrowRight") { e.preventDefault(); vtAnswer(false); }
     });
   }

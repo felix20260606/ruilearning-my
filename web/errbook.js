@@ -41,6 +41,8 @@
         if (x.del) { if (cur) { o[id] = { id, del: 1, u: +x.at }; ch = true; } continue; }
         if (x.v && typeof x.v === "object") { o[id] = Object.assign({}, x.v, { id, u: +x.at }); ch = true; }
       }
+      // 50 天前的删除记号：后台 60 天后会清掉，本机也丢掉（不然后台没有了、这里每次拉都再传一遍，白写一次 KV）
+      for (const id in o) if (o[id] && o[id].del && Date.now() - (+o[id].u || 0) > 50 * 86400e3 && !(j.items || {})[id]) { delete o[id]; ch = true; }
       // 本机有、后台没有的（离线时加的）补传
       for (const id in o) if (!(j.items || {})[id] || +j.items[id].at < +o[id].u) put(o[id]);
       if (ch) { save(o); if (root && root.isConnected) draw(); }
