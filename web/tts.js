@@ -33,6 +33,7 @@
   function play(text, o) {
     o = o || {};
     if (mode() === "sys") return false;
+    if (window.VL && window.VL !== "en") return false; // AI 真人声只会英语：学德语等其它语言时用系统语音（index.html 按语言挑）
     if (!M) { load(); return false; }
     var src = srcOf(text, o.who); if (!src) return false;
     stop(); try { speechSynthesis.cancel(); } catch (e) {}

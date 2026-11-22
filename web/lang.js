@@ -1,7 +1,9 @@
 /* 🌐 学习语言：现在学哪种语言（英语 / 德语 …），顶栏「👤」左边的按钮切换
    - 每个家人各选各的：存在 localStorage「lang」（index.html 的 MINE 按人分开存）；只存在这台设备上
-   - 切换后发 "lang-change" 事件、<html data-lang="de">；跟着语言换内容的页面自己监听
-   - 目前跟着换的：🎧 听 → 🧩 练习课（drill.js）。其它页面还是英语内容
+   - 每种语言的数据全部分开：生词本、错题本、练习进度、每日、阅读 / 写作 / 口语 / 听力记录… 本机缓存和后台都按「人 + 语言」分开存
+     （见 index.html 最上面那段：本机键加 "~de"、接口带 ?lang=de；英语和以前一样）
+   - 所以切换语言跟切换家人一样：先把没传完的改动传上去，再整页重新加载；<html data-lang="de">，一级标签「📚 英语」跟着变成「📚 德语」
+   - 内容跟着换语言的：🎧 听 → 🧩 练习课（drill.js）。其它页面的内容（BBC、雅思、新闻…）还是英语的
    - 加一门语言：在下面 LANGS 里加一项，再给 drill.js 的 PROV 加这门语言的素材来源
    window.LANG = { cur(), set(code), cfg(code?), list(), words(s), check(typed, right, code?), stop }
    check() 判填空：忽略标点和多余空格；英语不分大小写；德语允许 ae / oe / ue / ss 代替 ä / ö / ü / ß，名词没大写算对但提醒 */
@@ -17,6 +19,7 @@
   const KEY = "lang";
   let cur = "en";
   try { const v = localStorage.getItem(KEY); if (LANGS[v]) cur = v; } catch (e) {}
+  if (window.VL && LANGS[window.VL]) cur = window.VL; // index.html 最上面已经按这个语言把数据分开了：以它为准
   const H = document.documentElement;
   H.setAttribute("data-lang", cur);
 
@@ -42,20 +45,26 @@
     if (B.length >= 5 && dist(fold(A, c), fold(B, c)) === 1) return { ok: false, note: "差一个字母" };
     return { ok: false, note: "" };
   }
-  function set(code) {
+  // 切换：先把这门语言没传完的改动传上去（同切换家人），再记下新语言、整页重新加载（数据按语言分开存，不能不刷新就换）
+  async function set(code) {
     if (!LANGS[code] || code === cur) return;
-    cur = code; try { localStorage.setItem(KEY, code); } catch (e) {}
-    H.setAttribute("data-lang", code); paint();
-    try { window.dispatchEvent(new CustomEvent("lang-change", { detail: code })); } catch (e) {}
+    try { (window.toast || (() => {}))("正在切换到" + LANGS[code].name + "…"); } catch (e) {}
+    try { if (typeof window.syncNow === "function") await Promise.race([window.syncNow(), new Promise(r => setTimeout(r, 4000))]); } catch (e) {}
+    try { localStorage.setItem(KEY, code); } catch (e) {}
+    if (window.__langNoReload) { cur = code; H.setAttribute("data-lang", code); paint(); try { window.dispatchEvent(new CustomEvent("lang-change", { detail: code })); } catch (e) {} return; } // 测试用
+    location.reload();
   }
   window.LANG = { cur: () => cur, set, cfg, list: () => Object.values(LANGS), words, check, stop: c => new Set(cfg(c).stop) };
 
   // ---------- 顶栏按钮 + 菜单（样式和「👤」一样） ----------
   let btn = null, menu = null;
-  function paint() { if (btn) btn.innerHTML = cfg().flag + ' <b class="ln">' + cfg().name + "</b> ▾"; }
+  function paint() {
+    if (btn) btn.innerHTML = cfg().flag + ' <b class="ln">' + cfg().name + "</b> ▾";
+    const l1 = document.getElementById("l1-en"); if (l1) l1.textContent = "📚 " + cfg().name; // 一级标签跟着语言
+  }
   function open() {
     menu.innerHTML = Object.values(LANGS).map(x => '<button data-l="' + x.code + '" class="' + (x.code === cur ? "on" : "") + '">' + x.flag + " " + x.name + (x.ready ? "" : ' <small style="color:var(--ui-muted)">（准备中）</small>') + "</button>").join("") +
-      '<div class="who-tip">每个家人各自选，只记在这台设备上。<br>现在跟着换语言的：🎧 听 → 🧩 练习课。其它页面还是英语内容。</div>';
+      '<div class="who-tip">每种语言的生词本、错题本、练习进度、每日打卡都分开存，切换后页面会重新加载。<br>每个家人各自选，只记在这台设备上。<br>内容跟着换的：🎧 听 → 🧩 练习课；其它页面的内容（BBC、雅思、新闻…）还是英语的。</div>';
     const r = btn.getBoundingClientRect(); menu.classList.add("on");
     const w = menu.offsetWidth; menu.style.left = Math.max(16, Math.min(r.left, innerWidth - w - 16)) + "px"; menu.style.top = (r.bottom + 6) + "px";
   }
@@ -69,8 +78,6 @@
     menu.onclick = e => {
       e.stopPropagation(); const b = e.target.closest("button[data-l]"); if (!b) return; close();
       const c = b.dataset.l; if (c === cur) return; set(c);
-      const t = window.toast || (() => {});
-      t(cfg().ready ? "已切换到" + cfg().name : "已切换到" + cfg().name + "：素材还在准备，练习课页暂时是空的");
     };
     document.addEventListener("click", close); window.addEventListener("resize", close);
   }

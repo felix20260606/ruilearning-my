@@ -550,7 +550,7 @@
     try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { toast("没拿到麦克风：请在浏览器地址栏允许使用麦克风"); return; }
     const r = rec = { c, stream, chunks: [], srText: "" };
     try { r.mr = new MediaRecorder(stream); } catch (e) { r.mr = null; }
-    if (SR) { try { const sr = r.sr = new SR(); sr.lang = "en-US"; sr.interimResults = false; sr.continuous = true; sr.onresult = e => { r.srText = [...e.results].map(x => x[0].transcript).join(" "); }; sr.onerror = () => {}; sr.start(); } catch (e) { r.sr = null; } }
+    if (SR) { try { const sr = r.sr = new SR(); sr.lang = window.VL === "de" ? "de-DE" : "en-US"; sr.interimResults = false; sr.continuous = true; sr.onresult = e => { r.srText = [...e.results].map(x => x[0].transcript).join(" "); }; sr.onerror = () => {}; sr.start(); } catch (e) { r.sr = null; } }
     if (r.mr) { r.mr.ondataavailable = e => { if (e.data && e.data.size) r.chunks.push(e.data); }; r.mr.onstop = () => { stream.getTracks().forEach(t => t.stop()); if (!r.cancel) recDone(r); }; r.mr.start(); }
     else if (!r.sr) { stream.getTracks().forEach(t => t.stop()); rec = null; toast("这个浏览器不能录音"); return; }
     c.recOn = true; c.said = null; show();
@@ -561,7 +561,7 @@
     const blob = r.chunks.length ? new Blob(r.chunks, { type: r.chunks[0].type || "audio/webm" }) : null;
     if (blob) { try { if (c.myUrl) URL.revokeObjectURL(c.myUrl); } catch (e) {} c.myUrl = URL.createObjectURL(blob); }
     let text = "";
-    if (blob) { try { const j = await (await fetch("/api/stt", { method: "POST", headers: { "Content-Type": blob.type }, body: blob })).json(); if (j && j.ok) text = j.text || ""; else if (j && j.error === "noai") c.noai = true; } catch (e) {} }
+    if (blob) { try { const j = await (await fetch("/api/stt" + (window.VL && window.VL !== "en" ? "?lang=" + window.VL : ""), { method: "POST", headers: { "Content-Type": blob.type }, body: blob })).json(); if (j && j.ok) text = j.text || ""; else if (j && j.error === "noai") c.noai = true; } catch (e) {} }
     if (!text) { await new Promise(res => setTimeout(res, 600)); text = r.srText; } // 浏览器语音识别的结果稍晚一点才到
     c.busy = false; c.said = text; c.res = align(plain(c.s.en), text);
     c.best = Math.max(c.best || 0, c.res.score);

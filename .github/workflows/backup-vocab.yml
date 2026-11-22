@@ -39,6 +39,17 @@ jobs:
             curl -fsS --retry 3 "https://ruilearning-my.pages.dev/api/ext?u=$u" -o /tmp/e.json && jq -e '.ok == true and (.items | type == "object")' /tmp/e.json > /dev/null && jq '{ver, items}' /tmp/e.json > "data/users/$u/ext.json"
             python3 tools/backup-media.py --user "$u"
           done
+      - name: 下载其它学习语言（德语…）的生词本、插件数据（每种语言分开存：主人 data/lang/<语言>/，家人 data/users/<id>/lang/<语言>/；没内容的不存）
+        run: |
+          for lg in de; do
+            for u in "" $(jq -r '.users[].id | select(. != "")' /tmp/users.json); do
+              if [ -z "$u" ]; then d="data/lang/$lg"; q="lang=$lg"; else d="data/users/$u/lang/$lg"; q="u=$u&lang=$lg"; fi
+              curl -fsS --retry 3 "https://ruilearning-my.pages.dev/api/vocab?$q" -o /tmp/v.json && jq -e '.ok == true and (.custom | type == "array")' /tmp/v.json > /dev/null || continue
+              curl -fsS --retry 3 "https://ruilearning-my.pages.dev/api/ext?$q" -o /tmp/e.json && jq -e '.ok == true and (.items | type == "object")' /tmp/e.json > /dev/null || continue
+              if [ "$(jq '(.custom | length) + (.pending // [] | length)' /tmp/v.json)" = "0" ] && [ "$(jq '.items | length' /tmp/e.json)" = "0" ] && [ ! -d "$d" ]; then continue; fi
+              mkdir -p "$d"; jq 'del(.ok)' /tmp/v.json > "$d/vocab.json"; jq '{ver, items}' /tmp/e.json > "$d/ext.json"
+            done
+          done
       - name: 下载视频字幕（只下新增或有变化的）
         run: |
           mkdir -p data/captions
@@ -58,6 +69,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/vocab.json data/ext.json data/media data/captions data/users.json
           [ -d data/users ] && git add data/users
+          [ -d data/lang ] && git add data/lang
           if git diff --cached --quiet; then echo "没有变化"; exit 0; fi
           git commit -m "备份生词本、插件数据、原声截图和字幕 $(TZ=Asia/Shanghai date '+%F %H:%M')"
           git push

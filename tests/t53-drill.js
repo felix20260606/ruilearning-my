@@ -15,8 +15,9 @@ function env() {
 let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); } };
 
 // ---- 🌐 lang.js ----
+(async () => {
 {
-  const { ctx, store, events } = env();
+  const { ctx, store, events } = env(); ctx.__langNoReload = true; // 真的切换会整页重新加载
   vm.runInContext(W("lang.js"), ctx);
   const L = ctx.LANG;
   ok(ctx.document.documentElement["_data-lang"] === "en", "html data-lang");
@@ -30,7 +31,7 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
   ok(L.check("embarrased", "embarrassed").note === "差一个字母", "near miss note");
   ok(L.words("Don't stop—it's well-known.").join("|") === "Don't|stop|it's|well-known", "words en " + L.words("Don't stop—it's well-known.").join("|"));
   // 德语：变音字母可以用 ae/oe/ue/ss，名词小写算对但提醒
-  L.set("de");
+  await L.set("de");
   ok(L.cur() === "de" && store.get("lang") === "de", "switch stored per user key");
   ok(events.some(e => e.type === "lang-change" && e.detail === "de"), "lang-change event");
   ok(L.check("Mädchen", "Mädchen").ok && L.check("Maedchen", "Mädchen").ok, "de umlaut alt");
@@ -39,7 +40,7 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
   const c = L.check("mädchen", "Mädchen"); ok(c.ok && /大小写/.test(c.note), "de case note");
   ok(!L.check("Madchen", "Mädchen").ok, "de dropped umlaut is wrong (near miss)");
   ok(L.words("Das Mädchen heißt Jürgen.").join("|") === "Das|Mädchen|heißt|Jürgen", "words de");
-  L.set("xx"); ok(L.cur() === "de", "unknown lang ignored");
+  await L.set("xx"); ok(L.cur() === "de", "unknown lang ignored");
   // 下次打开记得上次选的
   const e2 = env(); e2.store.set("lang", "de"); vm.runInContext(W("lang.js"), e2.ctx); ok(e2.ctx.LANG.cur() === "de", "remembered");
 }
@@ -93,7 +94,8 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
 {
   const h = W("index.html");
   ok(/<script src="lang\.js\?v=\d+"><\/script>[\s\S]*<script src="listen\.js[^"]*"><\/script>\s*<script src="drill\.js\?v=\d+">/.test(h), "script order: lang before, drill after listen");
-  ok(/\|lang\|drill:prog\|drill:last\|/.test(h), "per-user keys");
+  ok(/\|lang\|drill:\[\\w:\]\+\|/.test(h), "per-user keys");
   ok(/data-mode="drill"/.test(h) && /<div id="drill">/.test(h) && /\['drill','🧩 练习课'\],\['sme'/.test(h), "drill tab first under 听");
 }
 console.log(fail ? fail + " FAILED" : "t53 drill: all ok"); process.exit(fail ? 1 : 0);
+})();

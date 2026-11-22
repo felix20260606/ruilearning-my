@@ -33,6 +33,7 @@
 //   POST {remove:id}            → 删掉一个家人：只有他的生词本和插件数据都是空的才删（加错了名字用），有内容的拒绝（409）
 //   其它接口带 ?u=<id> 就读写这个人的数据：生词本、插件数据、录音截图、每日存档的 KV 键前面加 "u/<id>/"（如 u/u2/vocab、u/u2/m:med:w:apple）；
 //   不带 u（或 u 为空）就是主人。视频字幕 /api/cap、例句 /api/sent 大家共用。不认识的 u 返回 404，免得打错字写到一份没人看的数据里。
+//   学习语言：上面这些再带 &lang=de 就是这个人的德语那一份（键再加 "l/de/"，如 u/u2/l/de/vocab）；英语不带 lang，和以前一样。不支持的语言也返回 404
 //
 // 五、例句 /api/sent?w=单词（网站「🔊 练习」用：像 PhrasePump 一样每次换几句例句听）
 //   → { ok, w, items:[{en, zh}] }，来自 Tatoeba 例句库（只要 14 个词以内、带中文翻译、确实包含这个词的），在 KV 里缓存 30 天（"s/单词"）
@@ -49,13 +50,17 @@ async function usersList(kv, fresh) {
   if (!fresh && usersMem && Date.now() - usersAt < 30000) return usersMem;
   const d = await kv.get(USERS_KEY, "json"); usersMem = Array.isArray(d) && d.length ? d : DEF_USERS; usersAt = Date.now(); return usersMem;
 }
-// 这次请求是谁：?u=<id>；返回 KV 键前缀（主人是 ""），不认识的返回 null
+// 这次请求是谁、学哪种语言：?u=<id>&lang=<语言>；返回 KV 键前缀（主人学英语是 ""），不认识的人 / 不支持的语言返回 null
+//   语言：英语不带参数（和以前一样，不用迁移）；其它语言在人的前缀后面再加 "l/<语言>/"，如 u/u2/l/de/vocab、l/de/mine:err
+const LANG_OK = /^(en|de)$/;
 async function userPre(req, kv) {
-  const id = new URL(req.url).searchParams.get("u") || "";
-  if (!id) return "";
+  const q = new URL(req.url).searchParams, id = q.get("u") || "", lg = q.get("lang") || "";
+  if (lg && !LANG_OK.test(lg)) return null;
+  const lp = lg && lg !== "en" ? "l/" + lg + "/" : "";
+  if (!id) return lp;
   if (!/^[a-z0-9]{1,12}$/.test(id)) return null;
   let L = await usersList(kv); if (!L.some(x => x.id === id)) L = await usersList(kv, true);
-  return L.some(x => x.id === id) ? "u/" + id + "/" : null;
+  return L.some(x => x.id === id) ? "u/" + id + "/" + lp : null;
 }
 const noUser = () => json({ ok: false, error: "unknown user" }, 404);
 
@@ -128,8 +133,11 @@ async function users(req, env) {
     }
     if (typeof b.remove === "string" && b.remove) {
       const x = L.find(y => y.id === b.remove); if (!x) return json({ ok: false, error: "not found" }, 404);
-      const pre = "u/" + x.id + "/", v = vnorm(await kv.get(pre + VOCAB_KEY, "json")), e = await kv.get(pre + EXT_KEY, "json");
-      if (v.custom.length || v.pending.length || Object.keys(v.srs || {}).length || Object.keys(live((e && e.items) || {})).filter(k => !k.startsWith("set|")).length) return json({ ok: false, error: "这个人已经有生词或保存的内容，不能删" }, 409);
+      const pre = "u/" + x.id + "/";
+      for (const lp of ["", "l/de/"]) { // 每种学习语言都要是空的
+        const v = vnorm(await kv.get(pre + lp + VOCAB_KEY, "json")), e = await kv.get(pre + lp + EXT_KEY, "json");
+        if (v.custom.length || v.pending.length || Object.keys(v.srs || {}).length || Object.keys(live((e && e.items) || {})).filter(k => !k.startsWith("set|")).length) return json({ ok: false, error: "这个人已经有生词或保存的内容，不能删" }, 409);
+      }
       const left = L.filter(y => y !== x); await kv.put(USERS_KEY, JSON.stringify(left)); usersMem = left; usersAt = Date.now();
       const keys = (await kv.list({ prefix: pre })).keys; for (const k of keys) await kv.delete(k.name);
       return json({ ok: true, users: left });

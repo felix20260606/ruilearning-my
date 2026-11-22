@@ -3,23 +3,31 @@
 <head>
 <meta charset="utf-8">
 <script>
-/* 家人（多用户，不设密码）：当前是谁存在 localStorage 的 "vu"（空 = 主人）。必须在所有脚本之前运行：
-   ① 发往 /api/vocab、/api/ext、/api/media 的请求自动带上 ?u=<id>（后台按人分开存，见 _worker.js「六、家人」）
-   ② 这几个本机缓存按人分开存（键后面加 "@<id>"）：生词本、练习设置和计数、视频观看进度 —— 否则网页打开时会把上一个人的缓存合并进这个人的生词本
-   切换用户：改 "vu" 后整页重新加载（见下面 #who 菜单） */
+/* 家人（多用户，不设密码）+ 学习语言：当前是谁存在 localStorage 的 "vu"（空 = 主人），学哪种语言存在 "lang"（按人分开；空或 en = 英语）。必须在所有脚本之前运行：
+   ① 发往 /api/vocab、/api/ext、/api/media、/api/mine 的请求自动带上 ?u=<id>、?lang=<语言>（英语不带）——后台按「人 + 语言」分开存，见 _worker.js「六、家人」
+   ② 本机缓存（下面 MINE 里的键：生词本、错题本、练习设置和计数、每日、阅读 / 写作 / 口语 / 听力 / 练习课的记录、视频观看进度…）按人、按语言分开存：
+      键后面加 "@<id>"（家人）和 "~<语言>"（非英语），如 err:items@u2~de —— 否则网页打开时会把别人 / 别的语言的缓存合并进来
+      "lang" 自己只按人分开（不然读不出来是哪种语言）
+   切换家人 / 语言：改 "vu" / "lang" 后整页重新加载（见下面 #who 菜单、lang.js）
+   英语和以前完全一样（键名、接口参数都不变），不用迁移旧数据 */
 (function(){
   var id="";try{id=localStorage.getItem("vu")||"";}catch(e){}
   if(!/^[a-z0-9]{1,12}$/.test(id))id="";
   window.VU=id;
-  if(!id)return;
+  var us=id?"@"+id:"",lg="";try{lg=localStorage.getItem("lang"+us)||"";}catch(e){}
+  if(!/^[a-z]{2}$/.test(lg)||lg==="en")lg="";
+  window.VL=lg||"en";
+  if(!id&&!lg)return;
+  var ls2=lg?"~"+lg:"";
   var API=/^\/api\/(vocab|ext|media|mine)$/,of=window.fetch;
+  var fix=function(u){var x=new URL(String(u),location.href);if(x.origin===location.origin&&API.test(x.pathname)){if(id)x.searchParams.set("u",id);if(lg)x.searchParams.set("lang",lg);return x.pathname+x.search;}return u;};
   window.fetch=function(u,o){
-    try{if(typeof u==="string"||u instanceof URL){var x=new URL(String(u),location.href);if(x.origin===location.origin&&API.test(x.pathname)){x.searchParams.set("u",id);u=x.pathname+x.search;}}}catch(e){}
+    try{if(typeof u==="string"||u instanceof URL)u=fix(u);}catch(e){}
     return of.call(this,u,o);
   };
-  if(navigator.sendBeacon){var ob=navigator.sendBeacon.bind(navigator);navigator.sendBeacon=function(u,d){try{var x=new URL(String(u),location.href);if(x.origin===location.origin&&API.test(x.pathname)){x.searchParams.set("u",id);u=x.pathname+x.search;}}catch(e){}return ob(u,d);};}
-  var MINE=/^(vocab_state_v1|pump:opt|pump:heard|pump:day|pump:log|wt:meta|reading:docs|reading:tr|speak:done|speak:log|speak:days|reading:lv|writing:draft|writing:history|writing:lang|vocab:test|remind:time|daily:opt|daily:check|daily:days|daily:sat|daily:sent|daily:wkseen|sme:done|sme:pos|sme:stat|sme:lq|sme:diff|err:items|exam:hist|lang|drill:prog|drill:last|mine:seen:reading|mine:seen:writing|mine:seen:vtest)$/,S=Storage.prototype,g=S.getItem,st=S.setItem,rm=S.removeItem;
-  var k=function(t,key){var ls=null;try{ls=window.localStorage;}catch(e){}return t===ls&&MINE.test(String(key))?key+"@"+id:key;};
+  if(navigator.sendBeacon){var ob=navigator.sendBeacon.bind(navigator);navigator.sendBeacon=function(u,d){try{u=fix(u);}catch(e){}return ob(u,d);};}
+  var MINE=/^(vocab_state_v1|pump:opt|pump:heard|pump:day|pump:log|wt:meta|reading:docs|reading:tr|speak:done|speak:log|speak:days|reading:lv|writing:draft|writing:history|writing:lang|vocab:test|remind:time|daily:opt|daily:check|daily:days|daily:sat|daily:sent|daily:wkseen|sme:done|sme:pos|sme:stat|sme:lq|sme:diff|err:items|exam:hist|lang|drill:[\w:]+|mine:seen:reading|mine:seen:writing|mine:seen:vtest)$/,S=Storage.prototype,g=S.getItem,st=S.setItem,rm=S.removeItem;
+  var k=function(t,key){var ls=null;try{ls=window.localStorage;}catch(e){}key=String(key);return t===ls&&MINE.test(key)?key+us+(key==="lang"?"":ls2):key;};
   S.getItem=function(key){return g.call(this,k(this,key));};
   S.setItem=function(key,v){return st.call(this,k(this,key),v);};
   S.removeItem=function(key){return rm.call(this,k(this,key));};
@@ -1336,12 +1344,15 @@ function eHtml(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").repl
 function eAttr(s){return (s||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 function noBrace(s){return (s||"").split("{").join("").split("}").join("");}
 let voices=[], chosenVoice=null;
+// 朗读按当前学习语言（window.VL，见最上面那段）挑系统语音：英语 en-*，德语 de-*；AI 真人声（tts.js，deepgram）只会英语，别的语言直接用系统语音
+const VLX=window.VL&&window.VL!=="en"?window.VL:"en";
 function enVoices(){
   const all=(window.speechSynthesis&&window.speechSynthesis.getVoices)?window.speechSynthesis.getVoices():[];
+  if(VLX==="de")return all.filter(v=>/^de[-_]/i.test(v.lang)||/german|deutsch/i.test(v.name));
   return all.filter(v=>/^en[-_]/i.test(v.lang)||/english/i.test(v.name));
 }
 function bestVoiceIndex(){
-  const pref=[/google us english/i,/google uk english female/i,/samantha/i,/ava/i,/allison/i,/serena/i,/aaron/i,/(enhanced|premium|natural|neural)/i,/^en-us/i,/^en-gb/i];
+  const pref=VLX==="de"?[/google deutsch/i,/anna/i,/(enhanced|premium|natural|neural)/i,/^de-de/i]:[/google us english/i,/google uk english female/i,/samantha/i,/ava/i,/allison/i,/serena/i,/aaron/i,/(enhanced|premium|natural|neural)/i,/^en-us/i,/^en-gb/i];
   for(const p of pref){const i=voices.findIndex(v=>p.test(v.name)||p.test(v.lang));if(i>=0)return i;}
   return voices.length?0:-1;
 }
@@ -1349,18 +1360,18 @@ function loadVoices(){
   voices=enVoices();
   const sel=document.getElementById("voice-sel");
   if(!sel)return;
-  const ai='<option value="ai">🤖 AI 真人声（推荐）</option>';
-  if(!voices.length){sel.innerHTML=ai+'<option value="none">此设备暂无英语语音</option>';sel.value=window.TTS&&TTS.mode()==="sys"?"none":"ai";return;}
+  const ai=VLX==="en"?'<option value="ai">🤖 AI 真人声（推荐）</option>':'';
+  if(!voices.length){sel.innerHTML=ai+'<option value="none">此设备暂无'+(VLX==="de"?"德语":"英语")+'语音</option>';sel.value=window.TTS&&TTS.mode()==="sys"?"none":"ai";return;}
   sel.innerHTML=ai+voices.map((v,i)=>`<option value="${i}">${v.name.replace(/^(Microsoft|Google)\s/,"")} · ${v.lang}</option>`).join("");
   let idx=state.voice?voices.findIndex(v=>v.name===state.voice):-1;
   if(idx<0)idx=bestVoiceIndex();
   if(idx>=0){sel.value=idx;chosenVoice=voices[idx];}
-  if(window.TTS&&TTS.mode()!=="sys")sel.value="ai";
+  if(VLX==="en"&&window.TTS&&TTS.mode()!=="sys")sel.value="ai";
 }
 // 全站朗读入口：先交给 AI 真人声（tts.js），播不了再用系统语音；o.rate 是相对正常速度的倍数（练习页的慢速用）
 function speak(text,o){
   o=o||{};
-  if(window.TTS&&TTS.play(text,{rate:o.rate||1,end:o.end,fallback:()=>sysSpeak(text,o)}))return;
+  if(VLX==="en"&&window.TTS&&TTS.play(text,{rate:o.rate||1,end:o.end,fallback:()=>sysSpeak(text,o)}))return;
   sysSpeak(text,o);
 }
 function sysSpeak(text,o){
@@ -1370,7 +1381,7 @@ function sysSpeak(text,o){
     if(!("speechSynthesis" in window)){toast("此环境不支持朗读，可在手机浏览器打开");return;}
     window.speechSynthesis.cancel();
     const u=new SpeechSynthesisUtterance(text);
-    if(chosenVoice){u.voice=chosenVoice;u.lang=chosenVoice.lang;}else{u.lang="en-US";}
+    if(chosenVoice){u.voice=chosenVoice;u.lang=chosenVoice.lang;}else{u.lang=VLX==="de"?"de-DE":"en-US";}
     u.rate=(state.rate||0.95)*(o.rate||1);u.pitch=1;
     if(o.end){u.onend=()=>o.end();u.onerror=()=>o.end(true);}
     window.speechSynthesis.speak(u);
@@ -1974,17 +1985,17 @@ refresh(); // show seed words immediately, no waiting on storage
   sw(/^(basics|notes|lexam|rexam)$/.test(s)?s:'lexam'); // 新加的「听力模考」排最前、第一次打开默认它
 })();
 </script>
-<script src="lang.js?v=1"></script>
-<script src="tts.js?v=1"></script>
+<script src="lang.js?v=2"></script>
+<script src="tts.js?v=2"></script>
 <script src="watch.js?v=16"></script>
 <script src="channels.js?v=3"></script>
-<script src="pump.js?v=29"></script>
+<script src="pump.js?v=30"></script>
 <script src="speak.js?v=11"></script>
 <script src="daily.js?v=6"></script>
 <script src="read.js?v=11"></script>
 <script src="listen.js?v=12"></script>
 <script src="drill.js?v=1"></script>
-<script src="errbook.js?v=1"></script>
+<script src="errbook.js?v=2"></script>
 <script src="exam.js?v=5"></script>
 <script src="import.js?v=1"></script>
 <script src="write.js?v=3"></script>

@@ -17,7 +17,7 @@
   const LS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
   const tip = m => { try { (window.toast || (() => {}))(m); } catch (e) {} };
   const say = t => { try { if (typeof window.speak === "function") window.speak(t); } catch (e) {} };
-  const norm = s => String(s || "").toLowerCase().replace(/[’']/g, "'").replace(/[^a-z0-9' ]+/g, " ").replace(/\s+/g, " ").trim();
+  const norm = s => String(s || "").normalize("NFC").toLowerCase().replace(/[’']/g, "'").replace(/[^\p{L}\p{N}' ]+/gu, " ").replace(/\s+/g, " ").trim(); // 字母含 ä ö ü ß é…（德语等其它学习语言的错题也能判）
   function hash(s) { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(36); }
   const SRC = { write: "✍️ 写作", read: "📰 阅读小测", exam: "🎓 模考", speak: "🗣 口语", pron: "🎯 跟读", listen: "🎧 精听", other: "📌 其它" };
   const clip = (s, n) => String(s == null ? "" : s).slice(0, n);
@@ -135,7 +135,7 @@
     if (!shown) s += '<div class="eb-btns">' + (x.kind === "mcq" ? "" : '<button class="ui-btn pri" data-a="show">' + (x.kind === "say" ? "读完了" : "看答案") + "</button>") + '<button class="ui-btn" data-a="skip">跳过</button></div>';
     else {
       const auto = x.kind === "mcq" ? pick === x.ans : (x.kind === "fix" || x.kind === "gap") && typed ? okTyped(x, typed) : null;
-      s += answerHtml(x, auto) + (x.right && /[a-z]/i.test(x.right) ? ' <button class="ui-btn" data-a="sayr">🔊 读正确的</button>' : "");
+      s += answerHtml(x, auto) + (x.right && /\p{L}/u.test(x.right) && !/[\u4e00-\u9fff]/.test(x.right) ? ' <button class="ui-btn" data-a="sayr">🔊 读正确的</button>' : "");
       s += '<div class="eb-btns">' + (auto == null ? '<button class="ui-btn" data-g="0">❌ 没想到</button><button class="ui-btn pri" data-g="1">✅ 想对了</button>' : '<button class="ui-btn pri" data-g="' + (auto ? 1 : 0) + '">下一题 →</button>' + (auto ? "" : '<button class="ui-btn" data-g="1">其实我想对了</button>')) + "</div>";
     }
     return s + "</div>";
