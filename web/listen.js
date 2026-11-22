@@ -1,5 +1,7 @@
-/* 「🎧 听 → 📻 BBC 听力」：BBC Learning English 的四个每周更新的栏目（后台 /api/sme，见 _worker.js）
-   🐢 慢速对话 Real Easy English / 💬 地道说法 The English We Speak / 📰 新闻英语 Learning English from the News / 📻 6 分钟英语 6 Minute English
+/* 「🎧 听 → 📻 BBC · VOA」：BBC Learning English 和 VOA Learning English 的十个栏目（后台 /api/sme，见 _worker.js）
+   VOA（美音，2025 年 3 月起停更，旧节目都在）：📚 美国故事 American Stories / 🗝 词语故事 Words and Their Stories / ✏️ 每日语法 Everyday Grammar / 🗞 慢速新闻 As It Is
+   BBC（英音）：🎭 广播剧 Drama / 🎓 大学英语 English at University（这两个也不更新了）/ 🐢 慢速对话 Real Easy English / 💬 地道说法 The English We Speak / 📰 新闻英语 Learning English from the News / 📻 6 分钟英语 6 Minute English
+   故事类（美国故事、广播剧、大学英语）：列表按故事排、每个故事从第 1 集起；顶上推荐「还没听的下一集」
    - 顶上一排切换栏目（记住上次选的 sme:s）；每个栏目：最新（或还没听的最新）一期 + 列表
    - 一期页面：播放器（慢 / 正常 / 快）、简介、本期问题、新闻标题、生词表（＋ 加生词本，例句取节目里那一句）、文稿按说话人分行（默认折起来，先盲听）
      「🀄 中文」开关（sme:zh）：所有英文下面加中文（一层层兜底：本机存的 sme:zhc → 后台存好的（KV，全家共用）→ 浏览器直接问谷歌 → 后台补缺的句子（谷歌没被拦就谷歌，不然 Workers AI）；还缺就显示「还有 N 句没翻出来 · 重试」，20 秒后自动再试一次）
@@ -24,20 +26,29 @@
   const LG = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
   const LS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
   const tip = m => { try { (window.toast || (() => {}))(m); } catch (e) {} };
-  // 新加的排前面
+  // 新加的排前面。[栏目, 按钮, 英文名, 一句介绍, 来源, 故事类（按集连着听）]
   const SER = [
+    ["vst", "📚 美国故事", "American Stories", "爱伦·坡、马克·吐温、欧·亨利等美国作家的经典短篇，用简单英语慢速朗读，长的分几集讲完；带生词表和全文", "VOA", 1],
+    ["vwd", "🗝 词语故事", "Words and Their Stories", "每期几分钟讲一个美国人常用的习语：意思、来历和例句，慢速；带生词表和全文", "VOA"],
+    ["vgr", "✏️ 每日语法", "Everyday Grammar", "每期讲一个语法点或容易用错的地方，例句多、慢速；带生词表和全文", "VOA"],
+    ["vnw", "🗞 慢速新闻", "As It Is", "一篇一则时事、科技、文化新闻，用常用词写、慢速念；带生词表和全文", "VOA"],
+    ["drama", "🎭 广播剧", "Drama", "名著改编的广播剧：爱丽丝梦游仙境、弗兰肯斯坦、格列佛游记、圣诞颂歌…多人对话，一个故事好几集；带文稿和生词", "BBC", 1],
+    ["eau", "🎓 大学英语", "English at University", "18 集情景剧：跟着留学生 Mary 过大学第一年，每集学几句实用表达（求助、讨论、交作业…）；带文稿", "BBC", 1],
     ["ree", "🐢 慢速对话", "Real Easy English", "每周一期 · 两位主持人用简单英语慢慢聊日常话题，带生词表和文稿，最适合打基础"],
     ["tews", "💬 地道说法", "The English We Speak", "每周一期 · 3 分钟讲一个英国人常说的地道表达，有例句和文稿"],
     ["news", "📰 新闻英语", "Learning English from the News", "每周一期 · 用真实的新闻标题讲词：新闻背景、各家标题、关键词和例句（这个栏目没有全文文稿）"],
     ["sme", "📻 6 分钟英语", "6 Minute English", "每周一期 · 两位主持人 6 分钟聊一个话题，有本期问题、生词表和文稿"],
-  ];
+  ].map(x => (x[4] ? x : x.concat("BBC")));
   const SM = Object.fromEntries(SER.map(x => [x[0], x]));
-  const serOf = id => /^real-easy-english\//.test(id) ? "ree" : /^the-english-we-speak/.test(id) ? "tews" : /^learning-english-from-the-news/.test(id) ? "news" : "sme";
+  const serOf = id => { const m = /^(vst|vwd|vgr|vnw)\//.exec(id); return m ? m[1] : /^drama\//.test(id) ? "drama" : /^english-at-university\//.test(id) ? "eau" : /^real-easy-english\//.test(id) ? "ree" : /^the-english-we-speak/.test(id) ? "tews" : /^learning-english-from-the-news/.test(id) ? "news" : "sme"; };
+  const srcName = id => (SM[serOf(id)][4] === "VOA" ? "VOA Learning English" : "BBC Learning English");
+  const srcUrl = (id, ep) => (ep && ep.url) || (SM[serOf(id)][4] === "VOA" ? "https://learningenglish.voanews.com/a/" + id.split("/")[1] + ".html" : "https://www.bbc.co.uk/learningenglish/english/features/" + id);
   const CSS = `
   #sme{display:none;max-width:900px;margin:0 auto;padding:6px 0 60px;overflow-wrap:anywhere;color:var(--ui-ink);font-family:var(--ui-font)}#sme.on{display:block}
   #sme .sm-ser{display:flex;gap:8px;overflow-x:auto;padding:2px 0 4px;margin:2px 0 8px;scrollbar-width:none}#sme .sm-ser::-webkit-scrollbar{display:none}
   #sme .sm-ser button{flex:0 0 auto;border:1px solid var(--ui-line-2);background:var(--ui-surface);color:var(--ui-ink);border-radius:999px;padding:7px 14px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
   #sme .sm-ser button.on{background:var(--ui-pur);border-color:var(--ui-pur);color:#fff}
+  #sme .sm-ser .src{flex:0 0 auto;align-self:center;font-size:11.5px;font-weight:800;letter-spacing:.04em;color:var(--ui-muted);padding:0 0 0 4px}#sme .sm-ser .src+button{margin-left:-2px}
   #sme .sm-head{margin:2px 0 12px;color:var(--ui-muted);font-size:13.5px;line-height:1.55}#sme .sm-head b{color:var(--ui-ink-2)}
   #sme .sm-new{display:grid;grid-template-columns:200px 1fr;gap:14px;align-items:center;background:linear-gradient(135deg,color-mix(in srgb,var(--ui-pur) 16%,var(--ui-surface)),var(--ui-surface));border:1px solid color-mix(in srgb,var(--ui-pur) 40%,var(--ui-line));border-radius:16px;padding:14px;cursor:pointer;margin-bottom:16px}
   #sme .sm-new img{width:100%;border-radius:10px;display:block;aspect-ratio:16/9;object-fit:cover}#sme .sm-new small{color:var(--ui-pur-text);font-weight:800;font-size:12.5px}#sme .sm-new b{display:block;font-size:19px;margin:4px 0}#sme .sm-new p{margin:0;color:var(--ui-ink-2);font-size:14px}
@@ -126,7 +137,7 @@
   function msSet() {
     const M = navigator.mediaSession; if (!M || !AU.dataset.id) return;
     const id = AU.dataset.id, m = meta(id), ep = EPS[id] || {};
-    try { M.metadata = new MediaMetadata({ title: ep.title || m.t || auTitle, artist: "BBC Learning English", album: SM[serOf(id)][2], artwork: m.img ? [{ src: m.img, sizes: "624x351", type: "image/jpeg" }] : [] }); } catch (e) {}
+    try { M.metadata = new MediaMetadata({ title: ep.title || m.t || auTitle, artist: srcName(id), album: SM[serOf(id)][2], artwork: m.img ? [{ src: m.img, sizes: "624x351", type: "image/jpeg" }] : [] }); } catch (e) {}
     const dk = () => EP && EP.id === id && DK[id] && DK[id].sents && view === "ep";
     const H = { play: () => AU.play().catch(() => {}), pause: () => AU.pause(), seekbackward: () => { AU.currentTime = Math.max(0, AU.currentTime - 10); }, seekforward: () => { AU.currentTime = Math.min(AU.duration || 1e9, AU.currentTime + 10); },
       previoustrack: () => dk() ? dkGo(-1) : (AU.currentTime = Math.max(0, AU.currentTime - 10)), nexttrack: () => dk() ? dkGo(1) : (AU.currentTime = Math.min(AU.duration || 1e9, AU.currentTime + 10)) };
@@ -334,7 +345,7 @@
     const dk = wk.reduce((n, x) => n + x.dk, 0), dks = wk.reduce((n, x) => n + x.dks, 0), sh = wk.reduce((n, x) => n + x.sh, 0), mx = Math.max(10, ...S.map(mins));
     return '<div class="sm-box"><h3>📈 我的听力</h3><div class="st-row"><span>今天 <b>' + mins(S[13]) + "</b> 分钟</span><span>近 7 天 <b>" + wk.reduce((n, x) => n + mins(x), 0) + "</b> 分钟</span><span>连续 <b>" + streak + "</b> 天</span>" +
       (dk ? "<span>精听 <b>" + dk + "</b> 句 · 听写平均 <b>" + Math.round(dks / dk) + "%</b></span>" : "") + (sh ? "<span>跟读 <b>" + sh + "</b> 句</span>" : "") + "</div>" +
-      '<div class="st-bars">' + S.map((x, i) => '<i class="' + (mins(x) ? "" : "z") + '" style="height:' + Math.max(4, mins(x) / mx * 100) + '%" title="' + days[i].slice(5) + "：" + mins(x) + " 分钟" + (x.dk ? "，精听 " + x.dk + " 句" : "") + '"></i>').join("") + '</div><div class="st-ax"><span>' + days[0].slice(5) + "</span><span>最近 14 天（BBC 听力、精听）</span><span>今天</span></div></div>";
+      '<div class="st-bars">' + S.map((x, i) => '<i class="' + (mins(x) ? "" : "z") + '" style="height:' + Math.max(4, mins(x) / mx * 100) + '%" title="' + days[i].slice(5) + "：" + mins(x) + " 分钟" + (x.dk ? "，精听 " + x.dk + " 句" : "") + '"></i>').join("") + '</div><div class="st-ax"><span>' + days[0].slice(5) + "</span><span>最近 14 天（BBC · VOA、精听）</span><span>今天</span></div></div>";
   }
 
   // ---------- 📊 每期难度：语速 + 生词率 ----------
@@ -577,16 +588,16 @@
     const D = done(), L = LISTS[ser], top = offHtml() + statHtml();
     if (!L) return top + '<div class="sm-empty">正在取节目列表…</div>';
     if (!L.length) return top + '<div class="sm-empty">节目列表没取到' + (navigator.onLine === false ? "（现在没网：上面「📥 已下载」的能听）" : "，过一会儿再试") + "</div>";
-    const n0 = L[0], fresh = L.find(x => !D[x.id]) || n0;
+    const story = !!SM[ser][5], n0 = L[0], fresh = L.find(x => !D[x.id]) || n0; // 故事类：列表就是从第 1 集起的顺序，「没听的第一个」= 该听的下一集
     const PP = POS();
     const OF = OFF(), QR = LQR();
     const it = x => '<div class="sm-it" data-ep="' + esc(x.id) + '"><img src="' + esc(x.img) + '" alt="" loading="lazy"><div class="t"><b>' + esc(x.t) + "</b><span>" + esc(x.d) + (D[x.id] ? ' · <em class="ok">✓ 听过</em>' : PP[x.id] ? " · ⏯ 听到 " + fmt(PP[x.id].t) : "") + (OF[x.id] ? " · 📥" : "") + (QR[x.id] ? " · 🧩 " + QR[x.id].got + "/" + QR[x.id].n : "") + diffShort(x.id) + "</span></div></div>";
-    return top + '<div class="sm-new" data-ep="' + esc(fresh.id) + '"><img src="' + esc(fresh.img) + '" alt=""><div><small>' + (fresh === n0 ? "🆕 最新一期" : "👉 还没听的最新一期") + " · " + esc(fresh.d) + "</small><b>" + esc(fresh.t) + "</b><p>" + esc(fresh.p) + "</p></div></div>" +
-      '<div class="sm-grid">' + L.slice(0, 40).map(it).join("") + "</div>";
+    return top + '<div class="sm-new" data-ep="' + esc(fresh.id) + '"><img src="' + esc(fresh.img) + '" alt=""><div><small>' + (story ? (fresh === n0 ? "👉 从这一集开始" : "👉 接着听下一集") : SM[ser][4] === "VOA" ? (fresh === n0 ? "🆕 最近一期" : "👉 还没听的最近一期") : fresh === n0 ? "🆕 最新一期" : "👉 还没听的最新一期") + " · " + esc(fresh.d) + "</small><b>" + esc(fresh.t) + "</b><p>" + esc(fresh.p || "") + "</p></div></div>" +
+      '<div class="sm-grid">' + L.slice(0, story || SM[ser][4] === "VOA" ? 120 : 40).map(it).join("") + "</div>"; // 故事类、VOA 是固定的旧节目（50–60 期），全列出来
   }
   function epHtml() {
     if (!EP) return '<div class="sm-empty">' + (epBusy ? "正在取这一期的音频和文稿…" : "") + "</div>";
-    if (EP.err) return '<div class="sm-empty">这一期没取到，<a href="https://www.bbc.co.uk/learningenglish/english/features/' + esc(EP.id) + '" target="_blank" rel="noopener">去 BBC 网站看</a></div>';
+    if (EP.err) return '<div class="sm-empty">这一期没取到，<a href="' + esc(srcUrl(EP.id)) + '" target="_blank" rel="noopener">去 ' + SM[serOf(EP.id)][4] + ' 网站看</a></div>';
     const m = meta(EP.id), D = done(), heard = !!D[EP.id], S = SM[serOf(EP.id)], Z = zhOn ? ZH[EP.id] : null, zl = zhOn && !Z && zhBusy[EP.id];
     // 中文：开着才有；还在翻就先在前面几处显示「翻译中…」
     const zh = (arr, i) => zhOn ? '<span class="zh' + (zl ? " ld" : "") + '">' + (Z ? esc((arr ? (Z[arr] || [])[i] : Z.intro) || "") : zl && (arr !== "lines" || i < 2) ? "翻译中…" : "") + "</span>" : "";
@@ -596,7 +607,7 @@
     const news = serOf(EP.id) === "news";
     const F = FL[EP.id] || {}, fst = !trShow || news || !follow ? "" : TS ? '<div class="sm-trst">🎵 放到哪句亮哪句' + (fword ? "、逐词跟着亮" : "") + "；点句首 ▸ 从那句播，点词查意思" + (bs ? "（橙色下划线 = 生词本里在学的词）" : "") + "</div>" : F.busy ? '<div class="sm-trst">🎵 正在给每一句对时间（这期第一次要一两分钟，以后打开就不用等）… <span class="fl-prog">' + esc(F.prog || "") + "</span></div>" : F.err ? '<div class="sm-trst">🎵 ' + esc(F.err) + ' <button class="ui-btn" data-a="follow-retry">重试</button></div>' : "";
     const off = OFF()[EP.id], ob = OFFB[EP.id];
-    return '<h1>' + esc(EP.title) + '</h1><div class="sm-date">' + esc(m.d || "") + " · BBC Learning English · " + esc(S[2]) + (heard ? ' · <span class="ok">✓ 听过</span>' : "") + "</div>" + (news ? "" : diffHtml(EP.id)) +
+    return '<h1>' + esc(EP.title) + '</h1><div class="sm-date">' + esc(m.d || "") + " · " + srcName(EP.id) + " · " + esc(S[2]) + (heard ? ' · <span class="ok">✓ 听过</span>' : "") + "</div>" + (news ? "" : diffHtml(EP.id)) +
       '<div class="sm-box sm-pl' + (trShow && tr ? " stick" : "") + '"><div id="sm-slot"></div><div class="sm-rate">速度 ' + [0.75, 0.9, 1, 1.15].map(v => '<button data-rate="' + v + '" class="' + (Math.abs(rate - v) < .01 ? "on" : "") + '">' + v + "×</button>").join("") +
       '<span class="sm-kbd" title="不在输入框里时按空格">空格 ⏯</span><span style="flex:1"></span><button data-a="done">' + (heard ? "✓ 已听完" : "✓ 听完了") + "</button></div></div>" +
       '<div class="sm-rate sm-opts"><button data-a="cont" class="' + (cont ? "on" : "") + '" title="播完自动放这个栏目里下一期没听过的">⏭ 播完接下一期：' + (cont ? "开" : "关") + "</button>" + (ob != null ? '<button disabled>📥 下载中 <span class="off-prog">' + esc(ob) + "</span></button>" : off ? '<button data-a="offdel" title="删掉下载的文件">📥 已下载 ' + mb(off.size || 0) + " · 删除</button>" : '<button data-a="off" title="存到这台设备上，没网也能听（连同文稿、每句时间）">📥 下载离线听</button>') + "</div>" + dkHtml() +
@@ -616,10 +627,11 @@
     if (!root) return;
     const f = flEl(); if (root.contains(AU)) f.querySelector(".au").append(AU); // 先把播放器挪出去，重画页面时不会被删掉（删掉会停）
     const S = SM[ser]; if (wantFollow()) followLoad(EP.id);
-    root.innerHTML = '<div class="sm-ser">' + SER.map(x => '<button data-ser="' + x[0] + '" class="' + (x[0] === ser ? "on" : "") + '">' + x[1] + "</button>").join("") + "</div>" +
+    root.innerHTML = '<div class="sm-ser">' + SER.map((x, i) => (i && SER[i - 1][4] === x[4] ? "" : '<span class="src">' + x[4] + "</span>") + '<button data-ser="' + x[0] + '" class="' + (x[0] === ser ? "on" : "") + '">' + x[1] + "</button>").join("") + "</div>" +
       (view === "ep" ? '<div class="sm-bar"><button class="ui-btn" data-a="home">← 节目列表</button><span class="sp"></span><button class="ui-btn' + (zhOn ? " on" : "") + '" data-a="zh" title="英文下面显示中文翻译">🀄 中文：' + (zhOn ? "开" : "关") + "</button></div>" + zhBar() + epHtml()
-        : '<div class="sm-head"><b>' + esc(S[2]) + "</b> · BBC Learning English · " + esc(S[3]) + "</div>" + homeHtml());
+        : '<div class="sm-head"><b>' + esc(S[2]) + "</b> · " + (S[4] === "VOA" ? "VOA Learning English（美音；2025 年 3 月起停更，旧节目都能听）" : "BBC Learning English") + " · " + esc(S[3]) + "</div>" + homeHtml());
     if (view === "ep" && EP && !EP.err && AU.dataset.id !== EP.id) { AU.pause(); AU.src = srcOf(EP.id); AU.dataset.id = EP.id; auTitle = SM[serOf(EP.id)][1] + " · " + EP.title; AU.playbackRate = rate; flClosed = false; }
+    { const bar = root.querySelector(".sm-ser"), on = bar && bar.querySelector("button.on"); if (on && bar.scrollWidth > bar.clientWidth) bar.scrollLeft += on.getBoundingClientRect().left - bar.getBoundingClientRect().left - (bar.clientWidth - on.offsetWidth) / 2; } // 栏目多、手机上一行放不下：选中的那个滚到中间
     sync(); stickTop(); curK = -1; curW = null; hl(true); hlWord();
     if (view === "ep" && EP && !EP.err && autoNext === EP.id && AU.dataset.id === EP.id) { autoNext = null; AU.play().catch(() => {}); }
     if (view === "ep" && EP && !EP.err && !DIFF()[EP.id] && navigator.onLine !== false) diffCalc(EP.id);

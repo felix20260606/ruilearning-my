@@ -532,8 +532,13 @@ async function news(req, env, u) {
   return json(out);
 }
 
-// ---------- 每日听力 /api/sme：BBC Learning English 的四个栏目（「🎧 听 → 📻 BBC 听力」）----------
-// s = ree Real Easy English（慢速简单对话）/ tews The English We Speak（地道说法）/ news Learning English from the News（新闻英语）/ sme 6 Minute English
+// ---------- 每日听力 /api/sme：BBC Learning English 和 VOA Learning English 的栏目（「🎧 听 → 📻 BBC · VOA」）----------
+// BBC：s = ree Real Easy English（慢速简单对话）/ tews The English We Speak（地道说法）/ news Learning English from the News（新闻英语）/ sme 6 Minute English
+//      drama 广播剧（名著改编，期号 drama/<名字>）/ eau English at University（18 集情景剧）：这两个早就不更新了，目录页一页就是全部
+// VOA（美国之音慢速英语，美国政府作品属公有领域；2025 年 3 月起停更，旧节目还在）：期号 = 栏目 + "/" + 文章号（如 vst/7504521）
+//      vst American Stories（美国故事）/ vwd Words and Their Stories（词语故事）/ vgr Everyday Grammar（每日语法）/ vnw As It Is（慢速新闻）
+//      目录：learningenglish.voanews.com/z/<栏目号>?p=0..4（一页 12 篇）；一期：/a/<文章号>.html（会跳到带标题的地址）的正文 <div class="wsw">、「Words in This Story」生词表、voa-audio.voanews.eu 的 mp3
+// 故事类栏目（story）：同一个故事的几集排在一起、按第 1 集 → 最后一集；故事之间新的在前
 // GET /api/sme?s=tews → { ok, s, list:[{id, t 标题, d 日期, p 一句简介, img}] }：今年和去年的节目目录（新的在前），KV「sme/list/<s>」存 12 小时（6 Minute English 还是「sme/list」）
 // GET /api/sme?ep=6-minute-english_2026/ep-261119 → { ok, id, s, title, mp3, intro, q:[问题, 选项…], vocab:[[词, 英文解释, 例句?]], heads:[[新闻标题, 来源]], lines:[{who, t}] }：KV「sme/ep/…」存 90 天
 // GET /api/sme?ep=…&zh=1 → { ok, intro, q:[], vocab:[], heads:[], lines:[] } 和上面一一对应的中文（谷歌翻译），KV「sme/zh/…」存 180 天
@@ -542,38 +547,100 @@ const SME_S = {
   tews: { slug: "the-english-we-speak", yearly: true, re: /^the-english-we-speak_\d{4}\/ep-\d{6}$/ },
   news: { slug: "learning-english-from-the-news", yearly: true, re: /^learning-english-from-the-news_\d{4}\/\d{6}$/ },
   sme: { slug: "6-minute-english", yearly: true, re: /^6-minute-english_\d{4}\/ep-\d{6}$/ },
+  drama: { slug: "drama", yearly: false, re: /^drama\/[a-z0-9-]{3,60}$/, idp: "drama/[a-z0-9-]{3,60}", story: true, skip: /^drama\/elephant-/ }, // The White Elephant 只有视频
+  eau: { slug: "english-at-university", yearly: false, re: /^english-at-university\/ep-\d{6}$/, story: true },
+  vst: { voa: 1581, re: /^vst\/\d{5,9}$/, story: true },
+  vwd: { voa: 987, re: /^vwd\/\d{5,9}$/ },
+  vgr: { voa: 4456, re: /^vgr\/\d{5,9}$/ },
+  vnw: { voa: 3521, re: /^vnw\/\d{5,9}$/ },
 };
 const smeOf = ep => Object.keys(SME_S).find(k => SME_S[k].re.test(ep)) || "";
+const VOA = "https://learningenglish.voanews.com";
 function smeLines(h) {
   const dec = s => s.replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;|&#x27;|&rsquo;|&lsquo;/g, "'").replace(/&ldquo;|&rdquo;/g, '"').replace(/&mdash;/g, "—").replace(/&ndash;/g, "–").replace(/&hellip;/g, "…").replace(/&pound;/g, "£").replace(/&euro;/g, "€").replace(/&#(\d+);/g, (m, n) => String.fromCharCode(+n));
   // 说话人 / 生词：「<strong>Name</strong><br />」或「<strong>Name<br /></strong>」→ 单独一行「@@Name」
-  return dec(h.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, "").replace(/<strong>([^<]{1,60})<br\s*\/?>\s*<\/strong>|<strong>([^<]{1,60})<\/strong>\s*<br\s*\/?>/gi, (m, x, y) => "\n@@" + (x || y) + "\n").replace(/<br\s*\/?>/gi, "\n").replace(/<\/(p|h\d|li|div|dt|dd)>/gi, "\n").replace(/<[^>]+>/g, "")).split("\n").map(s => s.replace(/\s+/g, " ").trim()).filter(s => s && s !== "@@");
+  return dec(h.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, "").replace(/<strong>([^<]{1,60})<br[^>]*>\s*<\/strong>|<strong>([^<]{1,60})<\/strong>\s*<br[^>]*>/gi, (m, x, y) => "\n@@" + (x || y) + "\n").replace(/<br\s*\/?>/gi, "\n").replace(/<\/(p|h\d|li|div|dt|dd)>/gi, "\n").replace(/<[^>]+>/g, "")).split("\n").map(s => s.replace(/\s+/g, " ").trim()).filter(s => s && s !== "@@");
 }
 function smeParse(html) {
   const L0 = smeLines(html), L = L0.map(s => s.replace(/^@@/, "")), at = (re, from) => { for (let i = from || 0; i < L.length; i++) if (re.test(L[i])) return i; return -1; };
   const og = (html.match(/<meta property="og:title" content="([^"]*)"/) || [])[1] || "";
-  const mp3 = (html.match(/href="(https:\/\/downloads\.bbc\.co\.uk\/[^"]+\.mp3)"/) || [])[1] || "";
+  const mp3 = ((html.match(/href="\s*(https?:\/\/downloads\.bbc\.co\.uk\/[^"]+\.mp3)"/) || [])[1] || "").replace(/^http:/, "https:"); // 老节目（广播剧、大学英语）是 http 地址
   const iI = at(/^(Introduction|The story)$/i), iH = at(/^News headlines$/i), iQ = at(/^This week'?s question$/i), iV = at(/^(Vocabulary|Key words and phrases)$/i), iT = at(/^Transcript$/i);
-  const iEnd = at(/^(Next|Latest|Download|Previous|Episode \d+|Take the quiz|Note: This podcast)/i, Math.max(iI, iV, iT, 0) + 1);
+  const iEnd = at(/^(Next|Previous)$|^(Latest|Download|Episode \d+$|Take the quiz|Note: This podcast)/i, Math.max(iI, iV, iT, 0) + 1); // 「Next.」可能是台词（大学英语），只认单独的 Next
+  // 广播剧有的没有「Transcript」标题：播放器下面几段简介，接着就是「说话人 / 台词」
+  let iT2 = -1, iA = -1;
+  if (iT < 0 && iI < 0) { iA = at(/^To play this (audio|video)/i); if (iA >= 0) { for (let i = iA + 1; i < L0.length && (iV < 0 || i < iV); i++) if (/^@@/.test(L0[i]) && L0[i + 1] && !/^@@/.test(L0[i + 1])) { iT2 = i; break; } } }
   const marks = [iI, iH, iQ, iV, iT, iEnd].filter(x => x >= 0).sort((x, y) => x - y);
   const end = a => { const n = marks.find(x => x > a); return n == null ? Math.min(L.length, a + 80) : n; };
   const seg = (a, raw) => (a < 0 ? [] : (raw ? L0 : L).slice(a + 1, end(a)));
-  const intro = seg(iI).join(" ");
+  const intro = iT2 > 0 ? L.slice(iA + 1, iT2).join(" ") : seg(iI).join(" ");
   const q = seg(iQ).filter(s => !/^Listen to the programme/i.test(s));
   const heads = []; { const H = seg(iH); for (let i = 0; i < H.length; i++) { if (H[i + 1] && H[i + 1].length < 40 && H[i].length > H[i + 1].length) { heads.push([H[i], H[i + 1]]); i++; } else heads.push([H[i], ""]); } }
   const V0 = seg(iV, true), vocab = [];
   if (V0.some(s => /^@@/.test(s))) { for (const s of V0) { if (/^@@/.test(s)) vocab.push([s.slice(2).trim(), ""]); else if (vocab.length) { const v = vocab[vocab.length - 1]; if (!v[1]) v[1] = s; else if (!v[2]) v[2] = s; } } }
+  else if (V0.filter(s => / [-–] /.test(s)).length >= Math.max(2, V0.length / 2)) { for (const s of V0) { const m = s.match(/^(.{1,60}?) [-–] (.+)$/); if (m) vocab.push([m[1].trim(), m[2].trim()]); } } // 大学英语：一行「词 - 解释」
   else for (let i = 0; i + 1 < V0.length; i += 2) vocab.push([V0[i], V0[i + 1]]);
-  const T = iT < 0 ? [] : L0.slice(iT + 1, end(iT)).filter(s => !/^(@@)?Note: This is not a word-for-word transcript/i.test(s));
+  const T = (iT < 0 ? (iT2 < 0 ? [] : L0.slice(iT2, iV > iT2 ? iV : end(iT2))) : L0.slice(iT + 1, end(iT))).filter(s => !/^(@@)?Note: This is not a word-for-word transcript/i.test(s));
   const lines = []; let who = "";
   for (let i = 0; i < T.length; i++) { const s = T[i]; if (/^@@/.test(s)) { who = s.slice(2).trim(); continue; } lines.push({ who, t: s }); }
-  return { title: og.split(" / ").pop().trim(), mp3, intro, q, vocab: vocab.filter(v => v[0] && v[1]), heads, lines };
+  return { title: og.split(" / ").pop().replace(/&amp;/g, "&").replace(/&#0?39;/g, "'").trim(), mp3, intro, q, vocab: vocab.filter(v => v[0] && v[1]), heads, lines };
 }
-function smeIndex(html, slug) {
-  const out = [], seen = new Set(), re = new RegExp('<a\\s+href="/learningenglish/english/features/(' + slug + '(?:_\\d{4})?/(?:ep-)?\\d{6})"><img src="([^"]+)"[\\s\\S]*?<h2><a\\s+href="[^"]+">([^<]+)</a></h2>[\\s\\S]*?<h3>([\\s\\S]*?)</h3>\\s*<p>([^<]*)</p>', "g");
-  const dec = s => s.replace(/&amp;/g, "&").replace(/&#39;|&rsquo;/g, "'").replace(/&quot;/g, '"').replace(/\s+/g, " ").trim();
+function smeIndex(html, slug, idp) {
+  const out = [], seen = new Set(), re = new RegExp('<a\\s+href="/learningenglish/english/features/(' + (idp || slug + '(?:_\\d{4})?/(?:ep-)?\\d{6}') + ')"><img src="([^"]+)"[\\s\\S]*?<h2><a\\s+href="[^"]+">([^<]+)</a></h2>[\\s\\S]*?<h3>([\\s\\S]*?)</h3>\\s*<p>([^<]*)</p>', "g");
+  const dec = s => s.replace(/&amp;/g, "&").replace(/&#0?39;|&rsquo;/g, "'").replace(/&quot;/g, '"').replace(/\s+/g, " ").trim();
   let m; while ((m = re.exec(html))) { if (seen.has(m[1])) continue; seen.add(m[1]); const d = (m[4].match(/(\d{1,2} \w{3} \d{4})/) || [])[1] || ""; out.push({ id: m[1], img: m[2], t: dec(m[3]), d, p: dec(m[5]) }); }
   return out;
+}
+// 故事类栏目的排序：同一个故事（标题去掉「Part 2」「Episode 3」以后一样）排在一起、按集数从前往后；故事之间按最近一集的日期新的在前
+const NUMW = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12 };
+function storySort(list) {
+  const PN = /[,:\-–]?\s*\b(?:(?:part|episode|chapter)\s+(\d+|[a-z]+)|ep\.?\s*(\d+))\b.*$/i; // 「Part Two」「Episode 3」「ep 05」
+  const key = t => String(t || "").replace(PN, "").replace(/['"‘’“”,]/g, "").replace(/\s+/g, " ").trim().toLowerCase();
+  const no = t => { const m = String(t || "").match(PN); return m ? (+(m[1] || m[2]) || NUMW[String(m[1] || "").toLowerCase()] || 0) : 0; };
+  const day = x => Date.parse(x.d) || 0, G = new Map(), nt = t => String(t || "").replace(/^(\d+)\s*[-–:]\s*/, "Episode $1 - "); // 大学英语后几集叫「18 - Emergency」
+  list.forEach(x => { const k = key(nt(x.t)); if (!G.has(k)) G.set(k, []); G.get(k).push(x); });
+  const gs = [...G.values()].map(g => ({ g: g.sort((a, b) => no(nt(a.t)) - no(nt(b.t)) || day(a) - day(b)), d: Math.max(...g.map(day)) }));
+  return gs.sort((a, b) => b.d - a.d).flatMap(x => x.g);
+}
+const voaTxt = h => String(h || "").replace(/<br\s*\/?>/gi, " ").replace(/<[^>]+>/g, "").replace(/&nbsp;|&#160;/g, " ").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;|&#x27;|&rsquo;|&lsquo;/g, "'").replace(/&ldquo;|&rdquo;/g, '"').replace(/&mdash;/g, "—").replace(/&ndash;/g, "–").replace(/&hellip;/g, "…").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#(\d+);/g, (m, n) => String.fromCharCode(+n)).replace(/&#x([0-9a-f]+);/gi, (m, n) => String.fromCharCode(parseInt(n, 16))).replace(/[\u200b-\u200d\ufeff]/g, "").replace(/\s+/g, " ").trim();
+// VOA 栏目目录页 → [{id, t, d, img, p:""}]
+function voaIndex(html, s) {
+  const out = [], seen = new Set();
+  for (const m of html.matchAll(/<a href="\/a\/[a-z0-9-]+\/(\d{5,9})\.html"\s+class="img-wrap[^"]*" title="([^"]*)">([\s\S]*?)<\/a>\s*<div class="media-block__content">([\s\S]*?)<\/div>/g)) {
+    if (seen.has(m[1])) continue; seen.add(m[1]);
+    const img = ((m[3].match(/<img src="(https:\/\/gdb\.voanews\.com\/[^"]+)"/) || [])[1] || "").replace(/_w\d+_r1\./, "_w320_r1.");
+    const d = voaTxt((m[4].match(/<span class="date[^"]*"\s*>([^<]+)</) || [])[1] || "");
+    out.push({ id: s + "/" + m[1], img, t: voaTxt(m[2]), d, p: "" });
+  }
+  return out;
+}
+// VOA 一篇文章 → 和 BBC 一样的结构 { title, mp3, intro, q:[], vocab:[[词, 解释]], heads:[], lines:[{who:"", t}] }
+function voaParse(html) {
+  const meta = k => voaTxt((html.match(new RegExp('<meta content="([^"]*)" property="og:' + k + '"')) || html.match(new RegExp('<meta property="og:' + k + '" content="([^"]*)"')) || [])[1] || "");
+  const au = [...new Set((html.match(/https?:\/\/(voa-audio\.voanews\.eu|voa-video\.voanews\.eu|av\.voanews\.com)\/[^"'\s<>]+?\.mp3/g) || []).map(u => u.replace(/^http:/, "https:").replace(/^https:\/\/av\.voanews\.com\/Videoroot\//, "https://voa-video.voanews.eu/")))]; // 2015 年前后的老文章：av.voanews.com 会跳到 voa-video.voanews.eu
+  const mp3 = au.find(u => /_hq\.mp3$/.test(u)) || au[0] || "";
+  const i = html.indexOf('<div class="wsw">'), j = i < 0 ? -1 : html.indexOf('id="comments"', i);
+  const body = i < 0 ? "" : html.slice(i, j > i ? j : i + 200000);
+  const lines = [], vocab = []; let sec = "t";
+  const parts = []; // 老文章整个故事在一个 <p> 里、用 <br> 分段：拆开当成一段一段
+  for (const m of body.matchAll(/<(p|h2|h3|h4)\b[^>]*>([\s\S]*?)<\/\1>/g)) m[1] === "p" ? m[2].split(/(?:<br[^>]*>\s*)+/i).forEach(x => parts.push(["p", x])) : parts.push([m[1], m[2]]);
+  for (const [tag, raw] of parts) {
+    const t = voaTxt(raw); if (!t || /^_+$/.test(t) || /^No media source currently available/i.test(t)) continue;
+    if (tag !== "p" || /^<strong>[^<]*<\/strong>$/.test(raw.trim())) { // 小标题：生词表 / 练习 / 讨论题之后都不是节目里念的
+      if (/^words in this (story|lesson|report)|^vocabulary|^words to know/i.test(t)) { sec = "v"; continue; }
+      if (/^(practice|quiz|test yourself|we want to hear from you|now it'?s your turn|what do you think|your thoughts|discussion|___)/i.test(t)) { sec = "x"; continue; }
+      if (tag !== "p") { if (sec === "t") lines.push({ who: "", t }); continue; }
+    }
+    if (/^(now it'?s your turn|download a lesson plan|click on the image)/i.test(t)) { if (sec === "t") sec = "x"; continue; }
+    if (sec === "v" || (sec === "x" && /^[a-z][a-z' -]{0,40} [-–] (n|v|adj|adv|phrase|idiom|prep|conj|pron)\.? /i.test(t))) { // 生词：「<strong>词</strong> –n. 解释」或纯文字「词 - v. 解释」
+      const w = raw.match(/^\s*<strong>([\s\S]*?)<\/strong>\s*([\s\S]*)$/), a = w ? [voaTxt(w[1]), voaTxt(w[2]).replace(/^[-–—]\s*/, "")] : (t.match(/^(.{1,40}?) [-–] (.+)$/) || []).slice(1);
+      if (a[0] && a[1]) vocab.push(a); continue;
+    }
+    if (sec !== "t") continue;
+    if (/\b(wrote|adapted|edited|reported|produced)\b.{0,120}\b(VOA Learning English|for VOA)\b|\breported (on )?(this|the) story for\b|^_{3,}|^(Copyright|Original story by)\b/i.test(t)) continue; // 署名：节目里不念
+    lines.push({ who: "", t });
+  }
+  return { title: meta("title") || voaTxt((html.match(/<title>([\s\S]*?)<\/title>/) || [])[1] || ""), mp3, intro: meta("description"), q: [], vocab, heads: [], lines };
 }
 // 一批英文句子 → 一样多的中文：按行拼起来（每段不超过 1500 字）交给谷歌翻译，行数对不上就拆小再试
 // Workers AI 翻译（不靠谷歌）：大模型一次翻 20 句（一次请求最多 50 个外部调用，一句一句翻会超）；没翻出来的再用翻译模型 m2m100 单句补（最多 12 句）
@@ -696,9 +763,9 @@ async function dw(req, env, u) {
 async function sme(req, env, u) {
   if (req.method === "OPTIONS") return json({ ok: true });
   if (u.searchParams.get("al")) return smeAlign(env, u);
-  if (u.searchParams.get("mp3")) { // 📥 离线下载：BBC 的 mp3 没开跨域，这里转一手（只转打开过的那几期、只转 downloads.bbc.co.uk）
+  if (u.searchParams.get("mp3")) { // 📥 离线下载：BBC 的 mp3 没开跨域，这里转一手（只转打开过的那几期、只转 downloads.bbc.co.uk / voa-audio.voanews.eu）
     const x = await env.CAPTIONS.get("sme/ep/" + u.searchParams.get("mp3"), "json");
-    if (!x || !/^https:\/\/downloads\.bbc\.co\.uk\/[^?#]+\.mp3$/.test(x.mp3 || "")) return json({ ok: false, error: "open the episode first" }, 409);
+    if (!x || !/^https:\/\/(downloads\.bbc\.co\.uk|voa-audio\.voanews\.eu|voa-video\.voanews\.eu)\/[^?#]+\.mp3$/.test(x.mp3 || "")) return json({ ok: false, error: "open the episode first" }, 409);
     const r = await fetch(x.mp3); if (!r.ok) return json({ ok: false, error: "mp3 " + r.status }, 502);
     return new Response(r.body, { headers: { "content-type": "audio/mpeg", "cache-control": "private, max-age=86400", ...(r.headers.get("content-length") ? { "content-length": r.headers.get("content-length") } : {}) } });
   }
@@ -709,9 +776,10 @@ async function sme(req, env, u) {
     const key = "sme/ep/" + ep; let x = fresh ? null : await env.CAPTIONS.get(key, "json");
     if (!x) {
       try {
-        const r = await fetch(BASE + ep, { headers: UA }); if (!r.ok) return json({ ok: false, error: "http " + r.status }, 502);
-        const p = smeParse(await r.text()); if (!p.mp3 || (p.lines.length < 6 && !(s === "news" && (p.intro || p.vocab.length)))) return json({ ok: false, error: "no transcript" }, 502);
-        x = { ok: true, id: ep, s, url: BASE + ep, ...p }; await env.CAPTIONS.put(key, JSON.stringify(x), { expirationTtl: 90 * 86400 });
+        const src = SME_S[s].voa ? VOA + "/a/" + ep.split("/")[1] + ".html" : BASE + ep;
+        const r = await fetch(src, { headers: UA }); if (!r.ok) return json({ ok: false, error: "http " + r.status }, 502);
+        const p = SME_S[s].voa ? voaParse(await r.text()) : smeParse(await r.text()); if (!p.mp3 || (p.lines.length < 6 && !(s === "news" && (p.intro || p.vocab.length)))) return json({ ok: false, error: "no transcript" }, 502);
+        x = { ok: true, id: ep, s, url: SME_S[s].voa ? r.url || src : BASE + ep, ...p }; await env.CAPTIONS.put(key, JSON.stringify(x), { expirationTtl: 90 * 86400 });
       } catch (e) { return json({ ok: false, error: String(e && e.message || e) }, 502); }
     }
     if (!u.searchParams.get("zh")) return json(x);
@@ -728,13 +796,17 @@ async function sme(req, env, u) {
   const s = SME_S[u.searchParams.get("s") || "sme"] ? (u.searchParams.get("s") || "sme") : "", S = SME_S[s]; if (!S) return json({ ok: false, error: "bad s" }, 400);
   const lk = s === "sme" ? "sme/list" : "sme/list/" + s;
   if (!fresh) { const c = await env.CAPTIONS.get(lk, "json"); if (c) return json(c); }
-  const y = +newsDay().slice(0, 4), seen = new Set(), list = [];
-  for (const page of S.yearly ? [S.slug + "_" + y, S.slug + "_" + (y - 1)] : [S.slug]) {
-    try { const r = await fetch(BASE + page, { headers: UA }); if (r.ok) for (const i of smeIndex(await r.text(), S.slug)) if (!seen.has(i.id)) { seen.add(i.id); list.push(i); } } catch (e) {}
+  const y = +newsDay().slice(0, 4), seen = new Set(), seenT = new Set(), list = [];
+  const add = i => { const tk = i.t.toLowerCase(); if (seen.has(i.id) || (S.story && seenT.has(tk)) || (S.skip && S.skip.test(i.id))) return; seen.add(i.id); seenT.add(tk); list.push(i); }; // 广播剧同一集有两个地址（alice-ep01 / aliceinwonderland-ep01）：按标题去重
+  if (S.voa) { const pages = await Promise.all([0, 1, 2, 3, 4].map(p => fetch(VOA + "/z/" + S.voa + (p ? "?p=" + p : ""), { headers: UA }).then(r => (r.ok ? r.text() : "")).catch(() => ""))); pages.forEach(h => voaIndex(h, s).forEach(add)); }
+  else for (const page of S.yearly ? [S.slug + "_" + y, S.slug + "_" + (y - 1)] : [S.slug]) {
+    try { const r = await fetch(BASE + page, { headers: UA }); if (r.ok) smeIndex(await r.text(), S.slug, S.idp).forEach(add); } catch (e) {}
   }
   if (!list.length) return json({ ok: false, error: "no list" }, 502);
-  list.sort((p, q) => (q.id.match(/\d{6}$/) || [""])[0].localeCompare((p.id.match(/\d{6}$/) || [""])[0])); // 期号 = 年月日，新的在前
-  const out = { ok: true, s, list: list.slice(0, 120) }; await env.CAPTIONS.put(lk, JSON.stringify(out), { expirationTtl: 12 * 3600 }); return json(out);
+  if (S.story) { const st = storySort(list); list.length = 0; list.push(...st); }
+  else if (S.voa) list.sort((p, q) => (Date.parse(q.d) || 0) - (Date.parse(p.d) || 0));
+  else list.sort((p, q) => (q.id.match(/\d{6}$/) || [""])[0].localeCompare((p.id.match(/\d{6}$/) || [""])[0])); // 期号 = 年月日，新的在前
+  const out = { ok: true, s, list: list.slice(0, 120) }; await env.CAPTIONS.put(lk, JSON.stringify(out), { expirationTtl: S.story || S.voa ? 7 * 86400 : 12 * 3600 }); return json(out); // 不再更新的栏目（广播剧、大学英语、VOA）存一周
 }
 
 // ---------- AI（Cloudflare Workers AI，免费额度每天 1 万 neurons；要在 Pages 项目「设置 → 绑定」里加 Workers AI，变量名 AI）----------
@@ -1053,7 +1125,7 @@ async function tts(req, env, u, ctx) {
 
 // GET/POST /api/px?u=<网址>：中国大陆打不开的几个外部服务（维基百科、维基词典、BBC 的图和音频、YouTube 缩略图、英文词典、LanguageTool）经后台转一手
 // 只转名单里的网站；音频带 Range（能拖进度条）；图片在 Cloudflare 边缘缓存一天
-const PX_HOSTS = { "en.wikipedia.org": /^\/w\/api\.php$/, "zh.wikipedia.org": /^\/w\/api\.php$/, "commons.wikimedia.org": /^\/w\/api\.php$/, "upload.wikimedia.org": /^\//, "thumb.wikimedia.org": /^\//, "ichef.bbci.co.uk": /^\//, "downloads.bbc.co.uk": /\.mp3$/, "radiodownloaddw-a.akamaihd.net": /\.mp3$/, "i.ytimg.com": /^\/vi\//, "api.dictionaryapi.dev": /^\/(api\/v2\/entries|media)\//, "api.languagetool.org": /^\/v2\/check$/, "en.wiktionary.org": /^\/(api\/rest_v1\/page\/definition\/|w\/api\.php$)/ }; // 维基词典：插件查词（释义、是不是固定短语）
+const PX_HOSTS = { "en.wikipedia.org": /^\/w\/api\.php$/, "zh.wikipedia.org": /^\/w\/api\.php$/, "commons.wikimedia.org": /^\/w\/api\.php$/, "upload.wikimedia.org": /^\//, "thumb.wikimedia.org": /^\//, "ichef.bbci.co.uk": /^\//, "downloads.bbc.co.uk": /\.mp3$/, "voa-audio.voanews.eu": /\.mp3$/, "voa-video.voanews.eu": /\.mp3$/, "gdb.voanews.com": /^\//, "radiodownloaddw-a.akamaihd.net": /\.mp3$/, "i.ytimg.com": /^\/vi\//, "api.dictionaryapi.dev": /^\/(api\/v2\/entries|media)\//, "api.languagetool.org": /^\/v2\/check$/, "en.wiktionary.org": /^\/(api\/rest_v1\/page\/definition\/|w\/api\.php$)/ }; // 维基词典：插件查词（释义、是不是固定短语）
 async function px(req, u) {
   if (req.method === "OPTIONS") return new Response(null, { headers: { "access-control-allow-origin": "*", "access-control-allow-methods": "GET,POST", "access-control-allow-headers": "content-type,range" } });
   let t; try { t = new URL(u.searchParams.get("u") || ""); } catch (e) { return json({ ok: false, error: "bad url" }, 400); }
@@ -1061,7 +1133,7 @@ async function px(req, u) {
   const post = req.method === "POST"; if (post && t.hostname !== "api.languagetool.org") return json({ ok: false, error: "method" }, 405);
   const h = { "User-Agent": "ruilearning-family-english/1.0 (https://ruilearning-my.pages.dev; low-volume cached proxy)", "Accept": req.headers.get("accept") || "*/*" }, range = req.headers.get("range");
   if (range) h.Range = range; if (post) h["Content-Type"] = req.headers.get("content-type") || "application/x-www-form-urlencoded";
-  const img = /^(upload\.wikimedia\.org|thumb\.wikimedia\.org|ichef\.bbci\.co\.uk|i\.ytimg\.com)$/.test(t.hostname);
+  const img = /^(upload\.wikimedia\.org|thumb\.wikimedia\.org|ichef\.bbci\.co\.uk|i\.ytimg\.com|gdb\.voanews\.com)$/.test(t.hostname);
   let r; try { r = await fetch(t.toString(), { method: post ? "POST" : "GET", headers: h, body: post ? await req.text() : undefined, cf: !post && !range && !/\.mp3$/.test(t.pathname) ? { cacheEverything: true, cacheTtl: 86400 } : undefined }); } catch (e) { return json({ ok: false, error: "fetch failed" }, 502); }
   const out = new Headers({ "access-control-allow-origin": "*", "cache-control": r.ok && !post ? "public, max-age=86400" : "no-store" });
   for (const k of ["content-type", "content-length", "content-range", "accept-ranges", "last-modified", "etag"]) { const v = r.headers.get(k); if (v) out.set(k, v); }
