@@ -413,7 +413,7 @@ async function gtrans(text, tl, bd) {
       if (r.ok) { const j = await r.json(); if (j && (j.sentences || []).some(x => x.trans)) return j; } else if (r.status === 403 || r.status === 429 || r.status >= 500) blocked++; } catch (e) { blocked++; }
   }
   if (blocked >= 2) G_DOWN = Date.now() + 10 * 60000;
-  try { // 再不行用 MyMemory（免费，每天有额度）
+  if (text.length <= 480) try { // 再不行用 MyMemory（免费，每天有额度；超过 500 字它不翻）
     const r = await fetch("https://api.mymemory.translated.net/get?q=" + encodeURIComponent(text) + "&langpair=en|" + tl, { headers: UA });
     const j = r.ok && (await r.json()), t = j && j.responseData && j.responseData.translatedText;
     if (t && !/MYMEMORY WARNING/i.test(t)) return { sentences: [{ trans: t }], dict: [] };
@@ -567,7 +567,7 @@ function smeIndex(html, slug) {
   return out;
 }
 // 一批英文句子 → 一样多的中文：按行拼起来（每段不超过 1500 字）交给谷歌翻译，行数对不上就拆小再试
-// Workers AI 翻译（不靠谷歌）：大模型一次翻 20 句（一次请求最多 50 个外部调用，一句一句翻会超）；没翻出来的再用翻译模型 m2m100 单句补（最多 20 句）
+// Workers AI 翻译（不靠谷歌）：大模型一次翻 20 句（一次请求最多 50 个外部调用，一句一句翻会超）；没翻出来的再用翻译模型 m2m100 单句补（最多 12 句）
 async function aiTrans(env, arr, idx) {
   const out = {}; if (!env.AI || !idx.length) return out;
   const B = []; for (let k = 0; k < idx.length && k < 200; k += 20) B.push(idx.slice(k, k + 20));
@@ -577,7 +577,7 @@ async function aiTrans(env, arr, idx) {
       o => Array.isArray(o && o.zh) && o.zh.length === part.length && o.zh.every(x => typeof x === "string") && !!(got = o.zh), 3000).catch(() => null);
     if (got) part.forEach((i, n) => { if (got[n].trim() && /[\u4e00-\u9fff]/.test(got[n])) out[i] = got[n].trim(); });
   }));
-  const left = idx.filter(i => !out[i]).slice(0, 20);
+  const left = idx.filter(i => !out[i]).slice(0, 12);
   const one = async i => { try { const r = await env.AI.run("@cf/meta/m2m100-1.2b", { text: clip(arr[i], 1000), source_lang: "en", target_lang: "zh" }); const t = r && String(r.translated_text || "").trim(); if (t && t !== arr[i].trim()) out[i] = t; } catch (e) {} };
   for (let k = 0; k < left.length; k += 5) await Promise.all(left.slice(k, k + 5).map(one));
   return out;
@@ -589,6 +589,7 @@ async function smeZh(arr, env) {
     const zh = j ? (j.sentences || []).map(x => x.trans || "").join("").split("\n").map(x => x.trim()) : [];
     if (zh.length === idx.length) { idx.forEach((i, k) => { out[i] = zh[k]; }); return; }
     if (idx.length === 1) { out[idx[0]] = zh.join(" ").trim(); return; }
+    if (!j) return; // 整个没翻成（谷歌拦了）：别拆开再试，一次请求只有 50 个外部调用，留给后面的 Workers AI
     if (depth < 3) { const h = Math.ceil(idx.length / 2); await run(idx.slice(0, h), depth + 1); await run(idx.slice(h), depth + 1); }
   }
   const chunks = []; let cur = [], len = 0;
