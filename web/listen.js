@@ -30,6 +30,7 @@
   const tip = m => { try { (window.toast || (() => {}))(m); } catch (e) {} };
   // 新加的排前面。[栏目, 按钮, 英文名, 一句介绍, 来源, 故事类（按集连着听）]
   const SER = [
+    ["new", "🆕 本周更新", "This week", "所有来源最近 7 天出的新节目合在一起，按天排、新的在前（VOA 已停更、广播剧和大学英语是固定的旧节目，不在这里）", "NEW"],
     ["bn1", "📶 L1 初级", "Level 1", "同一篇时事新闻按难度改写成好几级：L1 句子短、词简单；每篇一两分钟，带全文。每三四天出一篇新的", "BNE"],
     ["bn3", "📶 L3 中级", "Level 3", "同一篇新闻的 L3 版本：句子长一点、细节多一点；每篇两三分钟，带全文", "BNE"],
     ["bn5", "📶 L5 中高级", "Level 5", "进阶篇的 L5 版本：用词和句式接近真实新闻；带全文", "BNE"],
@@ -50,10 +51,22 @@
   ].map(x => (x[4] ? x : x.concat("BBC")));
   const SM = Object.fromEntries(SER.map(x => [x[0], x]));
   const serOf = id => { const m = /^([a-z0-9]{2,6})\//.exec(id); return m && SM[m[1]] ? m[1] : /^drama\//.test(id) ? "drama" : /^english-at-university\//.test(id) ? "eau" : /^real-easy-english\//.test(id) ? "ree" : /^the-english-we-speak/.test(id) ? "tews" : /^learning-english-from-the-news/.test(id) ? "news" : "sme"; };
-  const SRC = { BNE: ["分级", "Breaking News English", "分级新闻：同一篇新闻有好几个难度，选适合自己的那一级"], NPR: ["NPR", "NPR", "美国公共广播电台的播客，正常语速（进阶）；新节目的文稿 NPR 一般晚一两天才放"], VOA: ["VOA", "VOA Learning English", "美音；2025 年 3 月起停更，旧节目都能听"], BBC: ["BBC", "BBC Learning English", ""] }; // [行首标签, 全名, 说明]
+  const SRC = { NEW: ["最新", "各来源", ""], BNE: ["分级", "Breaking News English", "分级新闻：同一篇新闻有好几个难度，选适合自己的那一级"], NPR: ["NPR", "NPR", "美国公共广播电台的播客，正常语速（进阶）；新节目的文稿 NPR 一般晚一两天才放"], VOA: ["VOA", "VOA Learning English", "美音；2025 年 3 月起停更，旧节目都能听"], BBC: ["BBC", "BBC Learning English", ""] }; // [行首标签, 全名, 说明]
   const srcName = id => SRC[SM[serOf(id)][4]][1];
   const srcUrl = (id, ep) => { const s = serOf(id), sub = id.slice(s.length + 1), src = SM[s][4]; return (ep && ep.url) || (src === "VOA" ? "https://learningenglish.voanews.com/a/" + sub + ".html" : src === "NPR" ? "https://www.npr.org/transcripts/" + sub : src === "BNE" ? "https://breakingnewsenglish.com/" + sub + ".html" : "https://www.bbc.co.uk/learningenglish/english/features/" + id); };
   const MORE = {}; // 列表显示到第几期（「显示更多」）
+  // 🆕 本周更新：一直在更新的栏目（分级、NPR、BBC 每周的）各自的列表里，挑最近 7 天的合起来
+  const WKS = () => SER.filter(x => x[4] !== "NEW" && x[4] !== "VOA" && !x[5]).map(x => x[0]);
+  const WKDAY = t => { const d = new Date(t); d.setHours(0, 0, 0, 0); return +d; };
+  function weekItems() { // → [{id, s, t, d, img, day, lv:[[栏目, id]...]}]，同一篇分级新闻的几个级别合成一张
+    const cut = WKDAY(Date.now()) - 6 * 864e5, out = [], bne = {};
+    WKS().forEach((k, si) => (LISTS[k] || []).forEach(x => {
+      const t = Date.parse(x.d); if (!t || WKDAY(t) < cut) return;
+      if (SM[k][4] === "BNE") { const b = x.id.slice(k.length + 1); if (bne[b]) { bne[b].lv.push([k, x.id]); return; } out.push(bne[b] = Object.assign({}, x, { s: k, si, day: WKDAY(t), lv: [[k, x.id]] })); return; }
+      out.push(Object.assign({}, x, { s: k, si, day: WKDAY(t) }));
+    }));
+    return out.sort((a, b) => b.day - a.day || a.si - b.si);
+  }
   const CSS = `
   #sme{display:none;max-width:900px;margin:0 auto;padding:6px 0 60px;overflow-wrap:anywhere;color:var(--ui-ink);font-family:var(--ui-font)}#sme.on{display:block}
   #sme .sm-ser{display:flex;flex-direction:column;gap:7px;margin:2px 0 10px}#sme .sm-row{display:flex;flex-wrap:wrap;gap:7px;align-items:center} /* 一个来源一行（VOA / BBC），放不下就折行，不用左右滑 */
@@ -66,6 +79,9 @@
   #sme .sm-new img{width:100%;border-radius:10px;display:block;aspect-ratio:16/9;object-fit:cover}#sme .sm-new small{color:var(--ui-pur-text);font-weight:800;font-size:12.5px}#sme .sm-new b{display:block;font-size:19px;margin:4px 0}#sme .sm-new p{margin:0;color:var(--ui-ink-2);font-size:14px}
   #sme .sm-grid{display:grid;grid-template-columns:1fr;gap:10px}@media(min-width:720px){#sme .sm-grid{grid-template-columns:1fr 1fr}}
   #sme .sm-it{display:flex;gap:12px;align-items:center;background:var(--ui-surface);border:1px solid var(--ui-line);border-radius:14px;padding:10px 12px;cursor:pointer;min-width:0}#sme .sm-it:hover{border-color:var(--ui-pur)}
+  #sme .sm-wk-n{margin:0 0 4px;color:var(--ui-muted);font-size:13.5px}#sme .sm-wk-n b{color:var(--ui-ink)}#sme h3.sm-day{margin:16px 0 8px;font-size:14px;color:var(--ui-ink-2)}
+  #sme .sm-it .lv{font-style:normal;display:inline-flex;gap:5px;margin-left:4px;vertical-align:1px}#sme .sm-it .lv button{border:1px solid var(--ui-line-2);background:var(--ui-surface-2,var(--ui-surface));color:var(--ui-ink);border-radius:999px;padding:1px 8px;font:inherit;font-size:11.5px;font-weight:700;cursor:pointer}#sme .sm-it .lv button:hover{border-color:var(--ui-pur)}#sme .sm-it .lv button.ok{color:var(--ui-muted)}
+  #sme .sm-it .ph{width:88px;height:50px;border-radius:8px;flex:0 0 auto;display:grid;place-items:center;font-size:24px;font-style:normal;background:var(--ui-line)}
   #sme .sm-it img{width:88px;height:50px;object-fit:cover;border-radius:8px;flex:0 0 auto}#sme .sm-it .t{min-width:0;flex:1}#sme .sm-it b{display:block;font-size:14.5px;line-height:1.35}#sme .sm-it span{display:block;color:var(--ui-muted);font-size:12px;margin-top:2px}
   #sme .ok{color:var(--ui-green,#3fb37f);font-weight:700}
   #sme .sm-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:2px 0 12px}#sme .sm-bar .sp{flex:1}
@@ -183,8 +199,9 @@
   }
 
   function loadList(s) {
+    if (s === "new") { WKS().forEach(loadList); return; }
     if (LISTS[s] || listBusy[s]) return; listBusy[s] = true;
-    const fin = l => { listBusy[s] = false; LISTS[s] = l; if (view === "home" && ser === s) draw(); };
+    const fin = l => { listBusy[s] = false; LISTS[s] = l; if (view === "home" && (ser === s || (ser === "new" && WKS().includes(s)))) draw(); };
     fetch("/api/sme?s=" + s).then(r => r.json()).then(j => fin(j && j.ok ? j.list : [])).catch(() => fin([]));
   }
   function openEp(id) {
@@ -457,13 +474,13 @@
   // ---------- ⏭ 播完接下一期 ----------
   let autoNext = null;
   function nextEp(id) {
-    const L = LISTS[serOf(id)] || [], D = done(), i = L.findIndex(x => x.id === id);
+    const L = (ser === "new" ? weekItems().map(x => x.lv ? { id: x.lv.find(v => v[0] === serOf(id)) ? x.lv.find(v => v[0] === serOf(id))[1] : x.id, t: x.t } : x) : LISTS[serOf(id)]) || [], D = done(), i = L.findIndex(x => x.id === id); // 从「本周更新」点开的：接着放本周没听的
     return L.slice(i + 1).concat(L.slice(0, Math.max(0, i))).find(x => !D[x.id] && x.id !== id) || null; // 往旧的找没听过的，再从最新的找
   }
   AU.addEventListener("ended", () => {
     const id = AU.dataset.id; if (!cont || !id || (DK[id] && DK[id].auto)) return;
-    const n = nextEp(id); if (!n) { tip("这个栏目的都听过了"); return; }
-    tip("⏭ 接着放：" + n.t); autoNext = n.id; ser = serOf(n.id); openEp(n.id);
+    const n = nextEp(id); if (!n) { tip(ser === "new" ? "本周更新的都听过了" : "这个栏目的都听过了"); return; }
+    tip("⏭ 接着放：" + n.t); autoNext = n.id; if (ser !== "new") ser = serOf(n.id); openEp(n.id);
   });
 
   // ---------- 🎵 文稿跟着语音 ----------
@@ -596,14 +613,26 @@
     const tot = ids.reduce((n, id) => n + (+O[id].size || 0), 0), D = done();
     return '<div class="sm-box"><h3>📥 已下载 ' + ids.length + ' 期 <small style="font-weight:400;color:var(--ui-muted)">共 ' + mb(tot) + "，没网也能听</small></h3>" + ids.map(id => '<div class="sm-off"><div class="t" data-ep="' + esc(id) + '"><b>' + esc(O[id].t) + "</b><small>" + esc(SM[O[id].s || serOf(id)][1]) + (O[id].d ? " · " + esc(O[id].d) : "") + " · " + mb(+O[id].size || 0) + (D[id] ? " · ✓ 听过" : "") + '</small></div><button class="ui-btn" data-offdel="' + esc(id) + '" title="删掉下载的文件">🗑</button></div>').join("") + "</div>";
   }
+  const pic = (src, s) => src ? '<img src="' + esc(src) + '" alt="" loading="lazy">' : '<i class="ph">' + esc(SM[s][1].split(" ")[0]) + "</i>"; // 没配图的（NPR Up First）放栏目图标
+  function weekHtml(top) {
+    const ks = WKS(), wait = ks.filter(k => !LISTS[k]).length, W = weekItems(), D = done(), PP = POS(), OF = OFF();
+    if (!W.length) return top + '<div class="sm-empty">' + (wait ? "正在取各栏目的节目列表…" : "最近 7 天没取到新节目" + (navigator.onLine === false ? "（现在没网）" : "，过一会儿再试")) + "</div>";
+    const heard = x => (x.lv || [[x.s, x.id]]).some(v => D[v[1]]), left = W.filter(x => !heard(x)).length, today = WKDAY(Date.now());
+    const dayName = t => (t === today ? "今天" : t === today - 864e5 ? "昨天" : t === today - 1728e5 ? "前天" : "") + " " + (new Date(t).getMonth() + 1) + " 月 " + new Date(t).getDate() + " 日 周" + "日一二三四五六"[new Date(t).getDay()];
+    const it = x => '<div class="sm-it" data-ep="' + esc(x.id) + '">' + pic(x.img, x.s || ser) + '<div class="t"><b>' + esc(x.t) + "</b><span>" + (x.lv ? '分级新闻 <i class="lv">' + x.lv.map(v => '<button data-ep="' + esc(v[1]) + '" class="' + (D[v[1]] ? "ok" : "") + '" title="' + esc(SM[v[0]][1]) + '">' + esc(SM[v[0]][2].replace("Level ", "L")) + (D[v[1]] ? " ✓" : "") + "</button>").join("") + "</i>" : esc(SM[x.s][1]) + " · " + SRC[SM[x.s][4]][0] + (D[x.id] ? ' · <em class="ok">✓ 听过</em>' : PP[x.id] ? " · ⏯ 听到 " + fmt(PP[x.id].t) : "") + (OF[x.id] ? " · 📥" : "") + diffShort(x.id)) + "</span></div></div>";
+    const days = [...new Set(W.map(x => x.day))];
+    return top + '<div class="sm-wk-n">最近 7 天共 <b>' + W.length + "</b> 期新节目" + (left < W.length ? "，还没听 <b>" + left + "</b> 期" : "") + (wait ? " · 还在取 " + wait + " 个栏目…" : "") + "</div>" +
+      days.map(d => '<h3 class="sm-day">' + dayName(d) + '</h3><div class="sm-grid">' + W.filter(x => x.day === d).map(it).join("") + "</div>").join("");
+  }
   function homeHtml() {
     const D = done(), L = LISTS[ser], top = offHtml() + statHtml();
+    if (ser === "new") return weekHtml(top);
     if (!L) return top + '<div class="sm-empty">正在取节目列表…</div>';
     if (!L.length) return top + '<div class="sm-empty">节目列表没取到' + (navigator.onLine === false ? "（现在没网：上面「📥 已下载」的能听）" : "，过一会儿再试") + "</div>";
     const story = !!SM[ser][5], n0 = L[0], fresh = L.find(x => !D[x.id]) || n0; // 故事类：列表就是从第 1 集起的顺序，「没听的第一个」= 该听的下一集
     const PP = POS();
     const OF = OFF(), QR = LQR();
-    const it = x => '<div class="sm-it" data-ep="' + esc(x.id) + '"><img src="' + esc(x.img) + '" alt="" loading="lazy"><div class="t"><b>' + esc(x.t) + "</b><span>" + esc(x.d) + (D[x.id] ? ' · <em class="ok">✓ 听过</em>' : PP[x.id] ? " · ⏯ 听到 " + fmt(PP[x.id].t) : "") + (OF[x.id] ? " · 📥" : "") + (QR[x.id] ? " · 🧩 " + QR[x.id].got + "/" + QR[x.id].n : "") + diffShort(x.id) + "</span></div></div>";
+    const it = x => '<div class="sm-it" data-ep="' + esc(x.id) + '">' + pic(x.img, x.s || ser) + '<div class="t"><b>' + esc(x.t) + "</b><span>" + esc(x.d) + (D[x.id] ? ' · <em class="ok">✓ 听过</em>' : PP[x.id] ? " · ⏯ 听到 " + fmt(PP[x.id].t) : "") + (OF[x.id] ? " · 📥" : "") + (QR[x.id] ? " · 🧩 " + QR[x.id].got + "/" + QR[x.id].n : "") + diffShort(x.id) + "</span></div></div>";
     return top + '<div class="sm-new" data-ep="' + esc(fresh.id) + '"><img src="' + esc(fresh.img) + '" alt=""><div><small>' + (story ? (fresh === n0 ? "👉 从这一集开始" : "👉 接着听下一集") : SM[ser][4] === "VOA" ? (fresh === n0 ? "🆕 最近一期" : "👉 还没听的最近一期") : SM[ser][4] === "BNE" ? (fresh === n0 ? "🆕 最新一篇" : "👉 还没听的最新一篇") : fresh === n0 ? "🆕 最新一期" : "👉 还没听的最新一期") + " · " + esc(fresh.d) + "</small><b>" + esc(fresh.t) + "</b><p>" + esc(fresh.p || "") + "</p></div></div>" +
       '<div class="sm-grid">' + L.slice(0, MORE[ser] || (story || SM[ser][4] === "VOA" ? 120 : 40)).map(it).join("") + "</div>" + // 故事类、VOA 是固定的旧节目（50–60 期），全列出来
       (L.length > (MORE[ser] || (story || SM[ser][4] === "VOA" ? 120 : 40)) ? '<div style="text-align:center;margin:14px 0"><button class="ui-btn" data-a="more">显示更多（还有 ' + (L.length - (MORE[ser] || 40)) + " 期，往前到 " + esc((L[L.length - 1].d || "").slice(-4)) + " 年）</button></div>" : "");
@@ -700,7 +729,7 @@
       const ad = t.closest("[data-add]"); if (ad && EP) { const v = EP.vocab[+ad.dataset.add], w = String(v[0]).replace(/\s*\(.*?\)\s*/g, " ").trim(), re = new RegExp("\\b" + w.split(/\s+/)[0].replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"), line = (EP.lines || []).find(l => re.test(l.t)); if (window.vocabAddWord) { ad.disabled = true; window.vocabAddWord(w, v[2] || (line ? line.t : "")).then(ok => { ad.textContent = ok ? "✓ 已加" : "已在本里"; }); } return; }
       const b = t.closest("[data-a]"); if (!b) return; const a = b.dataset.a;
       if (a === "more") { MORE[ser] = (MORE[ser] || 40) + 80; draw(); return; }
-      if (a === "home") { view = "home"; if (EP && !EP.err) ser = serOf(EP.id); loadList(ser); draw(); return; }
+      if (a === "home") { view = "home"; if (EP && !EP.err && ser !== "new") ser = serOf(EP.id); loadList(ser); draw(); return; }
       if (a === "dk" && EP && !EP.err) { dkLoad(EP.id); return; }
       if (/^dk-/.test(a) && EP && DK[EP.id] && DK[EP.id].sents) {
         const d = DK[EP.id], inp = root.querySelector("#dk-in"); if (inp) d.typed = inp.value;
