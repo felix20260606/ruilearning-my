@@ -89,3 +89,9 @@
   #tripframe{width:100%;height:100%;border:0;display:block}
   #tripempty{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:26px;color:var(--muted);font-size:14px;line-height:1.7}
   #tripempty b{color:var(--ink);display:block;margin-bottom:6px;font-size:15px}
+
+/* ⚡ 按需加载（lazy.js）的页面：它们自己的样式要等脚本加载了才有，所以「不在这页时隐藏」先写在这里（和各页面脚本里的规则一样），免得空容器先占地方 */
+#view-speak,#view-basic{display:none}
+html.show-speak #view-en{display:none}html.show-speak #view-speak{display:block}
+html.show-basic-home #view-en,html.show-basic-home #view-speak{display:none}html.show-basic-home #view-basic{display:block}
+#reading,#sme,#drill,#grammar{display:none}#reading.on,#sme.on,#drill.on,#grammar.on{display:block}

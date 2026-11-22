@@ -19,7 +19,7 @@
    入口：window.drillShow()（index.html 点「🧩 练习课」时调）、drillReview()（直接开今日复习）、drillToday()（每日页用）；测试用 window.DRILL = {split, lessons, build, blankOf, chunksOf, shufIdx, LV} */
 (function () {
   "use strict";
-  if (window.drillShow) return;
+  if (window.drillShow && !window.drillShow.__lazy) return; // __lazy：lazy.js 先放的替身，不算加载过
   const { esc, LG, LS, tip } = U; // 全站共用的小工具（util.js）
   const LANG = () => window.LANG || { cur: () => "en", cfg: () => ({ code: "en", name: "英语", flag: "🇬🇧", bcp: "en-GB", ready: true }), words: s => String(s || "").match(/[A-Za-z0-9]+(?:'[A-Za-z]+)?/g) || [], check: (a, b) => ({ ok: String(a).trim().toLowerCase() === String(b).trim().toLowerCase(), note: "" }), stop: () => new Set() };
   const getJ = async u => { const r = await fetch(u); return r.json(); };

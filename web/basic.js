@@ -7,7 +7,7 @@
    依赖 index.html 的全局：enShow（切标签）；跳到生词本的模式用 .modes 按钮 */
 (function () {
   "use strict";
-  if (window.basicShow) return;
+  if (window.basicShow && !window.basicShow.__lazy) return; // __lazy：lazy.js 先放的替身，不算加载过
   const { esc, LG, LS } = U; // 全站共用的小工具（util.js）
   const CSS = `
   #view-basic{display:none;background:var(--ui-bg,var(--bg));color:var(--ui-ink);min-height:100vh;font-family:var(--ui-font)}

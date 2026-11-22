@@ -41,6 +41,9 @@
     });
   }
 
+  // ⚡ 练习课（今日进度）、阅读（今天的新闻）是按需加载的（lazy.js）：加载好了，「每日」开着就重画一次
+  document.addEventListener("lazy-loaded", e => { const n = e.detail && e.detail.name; if ((n === "drill" || n === "read") && root && document.documentElement.classList.contains("show-daily")) draw(); });
+
   // ---------- 跳到各模块 ----------
   const click = el => { if (el) el.click(); };
   // 英语七个标签（index.html 的 window.enShow(标签, 小标签)）；没有 enShow 的旧页面退回点按钮

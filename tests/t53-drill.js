@@ -131,7 +131,7 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
 // ---- index.html 接好了 ----
 {
   const h = require("./lib/page").html();
-  ok(/<script src="lang\.js\?v=\w+"><\/script>[\s\S]*<script src="listen\.js[^"]*"><\/script>\s*<script src="drill\.js\?v=\w+">/.test(h), "script order: lang before, drill after listen");
+  { const lz = W("lazy.js"); ok(/<script src="lang\.js\?v=\w+"><\/script>/.test(h) && /drill: \{ src: "drill\.js\?v=\w+", deps: \["listen"\]/.test(lz), "lang.js loaded up front; drill is lazy and loads listen first"); } // ⚡ 按需加载（lazy.js）
   ok(/\|lang\|drill:\[\\w:\]\+\|/.test(h), "per-user keys");
   ok(/data-mode="drill"/.test(h) && /<div id="drill">/.test(h) && /\['drill','🧩 练习课'\],\['sme'/.test(h), "drill tab first under 听");
 }
