@@ -10,18 +10,18 @@
    ④ 装到桌面：支持 beforeinstallprompt 的浏览器直接给安装按钮；iPhone 给「分享 → 添加到主屏幕」的步骤
    依赖 index.html 的全局：words / state / toast（masteryOf 有就用，没有用同一个算法） */
 (function () {
-  const { esc } = U; // 全站共用的小工具（util.js）
   const DAY = 864e5, HEAT_WEEKS = 26, AHEAD = 14, KNOWN_H = 42;
   const SITE = "https://ruilearning-my.pages.dev", PUMP_URL = SITE + "/?go=pump";
   const hasLS = typeof localStorage !== "undefined";
   const LG = (k, d) => { try { const v = hasLS ? localStorage.getItem(k) : null; return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
   const LS = (k, v) => { try { if (hasLS) localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
   const pad = n => (n < 10 ? "0" : "") + n;
-  // 日期一律按本机时区（马来西亚 = UTC+8）；pump.js 的 today() 是 UTC 日期，写 pump:log 时建议用这个（window.statsDayKey）
-  const dayKey = ts => { const d = new Date(ts); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); };
-  const dayStart = ts => { const d = new Date(ts); d.setHours(0, 0, 0, 0); return d.getTime(); };
-  const keyTs = k => { const p = String(k).split("-"); return new Date(+p[0], +p[1] - 1, +p[2]).getTime(); };
-  const addDay = (k, n) => { const d = new Date(keyTs(k)); d.setDate(d.getDate() + n); return dayKey(d.getTime()); };
+  // 📅 日期：全站共用的「今天」（util.js 的 U.day，吉隆坡 / 北京时间）；在 node 里单独跑（测试）时没有 U，用同样的算法
+  const UU = typeof U !== "undefined" ? U : (() => { const TZ = 8 * 3600e3, D = 864e5, day = t => new Date(+t + TZ).toISOString().slice(0, 10), st = t => { const x = +t + TZ; return x - (((x % D) + D) % D) - TZ; }; return { day, dayStart: st, dayAgo: (k, n) => day(Date.parse(k + "T12:00:00Z") - TZ - n * D) }; })();
+  const dayKey = ts => UU.day(ts);
+  const dayStart = ts => UU.dayStart(ts);
+  const addDay = (k, n) => UU.dayAgo(k, -n);
+  const keyTs = k => { const p = String(k).split("-"); return new Date(+p[0], +p[1] - 1, +p[2], 12).getTime(); }; // 只用来显示几月几日、星期几（当天中午）
   const WD = "日一二三四五六";
   const fmtDay = k => { const d = new Date(keyTs(k)); return (d.getMonth() + 1) + "月" + d.getDate() + "日 周" + WD[d.getDay()]; };
   const fmtShort = k => { const d = new Date(keyTs(k)); return (d.getMonth() + 1) + "/" + d.getDate(); };
@@ -146,6 +146,7 @@
   const API = { dayKey, mergeDaily, streakOf, forecastOf, distOf, curveOf, bucketOf, masteryLocal, vtBuild, vtEstimate, vtLevel, VT_BANDS, VT_POOL, VT_FAKE };
   if (typeof module === "object" && module.exports) module.exports = API;
   if (typeof document === "undefined") return;
+  const { esc } = U; // 全站共用的小工具（util.js）
   window.statsDayKey = (ts) => dayKey(ts == null ? Date.now() : ts);
 
   let root = null, tip = null, SRV = null, srvAt = 0, CURVE = null, installEv = null;
@@ -499,9 +500,9 @@
       else if (id === "st-inst" && installEv) { const ev = installEv; ev.prompt(); (ev.userChoice || Promise.resolve({})).then(c => { if (c.outcome === "accepted") { installEv = null; say("📲 已装到桌面"); } draw(); }); }
       else if (id === "st-go-pump") { const b = document.querySelector('.modes button[data-mode="pump"]'); if (b) b.click(); else location.href = "/?go=pump"; }
     });
-    document.addEventListener("keydown", e => {
-      if (!vt || vt.done || !root.classList.contains("on") || !root.offsetParent || /input|textarea|select/i.test((e.target && e.target.tagName) || "")) return;
-      if (e.key === "ArrowLeft") { e.preventDefault(); vtAnswer(true); } else if (e.key === "ArrowRight") { e.preventDefault(); vtAnswer(false); }
+    KEYS.on("vtest", { when: () => !!vt && !vt.done && root.classList.contains("on") && KEYS.visible(root) }, k => { // ⌨️ 全站共用的快捷键（keys.js）
+      if (k === "left") vtAnswer(true); else if (k === "right") vtAnswer(false); else return false;
+      return true;
     });
   }
   // 提醒和安装：页面一打开就开始（不用先进统计页）

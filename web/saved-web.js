@@ -27,7 +27,7 @@
   @media(max-width:560px){.sw-im{flex-basis:96px}.sw-im img{width:96px}}`;
   let D = null, tab = "w", q = "", shown = 60, box = null, io = null, player = null;
   const medRec = {}, medPr = {};
-  const medGet = k => medPr[k] || (medPr[k] = fetch("/api/media?k=" + encodeURIComponent(k)).then(r => (r.ok ? r.json() : null)).then(j => (medRec[k] = (j && j.rec) || null)).catch(() => (medRec[k] = null)));
+  const medGet = k => medPr[k] || (medPr[k] = CLOUD.media(k).then(rec => (medRec[k] = rec)));
   async function load() {
     const it = await CLOUD.chan("ext").get(0); // 全站共用的同步（cloud.js）
     const ws = [], ss = [], ctx = {}, wimg = {}, med = new Set(), tags = {};

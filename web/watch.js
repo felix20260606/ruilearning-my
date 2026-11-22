@@ -433,8 +433,7 @@
       const pc = e.target.closest(".vs-pc"); if (pc) { vsPatShow(+pc.dataset.pi); return; }
       const w = e.target.closest(".wt-w"); if (w) { lookup(w.dataset.w, cur, w); return; } const z = e.target.closest(".zh"); if (z) z.classList.toggle("rv");
     });
-    document.addEventListener("keydown", onKey);
-    document.addEventListener("keyup", e => { if (e.key === " " && root.classList.contains("playing") && e.target && e.target.tagName === "BUTTON" && root.contains(e.target)) e.preventDefault(); }); // 空格已经当作播放/暂停，别再触发按钮
+    KEYS.on("video", { when: () => document.documentElement.classList.contains("show-video") && root.classList.contains("playing") }, onKey); // ⌨️ 全站共用的快捷键（keys.js）
     // 离开页面 / 切到后台时记下看到哪里
     document.addEventListener("visibilitychange", () => { if (document.hidden) savePos(true); });
     addEventListener("pagehide", () => savePos(true));
@@ -486,14 +485,10 @@
   }
   function togglePlay() { if (!ready) return; try { if (playing()) player.pauseVideo(); else player.playVideo(); } catch (e) {} }
   async function copyCur() { const c = cues[cur]; if (!c) { tip("还没有正在播放的句子"); return; } tip(await copyText(c.t + (c.r ? "\n" + c.r : "")) ? "已复制这句" : "复制失败"); }
-  function onKey(e) { // 电脑上的快捷键（播放页）
-    if (!document.documentElement.classList.contains("show-video") || !root.classList.contains("playing")) return;
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
-    const tg = e.target; if (tg && (/^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName) || tg.isContentEditable)) return;
-    if ($("#wt-sheet").classList.contains("on")) { if (e.key === "Escape") { e.preventDefault(); closeSheet(); } return; }
-    const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-    const act = { " ": togglePlay, k: togglePlay, ArrowLeft: () => jump(-1), ArrowRight: () => jump(1), r: () => jump(0), l: toggleLoop, b: toggleAB, p: () => $("#wt-ap").click(), t: () => $("#wt-ht").click(), e: () => $("#wt-he").click(), s: () => $("#wt-rate").click(), c: copyCur }[k];
-    if (!act) return; e.preventDefault(); act();
+  function onKey(k) { // 电脑上的快捷键（播放页；全站共用的 keys.js 管「看不看得见、是不是在打字」）
+    if ($("#wt-sheet").classList.contains("on")) { if (k === "esc") { closeSheet(); return true; } return false; }
+    const act = { space: togglePlay, k: togglePlay, left: () => jump(-1), right: () => jump(1), r: () => jump(0), l: toggleLoop, b: toggleAB, p: () => $("#wt-ap").click(), t: () => $("#wt-ht").click(), e: () => $("#wt-he").click(), s: () => $("#wt-rate").click(), c: copyCur }[k];
+    if (!act) return false; act(); return true;
   }
   function fit() { // 播放页占满一屏：视频、当前字幕、按钮固定，下面的字幕列表自己滚动
     const p = $(".wt-play", root); if (!root.classList.contains("playing") || !document.documentElement.classList.contains("show-video")) return;
@@ -590,7 +585,7 @@
   }
   async function del(v) {
     const x = allItems.find(y => y.v === v) || (doc && doc.v === v ? doc : { v });
-    if (!confirm("删除「" + (x.title || v) + "」？\n\n字幕会从网站上删除（想再学要重新用插件或书签抓一次字幕）。本机的观看进度和收藏也会一起清掉。")) return;
+    if (!(await U.ask("删除「" + (x.title || v) + "」？\n\n字幕会从网站上删除（想再学要重新用插件或书签抓一次字幕）。本机的观看进度和收藏也会一起清掉。", { ok: "删除", danger: true }))) return; // ✅ 全站共用的弹窗（util.js）
     try {
       const r = await fetch(API + "?v=" + encodeURIComponent(v), { method: "DELETE" }); let j = null; try { j = await r.json(); } catch (e) {}
       if (!r.ok || !j || !j.ok) throw new Error((j && j.error) || "HTTP " + r.status);

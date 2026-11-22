@@ -883,11 +883,11 @@
     applyOne(r, m, rep == null ? m.rep[0] : rep);
     closePop(); syncText(r);
   }
-  function fixAll() {
+  async function fixAll() {
     const r = res; if (!canEdit(r)) return;
     const L = r.matches.filter(m => m.rep && m.rep.length && (r.filter === "all" || !r.filter || m.cat === r.filter)).sort((a, b) => b.offset - a.offset);
     if (!L.length) return;
-    if (typeof confirm === "function" && !confirm("把 " + L.length + " 条建议都按第一个改法应用到正文？（可以用 Ctrl/⌘+Z 在文本框里撤销）")) return;
+    if (!(await U.ask("把 " + L.length + " 条建议都按第一个改法应用到正文？（可以用 Ctrl/⌘+Z 在文本框里撤销）", { ok: "全部应用" })) || res !== r) return; // ✅ 全站共用的弹窗（util.js）
     let lim = Infinity, n = 0;
     L.forEach(m => { if (m.offset + m.length > lim || !r.matches.includes(m)) return; applyOne(r, m, m.rep[0]); lim = m.offset; n++; });
     syncText(r); say("已应用 " + n + " 条建议");
@@ -946,7 +946,7 @@
   }
   function bind(el) {
     if (el._wrBound) return; el._wrBound = true;
-    el.addEventListener("click", e => {
+    el.addEventListener("click", async e => { // async：确认弹窗（U.ask）要等回答
       if (!host || el !== host) return;
       const t = e.target;
       const tb = t.closest('[data-a="type"] [data-t]'); if (tb) { setType(tb.dataset.t); return; }
@@ -959,7 +959,7 @@
       else if (A === "timer") timer(!st.running);
       else if (A === "treset") { timer(false); st.elapsed = 0; st.warned = st.warned5 = false; saveDraft(true); updTimer(); }
       else if (A === "check") check();
-      else if (A === "clear") { if (!st.text || (typeof confirm === "function" && !confirm("清空正文？（题目保留）"))) return; st.text = ""; host.querySelector("#wr-text").value = ""; saveDraft(true); updCount(); redrawRes(); }
+      else if (A === "clear") { if (!st.text || !(await U.ask("清空正文？（题目保留）", { ok: "清空", danger: true }))) return; st.text = ""; host.querySelector("#wr-text").value = ""; saveDraft(true); updCount(); redrawRes(); }
       else if (A === "filt") { if (cur) { cur.filter = b.dataset.f; redrawRes(); } }
       else if (A === "fix1") fix1(b.dataset.id);
       else if (A === "fixall") fixAll();
@@ -968,11 +968,11 @@
       else if (A === "say" && cur && cur.ai) talk(cur.ai.rewrite);
       else if (A === "copy" && cur && cur.ai) { try { navigator.clipboard.writeText(cur.ai.rewrite).then(() => say("已复制范文"), () => say("复制失败")); } catch (er) { say("复制失败"); } }
       else if (A === "hopen") { const x = hist().find(y => y.id === b.dataset.id); if (x) { histId = x.id; histView = fromHist(x); draw(); loadVocab().then(() => { if (histView) { runLocal(histView); redrawRes(); } }); } }
-      else if (A === "hdel") { if (typeof confirm === "function" && !confirm("删除这条批改记录？")) return; saveHist(hist().filter(y => y.id !== b.dataset.id)); draw(); }
+      else if (A === "hdel") { if (!(await U.ask("删除这条批改记录？", { ok: "删除", danger: true }))) return; saveHist(hist().filter(y => y.id !== b.dataset.id)); draw(); }
       else if (A === "hback") { const up = () => { histView = null; draw(); }; if (window.NAV) NAV.back(up); else up(); } // 回到上一个页面
       else if (A === "hload" && histView) {
-        if (st.text.trim() && st.text !== histView.text && typeof confirm === "function" && !confirm("载入会替换写作区现在的正文和题目，继续？")) return;
-        const r = histView; timer(false);
+        if (st.text.trim() && st.text !== histView.text && !(await U.ask("载入会替换写作区现在的正文和题目，继续？", { ok: "载入" }))) return;
+        const r = histView; if (!r) return; timer(false);
         st.type = TYPES[r.type] ? r.type : "task2"; st.prompt = r.prompt; st.text = r.text; st.lang = r.lang || st.lang;
         r.readonly = false; res = r; histView = null; st.view = "write"; saveDraft(true); draw();
       }
@@ -992,7 +992,7 @@
     if (document.getElementById("wr-css")) return;
     const s = document.createElement("style"); s.id = "wr-css"; s.textContent = CSS; document.head.append(s);
     document.addEventListener("click", e => { if (pop && !pop.contains(e.target) && !e.target.closest(".wr-mk mark,.wr-is")) closePop(); }, true);
-    document.addEventListener("keydown", e => { if (e.key === "Escape") closePop(); });
+    KEYS.on("write-pop", { when: () => !!pop, prio: 5 }, k => { if (k === "esc") { closePop(); return true; } return false; }); // ⌨️ 全站共用的快捷键（keys.js）：Esc 关批改说明
     window.addEventListener("scroll", () => { if (pop && !(mask && mask.classList.contains("on"))) closePop(); }, { passive: true });
     window.addEventListener("resize", () => closePop());
     window.addEventListener("pagehide", () => saveDraft(true));

@@ -347,9 +347,9 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
   }
 
   /* ---------- 画页面 ---------- */
-  const fmtAt = t => { const d = new Date(t), n = new Date(); if (isNaN(d)) return ""; const hm = String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); return d.toDateString() === n.toDateString() ? "今天 " + hm : d.getMonth() + 1 + "月" + d.getDate() + "日" + (d.getFullYear() !== n.getFullYear() ? "（" + d.getFullYear() + "）" : ""); };
+  const fmtAt = t => { const d = new Date(t), n = new Date(); if (isNaN(d)) return ""; const hm = String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); return U.day(+d) === U.day() ? "今天 " + hm : d.getMonth() + 1 + "月" + d.getDate() + "日" + (d.getFullYear() !== n.getFullYear() ? "（" + d.getFullYear() + "）" : ""); };
   /* ---------- 📰 今日新闻 ---------- */
-  const nday = () => new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10); // 和后台同一个「今天」（吉隆坡 / 北京时间）
+  const nday = () => U.day(); // 📅 全站共用的「今天」（util.js），和后台同一个（吉隆坡 / 北京时间）
   const hashU = s => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36); };
   const newsId = n => "n:" + hashU(n.url || n.title || "");
   let NEWS = null, newsBusy = false, newsErr = "", newsList = false, newsTried = [], newsOpenAfter = false;
@@ -357,7 +357,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
     const c = LG("reading:news", null);
     if (!force && c && c.date === nday() && c.text) { NEWS = c; return; }
     if (newsBusy) return; newsBusy = true; newsErr = ""; paintNews();
-    fetch("/api/news?d=" + nday()).then(r => r.json()).then(j => { newsBusy = false; if (j && j.ok && j.text) { NEWS = j; LS("reading:news", j); } else newsErr = "今天的新闻还没取到，过一会儿再试"; paintNews(); if (NEWS && newsOpenAfter && view === "home") newsRead(); newsOpenAfter = false; })
+    U.json("/api/news?d=" + nday()).then(j => { newsBusy = false; if (j && j.ok && j.text) { NEWS = j; LS("reading:news", j); } else newsErr = j.error === "net" ? "今天的新闻没取到（网络问题）" : "今天的新闻还没取到，过一会儿再试"; paintNews(); if (NEWS && newsOpenAfter && view === "home") newsRead(); newsOpenAfter = false; })
       .catch(() => { newsBusy = false; newsErr = "今天的新闻没取到（网络问题）"; paintNews(); });
   }
   function newsHtml() {
@@ -502,7 +502,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
       const sm = t.closest("[data-si]"); if (sm) { sayOne(+sm.dataset.si); return; }
       if (t.closest(".ra-tr.err, .ra-ttr.err")) { const n = t.closest(".err"); n.textContent = "翻译中…"; n.classList.remove("err"); n.classList.add("ld"); fillTr(); return; }
       const b = t.closest("[data-a]"); if (!b) return; const a = b.dataset.a;
-      if (a === "del") { e.stopPropagation(); const L = docs(), d = L.find(x => x.id === b.dataset.id); if (!d || !confirm("删除「" + (d.title || "这篇文章") + "」？换设备同步的记录也会一起删掉。")) return; saveDocs(L.filter(x => x.id !== d.id)); if (doc && doc.id === d.id) doc = null; draw(); return; }
+      if (a === "del") { e.stopPropagation(); const L = docs(), d = L.find(x => x.id === b.dataset.id); if (!d) return; U.ask("删除「" + (d.title || "这篇文章") + "」？换设备同步的记录也会一起删掉。", { ok: "删除", danger: true }).then(ok => { if (!ok) return; saveDocs(docs().filter(x => x.id !== d.id)); if (doc && doc.id === d.id) doc = null; draw(); }); return; }
       if (a === "open") { const d = docs().find(x => x.id === b.dataset.id); if (d) openDoc(d.text, d.title, d.id); return; }
       if (a === "news") { newsRead(); return; }
       if (a === "news-alt") { newsAlt(); return; }
@@ -521,7 +521,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
         if (!v) { const u = ((root.querySelector("#ra-url") || {}).value || "").trim(); if (u) { fromUrl(u); return; } }
         showMsg(""); openDoc(v); if (view === "read") draft = ""; return;
       }
-      if (a === "link") { const u = location.origin + "/#article/" + encodeURIComponent(doc.id); (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(() => tip("已复制这篇文章的链接（换设备打开也能直接读到这篇）"), () => prompt("复制这个链接：", u)); return; }
+      if (a === "link") { const u = location.origin + "/#article/" + encodeURIComponent(doc.id); (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(() => tip("已复制这篇文章的链接（换设备打开也能直接读到这篇）"), () => U.input("复制这个链接：", u, { ok: "好了", cancel: "关掉" })); return; }
       if (a === "home") { stopAll(); closePop(); const home = () => { view = "home"; draw(); setHash(""); try { root.scrollIntoView({ block: "start" }); } catch (er) {} }; if (window.NAV) NAV.back(home); else home(); return; } // 回到上一个页面
       if (a === "all") { if (tts) stopAll(); else readAll(firstVisible()); }
       if (a === "tr") { trOn = !trOn; LS("reading:trOn", trOn); root.classList.toggle("tr-on", trOn); b.classList.toggle("on", trOn); b.textContent = "文 译文" + (trOn ? "：显示" : "：隐藏"); fillTr(); }
@@ -530,7 +530,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
     root.addEventListener("keydown", e => { if (e.target.id === "ra-url" && e.key === "Enter") { e.preventDefault(); urlDraft = e.target.value; fromUrl(urlDraft); } });
     root.addEventListener("change", e => { if (e.target.id !== "ra-lv") return; lvSel = e.target.value; LS("reading:lv", lvSel); redrawKeep(); });
     // Esc 停朗读（查词卡片的 Esc 由 word.js 处理）
-    document.addEventListener("keydown", e => { if (e.key === "Escape" && root.classList.contains("on") && tts) stopAll(); });
+    KEYS.on("read", { when: () => root.classList.contains("on") && KEYS.visible(root) }, k => { if (k === "esc" && tts) { stopAll(); return true; } return false; }); // ⌨️ 全站共用的快捷键（keys.js）：Esc 停朗读
     let sT = 0;
     window.addEventListener("scroll", () => {
       if (view !== "read" || tts || !root.classList.contains("on") || sT || Date.now() < quiet) return;

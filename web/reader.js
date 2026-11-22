@@ -71,20 +71,21 @@
     document.body.append(el);
     el.querySelector("#rd-back").onclick = () => close();
     el.querySelector("#rd-prev").onclick = () => go(-1); el.querySelector("#rd-next").onclick = () => go(1);
+    const doAct = (x, act) => { const r = window.readerAct(x.wid, act); if (r === "del") { list.splice(idx, 1); if (!list.length) return close(); idx = Math.min(idx, list.length - 1); history.replaceState(null, "", "#read/" + encodeURIComponent(list[idx].key)); } draw(); };
     el.addEventListener("click", e => {
       const big = e.target.closest("td.i img,.cover img"); if (big && big.src) { e.stopPropagation(); const v = document.createElement("div"); v.id = "rd-big"; v.innerHTML = '<img src="' + esc(big.src) + '">'; v.onclick = () => v.remove(); document.body.append(v); return; }
       const a = e.target.closest(".rd-act [data-act]");
-      if (a) { const x = list[idx]; if (a.dataset.act === "del" && !confirm("从生词本删除「" + x.title + "」？")) return; const r = window.readerAct(x.wid, a.dataset.act); if (r === "del") { list.splice(idx, 1); if (!list.length) return close(); idx = Math.min(idx, list.length - 1); history.replaceState(null, "", "#read/" + encodeURIComponent(list[idx].key)); } draw(); return; }
+      if (a) { const x = list[idx], act = a.dataset.act; if (act === "del") U.ask("从生词本删除「" + x.title + "」？", { ok: "删除", danger: true }).then(ok => { if (ok && list[idx] === x) doAct(x, act); }); else doAct(x, act); return; } // ✅ 全站共用的弹窗（util.js）
       const s = e.target.closest("[data-say]"); if (s && s.dataset.say) { try { speak(s.dataset.say); } catch (er) {} }
     });
     let x0 = null, y0 = null; // 手机左右滑换条
     el.addEventListener("touchstart", e => { const t = e.touches[0]; x0 = t.clientX; y0 = t.clientY; }, { passive: true });
     el.addEventListener("touchend", e => { if (x0 == null) return; const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0; x0 = null; if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) go(dx < 0 ? 1 : -1); }, { passive: true });
-    document.addEventListener("keydown", e => {
-      if (!opened || e.metaKey || e.ctrlKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
-      if (e.key === "ArrowRight") go(1); else if (e.key === "ArrowLeft") go(-1); else if (e.key === "Escape") { const b = document.getElementById("rd-big"); if (b) b.remove(); else close(); } else return;
-      e.preventDefault(); e.stopPropagation();
-    }, true);
+    // ⌨️ 快捷键：全站共用的 keys.js；单词阅读器盖在别的页面上面，优先级高
+    KEYS.on("reader", { when: () => opened, prio: 10 }, k => {
+      if (k === "right") go(1); else if (k === "left") go(-1); else if (k === "esc") { const b = document.getElementById("rd-big"); if (b) b.remove(); else close(); } else return false;
+      return true;
+    });
   }
   function go(d) { const n = idx + d; if (n < 0 || n >= list.length) return; idx = n; draw(); history.replaceState(null, "", "#read/" + encodeURIComponent(list[idx].key)); }
   function close() {

@@ -54,7 +54,7 @@
   const MORE = {}; // 列表显示到第几期（「显示更多」）
   // 🆕 本周更新：一直在更新的栏目（分级、NPR、BBC 每周的）各自的列表里，挑最近 7 天的合起来
   const WKS = () => SER.filter(x => x[4] !== "NEW" && x[4] !== "VOA" && !x[5]).map(x => x[0]);
-  const WKDAY = t => { const d = new Date(t); d.setHours(0, 0, 0, 0); return +d; };
+  const WKDAY = U.dayStart;
   function weekItems() { // → [{id, s, t, d, img, day, lv:[[栏目, id]...]}]，同一篇分级新闻的几个级别合成一张
     const cut = WKDAY(Date.now()) - 6 * 864e5, out = [], bne = {};
     WKS().forEach((k, si) => (LISTS[k] || []).forEach(x => {
@@ -179,7 +179,7 @@
   // ---------- 听过哪几期：本机 sme:done + 后台 /api/mine k=sme ----------
   const done = () => LG("sme:done", {}) || {};
   function markDone(id) {
-    const D = done(); if (D[id] && new Date(D[id]).toDateString() === new Date().toDateString()) return;
+    const D = done(); if (D[id] && U.day(D[id]) === U.day()) return;
     D[id] = Date.now(); LS("sme:done", D);
     CL.put(id, D[id], D[id]);
     tip("✓ 这期听完了"); if (view === "ep") draw();
@@ -201,7 +201,7 @@
     if (s === "new") { WKS().forEach(loadList); return; }
     if (LISTS[s] || listBusy[s]) return; listBusy[s] = true;
     const fin = l => { listBusy[s] = false; LISTS[s] = l; if (view === "home" && (ser === s || (ser === "new" && WKS().includes(s)))) draw(); };
-    fetch("/api/sme?s=" + s).then(r => r.json()).then(j => fin(j && j.ok ? j.list : [])).catch(() => fin([]));
+    U.json("/api/sme?s=" + s).then(j => fin(j.ok ? j.list : []));
   }
   let openId = null; // 正在打开的那一期（加载完之前 EP 还是空的，页面历史要用）
   function openEp(id) {
@@ -210,7 +210,7 @@
     view = "ep"; trShow = false; EP = EPS[id] || null; epBusy = !EP; draw(); if (root && root.getClientRects().length) window.scrollTo(0, 0);
     if (EP) { if (zhOn) loadZh(id); return; }
     const fromOff = async () => { const o = await offJson(id); if (!o || !o.ep) return null; if (o.zh) ZH[id] = o.zh; if (o.sents) TIM[id] = o.sents; return o.ep; };
-    fetch("/api/sme?ep=" + encodeURIComponent(id)).then(r => r.json()).catch(() => null).then(async j => { if (!(j && j.ok)) j = (await fromOff()) || j; epBusy = false; if (j && j.ok) EPS[id] = j; if (view === "ep" && !EP) { EP = j && j.ok ? j : { err: 1, id, msg: (j && j.error) || "" }; draw(); if (zhOn && EP.ok) loadZh(id); } });
+    U.json("/api/sme?ep=" + encodeURIComponent(id)).then(async j => { if (!(j && j.ok)) j = (await fromOff()) || j; epBusy = false; if (j && j.ok) EPS[id] = j; if (view === "ep" && !EP) { EP = j && j.ok ? j : { err: 1, id, msg: j && j.error === "net" ? "网络不通" : (j && j.error) || "" }; draw(); if (zhOn && EP.ok) loadZh(id); } });
   }
   // 🀄 中文：先找后台（翻过的存 KV，全家共用）；后台翻不了（谷歌拦了 Cloudflare 机房的 IP）就在浏览器里翻（tr.js，和阅读、视频字幕一样）
   // 一期要翻的所有文字（顺序和后台 /api/sme?zh=1 一样）↔ 翻好的结构
@@ -225,7 +225,7 @@
   async function loadZh(id, retry) {
     if (zhBusy[id] || (ZH[id] && !retry && !zhMiss(id))) return; zhBusy[id] = true; zhSt[id] = ""; if (EP && EP.id === id) draw();
     let j = ZH[id] || (ZHC()[id] || {}).j || null;
-    if (!j || zhMissOf(j, id)) { try { const r = await (await fetch("/api/sme?zh=1&co=1&ep=" + encodeURIComponent(id))).json(); if (r && r.ok && (!j || zhMissOf(r, id) < zhMissOf(j, id))) j = r; } catch (e) {} }
+    if (!j || zhMissOf(j, id)) { try { const r = await U.json("/api/sme?zh=1&co=1&ep=" + encodeURIComponent(id)); if (r && r.ok && (!j || zhMissOf(r, id) < zhMissOf(j, id))) j = r; } catch (e) {} }
     const ep = EPS[id];
     if (ep) {
       const all = zhAll(ep), zh = j ? zhFlat(j, ep) : all.map(() => ""), miss = () => all.map((t, i) => (t && !zh[i] ? i : -1)).filter(i => i >= 0);
@@ -282,7 +282,7 @@
       const dur = await durOf(id, srcOf(id, ep)); if (!dur) throw new Error("音频时长没取到");
       const W = []; let parts = 1, total = 0, id3 = 0;
       for (let p = 0; p < parts && p < 40; p++) {
-        const j = await (await fetch("/api/sme?al=" + encodeURIComponent(id) + "&part=" + p)).json();
+        const j = await U.json("/api/sme?al=" + encodeURIComponent(id) + "&part=" + p);
         if (!j || !j.ok) throw new Error(j && j.error === "noai" ? AI.MSG.noai : "对时间失败（" + ((j && j.error) || "网络") + "）");
         parts = j.parts || 1; total = j.total || 1; if (p === 0) id3 = +j.id3 || 0;
         const off = Math.max(0, (p * 1e6 - (p ? id3 : 0)) / Math.max(1, total - id3) * dur);
@@ -341,7 +341,7 @@
 
   // ---------- 📈 我的听力（每天几分钟、精听、听写、跟读） ----------
   const DEV = (() => { let d = LG("sme:dev", ""); if (!d) { d = Math.random().toString(36).slice(2, 8); LS("sme:dev", d); } return d; })();
-  const dayOf = t => { const d = new Date(t); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+  const dayOf = t => U.day(t); // 📅 全站共用的「今天」（util.js，吉隆坡 / 北京时间）
   const STAT = () => LG("sme:stat", {}) || {};
   let statAcc = 0, statT = 0, statSent = 0;
   function statAdd(f) {
@@ -670,17 +670,16 @@
     mo.observe(root, { attributes: true, attributeFilter: ["class"] }); mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "data-en", "data-mode"] });
     const ven = document.getElementById("view-en"); if (ven) mo.observe(ven, { attributes: true, attributeFilter: ["class", "style"] });
     window.addEventListener("scroll", stuckChk, { passive: true }); window.addEventListener("resize", stickTop);
-    let spKey = false;
-    document.addEventListener("keydown", e => { // 快捷键：节目页看得见、不在输入框里。空格 = 播放 / 暂停；开了精听就是精听的键
-      if (view !== "ep" || !EP || EP.err || !root.classList.contains("on") || !root.getClientRects().length) return;
-      const tg = e.target; if (e.metaKey || e.ctrlKey || e.altKey || (tg && (tg.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName)))) return;
-      const d = DK[EP.id], k = e.key;
-      if (!d || !d.sents) { if ((k === " " || k === "Spacebar") && tg !== AU) { e.preventDefault(); spKey = true; if (!e.repeat) playPause(); } return; }
-      if (k === " " || k === "Spacebar" || k === "r" || k === "R") { e.preventDefault(); if (d.auto) autoStop(); dkPlay(false); }
-      else if (k === "s" || k === "S") { e.preventDefault(); if (d.auto) autoStop(); dkPlay(true); }
-      else if (k === "ArrowLeft") { e.preventDefault(); dkGo(-1); } else if (k === "ArrowRight") { e.preventDefault(); dkGo(1); }
+    // ⌨️ 快捷键：全站共用的 keys.js（节目页看得见时）。空格 = 播放 / 暂停；开了精听就是精听的键
+    KEYS.on("listen", { when: () => view === "ep" && !!EP && !EP.err && root.classList.contains("on") && KEYS.visible(root) }, (k, e) => {
+      const d = DK[EP.id];
+      if (!d || !d.sents) { if (k === "space" && e.target !== AU) { if (!e.repeat) playPause(); return true; } return false; }
+      if (k === "space" || k === "r") { if (d.auto) autoStop(); dkPlay(false); }
+      else if (k === "s") { if (d.auto) autoStop(); dkPlay(true); }
+      else if (k === "left") dkGo(-1); else if (k === "right") dkGo(1);
+      else return false;
+      return true;
     });
-    document.addEventListener("keyup", e => { if (spKey && (e.key === " " || e.key === "Spacebar")) { spKey = false; e.preventDefault(); } }); // 焦点在按钮上时，别让空格再「点」一下那个按钮
     root.addEventListener("input", e => { if (e.target.id === "dk-in" && EP && DK[EP.id]) DK[EP.id].typed = e.target.value; });
     root.addEventListener("keydown", e => {
       const d = EP && DK[EP.id]; if (!d || !d.sents || view !== "ep") return;
@@ -691,7 +690,7 @@
       if (sp) { seekSent(+sp.dataset.sp); return; }
       const sy = t.closest("[data-say]"); if (sy) { try { AU.pause(); speak(sy.dataset.say, { rate: 0.85 }); } catch (e) {} return; }
       const lq = t.closest("[data-lq]"); if (lq && EP) { lqPick(EP.id, +lq.dataset.lq, +lq.dataset.o); return; }
-      const od = t.closest("[data-offdel]"); if (od) { if (confirm("删掉下载的这一期？（以后还能再下）")) offDel(od.dataset.offdel); return; }
+      const od = t.closest("[data-offdel]"); if (od) { U.ask("删掉下载的这一期？（以后还能再下）", { ok: "删掉", danger: true }).then(ok => { if (ok) offDel(od.dataset.offdel); }); return; }
       const rp = t.closest("[data-reps],[data-gap]"); if (rp) { if (rp.dataset.reps) LS("sme:dkreps", +rp.dataset.reps); else LS("sme:dkgap", +rp.dataset.gap); draw(); return; }
       const sv = t.closest("[data-ser]"); if (sv) { ser = sv.dataset.ser; LS("sme:s", ser); view = "home"; loadList(ser); draw(); return; }
       const epEl = t.closest("[data-ep]"); if (epEl) { openEp(epEl.dataset.ep); return; }
@@ -718,7 +717,7 @@
       if (a === "fword") { fword = !fword; LS("sme:fword", fword); draw(); return; }
       if (a === "cont") { cont = !cont; LS("sme:cont", cont); draw(); return; }
       if (a === "off" && EP && !EP.err) { offSave(EP.id); return; }
-      if (a === "offdel" && EP) { if (confirm("删掉下载的这一期？（以后还能再下）")) offDel(EP.id); return; }
+      if (a === "offdel" && EP) { const id = EP.id; U.ask("删掉下载的这一期？（以后还能再下）", { ok: "删掉", danger: true }).then(ok => { if (ok) offDel(id); }); return; }
       if (a === "lq" && EP && !EP.err) { lqLoad(EP.id); return; }
       if (a === "follow") { follow = !follow; LS("sme:follow", follow); draw(); return; }
       if (a === "follow-retry" && EP) { delete FL[EP.id]; draw(); return; }
@@ -740,6 +739,6 @@
     if (view !== "home") { view = "home"; loadList(ser); draw(); } else { loadList(ser); draw(); }
   });
   window.smeShow = () => { init(); if (!root) return; pull(); loadList(ser); draw(); };
-  window.smeDoneToday = () => { const D = done(), t = new Date().toDateString(); return Object.keys(D).filter(id => new Date(D[id]).toDateString() === t); }; // 「📅 每日」的「听」用
+  window.smeDoneToday = () => { const D = done(), t = U.day(); return Object.keys(D).filter(id => U.day(D[id]) === t); }; // 「📅 每日」的「听」用
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();

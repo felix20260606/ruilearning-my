@@ -104,7 +104,7 @@
   if (!sec || MOVED.includes(sec)) sec = "daily"; // 新手入门在「🌱 入门」标签
   let view = null; // 打开的条目：{t:"dialog"|"func"|"pair"|"conn"|"topic"|"sgrp", id}
   let shadowGroup = 0;
-  const today = () => new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10); // 吉隆坡 / 北京时间的日期
+  const today = () => U.day(); // 📅 全站共用的「今天」（util.js，吉隆坡 / 北京时间）
   const dayStart = () => Date.parse(today() + "T00:00:00+08:00");
   // 练过：记时间（每日一练按「今天练过」算）；每次练习也记进 speak:log（📊 统计的热力日历、连续天数用）
   const markDone = k => { const now = Date.now(), again = done[k] && done[k] >= dayStart(); done[k] = now; LS("speak:done", done); syPut("done:" + k, now); if (!again) { const L = LG("speak:log", {}); L[today()] = (L[today()] || 0) + 1; LS("speak:log", L); syPut("log:" + today(), L[today()]); } };
@@ -189,10 +189,10 @@
   }
   function doneCount(prefix) { return Object.keys(done).filter(k => k.indexOf(prefix) === 0).length; }
   // 最上边的统计条：今天 / 连续天数 / 近 7 天柱图 / 练习天数 / 各栏练过多少（数据：speak:log 每天练习次数、speak:days 打卡、speak:done 练过的条目）
-  const dayAgo = (k, n) => new Date(Date.parse(k + "T00:00:00+08:00") - n * 864e5 + 8 * 3600e3).toISOString().slice(0, 10);
+  const dayAgo = U.dayAgo;
   function statBar() {
     const L = LG("speak:log", {}), K = LG("speak:days", {}), t = today(), v = k => +L[k] || 0;
-    let run = 0, k = v(t) ? t : dayAgo(t, 1); while (v(k)) { run++; k = dayAgo(k, 1); }
+    const run = U.streak(k => v(k) > 0);
     const wk = Array.from({ length: 7 }, (_, i) => dayAgo(t, 6 - i)), mx = Math.max(1, ...wk.map(v)), w7 = wk.reduce((a, d) => a + v(d), 0);
     const days = Object.keys(L).filter(d => v(d) > 0).length, total = Object.keys(L).reduce((a, d) => a + v(d), 0), punch = Object.keys(K).filter(d => K[d]).length;
     const WD = "日一二三四五六", bars = wk.map(d => '<i title="' + d + "：" + v(d) + ' 次" class="' + (d === t ? "td" : "") + '"><u style="height:' + Math.round(v(d) / mx * 40) + 'px"></u><em>' + WD[new Date(d + "T12:00:00Z").getUTCDay()] + "</em></i>").join("");
@@ -393,10 +393,7 @@
     return { d, t, s: P.slice(st, st + 5) };
   }
   function streak() {
-    const D0 = LG("speak:days", {}); let n = 0, k = today();
-    if (!D0[k]) k = new Date(Date.parse(k + "T00:00:00+08:00") - 864e5 + 8 * 3600e3).toISOString().slice(0, 10); // 今天还没做完：从昨天往前数
-    while (D0[k]) { n++; k = new Date(Date.parse(k + "T00:00:00+08:00") - 864e5 + 8 * 3600e3).toISOString().slice(0, 10); }
-    return n;
+    const D0 = LG("speak:days", {}); return U.streak(k => !!D0[k]); // 今天还没做完：从昨天往前数
   }
   function dailyView() {
     const p = dailyPlan(), dOk = p.d && doneToday("d:" + p.d.id), sN = p.s.filter(x => doneToday(x.key)).length, tOk = p.t && doneToday("t:" + p.t.id), all = !!(dOk && sN >= 5 && tOk);
@@ -480,7 +477,7 @@
       CLIPS = L.sort((a, b) => b.at - a.at);
     }).catch(() => { CLIPS = []; });
   }
-  function clipGet(mk) { return CLIPREC[mk] ? Promise.resolve(CLIPREC[mk]) : fetch("/api/media?k=" + encodeURIComponent(mk)).then(r => r.ok ? r.json() : null).then(j => (CLIPREC[mk] = (j && j.rec) || {})).catch(() => ({})); }
+  function clipGet(mk) { return CLIPREC[mk] ? Promise.resolve(CLIPREC[mk]) : CLOUD.media(mk).then(rec => (rec ? (CLIPREC[mk] = rec) : {})); } // 全站共用（cloud.js）
   let clipAudio = null;
   function clipPlay(mk, slow) { clipGet(mk).then(r => { if (!r || !r.aud) { tip("这条没有原声"); return; } hush(); clipAudio = MEDIA.play(r.aud, { rate: slow ? 0.75 : 1 }); }); } // 全站共用的放音（media.js）
   function clipList() {
@@ -562,7 +559,7 @@
   }
   const topicOf = key => key.indexOf("t:") === 0 ? (D.topics || []).find(x => "t:" + x.id === key) : null;
   const MREC = {};
-  function playArchived(id) { (MREC[id] ? Promise.resolve(MREC[id]) : fetch("/api/media?k=" + encodeURIComponent("med:sp:" + id)).then(r => r.ok ? r.json() : null).then(j => (MREC[id] = j && j.rec))).then(r => { if (!r || !r.aud) return tip("这条录音没取到"); hush(); clipAudio = MEDIA.play(r.aud); }); }
+  function playArchived(id) { (MREC[id] ? Promise.resolve(MREC[id]) : CLOUD.media("med:sp:" + id).then(rec => (MREC[id] = rec))).then(r => { if (!r || !r.aud) return tip("这条录音没取到"); hush(); clipAudio = MEDIA.play(r.aud); }); }
   function curveSvg(pts) { // 每天跟读的平均分
     if (pts.length < 2) return '<div class="sk-note">练满两天就能看到分数曲线。</div>';
     const W = 640, H = 160, L = 34, B = 22, T = 10, xs = i => L + (W - L - 10) * (i / (pts.length - 1)), ys = v => T + (H - T - B) * (1 - v / 100);
@@ -575,7 +572,7 @@
   function mineView() {
     const R = items("rec:");
     if (!R.length) return '<div class="sk-intro">这里会存下你每次跟读、说话题的录音（存在云端，换设备也能听，按家人分开），还有每天的平均分曲线。去「🎯 跟读」或「📅 每日一练」录一句试试。</div>';
-    const day = {}; R.forEach(r => { if (r.score == null) return; const k = new Date(r.at + 8 * 3600e3).toISOString().slice(0, 10); (day[k] = day[k] || []).push(r.score); });
+    const day = {}; R.forEach(r => { if (r.score == null) return; const k = U.day(r.at); (day[k] = day[k] || []).push(r.score); });
     const pts = Object.keys(day).sort().slice(-30).map(k => ({ k, n: day[k].length, v: Math.round(day[k].reduce((a, b) => a + b, 0) / day[k].length) }));
     const by = {}; R.forEach(r => { const k = r.t || r.key; (by[k] = by[k] || []).push(r); });
     const groups = Object.keys(by).map(k => ({ t: k, L: by[k] })).sort((a, b) => b.L[0].at - a.L[0].at);
@@ -803,11 +800,11 @@
     const L = items("chat:"); if (!L.length) return "";
     return '<div class="sk-sub">📜 聊天记录<small>' + L.length + " 次</small></div>" + '<div class="sk-grid three">' + L.slice(0, 30).map(c => { const fx = (c.msgs || []).filter(m => m.fix).length + ((c.sum && c.sum.fixes) || []).length; return '<button class="sk-card" data-act="chat-hist" data-id="' + esc(c.id) + '"><div class="t"><b>' + esc(c.title) + "</b><span>" + new Date(c.at).toLocaleString("zh-CN", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" }) + " · " + (c.msgs || []).filter(m => m.role === "user").length + " 句" + (fx ? " · " + fx + " 处可改" : "") + "</span></div><i>›</i></button>"; }).join("") + "</div>";
   }
-  function chatFixesToBook(c) {
+  async function chatFixesToBook(c) {
     const F = [].concat((c.msgs || []).filter(m => m.fix).map(m => m.fix), (c.sum && c.sum.fixes) || []), seen = new Set();
     const L = F.filter(f => f && f.good && !seen.has(f.good) && seen.add(f.good));
     if (!L.length) return tip("这次没有要改的句子");
-    if (!confirm("把这次聊天里改过的 " + L.length + " 句正确说法加进生词本？之后在「🔊 练习」里复习。")) return;
+    if (!(await U.ask("把这次聊天里改过的 " + L.length + " 句正确说法加进生词本？之后在「🔊 练习」里复习。", { ok: "加进生词本" }))) return; // ✅ 全站共用的弹窗（util.js）
     (async () => { let n = 0; for (const f of L) if (await WORD.add(f.good, { sent: f.bad ? "✗ " + f.bad : "", silent: true, learn: false, from: "口语·更好的说法" })) n++; tip("已加入生词本 " + n + " 条"); })(); // 全站共用的加词（word.js）
   }
 
@@ -899,7 +896,7 @@
       else if (e.target.id === "sk-how" && !e.shiftKey) { e.preventDefault(); howGo(e.target.value); }
     });
     root.addEventListener("change", e => { if (e.target.id === "sk-auto") { chatAuto = e.target.checked; LS("speak:chatAuto", chatAuto); } });
-    document.addEventListener("keydown", e => { if (e.key === "Escape" && document.documentElement.classList.contains("show-speak")) { stopAll(); draw(); } });
+    KEYS.on("speak", { when: () => !!root && KEYS.visible(root) }, k => { if (k === "esc") { stopAll(); draw(); return true; } return false; }); // ⌨️ 全站共用的快捷键（keys.js）：Esc 全停
   }
   // 🔙 页面历史：口语在哪一栏、打开了哪个条目（看不到口语页时不记）
   if (window.NAV) NAV.reg("speak", () => document.documentElement.classList.contains("show-speak") ? { sec, v: view ? { t: view.t, id: view.id } : null } : undefined, x => {

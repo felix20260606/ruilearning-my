@@ -17,7 +17,7 @@
   const opt = Object.assign({ fmt: "anki", scope: "all", img: true, aud: true }, LS("exp:opt") || {});
   const noBr = s => String(s || "").replace(/[{}]/g, "");
   const hl = s => esc(s).replace(/\{([^}]+)\}/g, "<b>$1</b>");
-  const today = () => new Date().toISOString().slice(0, 10);
+  const today = () => U.day(); // 📅 全站共用的「今天」（util.js）
   let box = null, busy = false;
 
   function draw() {

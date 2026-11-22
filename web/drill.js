@@ -77,7 +77,7 @@
       week: ["bn1", "bn3", "bn5", "bn6", "nup", "nsw", "npm", "ree", "tews", "sme"],
       async list(s) {
         if (s === "new") { // 各栏目最近 7 天的合起来，新的在前；小字写是哪个栏目
-          const day = t => { const d = new Date(t); d.setHours(0, 0, 0, 0); return +d; }, cut = day(Date.now()) - 6 * 864e5, lab = Object.fromEntries(this.series.map(x => [x[0], x[1]]));
+          const day = U.dayStart, cut = day(Date.now()) - 6 * 864e5, lab = Object.fromEntries(this.series.map(x => [x[0], x[1]]));
           const Ls = await Promise.all(this.week.map(k => this.list(k).catch(() => [])));
           const out = []; Ls.forEach((L, si) => L.forEach(x => { const t = Date.parse(x.d); if (t && day(t) >= cut) out.push(Object.assign({}, x, { d: x.d + " · " + lab[this.week[si]], _t: day(t), _s: si })); }));
           if (!out.length && Ls.every(L => !L.length)) throw new Error("列表没拿到");
@@ -211,7 +211,7 @@
   const lastOf = () => (LG("drill:last", {}) || {})[LANG().cur()] || "";
   function setLast(id) { const o = LG("drill:last", {}) || {}; o[LANG().cur()] = id; LS("drill:last", o); }
   // 本地日期（同 daily.js）
-  const lday = t => { const d = t ? new Date(t) : new Date(); return new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); };
+  const lday = t => U.day(t); // 📅 全站共用的「今天」（util.js，吉隆坡 / 北京时间）
   const dayAdd = n => lday(Date.now() + n * 864e5);
 
   // ---------- 📅 隔天复习：做错的句子 1 天、3 天、7 天后再出，连对 3 次就不再出 ----------
@@ -662,20 +662,24 @@
     if (a === "rp-stop") { rpStop(); return draw(); }
     if (a === "rp-next") return rpNext();
   }
-  function onKey(e) {
-    if (!root || !root.classList.contains("on") || view !== "lesson" || !C || e.metaKey || e.ctrlKey || e.altKey) return;
-    if (!root.offsetParent) return; // 页面没显示（在别的标签）
-    const inInput = e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName), c = C.cards[ci];
-    if (inInput) { if (e.key === "Enter" && e.target.id === "dr-in") { e.preventDefault(); if (c.k === "dict") answerDict(false); else answerGap(false); } return; }
-    const k = e.key.toLowerCase();
-    if (k === "a" || k === "arrowleft") { e.preventDefault(); go(ci - 1); }
-    else if (k === "d" || k === "arrowright" || (k === "enter" && res[ci])) { e.preventDefault(); go(ci + 1); }
-    else if (k === "s") { e.preventDefault(); if (c.k === "voc") sayWord(M.vocab[c.v].w); else if (c.s != null && c.k !== "role" && !(c.k === "zh" && !res[ci])) play(c.s); }
-    else if (k === "e") { e.preventDefault(); if (c.k === "say" && LV[lvl()].zhOk) { setOpt({ zh: !opt().zh }); draw(); } }
-    else if (k === "r") { if (c.k === "say" || c.k === "zh") { e.preventDefault(); recToggle(); } }
-    else if (/^[1-9]$/.test(k) && c.k === "pick") { e.preventDefault(); answerPick(+k - 1); }
-    else if (/^[1-9]$/.test(k) && c.k === "ord") { e.preventDefault(); ordPick(+k - 1); }
+  // ⌨️ 快捷键：全站共用的 keys.js（只在这页看得见、在做课的时候；打字、查词卡片开着都不触发）
+  function onKey(k) {
+    const c = C.cards[ci];
+    if (k === "a" || k === "left") go(ci - 1);
+    else if (k === "d" || k === "right" || (k === "enter" && res[ci])) go(ci + 1);
+    else if (k === "s") { if (c.k === "voc") sayWord(M.vocab[c.v].w); else if (c.s != null && c.k !== "role" && !(c.k === "zh" && !res[ci])) play(c.s); }
+    else if (k === "e") { if (c.k === "say" && LV[lvl()].zhOk) { setOpt({ zh: !opt().zh }); draw(); } }
+    else if (k === "r") { if (c.k === "say" || c.k === "zh") recToggle(); else return false; }
+    else if (/^[1-9]$/.test(k) && c.k === "pick") answerPick(+k - 1);
+    else if (/^[1-9]$/.test(k) && c.k === "ord") ordPick(+k - 1);
+    else return false;
+    return true;
   }
+  function onInputKey(e) { // 输入框里按回车 = 交答案
+    if (e.key !== "Enter" || e.isComposing || !e.target || e.target.id !== "dr-in" || !C) return; const c = C.cards[ci];
+    e.preventDefault(); if (c.k === "dict") answerDict(false); else answerGap(false);
+  }
+
 
   // 🔙 页面历史：哪个栏目、打开了哪一期、在做第几节（看不到这一页时不记）
   if (window.NAV) NAV.reg("drill", () => root && root.getClientRects().length ? { ser, ep: busy ? navEp : view !== "home" && M ? M.id : null, li: !busy && view === "lesson" && C ? (C.review ? -1 : LI) : null } : undefined, async x => {
@@ -692,7 +696,8 @@
     if (!root.dataset.init) {
       root.dataset.init = "1";
       const st = document.createElement("style"); st.textContent = CSS; document.head.append(st);
-      root.addEventListener("click", onClick); document.addEventListener("keydown", onKey);
+      root.addEventListener("click", onClick); root.addEventListener("keydown", onInputKey);
+      KEYS.on("drill", { when: () => root.classList.contains("on") && view === "lesson" && !!C && KEYS.visible(root) }, onKey);
       window.addEventListener("lang-change", () => { hush(); fresh(); view = "home"; M = null; C = null; draw(); });
     }
     draw();

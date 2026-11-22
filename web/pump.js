@@ -7,7 +7,7 @@
 (function () {
   const { LG, LS, esc } = U; // 全站共用的小工具（util.js）
   const DAY = 864e5, PER = 3, NUMS = [20, 40, 60, 80, 100], NEWS = [0, 5, 10, 15, 20, 25];
-  const today = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }; // 本地日期（以前是 UTC：北京时间 8 点才换天）
+  const today = () => U.day(); // 📅 全站共用的「今天」（util.js，吉隆坡 / 北京时间）
   // 默认值同 PhrasePump：测验、建议、练习都开，练习数量 60，新项目 15 %（和默认不一样时「会话」旁出现「重置」）；后面几项是我们加的
   const DEF = { quiz: true, sugg: true, listen: true, num: 60, newPct: 15, tags: [], recall: false, dir: "en", types: ["word", "phrase", "sentence"], speed: 1, dict: false, shadow: false, gfill: false }; // 听写、跟读、语法填空也是我们加的，默认关 // 认词卡是我们加的，默认关（RL 没有）
   let opt = Object.assign(JSON.parse(JSON.stringify(DEF)), LG("pump:opt", {})); if (!Array.isArray(opt.tags)) opt.tags = [];
@@ -52,7 +52,7 @@
   // ---------- 例句：词条自带的 + Tatoeba 例句库（/api/sent，后台缓存）；听力每次换着听，最近听过的往后排 ----------
   const SENT = {}, heard = LG("pump:heard", {});
   const sentFor = w => { const k = String(w.word || "").toLowerCase().trim(); if (!hasEn(w) || w.type === "sentence" || /\s.*\s.*\s/.test(k) || k in SENT) return Promise.resolve(); SENT[k] = null;
-    return fetch("/api/sent?w=" + encodeURIComponent(k)).then(r => r.json()).then(j => { SENT[k] = (j && j.items) || []; }).catch(() => { delete SENT[k]; }); };
+    return U.json("/api/sent?w=" + encodeURIComponent(k)).then(j => { if (!j.items && j.ok === false) delete SENT[k]; else SENT[k] = j.items || []; }); };
   let day = LG("pump:day", { d: "", n: 0 }); if (day.d !== today()) day = { d: today(), n: 0 };
   let cards = [], at = 0, bad = 0, playing = false, root = null;
   // 🔙 页面历史：在首页还是在练（练到一半没法恢复，所以只支持「后退 = 停下回首页」）
@@ -73,7 +73,7 @@
   }
   function medFor(w) {
     const k = MED && MED[String(w.word || "").toLowerCase().trim()]; if (!k) return Promise.resolve(null);
-    return medPr[k] || (medPr[k] = fetch("/api/media?k=" + encodeURIComponent(k)).then(r => r.ok ? r.json() : null).then(j => (medRec[k] = (j && j.rec) || null)).catch(() => (medRec[k] = null)));
+    return medPr[k] || (medPr[k] = CLOUD.media(k).then(rec => (medRec[k] = rec)));
   }
   // 这张卡片的句子就是保存时的那一句：用原声和截图
   const medOf = c => { const k = MED && MED[String(c.w.word || "").toLowerCase().trim()], r = k && medRec[k]; if (!r) return null; return (r.t ? nrm(r.t) === nrm(c.s.en) : !!c.s.orig) ? r : null; };
@@ -187,7 +187,7 @@
   const countCard = c => { if (c && !c.counted) { c.counted = true; if (day.d !== today()) day = { d: today(), n: 0 }; day.n++; LS("pump:day", day); logDay(Object.assign({ n: 1, sec: spent() }, c.k === "listen" || c.k === "dict" ? { ls: 1 } : {})); } }; // 按「下一个」离开一张卡时算练了一张（同 PhrasePump）；听力、听写卡另记 ls（「📅 每日一练」的「听」用）
   // ---------- 每天的练习记录（「📊 统计」用）：本机 pump:log + /api/ext 的 "stat|日期"（换设备也在）----------
   // { "YYYY-MM-DD"（本地日期）: { n 卡片数, ok 记得, fail 忘了, nw 新词, sec 用时秒 } }
-  const lday = () => { const d = new Date(); return new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); };
+  const lday = today;
   let lastT = Date.now(), logT = null;
   const spent = () => { const now = Date.now(), s = Math.min(90, Math.max(0, (now - lastT) / 1000)); lastT = now; return Math.round(s); }; // 两张卡之间最多算 90 秒（中途走开不算）
   function logDay(add) {
@@ -350,7 +350,7 @@
     cards.forEach((c, i) => { c.last = !cards.slice(i + 1).some(x => x.w.id === c.w.id); });
     if (only) { enter(); return; } // 只练跟读 / 听写：不补额外句子
     // 名额还有剩：例句库的额外句子补满（不记进度，同 PhrasePump 的 pump）
-    if (p.pump) fetch("/api/sent?pump=" + p.pump).then(r => r.json()).then(j => { if (!playing) return; (j.items || []).forEach((x, i) => cards.push({ w: { id: "pump_" + i, word: "", zh: "", pump: 1 }, s: { en: x.en, zh: x.zh, src: "tatoeba" }, i: 0, k: "listen", last: true, rev: 0 })); if (cards[at]) show(); }).catch(() => {});
+    if (p.pump) U.json("/api/sent?pump=" + p.pump).then(j => { if (!playing) return; (j.items || []).forEach((x, i) => cards.push({ w: { id: "pump_" + i, word: "", zh: "", pump: 1 }, s: { en: x.en, zh: x.zh, src: "tatoeba" }, i: 0, k: "listen", last: true, rev: 0 })); if (cards[at]) show(); });
     enter();
   }
   function grade(c, ok) {
@@ -593,12 +593,13 @@
       (rows.length ? '<div class="pp-sum">' + rows.map(r => '<div class="row' + (r.k || r.b >= 1 ? " known" : "") + '"><span class="w">' + esc(r.w.word) + "</span>" + mbar(r.b, r.k || r.b >= 1) + '<span class="n">' + (r.k || r.b >= 1 ? "🏆 已掌握" : pcent(r.b) + "%") + (r.b > r.a + 0.005 ? " <em>+" + (pcent(r.b) - pcent(r.a)) + "%</em>" : r.b < r.a - 0.005 ? ' <em class="dn">' + (pcent(r.b) - pcent(r.a)) + "%</em>" : "") + "</span></div>").join("") + "</div>" : "") + "</div>";
     setTimeout(home, 500); // 同 PhrasePump：停半秒回首页
   }
-  document.addEventListener("keydown", e => {
-    if (!playing || !root || !root.classList.contains("on") || !root.offsetParent || e.metaKey || e.ctrlKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
-    const c = cards[at]; if (!c) return; const k = e.key.toLowerCase();
-    if (k === "d" || k === "arrowright") go(1); else if (k === "a" || k === "arrowleft") { if (at) go(-1); } else if (k === "s" || k === "arrowdown" || k === " ") say(c); else if (k === "r") toggleStar(c); else if (k === "e") { if (c.k === "listen") reveal(c); else if (c.k === "recall") flip(c); else if (c.k === "quiz") revealQuiz(c); else if (c.k === "dict" || c.k === "gfill") giveUp(c); } else if (c.k === "quiz" && !c.done && (k === "z" || k === "c")) rate(c, k === "c"); else if (c.k === "sugg" && /^[zxc]$/.test(k)) chooseSugg(c, { z: "known", x: "learn", c: "skip" }[k]); else if (c.k === "recall" && c.flip && !c.done && (k === "z" || k === "c")) rate(c, k === "c"); else return;
-    e.preventDefault();
+  // ⌨️ 快捷键：全站共用的 keys.js（在练、这页看得见时；打字、查词卡片开着都不触发）
+  KEYS.on("pump", { when: () => playing && !!root && root.classList.contains("on") && KEYS.visible(root) }, k => {
+    const c = cards[at]; if (!c) return false;
+    if (k === "d" || k === "right") go(1); else if (k === "a" || k === "left") { if (at) go(-1); } else if (k === "s" || k === "down" || k === "space") say(c); else if (k === "r") toggleStar(c); else if (k === "e") { if (c.k === "listen") reveal(c); else if (c.k === "recall") flip(c); else if (c.k === "quiz") revealQuiz(c); else if (c.k === "dict" || c.k === "gfill") giveUp(c); } else if (c.k === "quiz" && !c.done && (k === "z" || k === "c")) rate(c, k === "c"); else if (c.k === "sugg" && /^[zxc]$/.test(k)) chooseSugg(c, { z: "known", x: "learn", c: "skip" }[k]); else if (c.k === "recall" && c.flip && !c.done && (k === "z" || k === "c")) rate(c, k === "c"); else return;
+    return true;
   });
+
   window.pumpShow = () => { if (!playing) home(); };
   // 🔥 难词（「📅 每日」的难词、每周小结用）：[{id, word, zh, f 忘过几次, n 练过几轮, h 半衰期天数}]
   window.pumpHard = () => { const S = srs(); return hardOf((typeof words !== "undefined" ? words : []).filter(w => w && w.word), S).map(w => ({ id: w.id, word: w.word, zh: w.zh || "", f: S[w.id].f || 0, n: S[w.id].n || 0, h: S[w.id].h || 0 })); };

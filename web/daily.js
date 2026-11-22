@@ -14,9 +14,8 @@
 (function () {
   "use strict";
   const { LG, LS, esc, tip } = U; // 全站共用的小工具（util.js）
-  const lday = (t) => { const d = t ? new Date(t) : new Date(); return new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); }; // 本地日期（同 pump.js）
-  const kday = (t) => new Date((t || Date.now()) + 8 * 3600e3).toISOString().slice(0, 10); // 吉隆坡 / 北京时间（同 speak.js）
-  const ago = (k, n) => { const d = new Date(k + "T12:00:00"); d.setDate(d.getDate() - n); return lday(d.getTime()); };
+  // 📅 日期：全站共用的 U.day（util.js，吉隆坡 / 北京时间）；以前这里按手机时区、口语按北京时间，两种混着用
+  const lday = t => U.day(t), kday = lday, ago = U.dayAgo;
   const isToday = t => !!t && lday(+t) === lday();
   const $ = id => document.getElementById(id);
   const arr = v => (Array.isArray(v) ? v : []);
@@ -120,10 +119,10 @@
     return D;
   }
   const full = x => !!(x && x[1] && x[0] >= x[1]);
-  function streak(D) { let k = lday(), n = 0; if (!full(D[k])) k = ago(k, 1); while (full(D[k])) { n++; k = ago(k, 1); } return n; }
+  const streak = D => U.streak(k => full(D[k]));
 
   // ---------- 🎓 考试目标 ----------
-  const daysTo = d => Math.ceil((Date.parse(d + "T00:00:00") - Date.parse(lday() + "T00:00:00")) / 864e5);
+  const daysTo = d => U.daysBetween(lday(), d);
   const suggestWord = left => (left <= 30 ? 50 : left <= 90 ? 30 : 20);
 
   // ---------- 📊 本周小结（最近 7 天，和前 7 天比） ----------

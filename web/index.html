@@ -72,19 +72,20 @@
       if(!j||!j.ok)return t("连不上后台");
       if(!j.set)return modal("🔒 设一个写入口令","平时用网站、插件都不用输；只有整份还原、一次删很多词这类大改动才要。忘了的话：Cloudflare 后台 → KV → CAPTIONS 删掉「auth」这一条再重新设。建议存进密码管理器。",true).then(function(v){if(!v)return;
         return of("/api/auth",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({set:v})}).then(function(r){return r.json();}).then(function(x){if(x&&x.ok){try{localStorage.setItem("auth:key",v);}catch(e){}t("🔒 口令设好了，这台设备已经记住");}else t("没设成："+((x&&x.error)||""));});});
-      if(j.valid){if(confirm("这台设备已经记住口令了。\n\n要改口令吗？（取消 = 不改）"))return modal("🔒 新口令","输入新口令，其它设备下次遇到大改动时要输新的。",true).then(function(v){if(!v)return;return fetch("/api/auth",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({set:v})}).then(function(r){return r.json();}).then(function(x){if(x&&x.ok){try{localStorage.setItem("auth:key",v);}catch(e){}t("口令改好了");}else t("没改成");});});return;}
+      if(j.valid){return U.ask("这台设备已经记住口令了。\n\n要改口令吗？",{ok:"改口令",cancel:"不改"}).then(function(ok){if(!ok)return;return modal("🔒 新口令","输入新口令，其它设备下次遇到大改动时要输新的。",true).then(function(v){if(!v)return;return fetch("/api/auth",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({set:v})}).then(function(r){return r.json();}).then(function(x){if(x&&x.ok){try{localStorage.setItem("auth:key",v);}catch(e){}t("口令改好了");}else t("没改成");});});});}
       return modal("🔒 输入写入口令","这台设备还没记住口令。输一次以后，大改动就不会再问。",false).then(function(v){if(v)t("🔒 这台设备记住口令了");});
     }).catch(function(){(window.toast||alert)("连不上后台");});
   };
 })();
 </script>
-<script src="util.js?v=1"></script>
+<script src="util.js?v=2"></script>
 <script src="nav.js?v=1"></script>
 <script src="word.js?v=2"></script>
 <script src="ai.js?v=1"></script>
 <script src="tr.js?v=1"></script>
-<script src="cloud.js?v=1"></script>
+<script src="cloud.js?v=2"></script>
 <script src="media.js?v=1"></script>
+<script src="keys.js?v=1"></script>
 <script>
 /* 🇨🇳 在中国大陆也能用：谷歌、BBC、维基百科、YouTube 这些在大陆打不开（或者一直卡着不回）。
    window.NET：
@@ -1172,7 +1173,7 @@ function vStamp(s){
 }
 const tMax=(x,y)=>{const o={},cut=Date.now()-90*864e5;[x||{},y||{}].forEach(m=>{for(const k in m){const t=Math.min(+m[k]||0,Date.now()+5000);if(t>cut&&t>(o[k]||0))o[k]=t;}});return o;};
 // 新词条的日期：本地日期（toISOString 是 UTC，北京时间 0–8 点加的词会记成前一天）
-const ymdLocal=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
+const ymdLocal=()=>U.day(); // 📅 全站共用的「今天」（util.js，吉隆坡 / 北京时间）
 window.ymdLocal=ymdLocal;
 // 用固定 id（v_单词）加词的页面：这个 id 删过就换一个新的（删除记录只增不减，用旧 id 会被合并时再删掉）
 window.freshId=id=>(state.deleted||[]).includes(id)?id+"_"+Date.now().toString(36):id;
@@ -1539,12 +1540,12 @@ window.addEventListener("ban-ext",()=>{if(document.documentElement.getAttribute(
     e.stopPropagation();const b=e.target.closest("button");if(!b)return;
     if(b.dataset.u!=null)return switchTo(b.dataset.u);
     if(b.dataset.act==="auth"){close();if(window.authUI)window.authUI();return;}
-    if(b.dataset.act==="add"){const n=(prompt("家人的名字（比如：妈妈、Lily）")||"").trim();if(!n)return;
-      try{const j=await post({add:n});if(confirm("已添加「"+j.user.name+"」，现在切换过去吗？"))switchTo(j.user.id);else open();}catch(er){alert("没加上："+er.message);}}
-    if(b.dataset.act==="rename"){const m=me(),n=(prompt("改成什么名字？",m?m.name:"")||"").trim();if(!n)return;
-      try{await post({rename:{id:window.VU||"",name:n}});paint();open();}catch(er){alert("没改成："+er.message);}}
-    if(b.dataset.act==="remove"){const m=me();if(!confirm("删掉「"+(m?m.name:window.VU)+"」？只有还没收词、没保存内容的才能删（加错名字时用）。"))return;
-      try{await post({remove:window.VU});try{localStorage.removeItem("vocab_state_v1");localStorage.removeItem("vu");}catch(x){}location.reload();}catch(er){alert("没删："+er.message);}}
+    if(b.dataset.act==="add"){const n=((await U.input("家人的名字（比如：妈妈、Lily）",""))||"").trim();if(!n)return; // ✅ 全站共用的弹窗（util.js）
+      try{const j=await post({add:n});if(await U.ask("已添加「"+j.user.name+"」，现在切换过去吗？",{ok:"切换过去",cancel:"先不切"}))switchTo(j.user.id);else open();}catch(er){U.tip("没加上："+er.message);}}
+    if(b.dataset.act==="rename"){const m=me(),n=((await U.input("改成什么名字？",m?m.name:""))||"").trim();if(!n)return;
+      try{await post({rename:{id:window.VU||"",name:n}});paint();open();}catch(er){U.tip("没改成："+er.message);}}
+    if(b.dataset.act==="remove"){const m=me();if(!(await U.ask("删掉「"+(m?m.name:window.VU)+"」？只有还没收词、没保存内容的才能删（加错名字时用）。",{ok:"删掉",danger:true})))return;
+      try{await post({remove:window.VU});try{localStorage.removeItem("vocab_state_v1");localStorage.removeItem("vu");}catch(x){}location.reload();}catch(er){U.tip("没删："+er.message);}}
   };
   document.addEventListener("click",close);window.addEventListener("resize",close);
 })();
@@ -1719,7 +1720,7 @@ function renderPending(){
     '<div class="vrow"><button id="pend-auto" class="bulk-btn primary-btn">⚡ 自动生成词条</button><button id="pend-copy" class="bulk-btn">📋 复制发给 Claude</button><button id="pend-clear" class="bulk-btn">清空</button></div></div>';
   const cp=document.getElementById("pend-copy");if(cp)cp.onclick=async()=>{const t=(state.pending||[]).join("\n");try{await navigator.clipboard.writeText(t);toast("已复制，粘贴发给 Claude");}catch(e){download("pending.txt",t,"txt");toast("已下载为文本");}};
   const au=document.getElementById("pend-auto");if(au)au.onclick=async()=>{const L=(state.pending||[]).slice();au.disabled=true;au.textContent="生成中…";await addMany(L);prunePending();renderPending();};
-  const cl=document.getElementById("pend-clear");if(cl)cl.onclick=()=>{if(confirm("清空待整理队列？")){state.pending=[];save(state);renderPending();}};
+  const cl=document.getElementById("pend-clear");if(cl)cl.onclick=async()=>{if(await U.ask("清空待整理队列？",{ok:"清空",danger:true})){state.pending=[];save(state);renderPending();}};
 }
 // 阅读、视频等页面「＋ 加入生词本」：查词典自动生成词条，带上原句
 window.vocabAddWord=async(word,sentence)=>{const ok=await quickAdd(word,sentence);toast(ok?"已加入生词本："+word:"已在生词本里");return ok;};
@@ -2066,21 +2067,21 @@ refresh(); // show seed words immediately, no waiting on storage
 <script src="lang.js?v=3"></script>
 <script src="tts.js?v=3"></script>
 <script src="rec.js?v=1"></script>
-<script src="watch.js?v=23"></script>
+<script src="watch.js?v=24"></script>
 <script src="channels.js?v=4"></script>
-<script src="pump.js?v=35"></script>
-<script src="speak.js?v=17"></script>
+<script src="pump.js?v=36"></script>
+<script src="speak.js?v=18"></script>
 <script src="basic.js?v=2"></script>
 <script src="quota.js?v=5"></script>
-<script src="daily.js?v=12"></script>
-<script src="read.js?v=19"></script>
-<script src="listen.js?v=21"></script>
-<script src="drill.js?v=7"></script>
+<script src="daily.js?v=13"></script>
+<script src="read.js?v=20"></script>
+<script src="listen.js?v=22"></script>
+<script src="drill.js?v=8"></script>
 <script src="errbook.js?v=4"></script>
-<script src="exam.js?v=6"></script>
-<script src="import.js?v=2"></script>
-<script src="write.js?v=5"></script>
-<script src="stats.js?v=3"></script>
+<script src="exam.js?v=7"></script>
+<script src="import.js?v=3"></script>
+<script src="write.js?v=6"></script>
+<script src="stats.js?v=4"></script>
 <script>
 /* 个人学习资料换设备也在：阅读的文章（reading:docs）、作文批改历史（writing:history）、词汇量测试（vocab:test）
    这三页照旧存本机；这里在本机存储这一层盯着：哪一条变了就传到后台 /api/mine（按人分开），删掉的传删除记号；
@@ -2134,9 +2135,9 @@ refresh(); // show seed words immediately, no waiting on storage
 })();
 </script>
 <script>if('serviceWorker' in navigator&&location.protocol!=='file:'){navigator.serviceWorker.register('/sw.js').catch(function(){});} // 装到手机桌面后离线也能打开（sw.js：网络优先，断网用上次的）</script>
-<script src="export.js?v=3"></script>
-<script src="saved-web.js?v=7"></script>
-<script src="reader.js?v=4"></script>
-<script src="grammar.js?v=6"></script>
+<script src="export.js?v=4"></script>
+<script src="saved-web.js?v=8"></script>
+<script src="reader.js?v=5"></script>
+<script src="grammar.js?v=7"></script>
 </body>
 </html>

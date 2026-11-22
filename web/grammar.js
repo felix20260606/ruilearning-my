@@ -48,7 +48,7 @@
   let shared = null;
   function loadShared() {
     if (!window.VU || shared) return; shared = [];
-    fetch(new Request("/api/vocab", { cache: "no-store" })).then(r => r.json()).then(j => { shared = ((j && j.custom) || []).filter(w => w && w.type === "pattern"); draw(); }).catch(() => { shared = null; });
+    U.json("/api/vocab", { cache: "no-store" }).then(j => { if (!j.custom && j.ok === false) { shared = null; return; } shared = (j.custom || []).filter(w => w && w.type === "pattern"); draw(); }); // util.js：网络不通不抛错
   }
   function items() { // 每栏的条目：查看页格式（reader.js 的 readerFromWord / readerFromPat）+ text（搜索用）
     const own = (typeof words !== "undefined" ? words : []).filter(w => w.type === "pattern"), ids = new Set(own.map(w => w.id));

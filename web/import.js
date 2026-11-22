@@ -61,7 +61,7 @@
     for (let i = 0; i < pick.length; i++) { if (!box) return; msg.textContent = (i + 1) + " / " + pick.length + "：" + pick[i].w; try { if (await quickAdd(pick[i].w, pick[i].s)) added++; else dup++; } catch (e) {} bar.style.width = Math.round((i + 1) / pick.length * 100) + "%"; }
     busy = false; toast("导入完成：新加 " + added + " 个" + (dup ? "，跳过 " + dup + " 个重复" : "")); close();
   }
-  function close() { if (busy && !confirm("还在导入，关掉会停在这里（已经加的会留着）。确定关掉？")) return; busy = false; if (box) box.remove(); box = null; res = null; }
+  async function close() { if (busy && !(await U.ask("还在导入，关掉会停在这里（已经加的会留着）。确定关掉？", { ok: "关掉" }))) return; busy = false; if (box) box.remove(); box = null; res = null; }
   function open() {
     if (box) return; box = document.createElement("div"); box.className = "imp-mask"; document.body.append(box); draw();
     box.addEventListener("click", e => {

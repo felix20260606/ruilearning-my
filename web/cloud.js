@@ -10,6 +10,7 @@
    C.pull({force, every}) → Promise<后台的 items | null>：every 毫秒内（默认 60 秒）只拉一次，force 不管；拉不到给 null
    失败怎么办：断网、后台出错（5xx）、太频繁（429）→ 放回队列等下次发（同一 id 有更新的改动就不放回）；其它（4xx，发了也不会成功）丢掉并记日志
    关页面 / 切到后台（pagehide）：还没发的用 sendBeacon 发出去
+   CLOUD.media(k) → Promise<记录 | null>：卡片配图、原声、口语录音存档（/api/media?k=），同一条只请求一次
    出错都记进 U.log("cloud", …) */
 (function () {
   "use strict";
@@ -59,5 +60,12 @@
     return (CH[k] = { k, put, del, send, flush, pull, get, beacon, pending: () => Object.keys(Q).length });
   }
   window.addEventListener("pagehide", () => { for (const k in CH) CH[k].beacon(); });
-  window.CLOUD = { chan };
+  // 卡片配图、原声、录音存档（后台 /api/media?k=…）：几个页面要同一条只请求一次；取不到给 null（下次再取）
+  const MED = new Map();
+  function media(k) {
+    if (MED.has(k)) return MED.get(k);
+    const p = U.json("/api/media?k=" + encodeURIComponent(k)).then(j => { if (!j.ok && !j.rec) { MED.delete(k); if (j.status !== 404) log("配图 / 原声取不到：" + k, j.error); return null; } return j.rec || null; });
+    MED.set(k, p); return p;
+  }
+  window.CLOUD = { chan, media };
 })();

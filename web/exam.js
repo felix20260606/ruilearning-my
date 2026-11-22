@@ -14,7 +14,7 @@
 (function () {
   "use strict";
   const { esc, LG, LS, tip } = U; // 全站共用的小工具（util.js）
-  const nday = () => new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10);
+  const nday = () => U.day(); // 📅 全站共用的「今天」（util.js），和后台的新闻日期一致
   const norm = s => String(s || "").toLowerCase().replace(/[’']/g, "'").replace(/[^a-z0-9' ]+/g, " ").replace(/\s+/g, " ").trim();
   const noArt = s => norm(s).replace(/^(the|a|an) /, "");
   const words = s => (String(s).match(/[A-Za-z0-9'’-]+/g) || []).length;
@@ -228,9 +228,10 @@
 
   /* ---------- 交卷、打分 ---------- */
   function collect() { root && root.querySelectorAll("input.ex-in").forEach(i => { S.ans[i.dataset.k] = i.value.trim(); }); }
-  function submit(auto) {
+  async function submit(auto) {
     collect(); const L = qlist(S.Q);
-    if (!auto && L.some(q => S.ans[q.k] == null || S.ans[q.k] === "") && !confirm("还有题没答，确定交卷吗？")) return;
+    if (!auto && L.some(q => S.ans[q.k] == null || S.ans[q.k] === "") && !(await U.ask("还有题没答，确定交卷吗？", { ok: "交卷" }))) return; // ✅ 全站共用的弹窗（util.js）
+    if (S.res) return; // 等回答的时候时间到了、已经自动交卷了
     stopAll();
     const got = L.filter(q => right(q, S.ans[q.k])).length, B = bandOf(S.mode, got, L.length);
     S.res = { got, n: L.length, raw: B.raw, band: B.band, secs: Math.round((Date.now() - S.t0) / 1000) };
@@ -346,7 +347,7 @@
     if (a === "pause" && audio) { audio.paused ? audio.play() : audio.pause(); return; }
     if (a === "back5" && audio) { if (S.src.kind === "ai") { li = Math.max(0, li - (audio.currentTime < 1.5 ? 1 : 0)); playLine(); } else audio.currentTime = Math.max(0, audio.currentTime - 5); return; }
     if (a === "submit") return submit(false);
-    if (a === "quit") { if (!confirm("不交卷了？这次的答案不保存。")) return; stopAll(); S.view = "home"; S.Q = null; return draw(); }
+    if (a === "quit") { U.ask("不交卷了？这次的答案不保存。", { ok: "不交了", danger: true }).then(ok => { if (!ok) return; stopAll(); S.view = "home"; S.Q = null; draw(); }); return; }
     if (a === "home") { S.view = "home"; S.Q = null; S.res = null; S.src = null; draw(); return firstSource(); }
     if (a === "redo") { S.ans = {}; S.res = null; S.view = "do"; S.t0 = Date.now(); if (S.mode === "reading") { S.left = 20 * 60; } else { S.phase = "read"; S.left = 30; } tick(); return draw(); }
     if (a === "errbook") { if (window.enShow) window.enShow("notebook"); setTimeout(() => { const m = document.querySelector('.modes button[data-mode="err"]'); if (m) m.click(); }, 50); return; }
@@ -355,7 +356,14 @@
     if (!el) return;
     if (root !== el) { root = el; el.addEventListener("click", onClick); el.addEventListener("input", e => { if (e.target.matches("input.ex-in")) S.ans[e.target.dataset.k] = e.target.value; }); }
     mode = mode === "listening" ? "listening" : "reading";
-    if (S.mode !== mode) { if (S.view === "do" && !confirm("正在做的这套还没交卷，切过去就作废了。确定吗？")) { if (window.ieltsSub) window.ieltsSub(S.mode === "listening" ? "lexam" : "rexam"); return; } stopAll(); S.mode = mode; S.view = "home"; S.src = null; S.Q = null; S.res = null; S.pick = ""; S.err = ""; }
+    if (S.mode !== mode) {
+      if (S.view === "do") { // 正在做的这套还没交卷：先回到那一页，问清楚再切（✅ 全站共用的弹窗，util.js）
+        const back = S.mode === "listening" ? "lexam" : "rexam", to = mode === "listening" ? "lexam" : "rexam";
+        if (window.ieltsSub) window.ieltsSub(back);
+        U.ask("正在做的这套还没交卷，切过去就作废了。确定吗？", { ok: "作废，切过去", danger: true }).then(ok => { if (!ok) return; stopAll(); S.view = "home"; S.Q = null; if (window.ieltsSub) window.ieltsSub(to); else window.examShow(el, mode); });
+        return;
+      }
+      stopAll(); S.mode = mode; S.view = "home"; S.src = null; S.Q = null; S.res = null; S.pick = ""; S.err = ""; }
     draw(); pull();
     if (S.view === "home") firstSource();
   };
