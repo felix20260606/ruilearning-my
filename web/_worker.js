@@ -414,15 +414,16 @@ async function mine(req, env, u) {
 // 来源都是免费的：中文 = 谷歌翻译（插件同款接口），音标 / 英文释义 / 发音 = dictionaryapi.dev，例句 = Tatoeba（同 /api/sent）
 const UA = { "User-Agent": "ruilearning-my (personal study site)" };
 let G_DOWN = 0; // 谷歌拦了这台机房（403 / 429 / 连不上）：10 分钟内不再去问，省得每次白等几秒
-async function gtrans(text, tl, bd) {
+async function gtrans(text, tl, bd, sl) {
+  sl = sl === "de" ? "de" : "en";
   let blocked = 0;
   for (const host of Date.now() < G_DOWN ? [] : ["translate.googleapis.com", "clients5.google.com"]) { // 后台机房的 IP 有时被谷歌拦：换个入口再试
-    try { const r = await fetch("https://" + host + "/translate_a/single?client=" + (host[0] === "c" ? "dict-chrome-ex" : "gtx") + "&sl=en&tl=" + tl + "&dt=t" + (bd ? "&dt=bd" : "") + "&dj=1&q=" + encodeURIComponent(text), { headers: { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36" } });
+    try { const r = await fetch("https://" + host + "/translate_a/single?client=" + (host[0] === "c" ? "dict-chrome-ex" : "gtx") + "&sl=" + sl + "&tl=" + tl + "&dt=t" + (bd ? "&dt=bd" : "") + "&dj=1&q=" + encodeURIComponent(text), { headers: { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36" } });
       if (r.ok) { const j = await r.json(); if (j && (j.sentences || []).some(x => x.trans)) return j; } else if (r.status === 403 || r.status === 429 || r.status >= 500) blocked++; } catch (e) { blocked++; }
   }
   if (blocked >= 2) G_DOWN = Date.now() + 10 * 60000;
   if (text.length <= 480) try { // 再不行用 MyMemory（免费，每天有额度；超过 500 字它不翻）
-    const r = await fetch("https://api.mymemory.translated.net/get?q=" + encodeURIComponent(text) + "&langpair=en|" + tl, { headers: UA });
+    const r = await fetch("https://api.mymemory.translated.net/get?q=" + encodeURIComponent(text) + "&langpair=" + sl + "|" + tl, { headers: UA });
     const j = r.ok && (await r.json()), t = j && j.responseData && j.responseData.translatedText;
     if (t && !/MYMEMORY WARNING/i.test(t)) return { sentences: [{ trans: t }], dict: [] };
   } catch (e) {}
@@ -576,24 +577,25 @@ function smeIndex(html, slug) {
 }
 // 一批英文句子 → 一样多的中文：按行拼起来（每段不超过 1500 字）交给谷歌翻译，行数对不上就拆小再试
 // Workers AI 翻译（不靠谷歌）：大模型一次翻 20 句（一次请求最多 50 个外部调用，一句一句翻会超）；没翻出来的再用翻译模型 m2m100 单句补（最多 12 句）
-async function aiTrans(env, arr, idx) {
+async function aiTrans(env, arr, idx, sl) {
+  const SL = sl === "de" ? "German" : "English";
   const out = {}; if (!env.AI || !idx.length) return out;
   const B = []; for (let k = 0; k < idx.length && k < 200; k += 20) B.push(idx.slice(k, k + 20));
   for (let k = 0; k < B.length; k += 4) await Promise.all(B.slice(k, k + 4).map(async part => {
     let got = null;
-    await aiJson(env, [{ role: "system", content: 'Translate each English text into natural Simplified Chinese. Reply with ONLY JSON {"zh":[...]} with exactly one Chinese string per input, same order.' }, { role: "user", content: JSON.stringify(part.map(i => clip(arr[i], 800))) }],
+    await aiJson(env, [{ role: "system", content: 'Translate each ' + SL + ' text into natural Simplified Chinese. Reply with ONLY JSON {"zh":[...]} with exactly one Chinese string per input, same order.' }, { role: "user", content: JSON.stringify(part.map(i => clip(arr[i], 800))) }],
       o => Array.isArray(o && o.zh) && o.zh.length === part.length && o.zh.every(x => typeof x === "string") && !!(got = o.zh), 3000).catch(() => null);
     if (got) part.forEach((i, n) => { if (got[n].trim() && /[\u4e00-\u9fff]/.test(got[n])) out[i] = got[n].trim(); });
   }));
   const left = idx.filter(i => !out[i]).slice(0, 12);
-  const one = async i => { try { const r = await env.AI.run("@cf/meta/m2m100-1.2b", { text: clip(arr[i], 1000), source_lang: "en", target_lang: "zh" }); const t = r && String(r.translated_text || "").trim(); if (t && t !== arr[i].trim()) out[i] = t; } catch (e) {} };
+  const one = async i => { try { const r = await env.AI.run("@cf/meta/m2m100-1.2b", { text: clip(arr[i], 1000), source_lang: sl === "de" ? "de" : "en", target_lang: "zh" }); const t = r && String(r.translated_text || "").trim(); if (t && t !== arr[i].trim()) out[i] = t; } catch (e) {} };
   for (let k = 0; k < left.length; k += 5) await Promise.all(left.slice(k, k + 5).map(one));
   return out;
 }
-async function smeZh(arr, env) {
+async function smeZh(arr, env, sl) {
   const out = arr.map(() => "");
   async function run(idx, depth) {
-    const text = idx.map(i => arr[i].replace(/\s+/g, " ")).join("\n"), j = await gtrans(text, "zh-CN");
+    const text = idx.map(i => arr[i].replace(/\s+/g, " ")).join("\n"), j = await gtrans(text, "zh-CN", false, sl);
     const zh = j ? (j.sentences || []).map(x => x.trans || "").join("").split("\n").map(x => x.trim()) : [];
     if (zh.length === idx.length) { idx.forEach((i, k) => { out[i] = zh[k]; }); return; }
     if (idx.length === 1) { out[idx[0]] = zh.join(" ").trim(); return; }
@@ -605,7 +607,7 @@ async function smeZh(arr, env) {
   if (cur.length) chunks.push(cur);
   for (let i = 0; i < chunks.length; i += 4) await Promise.all(chunks.slice(i, i + 4).map(c => run(c, 0).catch(() => {})));
   const miss = arr.map((t, i) => (t && !out[i] ? i : -1)).filter(i => i >= 0); // 谷歌没翻出来的：用 Workers AI 补
-  if (miss.length && env) { const a = await aiTrans(env, arr, miss); for (const i in a) out[i] = a[i]; }
+  if (miss.length && env) { const a = await aiTrans(env, arr, miss, sl); for (const i in a) out[i] = a[i]; }
   return out;
 }
 // GET /api/sme?al=<期号>&part=N → { ok, part, parts, total, words:[[词, 开始秒, 结束秒]] }：逐句精听用的「每个词在第几秒」
@@ -615,10 +617,14 @@ const AL_PART = 1000000;
 async function smeAlign(env, u) {
   const ep = u.searchParams.get("al") || "", part = Math.max(0, Math.min(40, +u.searchParams.get("part") || 0));
   if (!smeOf(ep)) return json({ ok: false, error: "bad ep" }, 400);
-  const kv = env.CAPTIONS, key = "sme/al/" + ep + "/" + part;
+  return alignPart(env, "sme/al/" + ep + "/" + part, "sme/ep/" + ep, part, "en");
+}
+// 把一期 mp3 的第 part 段（1MB）交给 Whisper，存 KV（BBC 英语、DW 德语共用）
+async function alignPart(env, key, epKey, part, lang) {
+  const kv = env.CAPTIONS;
   const hit = await kv.get(key, "json"); if (hit) return json(Object.assign({ ok: true, cached: true }, hit));
   if (!env.AI) return json({ ok: false, error: "noai" }, 503);
-  const x = await kv.get("sme/ep/" + ep, "json"); if (!x || !x.mp3) return json({ ok: false, error: "open the episode first" }, 409);
+  const x = await kv.get(epKey, "json"); if (!x || !x.mp3) return json({ ok: false, error: "open the episode first" }, 409);
   try {
     const r = await fetch(x.mp3, { headers: { Range: "bytes=" + part * AL_PART + "-" + ((part + 1) * AL_PART - 1) } });
     if (r.status !== 206 && r.status !== 200) return json({ ok: false, error: "mp3 " + r.status }, 502);
@@ -626,7 +632,7 @@ async function smeAlign(env, u) {
     if (r.status === 200) { total = buf.length; buf = buf.subarray(part * AL_PART, (part + 1) * AL_PART); } // 不支持分段下载：整份下来自己切
     const parts = Math.max(1, Math.ceil(total / AL_PART)); if (!buf.length) return json({ ok: false, error: "past end", parts }, 400);
     let bin = ""; for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode.apply(null, buf.subarray(i, i + 0x8000));
-    const o = await env.AI.run("@cf/openai/whisper-large-v3-turbo", { audio: btoa(bin), language: "en" });
+    const o = await env.AI.run("@cf/openai/whisper-large-v3-turbo", { audio: btoa(bin), language: lang });
     const words = [];
     for (const sg of (o && o.segments) || []) {
       if (Array.isArray(sg.words) && sg.words.length) sg.words.forEach(w => words.push([String(w.word || "").trim(), Math.round((+w.start || 0) * 100) / 100, Math.round((+w.end || 0) * 100) / 100]));
@@ -637,6 +643,54 @@ async function smeAlign(env, u) {
     if (part === 0 && buf[0] === 73 && buf[1] === 68 && buf[2] === 51) out.id3 = 10 + ((buf[6] & 127) << 21 | (buf[7] & 127) << 14 | (buf[8] & 127) << 7 | (buf[9] & 127)); // 文件开头的 ID3 标签（封面图等）不是声音：换算时间时要扣掉
     await kv.put(key, JSON.stringify(out), { expirationTtl: 180 * 86400 });
     return json(Object.assign({ ok: true }, out));
+  } catch (e) { return json({ ok: false, error: String(e && e.message || e) }, 502); }
+}
+// ---------- 🇩🇪 德国之声 DW「Langsam gesprochene Nachrichten」慢速德语新闻（🧩 练习课的德语素材） ----------
+// GET /api/dw?list=1 → { ok, list:[{id, t, d, img}] }（KV dw/list 3 小时）
+// GET /api/dw?ep=<文章号> → { ok, id, title, mp3, lines:[{who 新闻标题, t 正文}], vocab:[] }（KV dw/ep/<号> 一年）
+// GET /api/dw?ep=<号>&zh=1 → { ok, lines:[中文] }（谷歌 → Workers AI，KV dw/zh/<号> 一年，家里人共用）
+// GET /api/dw?al=<号>&part=N → 和 /api/sme?al= 一样（Whisper 德语）
+const DW_UA = { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36", "Accept": "text/html" };
+const dwTxt = h => String(h || "").replace(/<br\s*\/?>/gi, " ").replace(/<[^>]+>/g, "").replace(/&#160;|&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;|&#x27;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/\s+/g, " ").trim();
+function dwParse(id, h) {
+  const title = dwTxt((h.match(/<title>([\s\S]*?)<\/title>/) || [])[1] || "").replace(/\s*\|.*$/, "");
+  const mp3 = (h.match(/<source src="(https:\/\/radiodownloaddw-a\.akamaihd\.net\/[^"]+?langsamenachrichten\/[^"]+?\.mp3)"/) || h.match(/"(https:\/\/radiodownloaddw-a\.akamaihd\.net\/[^"]+?langsamenachrichten\/[^"]+?\.mp3)"/) || [])[1] || "";
+  const i = h.indexOf('data-testid="richtext-content-container"'), body = i < 0 ? "" : h.slice(i, h.indexOf("</article>", i) > 0 ? h.indexOf("</article>", i) : i + 60000);
+  const lines = []; let who = "";
+  for (const m of body.matchAll(/<(h2|p)[^>]*>([\s\S]*?)<\/\1>/g)) { const t = dwTxt(m[2]); if (!t) continue; if (m[1] === "h2") who = t; else lines.push({ who, t }); }
+  return { id, title, mp3, lines, vocab: [] };
+}
+async function dw(req, env, u) {
+  if (req.method === "OPTIONS") return json({ ok: true });
+  const kv = env.CAPTIONS, q = k => u.searchParams.get(k) || "";
+  const id = q("ep") || q("al"); if (id && !/^\d{5,10}$/.test(id)) return json({ ok: false, error: "bad id" }, 400);
+  try {
+    if (q("al")) return alignPart(env, "dw/al/" + id + "/" + Math.max(0, Math.min(40, +q("part") || 0)), "dw/ep/" + id, Math.max(0, Math.min(40, +q("part") || 0)), "de");
+    if (q("list")) {
+      const hit = await kv.get("dw/list", "json"); if (hit && Date.now() - hit.at < 3 * 3600e3) return json({ ok: true, list: hit.list, cached: true });
+      const r = await fetch("https://learngerman.dw.com/de/langsam-gesprochene-nachrichten/s-60040332", { headers: DW_UA });
+      if (!r.ok) { if (hit) return json({ ok: true, list: hit.list, stale: true }); return json({ ok: false, error: "dw " + r.status }, 502); }
+      const h = await r.text(), seen = {}, list = [];
+      for (const m of h.matchAll(/href="\/de\/(\d{2})(\d{2})(\d{4})-langsam-gesprochene-nachrichten\/a-(\d+)"/g)) { if (seen[m[4]]) continue; seen[m[4]] = 1; list.push({ id: m[4], t: "Nachrichten vom " + m[1] + "." + m[2] + "." + m[3], d: m[3] + "-" + m[2] + "-" + m[1], img: "" }); }
+      list.sort((a, b) => (a.d < b.d ? 1 : -1));
+      if (!list.length) return json({ ok: false, error: "no episodes" }, 502);
+      await kv.put("dw/list", JSON.stringify({ at: Date.now(), list }));
+      return json({ ok: true, list });
+    }
+    if (!id) return json({ ok: false, error: "need list / ep / al" }, 400);
+    let ep = await kv.get("dw/ep/" + id, "json");
+    if (!ep) {
+      const r = await fetch("https://learngerman.dw.com/de/x/a-" + id, { headers: DW_UA }); if (!r.ok) return json({ ok: false, error: "dw " + r.status }, 502);
+      ep = dwParse(id, await r.text()); if (!ep.mp3 || !ep.lines.length) return json({ ok: false, error: "这一期不是慢速新闻（没有音频或文稿）" }, 404);
+      await kv.put("dw/ep/" + id, JSON.stringify(ep), { expirationTtl: 365 * 86400 });
+    }
+    if (q("zh")) {
+      const hit = await kv.get("dw/zh/" + id, "json"); if (hit) return json({ ok: true, lines: hit, cached: true });
+      const zh = await smeZh(ep.lines.map(l => l.t), env, "de");
+      if (zh.every(Boolean)) await kv.put("dw/zh/" + id, JSON.stringify(zh), { expirationTtl: 365 * 86400 });
+      return json({ ok: zh.some(Boolean), lines: zh });
+    }
+    return json(Object.assign({ ok: true }, ep));
   } catch (e) { return json({ ok: false, error: String(e && e.message || e) }, 502); }
 }
 async function sme(req, env, u) {
@@ -965,7 +1019,8 @@ async function stt(req, env) {
   try {
     const buf = await req.arrayBuffer(); if (!buf.byteLength) return json({ ok: false, error: "empty" }, 400); if (buf.byteLength > 4e6) return json({ ok: false, error: "too large" }, 413);
     const bytes = new Uint8Array(buf); let bin = ""; for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
-    try { const r = await env.AI.run("@cf/openai/whisper-large-v3-turbo", { audio: btoa(bin), language: "en" }); if (r && r.text != null) return json({ ok: true, text: String(r.text).trim() }); } catch (e) {}
+    const lang = new URL(req.url).searchParams.get("lang") === "de" ? "de" : "en"; // 🧩 练习课德语跟读：?lang=de
+    try { const r = await env.AI.run("@cf/openai/whisper-large-v3-turbo", { audio: btoa(bin), language: lang }); if (r && r.text != null) return json({ ok: true, text: String(r.text).trim() }); } catch (e) {}
     const r = await env.AI.run("@cf/openai/whisper", { audio: [...bytes] });
     return json({ ok: true, text: String((r && r.text) || "").trim() });
   } catch (e) { return json({ ok: false, error: String(e && e.message || e) }, 500); }
@@ -998,7 +1053,7 @@ async function tts(req, env, u, ctx) {
 
 // GET/POST /api/px?u=<网址>：中国大陆打不开的几个外部服务（维基百科、维基词典、BBC 的图和音频、YouTube 缩略图、英文词典、LanguageTool）经后台转一手
 // 只转名单里的网站；音频带 Range（能拖进度条）；图片在 Cloudflare 边缘缓存一天
-const PX_HOSTS = { "en.wikipedia.org": /^\/w\/api\.php$/, "zh.wikipedia.org": /^\/w\/api\.php$/, "commons.wikimedia.org": /^\/w\/api\.php$/, "upload.wikimedia.org": /^\//, "thumb.wikimedia.org": /^\//, "ichef.bbci.co.uk": /^\//, "downloads.bbc.co.uk": /\.mp3$/, "i.ytimg.com": /^\/vi\//, "api.dictionaryapi.dev": /^\/(api\/v2\/entries|media)\//, "api.languagetool.org": /^\/v2\/check$/, "en.wiktionary.org": /^\/(api\/rest_v1\/page\/definition\/|w\/api\.php$)/ }; // 维基词典：插件查词（释义、是不是固定短语）
+const PX_HOSTS = { "en.wikipedia.org": /^\/w\/api\.php$/, "zh.wikipedia.org": /^\/w\/api\.php$/, "commons.wikimedia.org": /^\/w\/api\.php$/, "upload.wikimedia.org": /^\//, "thumb.wikimedia.org": /^\//, "ichef.bbci.co.uk": /^\//, "downloads.bbc.co.uk": /\.mp3$/, "radiodownloaddw-a.akamaihd.net": /\.mp3$/, "i.ytimg.com": /^\/vi\//, "api.dictionaryapi.dev": /^\/(api\/v2\/entries|media)\//, "api.languagetool.org": /^\/v2\/check$/, "en.wiktionary.org": /^\/(api\/rest_v1\/page\/definition\/|w\/api\.php$)/ }; // 维基词典：插件查词（释义、是不是固定短语）
 async function px(req, u) {
   if (req.method === "OPTIONS") return new Response(null, { headers: { "access-control-allow-origin": "*", "access-control-allow-methods": "GET,POST", "access-control-allow-headers": "content-type,range" } });
   let t; try { t = new URL(u.searchParams.get("u") || ""); } catch (e) { return json({ ok: false, error: "bad url" }, 400); }
@@ -1007,7 +1062,7 @@ async function px(req, u) {
   const h = { "User-Agent": "ruilearning-family-english/1.0 (https://ruilearning-my.pages.dev; low-volume cached proxy)", "Accept": req.headers.get("accept") || "*/*" }, range = req.headers.get("range");
   if (range) h.Range = range; if (post) h["Content-Type"] = req.headers.get("content-type") || "application/x-www-form-urlencoded";
   const img = /^(upload\.wikimedia\.org|thumb\.wikimedia\.org|ichef\.bbci\.co\.uk|i\.ytimg\.com)$/.test(t.hostname);
-  let r; try { r = await fetch(t.toString(), { method: post ? "POST" : "GET", headers: h, body: post ? await req.text() : undefined, cf: !post && !range && t.hostname !== "downloads.bbc.co.uk" ? { cacheEverything: true, cacheTtl: 86400 } : undefined }); } catch (e) { return json({ ok: false, error: "fetch failed" }, 502); }
+  let r; try { r = await fetch(t.toString(), { method: post ? "POST" : "GET", headers: h, body: post ? await req.text() : undefined, cf: !post && !range && !/\.mp3$/.test(t.pathname) ? { cacheEverything: true, cacheTtl: 86400 } : undefined }); } catch (e) { return json({ ok: false, error: "fetch failed" }, 502); }
   const out = new Headers({ "access-control-allow-origin": "*", "cache-control": r.ok && !post ? "public, max-age=86400" : "no-store" });
   for (const k of ["content-type", "content-length", "content-range", "accept-ranges", "last-modified", "etag"]) { const v = r.headers.get(k); if (v) out.set(k, v); }
   return new Response(r.body, { status: r.status, headers: out });
@@ -1028,6 +1083,7 @@ export default {
     if (u.pathname === "/api/readurl") return readurl(req, env, u);
     if (u.pathname === "/api/news") return news(req, env, u);
     if (u.pathname === "/api/sme") return sme(req, env, u);
+    if (u.pathname === "/api/dw") return dw(req, env, u);
     if (u.pathname === "/api/ai") return ai(req, env);
     if (u.pathname === "/api/stt") return stt(req, env);
     if (u.pathname === "/api/tts") return tts(req, env, u, ctx);

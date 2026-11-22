@@ -82,7 +82,29 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
   ok(gaps.length >= 1 && gaps.every(c => M.sents[c.s].t.replace(c.word, "\u0000") === c.shown || c.shown.indexOf("\u0000") >= 0), "gap shown has blank");
   ok(gaps.every(c => c.s >= b0.range[0] && c.s < b0.range[1]) && picks.every(c => c.s >= b0.range[0] && c.s < b0.range[1]), "questions from this lesson");
   ok(JSON.stringify(D.build(M, 0).cards) === JSON.stringify(b0.cards), "same lesson → same questions");
-  ok(D.PROV.en && !D.PROV.de, "en source; de not yet");
+  ok(D.PROV.en && D.PROV.de && D.PROV.en.dialog && !D.PROV.de.dialog, "en + de sources");
+  // 新题型：排词成句、整句听写、看中文说、角色扮演（对话类）
+  const Md = Object.assign({}, M, { dialog: true });
+  const bd = D.build(Md, 0), kinds = bd.cards.map(c => c.k);
+  ok(["voc", "say", "pick", "ord", "gap", "dict", "zh", "role", "end"].every(k => kinds.includes(k)), "all card kinds " + [...new Set(kinds)]);
+  const seq = kinds.filter((k, i) => k !== kinds[i - 1]).join(); ok(seq === "voc,say,pick,ord,gap,dict,zh,role,end", "activity order " + seq);
+  const od = bd.cards.find(c => c.k === "ord");
+  ok(od.ch.join(" ") === Md.sents[od.s].t && od.ch.length <= 8 && od.sh.length === od.ch.length && od.sh.some((x, i) => x !== i), "ord chunks shuffled");
+  const role = bd.cards.find(c => c.k === "role"); ok(role.who.length === 2 && role.list.length === bd.range[1] - bd.range[0], "role play both speakers");
+  ok(!D.build(M, 0).cards.some(c => c.k === "role"), "no role play without dialog");
+  ok(bd.cards.filter(c => c.k === "zh").every(c => Md.sents[c.s].zh && !Md.sents[c.s].zhAll), "zh cards only with own translation");
+  // 拆块：太短不出、长句最多 8 块
+  ok(D.chunksOf("Hi there you") === null && D.chunksOf("one two three four five six seven eight nine ten eleven twelve thirteen").length <= 8, "chunksOf");
+  const sh = D.shufIdx(5, D.rng(3)); ok(sh.slice().sort().join() === "0,1,2,3,4" && sh.join() !== "0,1,2,3,4", "shufIdx");
+  // 难度：简单 3 个选项、没有整句听写；难：更多填空和整句听写
+  const e1 = D.build(Md, 1, 0, 1), e3 = D.build(Md, 1, 0, 3);
+  ok(e1.cards.filter(c => c.k === "pick").every(c => c.opts.length === 3) && !e1.cards.some(c => c.k === "dict"), "easy: 3 options, no dictation");
+  ok(e3.cards.filter(c => c.k === "dict").length === 2 && e3.cards.filter(c => c.k === "gap").length >= e1.cards.filter(c => c.k === "gap").length, "hard: 2 dictations, more gaps");
+  // 换一套题：同一节、不同的题；同一套还是一样
+  const v1 = D.build(M, 1, 1), v1b = D.build(M, 1, 1), v0 = D.build(M, 1);
+  const qs = b => b.cards.filter(c => c.k === "pick" || c.k === "gap").map(c => c.k + c.s + (c.word || "")).join();
+  ok(qs(v1) === qs(v1b) && qs(v1) !== qs(v0) && v1.v === 1, "variant changes questions, stays stable");
+  ok(v1.cards.every(c => c.k === "end" || c.k === "voc" || (c.s == null ? c.list : c.s >= v1.range[0] && c.s < v1.range[1])), "variant stays in lesson");
   // 句子够多时，选择题和填空不用同一句（选完再填就是送答案）
   const lines2 = Array.from({ length: 16 }, (_, i) => ({ who: "A", t: "Number " + i + " people traveled across beautiful mountains yesterday." }));
   const M2 = { id: "x", title: "T", sents: D.split(lines2).map(x => Object.assign(x, { zh: "", s: 0, e: 1 })), vocab: [] };

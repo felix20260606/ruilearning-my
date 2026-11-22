@@ -220,10 +220,10 @@
   // 每句的时间：后台 /api/sme?al=期号&part=N 用 Whisper 把原声分段转成「每个词在第几秒」（存 KV，只花一次），这里和文稿逐词对齐（最长公共子序列），
   // 每句从第一个对上的词开始、到下一句开头结束；对不上的句子按前后两句插值。听写对得少于 80% 的句子收进「❌ 错题本」
   const DK = {}; let segEnd = 0, segT = 0;
-  const ntok = t => String(t || "").toLowerCase().replace(/[’‘]/g, "'").replace(/[^a-z0-9'\s-]+/g, " ").split(/[\s-]+/).map(x => x.replace(/^'+|'+$/g, "")).filter(Boolean);
+  const ntok = t => String(t || "").toLowerCase().replace(/[’‘]/g, "'").replace(/[^\p{L}\p{N}'\s-]+/gu, " ").split(/[\s-]+/).map(x => x.replace(/^'+|'+$/g, "")).filter(Boolean);
   function splitSents(lines) {
     const out = [];
-    (lines || []).forEach((l, li) => (String(l.t || "").match(/[^.!?]+[.!?]+["'”’)]*|[^.!?]+$/g) || []).forEach(t => { t = t.trim(); if (/[a-z]/i.test(t)) { const p = out[out.length - 1]; if (p && p.li === li && ntok(t).length < 3) p.t += " " + t; else out.push({ who: l.who || "", t, li }); } }));
+    (lines || []).forEach((l, li) => (String(l.t || "").match(/[^.!?]+[.!?]+["'”’)]*|[^.!?]+$/g) || []).forEach(t => { t = t.trim(); if (/\p{L}/u.test(t)) { const p = out[out.length - 1]; if (p && p.li === li && ntok(t).length < 3) p.t += " " + t; else out.push({ who: l.who || "", t, li }); } }));
     return out;
   }
   function alignTimes(S, W) {

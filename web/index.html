@@ -87,7 +87,7 @@
    - NET.g(谷歌翻译网址)：谷歌通就用谷歌；不通就请后台翻（POST /api/ai {task:"tr"}，后台再用谷歌 / Workers AI），返回和谷歌一样格式的结果，原来的代码不用改
    - NET.isBad(网站)：比如视频页看 www.youtube.com 通不通，不通就提示要开 VPN */
 (function(){
-  var KEY="net:bad", PXH=/^(en\.wikipedia\.org|zh\.wikipedia\.org|commons\.wikimedia\.org|upload\.wikimedia\.org|thumb\.wikimedia\.org|ichef\.bbci\.co\.uk|downloads\.bbc\.co\.uk|i\.ytimg\.com|api\.dictionaryapi\.dev|api\.languagetool\.org)$/;
+  var KEY="net:bad", PXH=/^(en\.wikipedia\.org|zh\.wikipedia\.org|commons\.wikimedia\.org|upload\.wikimedia\.org|thumb\.wikimedia\.org|ichef\.bbci\.co\.uk|downloads\.bbc\.co\.uk|radiodownloaddw-a\.akamaihd\.net|i\.ytimg\.com|api\.dictionaryapi\.dev|api\.languagetool\.org)$/;
   function bad(){try{return JSON.parse(localStorage.getItem(KEY)||"{}")||{};}catch(e){return {};}}
   function save(b){try{localStorage.setItem(KEY,JSON.stringify(b));}catch(e){}}
   function host(u){try{return new URL(u,location.href).hostname;}catch(e){return "";}}
@@ -1985,16 +1985,16 @@ refresh(); // show seed words immediately, no waiting on storage
   sw(/^(basics|notes|lexam|rexam)$/.test(s)?s:'lexam'); // 新加的「听力模考」排最前、第一次打开默认它
 })();
 </script>
-<script src="lang.js?v=2"></script>
+<script src="lang.js?v=3"></script>
 <script src="tts.js?v=2"></script>
 <script src="watch.js?v=16"></script>
 <script src="channels.js?v=3"></script>
 <script src="pump.js?v=30"></script>
 <script src="speak.js?v=11"></script>
-<script src="daily.js?v=6"></script>
+<script src="daily.js?v=7"></script>
 <script src="read.js?v=11"></script>
-<script src="listen.js?v=12"></script>
-<script src="drill.js?v=1"></script>
+<script src="listen.js?v=13"></script>
+<script src="drill.js?v=2"></script>
 <script src="errbook.js?v=2"></script>
 <script src="exam.js?v=5"></script>
 <script src="import.js?v=1"></script>

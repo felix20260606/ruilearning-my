@@ -13,7 +13,7 @@
   const LANGS = {
     en: { code: "en", name: "英语", flag: "🇬🇧", bcp: "en-GB", ready: true, caseMatters: false, alt: {},
       stop: "a an the and or but if of to in on at for with from by as is are was were be been am do does did have has had i you he she it we they me him her us them my your his its our their this that these those there here so not no yes oh ok okay yeah well just very really what which who when where why how all some any can could will would should may might must shall then than too also about up down out into over".split(" ") },
-    de: { code: "de", name: "德语", flag: "🇩🇪", bcp: "de-DE", ready: false, caseMatters: true, alt: { "ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss" },
+    de: { code: "de", name: "德语", flag: "🇩🇪", bcp: "de-DE", ready: true, caseMatters: true, alt: { "ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss" },
       stop: "der die das den dem des ein eine einen einem einer eines und oder aber wenn von zu in im an am auf für mit aus bei nach als ist sind war waren sein bin bist hat haben hatte ich du er sie es wir ihr mich dich ihn uns euch mein dein sein unser nicht kein keine ja nein so auch noch nur schon sehr doch mal was wer wie wo wann warum dass da hier dort".split(" ") },
   };
   const KEY = "lang";
