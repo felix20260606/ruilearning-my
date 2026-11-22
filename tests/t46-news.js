@@ -64,7 +64,8 @@ const path = require("path");
   r = await call("/api/readurl?url=ftp%3A%2F%2Fx"); ok(r.status === 400, "readurl bad url 400");
   // 所有源都挂了
   globalThis.fetch = async () => new Response("", { status: 500 });
-  r = await call("/api/news?d=2026-11-22"); ok(r.status === 502 && !r.j.ok && !kv.has("news/2026-11-22"), "no feeds → 502, not cached");
+  // 用一个不会是「今天」的日期：上面「bad date → 今天」那次已经把今天的缓存好了（以前写死 2026-11-22，到了 11 月 22 日这天就撞上，测试就一直失败）
+  r = await call("/api/news?d=2000-01-01"); ok(r.status === 502 && !r.j.ok && !kv.has("news/2000-01-01"), "no feeds → 502, not cached");
   console.log(fail ? "t46 FAILED" : "t46 ok");
   process.exit(fail ? 1 : 0);
 })();
