@@ -207,9 +207,13 @@
 
   /* ---------- 生词本状态 ---------- */
   let book = new Map();
-  function loadBook() { book = new Map(); try { words.forEach(w => { const k = String(w.word || "").toLowerCase().replace(/[{}]/g, ""); if (k) book.set(k, w.status === "known" ? "kn" : "lr"); }); } catch (e) {} }
+  function loadBook() { book = new Map(); bookK = null; try { words.forEach(w => { const k = String(w.word || "").toLowerCase().replace(/[{}]/g, ""); if (k) book.set(k, w.status === "known" ? "kn" : "lr"); }); } catch (e) {} }
   function stems(w) { const o = [w]; if (/ies$/.test(w)) o.push(w.slice(0, -3) + "y"); if (/(es|ed)$/.test(w)) o.push(w.slice(0, -2), w.slice(0, -1)); if (/s$/.test(w)) o.push(w.slice(0, -1)); if (/ing$/.test(w)) o.push(w.slice(0, -3), w.slice(0, -3) + "e"); if (/(.)\1(ed|ing)$/.test(w)) o.push(w.replace(/(.)\1(ed|ing)$/, "$1")); return o; }
-  const statusOf = w => { for (const s of stems(w.toLowerCase())) if (book.has(s)) return book.get(s); return ""; };
+  // 生词本按原形建索引：收了 go，went / goes / going 也算；收了 bigger，big 也算（规则同插件：web/vs/vlevel.js 的 vsKeys，含不规则变化表；还没加载时退回简单去词尾）
+  let bookK = null;
+  const keysOf = w => { try { if (typeof vsKeys === "function") return [w].concat(vsKeys(w)); } catch (e) {} return stems(w); };
+  function bookIdx() { if (!bookK || bookK.fn !== typeof vsKeys) { bookK = new Map(); bookK.fn = typeof vsKeys; book.forEach((v, k) => keysOf(k).forEach(q => { if (!bookK.has(q) || v === "kn") bookK.set(q, v); })); } return bookK; }
+  const statusOf = w => { const B = bookIdx(); for (const s of keysOf(w.toLowerCase().replace(/’/g, "'"))) if (B.has(s)) return B.get(s); return ""; };
   const markup0 = t => esc(t).replace(WORD, w => '<span class="wt-w ' + statusOf(w.replace(/’/g, "'")) + '" data-w="' + w.replace(/’/g, "'") + '">' + w + "</span>");
   const markup = t => (VS ? vsHtml(t) : markup0(t));
 

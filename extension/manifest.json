@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "双语字幕 · 生词收集",
-  "version": "1.25.0",
+  "version": "1.25.1",
   "description": "YouTube / 哔哩哔哩双语字幕、悬停查词、字幕列表、单句循环，一键把生词收进你的生词本。",
   "permissions": [
     "storage",
