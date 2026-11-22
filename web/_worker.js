@@ -1297,8 +1297,25 @@ function meter(env, ctx, u) { // 包一层 env.AI：每次 run 记一笔；f = �
   function kick() { if (useT || !ctx || !ctx.waitUntil) return; useT = 1; ctx.waitUntil(new Promise(res => setTimeout(res, 15000)).then(() => useFlush(env))); }
   return Object.assign({}, env, { AI, __use: tag });
 }
+// 精确数字：Pages 设置里配了 CF_API_TOKEN（权限只要「Account Analytics: Read」）和 CF_ACCOUNT_ID 时，按天、按模型读 Cloudflare 自己记的用量
+// （GraphQL Analytics 的 aiInferenceAdaptiveGroups：sum.totalNeurons、count，按 date + modelId 分组；date 是 UTC 日期，和额度的一天一致）。
+// 功能分布（哪个功能花了多少）Cloudflare 不知道，还是用上面自己记的。读不到（没配、密钥错、接口出错）就整个退回自己记的估算，并把原因带给网页。
+async function cfUsage(env, from, to) {
+  const q = "query($a:String!,$s:Date!,$e:Date!){viewer{accounts(filter:{accountTag:$a}){aiInferenceAdaptiveGroups(limit:1000,filter:{date_geq:$s,date_leq:$e},orderBy:[date_ASC]){count sum{totalNeurons} dimensions{date modelId}}}}}";
+  const r = await fetch("https://api.cloudflare.com/client/v4/graphql", { method: "POST", headers: { Authorization: "Bearer " + env.CF_API_TOKEN, "Content-Type": "application/json" }, body: JSON.stringify({ query: q, variables: { a: String(env.CF_ACCOUNT_ID).trim(), s: from, e: to } }) });
+  const j = await r.json().catch(() => null);
+  if (!r.ok || !j) throw new Error("Cloudflare 接口 " + r.status);
+  if (j.errors && j.errors.length) throw new Error(String(j.errors[0].message || "GraphQL error").slice(0, 200));
+  const acc = j.data && j.data.viewer && j.data.viewer.accounts && j.data.viewer.accounts[0]; if (!acc) throw new Error("账户 ID 不对，或密钥没有这个账户的权限");
+  const days = {};
+  for (const g of acc.aiInferenceAdaptiveGroups || []) {
+    const d = g.dimensions && g.dimensions.date, m = String(g.dimensions && g.dimensions.modelId || "?").replace(/^@cf\/[^/]+\//, ""); if (!d) continue;
+    const D = days[d] || (days[d] = { m: {} }), a = D.m[m] || (D.m[m] = [0, 0]); a[0] += +g.count || 0; a[1] += +(g.sum && g.sum.totalNeurons) || 0;
+  }
+  return days;
+}
 async function usage(req, env) {
-  const cache = typeof caches !== "undefined" ? caches.default : null, ck = new Request("https://use.cache/v1");
+  const cache = typeof caches !== "undefined" ? caches.default : null, ck = new Request("https://use.cache/v2");
   if (cache) { const c = await cache.match(ck); if (c) return c; }
   const days = {}, from = new Date(Date.now() - 6 * 864e5).toISOString().slice(0, 10);
   if (env.CAPTIONS) {
@@ -1313,10 +1330,16 @@ async function usage(req, env) {
       }
     } while (cursor);
   }
-  for (const d in days) for (const g of ["m", "f"]) for (const n in days[d][g]) days[d][g][n][1] = Math.round(days[d][g][n][1]);
+  let src = "est", why = env.CF_API_TOKEN && env.CF_ACCOUNT_ID ? "" : "notset";
+  if (!why) try { // 模型用量换成 Cloudflare 的精确数字；自己记的估算留在 est 里对照
+    const C = await cfUsage(env, from, useDay());
+    for (const d of new Set(Object.keys(days).concat(Object.keys(C)))) { const D = days[d] || (days[d] = { m: {}, f: {}, e: 0 }); D.est = D.m; D.m = (C[d] && C[d].m) || {}; }
+    src = "cf";
+  } catch (e) { why = String(e && e.message || e).slice(0, 200); }
+  for (const d in days) for (const g of ["m", "f", "est"]) for (const n in days[d][g] || {}) days[d][g][n][1] = Math.round(days[d][g][n][1]);
   const now = new Date(), reset = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
-  const res = new Response(JSON.stringify({ ok: true, today: useDay(), limit: 10000, reset, days, at: Date.now() }), { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "max-age=30" } });
-  if (cache) await cache.put(ck, res.clone());
+  const res = new Response(JSON.stringify({ ok: true, src, why, today: useDay(), limit: 10000, reset, days, at: Date.now() }), { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "max-age=30" } });
+  if (cache) await cache.put(ck, res.clone()); // Cloudflare 的数字有几分钟延迟，缓存 30 秒够了
   return res;
 }
 

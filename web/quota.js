@@ -1,7 +1,9 @@
 /* 🔋 AI 额度面板（「📅 每日」最上面）：Workers AI 免费额度每天 1 万 neurons，00:00 UTC（北京 / 吉隆坡早上 8 点）重置。
-   数字来自 GET /api/usage（_worker.js 每次调用 AI 后按官方价格表折算、记在 KV「use/日期/…」，是估算；精确数字看 Cloudflare 后台）。
-   显示：今天用了多少 / 还剩多少、多久重置、每个模型用了多少、最近 7 天、剩下的额度还能做几次（单次花费优先用最近 7 天实际平均）。
-   用法：daily.js 画页面时放 '<div id="dy-quota">' + quotaHtml() + '</div>'；数据回来后这里自己重画那个格子。本机只存 quota:open（展开 / 收起） */
+   数字来自 GET /api/usage：src = "cf" 时模型用量是 Cloudflare 自己记的精确数字（Pages 配了 CF_API_TOKEN + CF_ACCOUNT_ID）；
+   否则是 _worker.js 每次调用 AI 后按官方价格表折算的估算（why 说明为什么没读到 Cloudflare）。功能分布（哪个功能花了多少）一直是网站自己记的。
+   显示：今天用了多少 / 还剩多少、多久重置、每个模型用了多少、最近 7 天；所有用到 AI 的功能按「听 · 说 · 读写 · 雅思入门」列出来，
+   每张卡写着剩下的额度还能做几次（单次花费优先用最近 7 天实际平均），点一下直接跳到那个功能。
+   用法：daily.js 画页面时放 '<div id="dy-quota">' + quotaHtml() + '</div>'；数据回来后这里自己重画那个格子。本机只存 quota:open（默认收起，"1" = 展开） */
 (function () {
   "use strict";
   if (window.quotaHtml) return;
@@ -16,16 +18,47 @@
     ["whisper", "Whisper", "语音识别备用"],
     ["m2m100-1.2b", "M2M100", "翻译（谷歌翻译不通时）"],
   ];
-  // 剩下的额度还能做几次：k = 功能（/api/usage 的 f），def = 没有实际数据时的估计（按官方价格和平均长度算），mul = 一次要调用几回
-  const ACTS = [
-    ["ai:write", "✍️", "写作批改", "篇", 250],
-    ["ai:newsimp", "📰", "新闻简单版 + 小测", "篇", 270],
-    ["ai:speak", "🗣", "口语话题点评", "次", 100],
-    ["ai:chat", "🤖", "AI 陪练", "轮", 70],
-    ["sme:al", "🎯", "BBC 精听对时间", "期", 47, 6],
-    ["tts", "🔊", "AI 语音（新句子）", "句", 80],
-    ["stt", "🎙", "跟读打分", "次", 4],
+  // 所有用到 AI 的地方：[功能（/api/usage 的 f）, 图标, 名字, 单位, 没有实测时的单次估计（按官方价格和平均长度算）, 一次调用几回, 跳到哪]
+  const GROUPS = [
+    ["🎧 听", [
+      ["sme:al", "🎯", "BBC 精听 · 逐词对时间", "期", 47, 6, "sme"],
+      ["ai:lquiz", "🧩", "BBC 听后小测", "次", 190, 1, "sme"],
+      ["sme:zh", "🀄", "BBC 中文对照（谷歌不通时）", "期", 30, 1, "sme"],
+      ["stt", "🎙", "练习课跟读打分", "次", 4, 1, "drill"],
+      ["ai:whymiss", "🤔", "为什么没听出来", "次", 50, 1, "drill"],
+      ["dw:al", "🇩🇪", "德语慢速新闻对时间", "期", 47, 6, "drill"],
+    ]],
+    ["🗣 说", [
+      ["ai:chat", "🤖", "AI 陪练", "轮", 70, 1, "s:chat"],
+      ["ai:chatsum", "📋", "陪练结束总结", "次", 135, 1, "s:chat"],
+      ["ai:speak", "🗣", "话题回答点评", "次", 100, 1, "s:topic"],
+      ["ai:judge", "⚡", "快问快答判断", "题", 40, 1, "s:quick"],
+      ["ai:howto", "🧰", "这句话怎么说", "次", 70, 1, "s:tools"],
+      ["tts", "🔊", "AI 语音（新句子）", "句", 80, 1, "s:daily"],
+    ]],
+    ["📖 读 · ✍️ 写", [
+      ["ai:newsimp", "📰", "新闻简单版 + 小测", "篇", 270, 1, "read"],
+      ["ai:write", "✍️", "写作批改", "篇", 250, 1, "write"],
+      ["ai:useword", "📘", "用生词造句（每日一练）", "句", 50, 1, "useword"],
+    ]],
+    ["🎓 雅思 · 🌱 入门", [
+      ["ai:exam", "📄", "雅思模考出题", "套", 400, 1, "ielts"],
+      ["ai:ieltsscript", "🎙", "雅思听力对话 / 独白", "篇", 260, 1, "ielts"],
+      ["ai:coach", "🧭", "AI 教练定 7 天计划", "次", 230, 1, "coach"],
+    ]],
   ];
+  function goTo(g) { // 跳到那个功能（英语的标签：window.enShow(标签, 小标签)）
+    const en = (w, sub) => { if (typeof window.enShow === "function") window.enShow(w, sub); try { window.scrollTo(0, 0); } catch (e) {} };
+    if (g.startsWith("s:")) { // 口语页：切过去以后点那一栏的按钮（同 daily.js 的 toSpeak）
+      const sec = g.slice(2); try { localStorage.setItem("speak:sec", JSON.stringify(sec)); } catch (e) {} en("speak");
+      let n = 0; const t = setInterval(() => { const b = document.querySelector('#view-speak [data-sec="' + sec + '"]'); if (b) { if (!b.classList.contains("on")) b.click(); clearInterval(t); } else if (++n > 30) clearInterval(t); }, 100);
+      return;
+    }
+    if (g === "sme" || g === "drill") return en("listen", g);
+    if (g === "coach") return en("basic", "speak");
+    if (g === "useword") { const el = document.querySelector("#view-daily [data-sent]"); if (el) el.scrollIntoView({ block: "center" }); return; }
+    en(g);
+  }
   const FEAT = { tts: "🔊 AI 语音", stt: "🎙 跟读打分", "sme:al": "🎯 BBC 对时间", "sme:zh": "🀄 BBC 中文", "dw:al": "🇩🇪 DW 对时间", "dw:zh": "🇩🇪 DW 中文", "ai:write": "✍️ 写作批改", "ai:newsimp": "📰 简单版", "ai:chat": "🤖 陪练", "ai:chatsum": "🤖 陪练总结", "ai:speak": "🗣 话题点评", "ai:judge": "⚡ 快问快答", "ai:coach": "🧭 AI 教练", "ai:howto": "🧰 怎么说", "ai:useword": "📘 用生词", "ai:exam": "🎓 出题", "ai:lquiz": "🎧 听力题", "ai:ieltsscript": "🎓 听力模考", "ai:whymiss": "🤔 为什么没听出", "ai:tr": "🀄 翻译" };
   const CSS = `
   .qa{background:linear-gradient(140deg,color-mix(in srgb,var(--ui-pur) 16%,var(--ui-surface)) 0%,var(--ui-surface) 55%);border:1px solid color-mix(in srgb,var(--ui-pur) 38%,var(--ui-line));border-radius:18px;padding:14px 16px;margin:6px 0 14px}
@@ -53,8 +86,13 @@
   .qa-wk i em{font-style:normal;font-size:11px;color:var(--ui-muted);margin-top:4px}.qa-wk i.td em{color:var(--ui-ink);font-weight:800}
   .qa-wk i:hover u{outline:2px solid var(--ui-pur-line)}
   .qa-wks{font-size:12px;color:var(--ui-muted);margin-top:8px;line-height:1.6}
-  .qa-acts{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:14px}
-  .qa-act{background:var(--ui-surface-2);border:1px solid var(--ui-line);border-radius:12px;padding:9px 11px}
+  .qa-grp{margin-top:14px}.qa-grp h5{margin:0 0 6px;font-size:13px;color:var(--ui-ink-2);font-weight:800}
+  .qa-acts{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+  .qa-act{position:relative;display:block;text-align:left;width:100%;background:var(--ui-surface-2);border:1px solid var(--ui-line);border-radius:12px;padding:9px 26px 9px 11px;color:inherit;font:inherit;cursor:pointer}
+  .qa-act:hover{border-color:var(--ui-pur-line)}.qa-act::after{content:"›";position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--ui-muted);font-size:18px}
+  .qa-act .u{font-size:11px;color:var(--ui-pur-text);margin-top:2px}
+  .qa-src{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:1px 9px;font-size:11.5px;font-weight:800}.qa-src.cf{background:color-mix(in srgb,var(--ui-green) 20%,transparent);color:var(--ui-green)}.qa-src.est{background:var(--ui-surface-3,#3a3d43);color:var(--ui-ink-2)}
+  .qa-set{margin-top:12px;background:var(--ui-surface-2);border:1px dashed var(--ui-line-2);border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.7;color:var(--ui-ink-2)}.qa-set summary{cursor:pointer;font-weight:800;color:var(--ui-ink)}.qa-set ol{margin:6px 0 0;padding-left:20px}.qa-set code{color:var(--ui-orange)}.qa-set a{color:var(--ui-pur-text)}
   .qa-act .n{font-size:22px;font-weight:900;font-variant-numeric:tabular-nums}.qa-act .n small{font-size:12px;font-weight:600;color:var(--ui-muted);margin-left:3px}
   .qa-act .t{font-size:13px;margin-top:1px}.qa-act .c{font-size:11.5px;color:var(--ui-muted);margin-top:2px}
   .qa-ft{display:flex;flex-wrap:wrap;gap:4px 8px;margin-top:10px;font-size:12px;color:var(--ui-muted)}.qa-ft span{background:var(--ui-surface-2);border-radius:999px;padding:2px 9px}
@@ -62,7 +100,7 @@
   @media(max-width:640px){.qa-grid{grid-template-columns:1fr}.qa-big{font-size:34px}.qa-hero{grid-template-columns:1fr}.qa-side{text-align:left}}`;
 
   let J = null, at = 0, busy = false, err = "";
-  const isOpen = () => { try { return localStorage.getItem("quota:open") !== "0"; } catch (e) { return true; } };
+  const isOpen = () => { try { return localStorage.getItem("quota:open") === "1"; } catch (e) { return false; } }; // 默认收起
   function load(force) {
     if (busy || (!force && Date.now() - at < 60e3)) return; busy = true;
     fetch("/api/usage").then(r => r.json()).then(j => { if (j && j.ok) { J = j; err = ""; } else err = "读不到用量"; }).catch(() => { err = "读不到用量（网络不通）"; })
@@ -77,15 +115,17 @@
     let C = document.getElementById("qa-css"); if (!C) { C = document.createElement("style"); C.id = "qa-css"; C.textContent = CSS; document.head.append(C); }
     load();
     const open = isOpen();
-    const head = (t, extra) => '<div class="qa-h"><b>🔋 AI 额度</b><small>' + t + '</small><span class="sp"></span>' + (extra || "") + '<button class="qa-tg" data-qa="tg">' + (open ? "收起" : "展开") + "</button></div>";
+    const badge = J ? (J.src === "cf" ? '<span class="qa-src cf" title="模型用量来自 Cloudflare 后台（几分钟延迟）">✓ Cloudflare 精确</span>' : '<span class="qa-src est" title="' + esc(J.why === "notset" ? "还没接 Cloudflare：展开后看怎么接" : "读 Cloudflare 出错：" + (J.why || "")) + '">估算</span>') : "";
+    const head = (t, extra) => '<div class="qa-h"><b>🔋 AI 额度</b>' + badge + '<small>' + t + '</small><span class="sp"></span>' + (extra || "") + '<button class="qa-tg" data-qa="tg">' + (open ? "收起" : "展开 ▾") + "</button></div>";
     if (!J) return '<div class="qa">' + head(err || "正在读今天的用量…") + "</div>";
     const T = day(J, J.today), used = sum(T.m), rest = Math.max(0, LIMIT - used), pct = Math.min(100, used / LIMIT * 100);
     const lv = pct >= 100 ? "full" : pct >= 80 ? "warn" : "";
     const side = '<div class="qa-side">总量 <b>' + fmt(LIMIT) + "</b> / 天<br>已用 <b>" + fmt(used) + "</b>（" + Math.round(pct) + "%）<br>" + resetClock(J.reset) + " 重置 · 还有 " + left(J.reset) + "</div>";
-    if (!open) return '<div class="qa">' + head("今天还剩 " + fmt(rest) + " / " + fmt(LIMIT) + " · " + left(J.reset) + "后重置") + '<div class="qa-bar ' + lv + '" style="margin-top:8px"><u style="width:' + pct + '%"></u></div></div>';
+    if (!open) return '<div class="qa">' + head('今天还剩 <b style="color:var(--ui-ink);font-size:14px">' + fmt(rest) + "</b> / " + fmt(LIMIT) + " · " + left(J.reset) + "后重置") + '<div class="qa-bar ' + lv + '" style="margin-top:8px"><u style="width:' + pct + '%"></u></div></div>';
     // 每个模型
-    const maxM = Math.max(1, ...MODELS.map(m => (T.m[m[0]] || [0, 0])[1]));
-    const models = MODELS.map(([k, n, s]) => { const x = T.m[k] || [0, 0]; return '<div class="qa-m' + (x[1] ? "" : " zero") + '"><div><b>' + esc(n) + "</b><small>" + esc(s) + '</small></div><div class="v">' + fmt(x[1]) + "<small> · " + x[0] + ' 次</small></div><div class="tr"><u style="width:' + (x[1] / maxM * 100) + '%"></u></div></div>'; }).join("");
+    const ML = MODELS.concat(Object.keys(T.m).filter(k => !MODELS.some(m => m[0] === k)).map(k => [k, k, "其它模型"]));
+    const maxM = Math.max(1, ...ML.map(m => (T.m[m[0]] || [0, 0])[1]));
+    const models = ML.map(([k, n, s]) => { const x = T.m[k] || [0, 0]; return '<div class="qa-m' + (x[1] ? "" : " zero") + '"><div><b>' + esc(n) + "</b><small>" + esc(s) + '</small></div><div class="v">' + fmt(x[1]) + "<small> · " + x[0] + ' 次</small></div><div class="tr"><u style="width:' + (x[1] / maxM * 100) + '%"></u></div></div>'; }).join("");
     // 最近 7 天
     const ds = Array.from({ length: 7 }, (_, i) => new Date(Date.parse(J.today + "T00:00:00Z") - (6 - i) * 864e5).toISOString().slice(0, 10));
     const vals = ds.map(d => sum(day(J, d).m)), top = Math.max(LIMIT, ...vals) * 1.05, WD = "日一二三四五六";
@@ -93,21 +133,30 @@
     const wk = '<div class="qa-wk"><div class="lim" style="bottom:' + (LIMIT / top * 100) + '%"><span>1 万</span></div>' + ds.map((d, i) => '<i class="' + (d === J.today ? "td" : "") + '" title="' + d + "（UTC）：" + fmt(vals[i]) + " neurons" + (day(J, d).e ? "，" + day(J, d).e + " 次失败" : "") + '"><u style="height:' + (vals[i] / top * 100) + '%"></u><em>' + (d === J.today ? "今天" : WD[new Date(d + "T12:00:00Z").getUTCDay()]) + "</em></i>").join("") + "</div>";
     // 剩下的还能做几次：单次花费 = 最近 7 天实际平均（至少 2 次才用），没有就用估计值
     const F7 = {}; ds.forEach(d => { const f = day(J, d).f; for (const k in f) { const a = F7[k] || (F7[k] = [0, 0]); a[0] += f[k][0]; a[1] += f[k][1]; } });
-    const acts = ACTS.map(([k, ic, t, unit, def, mul]) => { const a = F7[k], real = a && a[0] >= 2 && a[1] > 0, per = (real ? a[1] / a[0] : def) * (mul || 1); return '<div class="qa-act"><div class="n">' + fmt(Math.floor(rest / Math.max(1, per))) + "<small>" + unit + '</small></div><div class="t">' + ic + " " + esc(t) + '</div><div class="c">每' + unit + "约 " + fmt(per) + (real ? "（实测）" : "（估计）") + "</div></div>"; }).join("");
+    const TF = T.f || {};
+    const acts = GROUPS.map(([gt, L]) => '<div class="qa-grp"><h5>' + gt + '</h5><div class="qa-acts">' + L.map(([k, ic, t, unit, def, mul, go]) => { const a = F7[k], real = a && a[0] >= 2 && a[1] > 0, per = (real ? a[1] / a[0] : def) * (mul || 1), td = TF[k]; return '<button class="qa-act" data-qgo="' + go + '" title="去' + esc(t) + '"><div class="n">' + fmt(Math.floor(rest / Math.max(1, per))) + "<small>" + unit + '</small></div><div class="t">' + ic + " " + esc(t) + '</div><div class="c">每' + unit + "约 " + fmt(per) + (real ? "（实测）" : "（估计）") + "</div>" + (td && td[1] >= 1 ? '<div class="u">今天用了 ' + fmt(td[1]) + " · " + td[0] + " 次</div>" : "") + "</button>"; }).join("") + "</div></div>").join("");
+    const setup = J.src === "cf" ? "" : '<details class="qa-set"' + (J.why && J.why !== "notset" ? " open" : "") + '><summary>' + (J.why === "notset" ? "🔌 接上 Cloudflare 精确数据（现在是网站自己估的）" : "⚠️ 读 Cloudflare 数据出错，暂时用估算：" + esc(J.why)) + "</summary><ol>" +
+      '<li>打开 <a href="https://dash.cloudflare.com/profile/api-tokens" target="_blank" rel="noopener">Cloudflare → 我的个人资料 → API 令牌</a> →「创建令牌」→ 最下面「创建自定义令牌」</li>' +
+      "<li>权限选 <b>帐户 · 帐户分析 · 读取</b>（Account · Account Analytics · Read），帐户资源选你的帐户，其它都不用加 → 创建，复制令牌（只显示一次）</li>" +
+      "<li>帐户 ID：Cloudflare 首页「Workers 和 Pages」右边能看到「帐户 ID」，复制</li>" +
+      "<li>Pages 项目 → 设置 → 变量和机密 → 添加两个：<code>CF_API_TOKEN</code>（类型选「机密」，填令牌）、<code>CF_ACCOUNT_ID</code>（填帐户 ID）→ 保存</li>" +
+      "<li>重新部署一次（部署记录里最新那条点「重试部署」，或者随便推一个提交）就生效，这里的标签会变成「✓ Cloudflare 精确」</li></ol>" +
+      '<div style="margin-top:6px;color:var(--ui-muted);font-size:12px">令牌只能读用量统计，改不了任何东西；只存在 Cloudflare 的机密里，网页和代码里都看不到。</div></details>';
     const fs = Object.entries(T.f || {}).filter(x => x[1][1] >= 1).sort((a, b) => b[1][1] - a[1][1]).slice(0, 8);
     const feats = fs.length ? '<div class="qa-ft">今天花在：' + fs.map(([k, x]) => "<span>" + esc(FEAT[k] || k) + " " + fmt(x[1]) + "</span>").join("") + "</div>" : "";
     return '<div class="qa">' + head("Workers AI 免费额度 · 每天 " + resetClock(J.reset) + " 重置") +
-      '<div class="qa-hero"><div><div class="qa-big">' + fmt(rest) + "<small>neurons 今天还剩</small></div><div class=\"qa-cap\">按官方价格估算 · 每分钟刷新</div></div>" + side +
+      '<div class="qa-hero"><div><div class="qa-big">' + fmt(rest) + "<small>neurons 今天还剩</small></div><div class=\"qa-cap\">" + (J.src === "cf" ? "Cloudflare 后台的数字（有几分钟延迟）" : "网站按官方价格估算") + " · 每分钟刷新</div></div>" + side +
       '<div class="qa-bar ' + lv + '"><u style="width:' + pct + '%"></u></div><div class="qa-scale"><span>0</span><span>5,000</span><span>10,000</span></div>' +
       (lv ? '<div class="qa-st ' + lv + '">' + (lv === "full" ? "⛔ 今天的额度用完了：AI 批改、AI 语音这些会失败，" + resetClock(J.reset) + " 以后恢复（已录好的语音、文稿、练习都还能用）" : "⚠️ 快用完了：先做不花额度的（背单词、听已对好时间的节目、读文章）") + "</div>" : "") +
       (T.e ? '<div class="qa-st warn">今天有 ' + T.e + " 次 AI 调用失败（多半是额度用完）</div>" : "") + "</div>" +
-      '<div class="qa-acts">' + acts + "</div>" + feats +
-      '<div class="qa-grid"><div class="qa-box"><h4>每个模型今天用了多少<small>neurons · 次数</small></h4>' + models + "</div>" +
+      acts + feats +
+      '<div class="qa-grid"><div class="qa-box"><h4>每个模型今天用了多少<small>neurons · 次数' + (J.src === "cf" ? " · Cloudflare 数据" : " · 估算") + "</small></h4>" + models + "</div>" +
       '<div class="qa-box"><h4>最近 7 天<small>按 UTC 日期，虚线 = 每天 1 万</small></h4>' + wk + '<div class="qa-wks">前 6 天平均每天 ' + fmt(avgN) + "（" + Math.round(avgN / LIMIT * 100) + "%）。每天早上 6:30 GitHub 会自动用当天剩下的额度预先生成 AI 语音（最多约 8,200），所以白天剩下的不会浪费。</div></div></div>" +
-      '<div class="qa-note">「还能做几次」= 今天剩下的 ÷ 每次大约花多少；已经生成过的（AI 语音、BBC 对过时间、新闻简单版）再打开不花额度。数字是网站后台按 <a href="https://developers.cloudflare.com/workers-ai/platform/pricing/" target="_blank" rel="noopener">官方价格</a> 估的，精确用量看 Cloudflare 后台「Workers AI」。</div></div>';
+      '<div class="qa-note">「还能做几次」= 今天剩下的 ÷ 每次大约花多少，点卡片直接去做；已经生成过的（AI 语音、BBC 对过时间、新闻简单版、出过的题）再打开不花额度。' + (J.src === "cf" ? "模型用量是 Cloudflare 记的；「今天用了」和单次花费是网站自己按功能记的估算，加起来和 Cloudflare 的数可能差一点。" : '数字是网站后台按 <a href="https://developers.cloudflare.com/workers-ai/platform/pricing/" target="_blank" rel="noopener">官方价格</a> 估的。') + "</div>" + setup + "</div>";
   }
   document.addEventListener("click", e => {
-    const b = e.target.closest("[data-qa]"); if (!b) return;
+    const b = e.target.closest("[data-qa],[data-qgo]"); if (!b) return;
+    if (b.dataset.qgo) { goTo(b.dataset.qgo); return; }
     if (b.dataset.qa === "tg") { try { localStorage.setItem("quota:open", isOpen() ? "0" : "1"); } catch (x) {} paint(); }
   });
   setInterval(() => { if (!document.hidden && document.getElementById("dy-quota") && document.documentElement.classList.contains("show-daily")) { load(); paint(); } }, 60e3);
