@@ -129,6 +129,20 @@ const path = require("path");
   // ---- 📥 离线下载转 mp3：只转打开过（KV 里有）的那期 ----
   r = await call("/api/sme?mp3=" + encodeURIComponent("6-minute-english_2026/ep-999999")); ok(r.status === 409, "mp3 proxy needs a known episode");
 
+  // ---- 🀄 翻译兜底：谷歌（和 MyMemory）全拦了 → Workers AI 翻译模型；它也翻不出的 → 大模型成批翻；谷歌拦了以后 10 分钟内不再去问 ----
+  {
+    const realFetch = globalThis.fetch, realRun = env.AI.run; let gCalls = 0;
+    globalThis.fetch = async (u, o) => { const s = String((u && u.url) || u); if (/google|mymemory/.test(s)) { if (/google/.test(s)) gCalls++; return new Response("blocked", { status: 429 }); } return realFetch(u, o); };
+    env.AI.run = async (m, o) => m.includes("m2m100") ? (/FAILM2M/.test(o.text) ? Promise.reject(new Error("x")) : { translated_text: "译:" + o.text }) : realRun(m, o);
+    aiOut = { zh: ["大模型翻的"] };
+    r = await call("/api/ai", "POST", { task: "tr", texts: ["Hello there.", "FAILM2M line", ""] });
+    ok(r.j.ok && r.j.zh[0] === "译:Hello there." && r.j.zh[1] === "大模型翻的" && r.j.zh[2] === "", "tr fallback " + JSON.stringify(r.j));
+    const g1 = gCalls; r = await call("/api/ai", "POST", { task: "tr", texts: ["Good morning."] });
+    ok(r.j.zh[0] === "译:Good morning." && gCalls === g1, "google skipped while down " + gCalls + " " + g1);
+    r = await call("/api/ai", "POST", { task: "tr", texts: [] }); ok(r.status === 400, "tr empty");
+    globalThis.fetch = realFetch; env.AI.run = realRun;
+  }
+
   console.log(fail ? fail + " FAILED" : "t49 auth + exam: all passed");
   process.exit(fail ? 1 : 0);
 })();

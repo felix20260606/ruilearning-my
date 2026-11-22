@@ -405,11 +405,14 @@ async function mine(req, env, u) {
 // → { ok, word, phon, audio, zh 常用中文, zhs:[{pos, terms}], en:[{pos, def, ex}], examples:[[英, 中]] }，大家共用，KV 缓存 30 天（"d/词"）
 // 来源都是免费的：中文 = 谷歌翻译（插件同款接口），音标 / 英文释义 / 发音 = dictionaryapi.dev，例句 = Tatoeba（同 /api/sent）
 const UA = { "User-Agent": "ruilearning-my (personal study site)" };
+let G_DOWN = 0; // 谷歌拦了这台机房（403 / 429 / 连不上）：10 分钟内不再去问，省得每次白等几秒
 async function gtrans(text, tl, bd) {
-  for (const host of ["translate.googleapis.com", "clients5.google.com"]) { // 后台机房的 IP 有时被谷歌拦：换个入口再试
+  let blocked = 0;
+  for (const host of Date.now() < G_DOWN ? [] : ["translate.googleapis.com", "clients5.google.com"]) { // 后台机房的 IP 有时被谷歌拦：换个入口再试
     try { const r = await fetch("https://" + host + "/translate_a/single?client=" + (host[0] === "c" ? "dict-chrome-ex" : "gtx") + "&sl=en&tl=" + tl + "&dt=t" + (bd ? "&dt=bd" : "") + "&dj=1&q=" + encodeURIComponent(text), { headers: { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36" } });
-      if (r.ok) { const j = await r.json(); if (j && (j.sentences || []).some(x => x.trans)) return j; } } catch (e) {}
+      if (r.ok) { const j = await r.json(); if (j && (j.sentences || []).some(x => x.trans)) return j; } else if (r.status === 403 || r.status === 429 || r.status >= 500) blocked++; } catch (e) { blocked++; }
   }
+  if (blocked >= 2) G_DOWN = Date.now() + 10 * 60000;
   try { // 再不行用 MyMemory（免费，每天有额度）
     const r = await fetch("https://api.mymemory.translated.net/get?q=" + encodeURIComponent(text) + "&langpair=en|" + tl, { headers: UA });
     const j = r.ok && (await r.json()), t = j && j.responseData && j.responseData.translatedText;
@@ -564,7 +567,21 @@ function smeIndex(html, slug) {
   return out;
 }
 // 一批英文句子 → 一样多的中文：按行拼起来（每段不超过 1500 字）交给谷歌翻译，行数对不上就拆小再试
-async function smeZh(arr) {
+// Workers AI 翻译（不靠谷歌）：先用专门的翻译模型 m2m100 一句一句翻，还没出来的再让大模型成批翻
+async function aiTrans(env, arr, idx) {
+  const out = {}; if (!env.AI || !idx.length) return out;
+  const one = async i => { try { const r = await env.AI.run("@cf/meta/m2m100-1.2b", { text: clip(arr[i], 1000), source_lang: "en", target_lang: "zh" }); const t = r && String(r.translated_text || "").trim(); if (t && t !== arr[i].trim()) out[i] = t; } catch (e) {} };
+  for (let k = 0; k < idx.length; k += 8) await Promise.all(idx.slice(k, k + 8).map(one));
+  const left = idx.filter(i => !out[i]);
+  for (let k = 0; k < left.length && k < 120; k += 15) {
+    const part = left.slice(k, k + 15); let got = null;
+    await aiJson(env, [{ role: "system", content: 'Translate each English text into natural Simplified Chinese. Reply with ONLY JSON {"zh":[...]} with exactly one Chinese string per input, same order.' }, { role: "user", content: JSON.stringify(part.map(i => clip(arr[i], 800))) }],
+      o => Array.isArray(o && o.zh) && o.zh.length === part.length && o.zh.every(x => typeof x === "string") && !!(got = o.zh), 2500).catch(() => null);
+    if (got) part.forEach((i, n) => { if (got[n].trim()) out[i] = got[n].trim(); });
+  }
+  return out;
+}
+async function smeZh(arr, env) {
   const out = arr.map(() => "");
   async function run(idx, depth) {
     const text = idx.map(i => arr[i].replace(/\s+/g, " ")).join("\n"), j = await gtrans(text, "zh-CN");
@@ -577,6 +594,8 @@ async function smeZh(arr) {
   arr.forEach((s, i) => { if (!s) return; if (cur.length && len + s.length > 1500) { chunks.push(cur); cur = []; len = 0; } cur.push(i); len += s.length + 1; });
   if (cur.length) chunks.push(cur);
   for (let i = 0; i < chunks.length; i += 4) await Promise.all(chunks.slice(i, i + 4).map(c => run(c, 0).catch(() => {})));
+  const miss = arr.map((t, i) => (t && !out[i] ? i : -1)).filter(i => i >= 0); // 谷歌没翻出来的：用 Workers AI 补
+  if (miss.length && env) { const a = await aiTrans(env, arr, miss); for (const i in a) out[i] = a[i]; }
   return out;
 }
 // GET /api/sme?al=<期号>&part=N → { ok, part, parts, total, words:[[词, 开始秒, 结束秒]] }：逐句精听用的「每个词在第几秒」
@@ -635,7 +654,7 @@ async function sme(req, env, u) {
     const zk = "sme/zh/" + ep; if (!fresh) { const c = await env.CAPTIONS.get(zk, "json"); if (c) return json(c); }
     const q = x.q || [], V = x.vocab || [], H = x.heads || [], Ls = x.lines || [];
     const all = [x.intro || "", ...q, ...V.map(v => v[1] || ""), ...V.map(v => v[2] || ""), ...H.map(h => h[0]), ...Ls.map(l => l.t)];
-    const zh = await smeZh(all); let i = 1; const take = n => { const r = zh.slice(i, i + n); i += n; return r; };
+    const zh = await smeZh(all, env); let i = 1; const take = n => { const r = zh.slice(i, i + n); i += n; return r; };
     const out = { ok: true, id: ep, intro: zh[0], q: take(q.length), vocab: take(V.length), vex: take(V.length), heads: take(H.length), lines: take(Ls.length) };
     const got = zh.filter(Boolean).length; if (!got) return json({ ok: false, error: "translate failed" }, 502);
     if (got >= all.filter(Boolean).length * 0.9) await env.CAPTIONS.put(zk, JSON.stringify(out), { expirationTtl: 180 * 86400 }); // 大部分翻好了才存，没翻全的下次再试
@@ -875,6 +894,11 @@ async function ai(req, env) {
       if (!r.ok || !got) return json({ ok: false, error: r.error || "bad output" }, 502);
       got.model = r.model; if (kv) await kv.put(ck, JSON.stringify(got), { expirationTtl: 180 * 86400 });
       return json(Object.assign({ ok: true }, got));
+    }
+    if (b.task === "tr") { // 浏览器翻不了（谷歌连不上）时最后一道：后台翻一批句子（谷歌 → Workers AI）
+      const T = (Array.isArray(b.texts) ? b.texts : []).slice(0, 200).map(x => clip(x, 1000));
+      if (!T.length || T.join("").length > 40000) return json({ ok: false, error: "bad body" }, 400);
+      const zh = await smeZh(T, env); return json({ ok: zh.some(Boolean), zh });
     }
     if (b.task === "lquiz") {
       const t = clip(b.text, 12000).trim(); if (t.split(/\s+/).length < 150) return json({ ok: false, error: "too short" }, 400);

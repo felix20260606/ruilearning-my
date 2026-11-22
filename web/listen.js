@@ -2,7 +2,7 @@
    🐢 慢速对话 Real Easy English / 💬 地道说法 The English We Speak / 📰 新闻英语 Learning English from the News / 📻 6 分钟英语 6 Minute English
    - 顶上一排切换栏目（记住上次选的 sme:s）；每个栏目：最新（或还没听的最新）一期 + 列表
    - 一期页面：播放器（慢 / 正常 / 快）、简介、本期问题、新闻标题、生词表（＋ 加生词本，例句取节目里那一句）、文稿按说话人分行（默认折起来，先盲听）
-     「🀄 中文」开关（sme:zh）：所有英文下面加中文（后台用谷歌翻译，一期翻一次存起来；后台被谷歌拦了就在浏览器里直接翻）
+     「🀄 中文」开关（sme:zh）：所有英文下面加中文（一层层兜底：本机存的 sme:zhc → 后台 KV / 谷歌 / Workers AI → 浏览器直接问谷歌 → 后台 AI 补缺的句子；还缺就显示「还有 N 句没翻出来 · 重试」，20 秒后自动再试一次）
      「📰 在阅读里打开文稿」= 用阅读页打开（按水平上色、点词查词、译文）
    - 播放中切到别的页面：播放器变成底部悬浮条继续播（↩ 回到节目 / ✕ 关掉）；同一个 <audio> 元素在页面和悬浮条之间挪，不会断
    - 听完（播放到 90% 以上，或点「✓ 听完了」）记进 sme:done {期号: 时间}，同步到后台 /api/mine k=sme；「📅 每日」的「听」今天听完一期就自动打勾
@@ -181,19 +181,35 @@
     for (let i = 0; i < chunks.length; i += 3) await Promise.all(chunks.slice(i, i + 3).map(c => go(c).catch(() => {})));
     return out;
   }
-  async function zhLocal(ep) { // 和后台 /api/sme?zh=1 拼的顺序一样
-    const q = ep.q || [], V = ep.vocab || [], H = ep.heads || [], Ls = ep.lines || [];
-    const all = [ep.intro || "", ...q, ...V.map(v => v[1] || ""), ...V.map(v => v[2] || ""), ...H.map(h => h[0]), ...Ls.map(l => l.t)];
-    const zh = await gtx(all); if (!zh.some(Boolean)) return null; let i = 1; const take = n => { const r = zh.slice(i, i + n); i += n; return r; };
-    return { ok: true, id: ep.id, intro: zh[0], q: take(q.length), vocab: take(V.length), vex: take(V.length), heads: take(H.length), lines: take(Ls.length), local: true };
-  }
-  async function loadZh(id) {
-    if (ZH[id] || zhBusy[id]) return; zhBusy[id] = true;
-    let j = null; try { j = await (await fetch("/api/sme?zh=1&ep=" + encodeURIComponent(id))).json(); } catch (e) {}
-    if (!(j && j.ok) && EPS[id]) { try { j = await zhLocal(EPS[id]); } catch (e) { j = null; } }
-    zhBusy[id] = false; if (j && j.ok) ZH[id] = j; else tip("中文翻译没取到（网络问题？），过一会儿再点一次「🀄 中文」");
+  // 一期要翻的所有文字（顺序和后台 /api/sme?zh=1 一样）↔ 翻好的结构
+  const zhAll = ep => [ep.intro || "", ...(ep.q || []), ...(ep.vocab || []).map(v => v[1] || ""), ...(ep.vocab || []).map(v => v[2] || ""), ...(ep.heads || []).map(h => h[0]), ...(ep.lines || []).map(l => l.t)];
+  const zhFlat = (j, ep) => { const pad = (a, n) => Array.from({ length: n }, (_, i) => (a || [])[i] || ""); const V = (ep.vocab || []).length; return [j.intro || "", ...pad(j.q, (ep.q || []).length), ...pad(j.vocab, V), ...pad(j.vex, V), ...pad(j.heads, (ep.heads || []).length), ...pad(j.lines, (ep.lines || []).length)]; };
+  function zhBuild(ep, zh) { let i = 1; const take = n => { const r = zh.slice(i, i + n); i += n; return r; }, V = (ep.vocab || []).length; return { ok: true, id: ep.id, intro: zh[0], q: take((ep.q || []).length), vocab: take(V), vex: take(V), heads: take((ep.heads || []).length), lines: take((ep.lines || []).length) }; }
+  const zhMiss = id => { const ep = EPS[id], j = ZH[id]; if (!ep) return 0; if (!j) return zhAll(ep).filter(Boolean).length; const f = zhFlat(j, ep); return zhAll(ep).filter((t, i) => t && !f[i]).length; };
+  const ZHC = () => LG("sme:zhc", {}) || {}; // 这台设备翻好的（最近 15 期）：再打开马上有，没网也有
+  function zhKeep(id, j) { const C = ZHC(); C[id] = { j, at: Date.now() }; const ks = Object.keys(C).sort((a, b) => C[b].at - C[a].at); ks.slice(15).forEach(k => delete C[k]); try { localStorage.setItem("sme:zhc", JSON.stringify(C)); } catch (e) { LS("sme:zhc", { [id]: C[id] }); } } // 存满了就只留这一期
+  // 🀄 一层层来，哪层成了就停：① 本机存的 ② 后台（存过的 / 谷歌 / Workers AI）③ 浏览器直接问谷歌 ④ 剩下的请后台 AI 翻；还缺的页面上写「还有 N 句没翻出来 · 重试」
+  const zhSt = {};
+  async function loadZh(id, retry) {
+    if (zhBusy[id] || (ZH[id] && !retry && !zhMiss(id))) return; zhBusy[id] = true; zhSt[id] = ""; if (EP && EP.id === id) draw();
+    let j = ZH[id] || (ZHC()[id] || {}).j || null;
+    if (!j || zhMissOf(j, id)) { try { const r = await (await fetch("/api/sme?zh=1&ep=" + encodeURIComponent(id))).json(); if (r && r.ok && (!j || zhMissOf(r, id) < zhMissOf(j, id))) j = r; } catch (e) {} }
+    const ep = EPS[id];
+    if (ep) {
+      const all = zhAll(ep), zh = j ? zhFlat(j, ep) : all.map(() => ""), miss = () => all.map((t, i) => (t && !zh[i] ? i : -1)).filter(i => i >= 0);
+      let m = miss();
+      if (m.length) { try { const g = await gtx(m.map(i => all[i])); m.forEach((i, k) => { if (g[k]) zh[i] = g[k]; }); } catch (e) {} m = miss(); }
+      for (let k = 0; k < m.length; k += 120) { try { const r = await (await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "tr", texts: m.slice(k, k + 120).map(i => all[i]) }) })).json(); if (r && Array.isArray(r.zh)) m.slice(k, k + 120).forEach((i, n) => { if (r.zh[n]) zh[i] = r.zh[n]; }); } catch (e) {} }
+      if (zh.some(Boolean)) j = zhBuild(ep, zh);
+    }
+    zhBusy[id] = false;
+    if (j && j.ok) { ZH[id] = j; zhKeep(id, j); }
+    const left = zhMiss(id); zhSt[id] = left ? (ZH[id] ? "还有 " + left + " 句没翻出来" : "中文没翻出来（网络不通？）") : "";
+    if (left && !retry) setTimeout(() => { if (zhOn && zhMiss(id)) loadZh(id, true); }, 20000); // 过 20 秒自动再试一次
     if (EP && EP.id === id) draw();
   }
+  const zhMissOf = (j, id) => { const ep = EPS[id]; if (!ep) return j ? 0 : 1; const f = zhFlat(j, ep); return zhAll(ep).filter((t, i) => t && !f[i]).length; };
+
 
   const meta = id => (LISTS[serOf(id)] || []).find(x => x.id === id) || {};
 
@@ -587,12 +603,17 @@
       (tr ? '<div class="sm-box"><h3 style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">📄 文稿 <span style="flex:1"></span><button class="ui-btn" data-a="tr">' + (trShow ? "折起来" : "显示文稿") + '</button>' + (trShow ? '<button class="ui-btn' + (follow ? " on" : "") + '" data-a="follow" title="放到哪句就高亮哪句、自动滚过去">🎵 跟着语音：' + (follow ? "开" : "关") + "</button>" + (follow ? '<button class="ui-btn' + (fword ? " on" : "") + '" data-a="fword" title="正在说的那个词也亮">逐词：' + (fword ? "开" : "关") + "</button>" : "") : "") + '<button class="ui-btn" data-a="read">📰 在阅读里打开（查词、上色）</button></h3>' + fst +
         '<div class="sm-tr' + (trShow ? "" : " hide") + '" data-a="tr-peek" title="' + (trShow ? "" : "建议先不看文稿听一两遍，再点开对照") + '">' + tr + "</div></div>" + lqHtml() : (news ? '<div class="sm-empty">这个栏目 BBC 没有放全文文稿：先听一遍，再看上面的新闻背景和关键词。</div>' : ""));
   }
+  function zhBar() {
+    if (!zhOn || view !== "ep" || !EP || EP.err) return "";
+    if (zhBusy[EP.id]) return '<div class="sm-trst">🀄 正在翻译…（第一次打开这期要几秒）</div>';
+    return zhSt[EP.id] ? '<div class="sm-trst">🀄 ' + esc(zhSt[EP.id]) + ' <button class="ui-btn" data-a="zh-retry">重试</button></div>' : "";
+  }
   function draw() {
     if (!root) return;
     const f = flEl(); if (root.contains(AU)) f.querySelector(".au").append(AU); // 先把播放器挪出去，重画页面时不会被删掉（删掉会停）
     const S = SM[ser]; if (wantFollow()) followLoad(EP.id);
     root.innerHTML = '<div class="sm-ser">' + SER.map(x => '<button data-ser="' + x[0] + '" class="' + (x[0] === ser ? "on" : "") + '">' + x[1] + "</button>").join("") + "</div>" +
-      (view === "ep" ? '<div class="sm-bar"><button class="ui-btn" data-a="home">← 节目列表</button><span class="sp"></span><button class="ui-btn' + (zhOn ? " on" : "") + '" data-a="zh" title="英文下面显示中文翻译">🀄 中文：' + (zhOn ? "开" : "关") + "</button></div>" + epHtml()
+      (view === "ep" ? '<div class="sm-bar"><button class="ui-btn" data-a="home">← 节目列表</button><span class="sp"></span><button class="ui-btn' + (zhOn ? " on" : "") + '" data-a="zh" title="英文下面显示中文翻译">🀄 中文：' + (zhOn ? "开" : "关") + "</button></div>" + zhBar() + epHtml()
         : '<div class="sm-head"><b>' + esc(S[2]) + "</b> · BBC Learning English · " + esc(S[3]) + "</div>" + homeHtml());
     if (view === "ep" && EP && !EP.err && AU.dataset.id !== EP.id) { AU.pause(); AU.src = srcOf(EP.id); AU.dataset.id = EP.id; auTitle = SM[serOf(EP.id)][1] + " · " + EP.title; AU.playbackRate = rate; flClosed = false; }
     sync(); curK = -1; curW = null; hl(true); hlWord();
@@ -661,6 +682,7 @@
       if (a === "lq" && EP && !EP.err) { lqLoad(EP.id); return; }
       if (a === "follow") { follow = !follow; LS("sme:follow", follow); draw(); return; }
       if (a === "follow-retry" && EP) { delete FL[EP.id]; draw(); return; }
+      if (a === "zh-retry" && EP && !EP.err) { loadZh(EP.id, true); return; }
       if (a === "zh") { zhOn = !zhOn; LS("sme:zh", zhOn); if (zhOn && EP && !EP.err) loadZh(EP.id); draw(); return; }
       if (a === "done" && EP && !EP.err) { markDone(EP.id); return; }
       if (a === "tr" || (a === "tr-peek" && !trShow)) { trShow = !trShow; draw(); return; }
