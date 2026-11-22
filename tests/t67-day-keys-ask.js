@@ -13,7 +13,7 @@ for (const f of PAGES) {
   ok(!/fetch\("\/api\/[^"]*"[^)]*\)\.then\(r => r\.(ok \? r\.)?json\(\)/.test(s), f + ": 读后台用 U.json / CLOUD");
   ok(!/fetch\("\/api\/media\?/.test(s), f + ": 读配图 / 原声用 CLOUD.media");
 }
-const h = W("index.html");
+const h = require("./lib/page").html();
 ok(/<script src="media\.js\?v=\w+"><\/script>\s*<script src="keys\.js\?v=\w+"><\/script>/.test(h), "keys.js loaded after media.js");
 ok(/const ymdLocal=\(\)=>U\.day\(\)/.test(h), "vocab entry dates use U.day");
 ok(!/[^.\w]confirm\(|[^.\w]prompt\(|[^.\w]alert\("没/.test(h.slice(h.indexOf("<script src=\"util.js"))), "index.html after util.js: no confirm / prompt");

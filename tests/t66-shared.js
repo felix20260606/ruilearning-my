@@ -3,7 +3,7 @@
 const fs = require("fs"), path = require("path"), vm = require("vm");
 const W = p => fs.readFileSync(path.join(__dirname, "..", "web", p), "utf8");
 let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); } };
-const PAGES = fs.readdirSync(path.join(__dirname, "..", "web")).filter(f => /\.js$/.test(f) && !/^(_worker|util|ai|tr|cloud|media|tts|rec|nav|speak-data|sw)\.js$/.test(f));
+const PAGES = fs.readdirSync(path.join(__dirname, "..", "web")).filter(f => /\.js$/.test(f) && !/^(_worker|util|ai|tr|cloud|media|tts|rec|nav|speak-data|sw|boot|net|mine-sync)\.js$/.test(f));
 
 // ---------- ① 源码 ----------
 for (const f of PAGES) {
@@ -17,7 +17,7 @@ for (const f of PAGES) {
   ok(!/const LG = \(k, d\) => \{ try \{ const v = localStorage/.test(s), f + ": LG 用 U.LG");
   ok(!/sendBeacon\("\/api\/mine"/.test(s), f + ": 关页面发送在 cloud.js");
 }
-const h = W("index.html");
+const h = require("./lib/page").html();
 ok(/<script src="util\.js\?v=\w+"><\/script>\s*<script src="nav\.js\?v=\w+"><\/script>\s*<script src="word\.js\?v=\w+"><\/script>\s*<script src="ai\.js\?v=\w+"><\/script>\s*<script src="tr\.js\?v=\w+"><\/script>\s*<script src="cloud\.js\?v=\w+"><\/script>\s*<script src="media\.js\?v=\w+"><\/script>/.test(h), "shared modules load first, in order");
 ok(/const g=await TR\.word\(word\)/.test(h), "index dictGet uses TR.word");
 

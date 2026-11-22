@@ -1,0 +1,91 @@
+/* 从 index.html 原样搬出来的样式（收词模式、标签栏、各页面的布局）：按原来的位置引用，前后顺序不变 */
+  html.collect-mode body>*:not(#collect-overlay){display:none!important}
+  html.collect-mode #collect-overlay{display:flex!important}
+  #apptabs{position:fixed;top:0;left:0;right:0;height:56px;z-index:9000;display:flex;align-items:center;justify-content:center;
+    background:var(--paper);border-bottom:1px solid var(--line);padding:0 14px;
+    box-shadow:0 1px 0 rgba(20,30,45,.02),0 4px 14px rgba(20,30,45,.05)}
+  #apptabs .seg-wrap{display:flex;gap:4px;width:100%;max-width:340px;
+    background:var(--paper-2);border:1px solid var(--line);border-radius:13px;padding:4px}
+  #apptabs button{flex:1;border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:700;
+    font-family:inherit;cursor:pointer;transition:.18s ease;border-radius:10px;padding:8px 0;
+    display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+  #apptabs button:hover{color:var(--ink)}
+  #apptabs button.on{color:#fff;font-weight:800;
+    background:linear-gradient(150deg,var(--accent),var(--jade));
+    box-shadow:0 3px 10px rgba(12,147,112,.30)}
+
+  #subtabs{position:fixed;top:56px;left:0;right:0;height:42px;z-index:8900;display:flex;align-items:center;justify-content:center;
+    background:var(--paper);border-bottom:1px solid var(--line);padding:0 14px}
+  .subgrp{display:none;gap:28px;width:100%;max-width:340px;margin:0 auto;justify-content:center}
+  .subgrp.on{display:flex}
+  .subgrp button{flex:0 0 auto;border:0;background:transparent;color:var(--muted);
+    font-family:inherit;font-size:13px;font-weight:600;padding:0 2px 9px;cursor:pointer;transition:.15s;position:relative}
+  .subgrp button:hover{color:var(--ink)}
+  .subgrp button.on{color:var(--jade);font-weight:800}
+  .subgrp button.on::after{content:"";position:absolute;left:2px;right:2px;bottom:0;height:2.5px;background:var(--jade);border-radius:2px}
+
+  #view-en{padding-top:98px}
+  /* 七个二级标签：一行放不下时可以左右滑 */
+  .subgrp{max-width:none;overflow-x:auto;scrollbar-width:none}
+  .subgrp::-webkit-scrollbar{display:none}
+  .subgrp button{white-space:nowrap}
+  .modes button.mx{display:none!important}
+  /* 「📰 读」「✍️ 写」「🎧 听 → 听力练习」借用生词本这一页，但不显示生词本的大标题和模式按钮 */
+  html[data-en="read"] #view-en>header,html[data-en="write"] #view-en>header,html[data-en="listen"] #view-en>header{display:none}
+  html[data-en="read"] #view-en,html[data-en="write"] #view-en,html[data-en="listen"] #view-en{padding-top:110px}
+  html.has-sec #view-en{padding-top:150px}
+  #en-secbar{display:none;position:fixed;top:98px;left:0;right:0;height:40px;z-index:8800;align-items:center;justify-content:center;gap:8px;
+    background:var(--paper);border-bottom:1px solid var(--line);padding:0 14px}
+  html.has-sec #en-secbar{display:flex}
+  html.show-fat #en-secbar,html.show-trip #en-secbar,html.show-ielts #en-secbar,html.show-speak #en-secbar,html.show-daily #en-secbar,html.collect-mode #en-secbar{display:none!important}
+  #en-secbar .seg-wrap{display:flex;gap:8px;background:transparent;border:0;padding:0;width:auto;max-width:none}
+  #en-secbar button{flex:0 0 auto;border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:600;
+    font-family:inherit;cursor:pointer;transition:.15s ease;border-radius:999px;padding:5px 15px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+  #en-secbar button:hover{color:var(--ink)}
+  #en-secbar button.on{background:var(--ui-pur-soft,#E3F0EA);color:var(--ui-pur-text,var(--jade));font-weight:700}
+  /* 🎬 视频挪进「🎧 听」：留着二级标签和小标签条 */
+  html.show-video #view-video{padding-top:138px!important}
+  #view-fat,#view-trip{display:none;position:fixed;top:98px;left:0;right:0;bottom:0;background:var(--bg)}
+  #view-fat iframe{width:100%;height:100%;border:0;display:block}
+  #fat-region{flex:0 0 auto;display:flex;align-items:center;justify-content:safe center;gap:8px;
+    padding:0 14px;height:40px;background:var(--paper);border-bottom:1px solid var(--line);overflow-x:auto}
+  #fat-region::-webkit-scrollbar{display:none}
+  #fat-region .seg-wrap{display:flex;gap:8px;background:transparent;border:0;padding:0;width:auto;max-width:none;flex:0 0 auto}
+  #fat-region button{flex:0 0 auto;border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:600;
+    font-family:inherit;cursor:pointer;transition:.15s ease;border-radius:999px;padding:5px 15px;
+    display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+  #fat-region button:hover{color:var(--ink)}
+  #fat-region button.on{background:#E3F0EA;color:var(--jade);font-weight:700}
+  #fatwrap{flex:1 1 auto;position:relative;min-height:0}
+  html.show-fat #view-en{display:none}
+  html.show-fat #view-fat{display:flex;flex-direction:column}
+  html.show-trip #view-en{display:none}
+  html.show-trip #view-trip{display:flex;flex-direction:column}
+  #view-ielts{display:none;padding-top:98px}
+  html.show-ielts #view-en{display:none}
+  /* 生词本「⭐ 已保存」模式：装了插件的电脑直接嵌入插件自己的页面（插件里的 site.js 告诉网页插件的 ID）；没装插件显示网站只读版（saved-web.js） */
+  #savedbox{display:none;flex-direction:column;border-radius:14px;overflow:hidden;border:1px solid var(--ui-line,#34373d);background:#1b1d21}
+  #savedbox.on{display:flex}
+  #savedbox .ext-bar{flex:0 0 auto;display:flex;align-items:center;gap:12px;height:34px;padding:0 16px;background:#24262b;color:#9aa3ad;font-size:12.5px}
+  #savedbox .ext-bar a{margin-left:auto;color:#B985E6;text-decoration:none;font-weight:700}#savedbox .ext-bar a:hover{text-decoration:underline}
+  #savedbox iframe{width:100%;height:calc(100vh - 230px);min-height:520px;border:0;display:block}
+  #savedbox.web{border:0;background:none;border-radius:0;overflow:visible}#savedbox.web iframe,#savedbox.web .ext-bar{display:none}
+  html.show-ielts #view-ielts{display:block}
+  #trip-dest{flex:0 0 auto;display:flex;align-items:center;justify-content:safe center;gap:8px;
+    padding:0 14px;height:40px;background:var(--paper);border-bottom:1px solid var(--line);overflow-x:auto}
+  #trip-dest::-webkit-scrollbar{display:none}
+  #trip-dest .seg-wrap{display:flex;gap:8px;background:transparent;border:0;padding:0;width:auto;max-width:none;flex:0 0 auto}
+  #trip-dest button{flex:0 0 auto;border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:600;
+    font-family:inherit;cursor:pointer;transition:.15s ease;border-radius:999px;padding:5px 15px;
+    display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+  #trip-dest button:hover{color:var(--ink)}
+  #trip-dest button.on{background:#E3F0EA;color:var(--jade);font-weight:700}
+  #triprow{flex:0 0 auto;display:flex;gap:6px;overflow-x:auto;padding:8px 10px;background:var(--paper);border-bottom:1px solid var(--line);-webkit-overflow-scrolling:touch}
+  #triprow::-webkit-scrollbar{display:none}
+  #triprow button{flex:0 0 auto;border:1px solid var(--line);background:var(--paper);color:var(--ink);font-family:inherit;font-size:13px;font-weight:600;padding:7px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:.15s;box-shadow:0 1px 2px rgba(20,30,45,.03)}
+  #triprow button:hover{border-color:var(--accent);color:var(--jade)}
+  #triprow button.on{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 3px 8px rgba(15,163,122,.25)}
+  #tripwrap{flex:1 1 auto;position:relative;min-height:0}
+  #tripframe{width:100%;height:100%;border:0;display:block}
+  #tripempty{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:26px;color:var(--muted);font-size:14px;line-height:1.7}
+  #tripempty b{color:var(--ink);display:block;margin-bottom:6px;font-size:15px}

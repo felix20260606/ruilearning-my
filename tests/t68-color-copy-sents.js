@@ -17,7 +17,7 @@ ok(/const markup = t => WORD\.html\(t\)/.test(W("watch.js")) && !/const WORD = \
 ok(/const h = WORD\.html\(t\)/.test(W("listen.js")), "listen transcript uses WORD.html (level colours)");
 ok(/WORD\.html\(plain\(c\.s\.en\)\)/.test(W("pump.js")), "pump cards use WORD.html");
 for (const f of PAGES.concat(["util.js"])) ok(!/(const|let|var) (U|AI|TR|CLOUD|MEDIA|KEYS|WORD|TTS|REC|NAV) =/.test(W(f).replace(/window\.\w+ = /g, "")), f + ": no local variable shadows a shared module");
-const h = W("index.html");
+const h = require("./lib/page").html();
 ok(/function download\(name,text,type\)\{U\.download\(/.test(h), "index download() → U.download");
 
 // ---------- util：分句、复制、下载 ----------

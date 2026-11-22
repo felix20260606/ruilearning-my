@@ -3,7 +3,7 @@
 const fs = require("fs"), path = require("path"), vm = require("vm");
 const W = p => fs.readFileSync(path.join(__dirname, "..", "web", p), "utf8");
 let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); } };
-const h = W("index.html"), sp = W("speak.js"), bs = W("basic.js");
+const h = require("./lib/page").html(), sp = W("speak.js"), bs = W("basic.js");
 
 // 标签顺序：雅思后面是入门
 const tabs = [...h.matchAll(/<button id="tab-(\w+)" type="button">/g)].map(m => m[1]);

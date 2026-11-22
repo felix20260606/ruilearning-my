@@ -41,7 +41,7 @@ win.location.href = "https://x.test/?go=x#read/abc"; page = { tab: "speak" }; NA
 ok(stack[idx].url === "https://x.test/?go=x", "new page drops #read/ " + stack[idx].url);
 ok(/function draw\(\) \{[^\n]*setHash\(view === "read" && doc \? doc\.id : ""\)/.test(W("read.js")) && /if \(id && !\(root && root\.getClientRects\(\)\.length\)\) return;/.test(W("read.js")), "read.js: #article/ only while the article is on screen");
 // 接进各模块：index.html 的标签、口语 / 听力 / 练习课 / 阅读 / 写作 / 视频 / 背单词
-const h = W("index.html");
+const h = require("./lib/page").html();
 ok(/<script src="util\.js\?v=\w+"><\/script>\s*<script src="nav\.js\?v=\w+"><\/script>\s*<script src="word\.js\?v=\w+"><\/script>/.test(h), "util.js + nav.js load before everything else");
 ok(/NAV\.reg\('tab'/.test(h) && /NAV\.reg\('ielts'/.test(h) && /NAV\.reg\('life'/.test(h), "tabs registered");
 for (const [f, k] of [["speak.js", "speak"], ["listen.js", "sme"], ["drill.js", "drill"], ["read.js", "read"], ["write.js", "write"], ["watch.js", "video"], ["pump.js", "pump"]]) {

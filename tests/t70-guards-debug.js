@@ -6,7 +6,7 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
 // ---------- 🔢 版本号 ----------
 let out = ""; try { out = execFileSync(process.execPath, [R("tools", "bump-versions.js"), "--check"], { encoding: "utf8" }); } catch (e) { out = String(e.stdout || e.message); }
 ok(/✓/.test(out), "every ?v= equals the file's content hash: " + out.slice(0, 300));
-ok(/src="util\.js\?v=[0-9a-f]{8}"/.test(W("index.html")) && /"speak-data\.js\?v=[0-9a-f]{8}"/.test(W("speak.js")) && /"pron-real\.json\?v=[0-9a-f]{8}"/.test(W("tts.js")), "versions are content hashes (html + js string literals)");
+ok(/src="util\.js\?v=[0-9a-f]{8}"/.test(require("./lib/page").html()) && /"speak-data\.js\?v=[0-9a-f]{8}"/.test(W("speak.js")) && /"pron-real\.json\?v=[0-9a-f]{8}"/.test(W("tts.js")), "versions are content hashes (html + js string literals)");
 
 // ---------- 🛡 自动测试的步骤 ----------
 const wf = fs.readFileSync(R(".github", "workflows", "test.yml"), "utf8");
@@ -38,7 +38,7 @@ function env(store) {
   { const { U } = env(store); // 刷新以后
     const L = U.logs(); ok(L.length === 2 && L.every(x => x.old) && /^· /m.test(U.report()), "kept after reload, marked as earlier");
     U.clearLogs(); ok(!store.has("debug:log") && !U.logs().length, "clear"); }
-  const h = W("index.html");
+  const h = require("./lib/page").html();
   ok(/id="dbg-open"/.test(h) && /U\.showLogs\(\)/.test(h) && /\[\?&\]debug/.test(h), "settings entry + ?debug");
   console.log(fail ? fail + " FAILED" : "t70 guards + debug: all ok"); process.exit(fail ? 1 : 0);
 })();

@@ -41,7 +41,7 @@ const path = require("path"), fs = require("fs"), vm = require("vm");
   r = await call("/api/users", { remove: u3 }); ok(r.status === 409, "user with only German data not removable");
 
   // ---- 网页：index.html 最上面那段 ----
-  const html = fs.readFileSync(path.join(__dirname, "..", "web", "index.html"), "utf8");
+  const html = require("./lib/page").html();
   const head = html.match(/<script>\s*(\/\* 家人（多用户[\s\S]*?\}\)\(\);)/)[1];
   function page(init) {
     const store = new Map(Object.entries(init)), calls = [];

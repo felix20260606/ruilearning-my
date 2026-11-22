@@ -5,7 +5,7 @@ const path = require("path"), fs = require("fs");
   const W = (await import(path.join(__dirname, "..", "web", "_worker.js"))).default;
   const kv = new Map(); let nPut = 0; const kvPuts = () => nPut;
   const KV = { get: async (k, t) => { const v = kv.get(k); return v == null ? null : t === "json" ? JSON.parse(v) : v; }, put: async (k, v) => { kv.set(k, String(v)); nPut++; }, delete: async k => { kv.delete(k); }, list: async ({ prefix }) => ({ keys: [...kv.keys()].filter(k => k.startsWith(prefix)).map(name => ({ name })), list_complete: true }) };
-  const html = fs.readFileSync(path.join(__dirname, "..", "web", "index.html"), "utf8");
+  const html = require("./lib/page").html();
   const code = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]).find(s => s.includes("mineSyncPull"));
   let pending = [];
   function device() { // 一台设备：自己的 Storage 类、localStorage、fetch（直接调假后台）

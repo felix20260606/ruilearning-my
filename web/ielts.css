@@ -1,0 +1,92 @@
+/* 从 index.html 原样搬出来的样式（雅思页）：按原来的位置引用，前后顺序不变 */
+  #ielts-subnav{position:fixed;top:98px;left:0;right:0;height:40px;z-index:8800;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    background:var(--paper);border-bottom:1px solid var(--line);padding:0 14px}
+  #ielts-subnav .seg-wrap{display:flex;gap:8px;background:transparent;border:0;padding:0;width:auto;max-width:none}
+  #ielts-subnav button{flex:0 0 auto;border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:600;
+    font-family:inherit;cursor:pointer;transition:.15s ease;border-radius:999px;padding:5px 15px;
+    display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+  #ielts-subnav button:hover{color:var(--ink)}
+  #ielts-subnav button[hidden]{display:none!important}
+  #ielts-subnav button.on{background:#E3F0EA;color:var(--jade);font-weight:700}
+  #ielts-basics{padding-top:40px}
+  #ielts-notes-view{display:none}
+  #ielts-notes-view iframe{position:fixed;top:138px;left:0;right:0;width:100%;
+    height:calc(100vh - 138px);height:calc(100dvh - 138px);border:0;display:block;background:var(--bg)}
+  #view-ielts{background:var(--bg);color:var(--ink);
+    font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",-apple-system,system-ui,sans-serif;
+    line-height:1.7;padding-bottom:64px;-webkit-font-smoothing:antialiased}
+  #view-ielts .wrap{max-width:620px;margin:0 auto;padding:0 18px}
+  #view-ielts .ielts-header{background:
+      radial-gradient(120% 100% at 85% -40%,rgba(15,163,122,.09),transparent 60%),
+      var(--paper);
+    border-bottom:1px solid var(--line);padding:24px 0 14px;position:sticky;top:98px;z-index:20}
+  #view-ielts .eyebrow{font-family:var(--ui-font);font-size:11px;letter-spacing:.3em;text-transform:uppercase;
+    color:var(--accent);font-weight:700;margin:0 0 6px}
+  #view-ielts h1{font-family:var(--ui-font);font-size:27px;font-weight:900;letter-spacing:-.01em;margin:0 0 16px;color:var(--ink)}
+  #view-ielts nav{display:flex;gap:7px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 0 4px;margin:0 -2px}
+  #view-ielts nav::-webkit-scrollbar{display:none}
+  #view-ielts nav a{flex:0 0 auto;font-size:12.5px;font-weight:600;color:var(--muted);text-decoration:none;
+    background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:7px 13px;white-space:nowrap;
+    transition:.15s ease}
+  #view-ielts nav a:hover{color:#fff;background:var(--accent);border-color:var(--accent)}
+
+  #view-ielts section{padding:38px 0 8px}
+  #view-ielts section:first-of-type{padding-top:30px}
+  #view-ielts .sec-head{display:flex;align-items:center;gap:11px;margin-bottom:4px}
+  #view-ielts .sec-badge{flex:0 0 auto;width:34px;height:34px;border-radius:12px;
+    background:linear-gradient(155deg,var(--accent),var(--jade));
+    display:flex;align-items:center;justify-content:center;font-size:16px;
+    box-shadow:0 4px 10px rgba(12,147,112,.22)}
+  #view-ielts h2{font-family:var(--ui-font);font-size:19px;font-weight:800;margin:0;color:var(--ink)}
+  #view-ielts .sub{color:var(--muted);font-size:13px;margin:8px 0 18px;padding-left:45px}
+
+  #view-ielts .card{background:var(--paper);border:1px solid var(--line);border-radius:16px;
+    padding:18px 18px 16px;margin-bottom:14px;box-shadow:0 1px 2px rgba(20,30,45,.03)}
+
+  #view-ielts table{width:100%;border-collapse:collapse;font-size:13.5px}
+  #view-ielts th{text-align:left;color:var(--muted);font-weight:700;font-size:10.5px;text-transform:uppercase;
+    letter-spacing:.06em;padding:0 10px 10px 0;border-bottom:1.5px solid var(--line)}
+  #view-ielts td{padding:11px 10px 11px 0;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink)}
+  #view-ielts tr:last-child td{border-bottom:0}
+  #view-ielts td b{font-weight:700;font-size:13.5px}
+  #view-ielts td span{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+  #view-ielts td i{font-style:normal;color:var(--jade);font-weight:600}
+
+  #view-ielts .swap{display:flex;align-items:center;gap:10px;font-size:13.5px;padding:10px 2px;
+    border-bottom:1px solid var(--line)}
+  #view-ielts .swap:last-child{border-bottom:0}
+  #view-ielts .swap .old{color:var(--muted);text-decoration:line-through;flex:0 0 auto;font-size:13px}
+  #view-ielts .swap .arrow{color:var(--gold);flex:0 0 auto;font-size:12px}
+  #view-ielts .swap .new{color:var(--jade);font-weight:700;flex:1 1 auto;line-height:1.5}
+
+  #view-ielts .chip{display:inline-block;background:var(--paper-2);border:1px solid var(--line);
+    color:var(--ink);border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:500;margin:0 6px 6px 0;
+    transition:.15s}
+  #view-ielts .chip:hover{border-color:var(--accent);color:var(--jade)}
+  #view-ielts .conn-grp{margin-bottom:16px}
+  #view-ielts .conn-grp:last-child{margin-bottom:0}
+  #view-ielts .conn-grp .lbl{font-size:11px;font-weight:800;color:var(--gold);text-transform:uppercase;
+    letter-spacing:.08em;margin-bottom:8px}
+
+  #view-ielts .topic{background:var(--paper);border:1px solid var(--line);border-radius:16px;
+    padding:16px 18px;margin-bottom:12px;box-shadow:0 1px 2px rgba(20,30,45,.03);position:relative;overflow:hidden}
+  #view-ielts .topic::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+  #view-ielts .topic h3{margin:0 0 8px;font-size:14.5px;font-weight:800;color:var(--ink)}
+  #view-ielts .qa{font-size:13.5px;margin:0 0 6px;color:var(--ink)}
+  #view-ielts .qa b{color:var(--accent);font-weight:700;margin-right:3px}
+  #view-ielts .topic .cn{color:var(--muted);font-size:12.5px;margin:0;line-height:1.6}
+
+  #view-ielts .tip{background:linear-gradient(155deg,#FFF9EE,#FFF4E0);border:1px solid #F0DDB0;
+    border-radius:14px;padding:13px 15px;font-size:13px;color:#6b5417;margin-top:12px;line-height:1.65}
+  #view-ielts .tip b{color:#4a3810}
+
+  #view-ielts .struct{display:flex;flex-direction:column;gap:4px}
+  #view-ielts .step{display:flex;gap:13px;align-items:flex-start;padding:9px 0}
+  #view-ielts .stepnum{flex:0 0 auto;width:24px;height:24px;border-radius:8px;
+    background:var(--paper-2);border:1.5px solid var(--accent);color:var(--jade);
+    display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;margin-top:1px}
+  #view-ielts .stepbody b{display:block;font-size:14px;color:var(--ink);margin-bottom:2px}
+  #view-ielts .stepbody span{font-size:12.5px;color:var(--muted)}
+
+  #view-ielts ::selection{background:rgba(15,163,122,.22)}
