@@ -340,7 +340,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
   const newsRead = () => { if (NEWS) openDoc(NEWS.text, NEWS.title, newsId(NEWS)); };
   // ✨ 简单版 + 读后小测（/api/ai task newsimp）：结果按文章 id 存本机「reading:newsq」（最多 20 篇）；简单版作为一篇文章打开（id 后面加 ":s"）
   let simpBusy = false;
-  const simpAll = () => LG("reading:newsq", {}) || {};
+  const simpAll = () => { const A = LG("reading:newsq", {}) || {}, o = {}; for (const k in A) { const x = A[k]; o[k] = x && typeof x === "object" && "v" in x ? x.v : x; } return o; }; // 💾 U.keep 存的是 {v, at}（以前直接存内容，两种都认）
   const simpOf = n => n && simpAll()[newsId(n)];
   const baseId = id => String(id || "").replace(/:s$/, "");
   async function newsSimp() {
@@ -349,8 +349,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
     const j = await AI.ask("newsimp", { url: NEWS.url, title: NEWS.title, text: NEWS.text });
     simpBusy = false;
     if (!(j && j.ok && j.simple)) { paintNews(); tip(j.ok ? "AI 改写失败了，过一会儿再试" : AI.msg(j, "AI 改写失败了，过一会儿再试")); return; }
-    const A = simpAll(), id = newsId(NEWS); A[id] = { simple: j.simple, summary_zh: j.summary_zh || "", quiz: j.quiz || [], words: j.words || [], at: Date.now() };
-    const ks = Object.keys(A).sort((a, b) => (A[b].at || 0) - (A[a].at || 0)); ks.slice(20).forEach(k => delete A[k]); LS("reading:newsq", A);
+    const id = newsId(NEWS); U.keep("reading:newsq", id, { simple: j.simple, summary_zh: j.summary_zh || "", quiz: j.quiz || [], words: j.words || [], at: Date.now() }, { max: 20 }); // 💾 全站共用的缓存（util.js）：最多 20 篇
     paintNews(); if (view === "home") openDoc(j.simple, "（简单版）" + NEWS.title, id + ":s");
   }
   let quizPick = {};

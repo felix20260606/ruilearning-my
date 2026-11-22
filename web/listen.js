@@ -219,12 +219,12 @@
   function zhBuild(ep, zh) { let i = 1; const take = n => { const r = zh.slice(i, i + n); i += n; return r; }, V = (ep.vocab || []).length; return { ok: true, id: ep.id, intro: zh[0], q: take((ep.q || []).length), vocab: take(V), vex: take(V), heads: take((ep.heads || []).length), lines: take((ep.lines || []).length) }; }
   const zhMiss = id => { const ep = EPS[id], j = ZH[id]; if (!ep) return 0; if (!j) return zhAll(ep).filter(Boolean).length; const f = zhFlat(j, ep); return zhAll(ep).filter((t, i) => t && !f[i]).length; };
   const ZHC = () => LG("sme:zhc", {}) || {}; // 这台设备翻好的（最近 15 期）：再打开马上有，没网也有
-  function zhKeep(id, j) { const C = ZHC(); C[id] = { j, at: Date.now() }; const ks = Object.keys(C).sort((a, b) => C[b].at - C[a].at); ks.slice(15).forEach(k => delete C[k]); try { localStorage.setItem("sme:zhc", JSON.stringify(C)); } catch (e) { LS("sme:zhc", { [id]: C[id] }); } } // 存满了就只留这一期
+  const zhKeep = (id, j) => U.keep("sme:zhc", id, j, { max: 15 }); // 💾 全站共用的缓存（util.js）：最近 15 期
   // 🀄 一层层来，哪层成了就停：① 本机存的 ② 后台（存过的 / 谷歌 / Workers AI）③ 浏览器直接问谷歌 ④ 剩下的请后台 AI 翻（③④ 都在 tr.js 的 TR.lines）；还缺的页面上写「还有 N 句没翻出来 · 重试」
   const zhSt = {};
   async function loadZh(id, retry) {
     if (zhBusy[id] || (ZH[id] && !retry && !zhMiss(id))) return; zhBusy[id] = true; zhSt[id] = ""; if (EP && EP.id === id) draw();
-    let j = ZH[id] || (ZHC()[id] || {}).j || null;
+    let j = ZH[id] || U.kept("sme:zhc", id) || (ZHC()[id] || {}).j || null; // (… ).j：以前的存法
     if (!j || zhMissOf(j, id)) { try { const r = await U.json("/api/sme?zh=1&co=1&ep=" + encodeURIComponent(id)); if (r && r.ok && (!j || zhMissOf(r, id) < zhMissOf(j, id))) j = r; } catch (e) {} }
     const ep = EPS[id];
     if (ep) {

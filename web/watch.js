@@ -7,16 +7,8 @@
   const API = "/api/cap";
   const $ = (s, r) => (r || document).querySelector(s);
   const LS = { get: U.LG, set: U.LS }; // util.js
-  // 本机缓存（字幕、翻译、查词）只留最近用过的那些：以前每看一个视频存一份（约 50KB）永不清理，存储满了生词本、练习记录都存不进去
-  //   key = 记最近顺序的列表，v = 这次用到的，n = 留几个，pre = 要跟着删的键前缀；第一次用时把以前留下的同类缓存都清掉
-  function wtKeep(key, v, n, pre) {
-    try {
-      let L = JSON.parse(localStorage.getItem(key) || "null");
-      if (!Array.isArray(L)) { L = []; for (let i = localStorage.length - 1; i >= 0; i--) { const k = localStorage.key(i); if (k && pre.some(p => k.startsWith(p)) && !pre.some(p => k === p + v)) localStorage.removeItem(k); } }
-      L = [v].concat(L.filter(x => x !== v)); const drop = L.slice(n); L = L.slice(0, n);
-      drop.forEach(x => pre.forEach(p => localStorage.removeItem(p + x))); localStorage.setItem(key, JSON.stringify(L));
-    } catch (e) {}
-  }
+  // 本机缓存（字幕、翻译、查词）只留最近用过的那些：全站共用的 U.keepKeys（util.js）；存储满了 util.js 会先清这些缓存
+  const wtKeep = (key, v, n, pre) => U.keepKeys(key, v, n, pre);
   const fmt = t => { t = Math.max(0, Math.floor(t)); const m = Math.floor(t / 60), s = t % 60; return (m >= 60 ? Math.floor(m / 60) + ":" + String(m % 60).padStart(2, "0") : m) + ":" + String(s).padStart(2, "0"); };
 
   let set = Object.assign({ autoPause: false, hideTr: false, hideEn: false, rate: 1, fs: 1 }, LS.get("wt:set", {}));

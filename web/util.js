@@ -15,6 +15,11 @@
      先用剪贴板，不行用老办法（选中再复制）；都不行弹出文字让你手动复制
    ⬇️ U.download(文件名, 文字或 Blob, 类型)：存成文件（类型默认看后缀：.csv 带 BOM 让 Excel 认中文、.json、.html、.ics、其它当纯文本）
    ✂️ U.sents(文字) → 句子数组：. ! ? … 后面跟空格、下一个字不是小写才断；缩写（Mr.）、人名首字母（J. K.）、e.g. / U.S.、No. 5、小数都不断；有换行先按行分
+   💾 本机缓存（统一管理，存储满了不再悄悄丢数据）：
+     U.keep(键, id, 值, {max}) 一个键里存一组缓存，只留最近 max 条（默认 20）；U.kept(键, id) 取出来（没有 = undefined）
+     U.keepKeys(列表键, id, max, [键前缀…]) 每条单独一个键的缓存（视频字幕、查词）：记最近用过的顺序，超出的连同各自的键一起删
+     U.cacheable(键前缀, 名字) 登记「可以丢的缓存」；任何地方 localStorage 存满了（QuotaExceeded）：按登记顺序一组组清掉缓存再试，
+       存进去了记日志、提示一次；清完还存不进去照旧抛错（原来的兜底照常走）。生词本、记录这些数据不会被清
    🐞 排查：U.log(模块, 事情, 详情) 记一条（内存里最多 300 条，最近 200 条存进这台设备）；在浏览器控制台打 U.logs() 看全部，U.logs("ai") 只看一个模块
      页面上的报错（代码出错、没处理的 Promise 失败）自动记成 "error"；手机上看：生词本「⚙ 设置」→「🐞 问题记录」，或者网址加 ?debug
      U.showLogs() 打开问题记录（能一键复制发给 Claude）；U.clearLogs() 清空
@@ -143,7 +148,52 @@
     return out;
   }
   const sents = t => String(t == null ? "" : t).split(/\n\s*/).flatMap(sentsOf); // 有换行先按行分（每行各自分句）
+  /* ---------- 💾 本机缓存 ---------- */
+  function keep(key, id, value, o) {
+    const max = (o && o.max) || 20, A = LG(key, {}) || {};
+    let at = Date.now(); for (const k in A) if (A[k] && +A[k].at >= at) at = +A[k].at + 1; // 同一毫秒连存几条：新存的一定排在最前
+    A[id] = { v: value, at };
+    Object.keys(A).sort((a, b) => (A[b].at || 0) - (A[a].at || 0)).slice(max).forEach(k => delete A[k]);
+    return LS(key, A) || LS(key, { [id]: A[id] }); // 还是存不下：只留这一条
+  }
+  const kept = (key, id) => { const x = (LG(key, {}) || {})[id]; return x && typeof x === "object" && "v" in x ? x.v : undefined; };
+  function keepKeys(key, id, n, pre) {
+    try {
+      let L = JSON.parse(localStorage.getItem(key) || "null");
+      if (!Array.isArray(L)) { L = []; for (let i = localStorage.length - 1; i >= 0; i--) { const k = localStorage.key(i); if (k && pre.some(p => k.startsWith(p)) && !pre.some(p => k === p + id)) localStorage.removeItem(k); } } // 第一次用：以前留下的同类缓存都清掉
+      L = [id].concat(L.filter(x => x !== id)); const drop = L.slice(n); L = L.slice(0, n);
+      drop.forEach(x => pre.forEach(p => localStorage.removeItem(p + x)));
+      localStorage.setItem(key, JSON.stringify(L));
+    } catch (e) {}
+  }
+  // 可以丢的缓存（丢了只是要重新下载 / 翻译，不丢数据），按「最不心疼」排在前面
+  const CACHES = [];
+  const cacheable = (pre, name) => { if (!CACHES.some(c => c.pre === pre)) CACHES.push({ pre, name }); };
+  [["debug:log", "问题记录"], ["wt:doc:", "视频字幕"], ["wt:tr:", "视频字幕译文"], ["wt:recent", "最近看的视频"], ["wt:w:", "视频查过的词"], ["wt:wl", "视频查词列表"], ["wt:list", "视频列表"], ["reader:img", "配图地址"],
+    ["sme:zhc", "听力节目的中文"], ["sme:diff", "听力节目难度"], ["reading:newsq", "新闻简单版"], ["reading:news", "今天的新闻"], ["reading:tr", "文章译文"]].forEach(c => cacheable(c[0], c[1]));
+  const isQuota = e => !!e && (e.name === "QuotaExceededError" || e.name === "NS_ERROR_DOM_QUOTA_REACHED" || e.code === 22 || e.code === 1014);
+  function clearCache(c, except) {
+    let n = 0;
+    try { for (let i = localStorage.length - 1; i >= 0; i--) { const k = localStorage.key(i); if (k && k !== except && k.startsWith(c.pre)) { localStorage.removeItem(k); n++; } } } catch (e) {} // 原始键名（带家人后缀的也是这个前缀开头）
+    return n;
+  }
+  let fullTipped = false;
+  try {
+    const SP = Storage.prototype, orig = SP.setItem; // 包在 index.html 的「按家人分开存」外面
+    SP.setItem = function (k, v) {
+      try { return orig.call(this, k, v); } catch (e) {
+        if (!isQuota(e) || this !== window.localStorage) throw e;
+        for (const c of CACHES) {
+          if (!clearCache(c, k)) continue;
+          try { const r = orig.call(this, k, v); log("store", "本机存储满了：清掉「" + c.name + "」缓存后存进去了", k); if (!fullTipped) { fullTipped = true; tip("本机存储快满了，已经清掉一些缓存（字幕、翻译之类，用到时会重新下载）"); } return r; }
+          catch (e2) { if (!isQuota(e2)) throw e2; }
+        }
+        log("store", "本机存储满了，清了缓存也存不进去", k); throw e;
+      }
+    };
+  } catch (e) {}
+
   const ask = (q, o) => dialog(q, o, false);
   const input = (q, def, o) => dialog(q, o, true, def);
-  window.U = { esc, LG, LS, tip, log, logs, json, day, dayStart, dayAgo, daysBetween, streak, ask, input, copy, download, sents, showLogs, clearLogs, report };
+  window.U = { esc, LG, LS, tip, log, logs, json, day, dayStart, dayAgo, daysBetween, streak, ask, input, copy, download, sents, showLogs, clearLogs, report, keep, kept, keepKeys, cacheable };
 })();
