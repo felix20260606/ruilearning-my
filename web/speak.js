@@ -94,11 +94,14 @@
   @media(max-width:640px){.sk-hd h1{font-size:22px}.sk-title{font-size:21px}.sk-ln{max-width:100%}.sk-en{font-size:16px}.sk-ib{height:36px}}`;
 
   let root = null, D = null, loading = null;
+  // 「🌱 入门」「🔊 发音」挪到了英语「🌱 入门」标签（index.html 的 SECS.basic，basic.js）：那边用 speakShow("start" / "pron") 只显示这一栏；「🗣 说」里不再列
+  const MOVED = ["start", "pron"];
+  let only = null; // 嵌在「🌱 入门」里时 = "start" / "pron"
   let sec = LG("speak:sec", ""); if (!SECS.some(s => s[0] === sec)) sec = "";
   let opt = Object.assign({ rate: 1, zh: true }, LG("speak:opt", {}));
   if (opt.voice) { if (opt.voice === "sys" && window.TTS) TTS.setMode("sys"); delete opt.voice; } // 声音开关搬到全站共用的 tts:mode
   let done = LG("speak:done", {});
-  if (!sec) sec = Object.keys(done).length ? "daily" : "start"; // 第一次来：先进「🌱 入门」
+  if (!sec || MOVED.includes(sec)) sec = "daily"; // 新手入门在「🌱 入门」标签
   let view = null; // 打开的条目：{t:"dialog"|"func"|"pair"|"conn"|"topic"|"sgrp", id}
   let shadowGroup = 0;
   const today = () => new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10); // 吉隆坡 / 北京时间的日期
@@ -235,18 +238,19 @@
   }
   function head() {
     const n = counts();
-    return '<div class="sk-hd"><h1>🗣 口语</h1><p>每天 15 分钟：听 → 跟读 → 角色扮演 → 自己说。点 🔊 听，点 🎙 录音跟读，会标出读对、读漏的词。</p><div class="sp">' +
+    const H = only === "start" ? ["🗣 口语入门", "第一次练口语从这里开始：先学救命句、把自我介绍说顺，再照新手 7 天计划每天练一点。"] : only === "pron" ? ["🔊 发音", "中国人最容易混的音（最小对立词）、连读弱读、重音、数字：先听、再跟读，会标出读对、读漏的词。"] : ["🗣 口语", "每天 15 分钟：听 → 跟读 → 角色扮演 → 自己说。点 🔊 听，点 🎙 录音跟读，会标出读对、读漏的词。"];
+    return '<div class="sk-hd"><h1>' + H[0] + "</h1><p>" + H[1] + '</p><div class="sp">' +
       '<span class="sk-seg" title="朗读速度"><button data-rate="0.8" class="' + (opt.rate < .95 ? "on" : "") + '">慢</button><button data-rate="1" class="' + (opt.rate >= .95 && opt.rate < 1.1 ? "on" : "") + '">正常</button><button data-rate="1.15" class="' + (opt.rate >= 1.1 ? "on" : "") + '">快</button></span>' +
       '<span class="sk-seg" title="朗读声音：AI 真人语音（Workers AI）或这台设备自带的语音"><button data-voice="ai" class="' + (!window.TTS || TTS.mode() !== "sys" ? "on" : "") + '">AI 真人声</button><button data-voice="sys" class="' + (window.TTS && TTS.mode() === "sys" ? "on" : "") + '">系统声</button></span>' +
       '<span class="sk-seg" title="显示中文"><button data-zh="1" class="' + (opt.zh ? "on" : "") + '">中文</button><button data-zh="0" class="' + (!opt.zh ? "on" : "") + '">隐藏</button></span></div></div>' +
-      '<div class="sk-chips">' + SECS.map(([k, t]) => '<button data-sec="' + k + '" class="' + (sec === k && !view ? "on" : sec === k ? "on" : "") + '">' + t + (n[k] === "" ? "" : "<b>" + (n[k] || 0) + "</b>") + "</button>").join("") + "</div>" + (view ? "" : statBar());
+      (only ? "" : '<div class="sk-chips"><button data-basic="speak" title="救命句、自我介绍、发音在「🌱 入门」标签">🌱 新手入门 ›</button>' + SECS.filter(x => !MOVED.includes(x[0])).map(([k, t]) => '<button data-sec="' + k + '" class="' + (sec === k && !view ? "on" : sec === k ? "on" : "") + '">' + t + (n[k] === "" ? "" : "<b>" + (n[k] || 0) + "</b>") + "</button>").join("") + "</div>") + (view || only ? "" : statBar());
   }
   function draw() {
     if (!root) return;
     if (!D) { root.innerHTML = head() + '<div class="sk-empty">' + (loading ? "正在加载口语内容…" : "口语内容没加载出来，刷新一下") + "</div>"; return; }
     let body = "";
     if (view) body = ({ dialog: dialogView, func: funcView, pair: pairView, conn: connView, topic: topicView, rescue: rescueView, intro: introView, howto: howtoView, useword: usewordView, mock: mockView, drill: drillView, stress: stressView, twist: twistView, num: numView })[view.t]();
-    else body = ({ start: startView, daily: dailyView, chat: chatView, tools: toolsView, clip: clipList, dialog: dialogList, func: funcList, drill: drillList, pron: pronList, shadow: shadowList, quick: quickView, topic: topicList, mine: mineView })[sec]();
+    else body = ({ start: startView, daily: dailyView, chat: chatView, tools: toolsView, clip: clipList, dialog: dialogList, func: funcList, drill: drillList, pron: pronList, shadow: shadowList, quick: quickView, topic: topicList, mine: mineView })[only || sec]();
     root.innerHTML = head() + '<div class="' + (opt.zh ? "" : "sk-hide") + '">' + body + "</div>";
     if (view && view.t === "pair") quizPaint();
     if (view && view.t === "topic") timerPaint();
@@ -613,6 +617,8 @@
   const SECINFO = { rescue: ["🆘 救命句", "听不懂、想不起词时的 40 句"], intro: ["🙋 自我介绍", "12 句，先把自己介绍顺"], daily: ["📅 每日一练", "每天自动安排，15 分钟"], dialog: ["🎭 情景对话", "听全文 → 跟读 → 角色扮演"], func: ["💬 表达和俚语", "按功能分类的地道说法"], drill: ["🔁 句型操练", "一个句型换着说，练到脱口而出"], pron: ["🔊 发音", "易混音、连读、重音、绕口令、数字"], shadow: ["🎯 跟读", "120 句高频句"], clip: ["🎬 原声跟读", "你保存的 YouTube 真人原声"], quick: ["⚡ 快问快答", "听到问题 3 秒内开口，AI 判断"], chat: ["🤖 AI 陪练", "和 AI 用英语聊天，顺手纠错"], howto: ["🧰 这句话怎么说", "中文 → 地道英语三种说法"], topic: ["🗣 话题", "说 1–2 分钟，AI 按雅思点评"], mock: ["🎓 模拟考", "雅思口语三部分完整走一遍"], useword: ["📘 用生词说一句", "生词本里的词，开口用一次"] };
   function goSec(k) { // 入门里的「去练」：有的是一栏，有的是 AI 工具或入门里的小页
     if (k === "rescue" || k === "intro") return open(k, k);
+    if (only && k === "pron") { stopAll(); view = null; if (window.enShow) window.enShow("basic", "pron"); return; }
+    if (only) { only = null; if (SECS.some(s => s[0] === k) && !MOVED.includes(k)) { sec = k; view = null; LS("speak:sec", sec); } else if (k === "howto" || k === "mock" || k === "useword") { sec = "tools"; LS("speak:sec", sec); open(k, k); } if (window.enShow) window.enShow("speak"); window.scrollTo(0, 0); return; } // 嵌在「🌱 入门」里：别的栏在「🗣 说」
     if (k === "howto" || k === "mock" || k === "useword") { sec = "tools"; LS("speak:sec", sec); return open(k, k); }
     if (SECS.some(s => s[0] === k)) { stopAll(); sec = k; view = null; LS("speak:sec", sec); draw(); window.scrollTo(0, 0); }
   }
@@ -864,6 +870,7 @@
         return;
       }
       const ad = t.closest("[data-add]"); if (ad) { if (window.vocabAddWord) window.vocabAddWord(ad.dataset.add, ad.dataset.sent || ""); else tip("生词本还没加载好"); return; }
+      const bz = t.closest("[data-basic]"); if (bz) { stopAll(); if (window.enShow) window.enShow("basic", bz.dataset.basic); return; }
       const sc = t.closest("[data-sec]"); if (sc) { stopAll(); sec = sc.dataset.sec; view = null; LS("speak:sec", sec); draw(); return; }
       const vc = t.closest("[data-voice]"); if (vc) { hush(); if (window.TTS) TTS.setMode(vc.dataset.voice); draw(); if (vc.dataset.voice !== "sys" && window.TTS) TTS.load().then(() => say("Hi! This is the voice you will hear.")); return; }
       const rt = t.closest("[data-rate]"); if (rt) { opt.rate = +rt.dataset.rate; LS("speak:opt", opt); draw(); return; }
@@ -920,9 +927,9 @@
     root.addEventListener("change", e => { if (e.target.id === "sk-auto") { chatAuto = e.target.checked; LS("speak:chatAuto", chatAuto); } });
     document.addEventListener("keydown", e => { if (e.key === "Escape" && document.documentElement.classList.contains("show-speak")) { stopAll(); draw(); } });
   }
-  window.speakShow = () => { init(); if (!root) return; draw(); if (!D) loadData().then(draw); syPull().then(ch => { if (root && document.documentElement.classList.contains("show-speak")) draw(); }); };
+  window.speakShow = o => { init(); if (!root) return; const was = only; only = MOVED.includes(o) ? o : null; if (was !== only) { stopAll(); view = null; } draw(); if (!D) loadData().then(draw); syPull().then(ch => { if (root && document.documentElement.classList.contains("show-speak")) draw(); }); };
   window.speakHide = () => { if (root) { stopAll(); } };
   // 直达链接（?go=speak）或上次停在口语页：切换标签的代码比本文件先跑，那时还没有 speakShow，这里补画一次
-  const boot = () => { init(); if (document.documentElement.classList.contains("show-speak")) window.speakShow(); };
+  const boot = () => { const h = document.documentElement; init(); if (h.classList.contains("show-speak")) { let o; if (h.classList.contains("show-basic")) { try { o = localStorage.getItem("en_sub_basic") === "pron" ? "pron" : "start"; } catch (e) { o = "start"; } } window.speakShow(o); } };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
 })();

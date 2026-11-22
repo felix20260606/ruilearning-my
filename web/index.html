@@ -215,7 +215,7 @@
   /* 🌐 学习语言（lang.js 加的按钮，样式同「👤」）：手机只显示国旗 */
   #apptabs button.who.lang{max-width:none}#apptabs button.who.lang .ln{display:none}
   @media (min-width:600px) and (max-width:1023px),(min-width:1400px){#apptabs button.who.lang .ln{display:inline}} /* 电脑窄屏和二级标签挤在一行：只留国旗 */
-  @media (min-width:1024px) and (max-width:1279px){.subgrp{gap:14px!important}} /* 电脑窄屏：二级标签挤一点，别压到右上角的 🌐 / 👤 */
+  @media (min-width:1024px) and (max-width:1279px){.subgrp{gap:14px!important}#apptabs .seg-wrap,#apptabs .seg-wrap.three{max-width:300px!important}#subtabs{left:364px!important}} /* 电脑窄屏：二级标签挤一点、一级标签窄一点，八个二级标签（加了 🌱 入门）别压到右上角的 🌐 / 👤 */
   .who{display:inline-flex;align-items:center;gap:5px;margin:8px 0 0;border:1px solid var(--ui-line-2);background:var(--ui-surface-2);color:var(--ui-ink-2);border-radius:999px;padding:4px 11px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;max-width:100%}
   .who:hover{border-color:var(--ui-pur);color:var(--ui-ink)}.who b{color:var(--ui-ink);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:12em}
   .who-menu{position:fixed;z-index:9600;min-width:200px;max-width:min(320px,calc(100vw - 32px));background:var(--ui-surface);border:1px solid var(--ui-line-2);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.45);padding:6px;display:none}
@@ -573,6 +573,7 @@
     <button id="tab-read" type="button">📰 读</button>
     <button id="tab-write" type="button">✍️ 写</button>
     <button id="tab-ielts" type="button">🎓 雅思</button>
+    <button id="tab-basic" type="button">🌱 入门</button>
   </div>
   <div class="subgrp" data-l1="life">
     <button id="tab-fat" type="button">🥗 减脂</button>
@@ -817,6 +818,7 @@
 </style>
 <!-- 🗣 口语：情景对话、常用表达、发音、跟读、话题（见 speak.js，内容在 speak-data.js） -->
 <div id="view-speak"></div>
+<div id="view-basic"></div><!-- 🌱 入门 → 🧭 从这开始（basic.js）；口语入门 / 发音借用 #view-speak，语法借用 #view-en -->
 <div id="view-daily"></div>
 <div id="view-ielts">
 <div id="ielts-subnav">
@@ -1832,13 +1834,14 @@ refresh(); // show seed words immediately, no waiting on storage
     if(fr)fr.setAttribute('src',FAT_FILES[r]||FAT_FILES.wrap);
     try{localStorage.setItem('fat_region',r);}catch(e){}
   }
-  // 英语七个二级标签：📅 每日 | 📖 词汇 | 🎧 听 | 🗣 说 | 📰 读 | ✍️ 写 | 🎓 雅思
+  // 英语八个二级标签：📅 每日 | 📖 词汇 | 🎧 听 | 🗣 说 | 📰 读 | ✍️ 写 | 🎓 雅思 | 🌱 入门
+  //   入门 → 🧭 从这开始（basic.js）/ 🗣 口语入门、🔊 发音（speak.js 只显示这一栏：speakShow("start" / "pron")）/ 📐 语法（生词本页的语法模式，原来在「✍️ 写」下面）
   //   词汇 / 听（听力练习）/ 读 / 写 借用生词本这一页（#view-en）：html[data-en] 决定隐藏哪些部分，再切到对应的模式（.modes 按钮）
   //   听 → 🎬 视频（watch.js 的 videoCore）/ 🎧 听力练习（「🔊 练习」）；写 → 📝 写作批改（write.js）/ 📐 语法；读 → 📰 阅读（今日新闻、文章）
-  var tListen=document.getElementById('tab-listen'),tRead=document.getElementById('tab-read'),tWrite=document.getElementById('tab-write');
-  var L2_OWNER={daily:'en',notebook:'en',listen:'en',speak:'en',read:'en',write:'en',ielts:'en',fat:'life',trip:'life'};
-  var EN_PAGE={notebook:'vocab',listen:'listen',read:'read',write:'write'};
-  var SECS={listen:[['drill','🧩 练习课'],['sme','📻 听力节目'],['video','🎬 视频'],['practice','🎧 听力练习']],write:[['writing','📝 写作批改'],['grammar','📐 语法']]};
+  var tListen=document.getElementById('tab-listen'),tRead=document.getElementById('tab-read'),tWrite=document.getElementById('tab-write'),tBasic=document.getElementById('tab-basic');
+  var L2_OWNER={daily:'en',notebook:'en',listen:'en',speak:'en',read:'en',write:'en',ielts:'en',basic:'en',fat:'life',trip:'life'};
+  var EN_PAGE={notebook:'vocab',listen:'listen',read:'read',write:'write',basic:'write'}; // 入门只有「📐 语法」用生词本页
+  var SECS={listen:[['drill','🧩 练习课'],['sme','📻 听力节目'],['video','🎬 视频'],['practice','🎧 听力练习']],basic:[['start','🧭 从这开始'],['speak','🗣 口语入门'],['pron','🔊 发音'],['grammar','📐 语法']]}; // 「📐 语法」从「✍️ 写」挪到了「🌱 入门」
   var VOCAB_MODES=/^(err|stats|pump|saved|list)$/, CUR='', busy=false;
   try{if(!localStorage.getItem('drill:seen')){localStorage.setItem('drill:seen','1');if(localStorage.getItem('en_sub_listen'))localStorage.setItem('en_sub_listen','drill');}}catch(e){} // 新加的「🧩 练习课」第一次默认选它（新标签排最前、默认选最新）
   function getSub(w){var d=SECS[w][0][0];try{var v=localStorage.getItem('en_sub_'+w);if(SECS[w].some(function(x){return x[0]===v;}))return v;}catch(e){}return d;}
@@ -1864,14 +1867,17 @@ refresh(); // show seed words immediately, no waiting on storage
     if(tIelts)tIelts.classList.toggle('on',which==='ielts');
     if(tSpeak)tSpeak.classList.toggle('on',which==='speak');
     if(tDaily)tDaily.classList.toggle('on',which==='daily');
+    if(tBasic)tBasic.classList.toggle('on',which==='basic');
     tFat.classList.toggle('on',which==='fat');
     tTrip.classList.toggle('on',which==='trip');
     // 内容区切换
-    root.classList.remove('show-fat','show-trip','show-ielts','show-speak','show-daily');
-    if(which!=='speak'&&window.speakHide)speakHide();
-    if(which!=='daily'&&window.dailyHide)dailyHide();
-    if(EN_PAGE[which])root.setAttribute('data-en',EN_PAGE[which]);else root.removeAttribute('data-en');
+    root.classList.remove('show-fat','show-trip','show-ielts','show-speak','show-daily','show-basic','show-basic-home');
     if(SECS[which]){sub=sub&&SECS[which].some(function(x){return x[0]===sub;})?sub:getSub(which);try{localStorage.setItem('en_sub_'+which,sub);}catch(e){}}else sub='';
+    var bSpeak=which==='basic'&&(sub==='speak'||sub==='pron');
+    if(which!=='speak'&&!bSpeak&&window.speakHide)speakHide();
+    if(which!=='daily'&&window.dailyHide)dailyHide();
+    var ep=which==='basic'&&sub!=='grammar'?'':EN_PAGE[which];
+    if(ep)root.setAttribute('data-en',ep);else root.removeAttribute('data-en');
     setSec(which,sub);
     var wantVideo=which==='listen'&&sub==='video';
     if(!wantVideo){window.__wantVideo=0;if(window.videoCore)videoCore.leave();}
@@ -1895,12 +1901,17 @@ refresh(); // show seed words immediately, no waiting on storage
     }else if(which==='daily'){
       root.classList.add('show-daily');
       if(window.dailyShow)dailyShow();
+    }else if(which==='basic'){
+      root.classList.add('show-basic');
+      if(bSpeak){root.classList.add('show-speak');if(window.speakShow)speakShow(sub==='speak'?'start':'pron');}
+      else if(sub==='start'){root.classList.add('show-basic-home');if(window.basicShow)basicShow();}
     }
     busy=true;
     try{
       if(which==='notebook'){if(!VOCAB_MODES.test(root.getAttribute('data-mode')||'')){var lm='list';try{lm=localStorage.getItem('vocab_mode_v')||'list';}catch(e){}clickMode(VOCAB_MODES.test(lm)?lm:'list');}}
       else if(which==='read')clickMode('reading');
-      else if(which==='write')clickMode(sub==='grammar'?'grammar':'writing');
+      else if(which==='write')clickMode('writing');
+      else if(which==='basic'&&sub==='grammar')clickMode('grammar');
       else if(which==='listen'){if(wantVideo){if(window.videoCore)videoCore.enter();else window.__wantVideo=1;}else clickMode(sub==='sme'||sub==='drill'?sub:'pump');}
     }finally{busy=false;}
     try{localStorage.setItem('vocab_tab',which);}catch(e){}
@@ -1908,11 +1919,13 @@ refresh(); // show seed words immediately, no waiting on storage
   window.enShow=show;
   // 生词本的模式按钮被点了（包括每日一练、统计页、#article 链接直接点模式按钮跳过来）：上面的标签跟着变
   window.enSync=function(m){
+    if(CUR==='basic'&&getSub('basic')!=='grammar'&&m!=='grammar'&&!busy)return; // 入门的其它小标签不用生词本页：网页启动时恢复的模式别把标签切走
     if(busy||!EN_PAGE[CUR]||root.classList.contains('show-video')){if(CUR==='notebook'&&VOCAB_MODES.test(m)){try{localStorage.setItem('vocab_mode_v',m);}catch(e){}}return;}
     if(VOCAB_MODES.test(m)&&!(m==='pump'&&CUR==='listen')){try{localStorage.setItem('vocab_mode_v',m);}catch(e){}} // 「📖 词汇」记住上次的模式（听力练习不算）
     if(m==='reading'){if(CUR!=='read')show('read');return;}
     if(m==='sme'||m==='drill'){if(CUR!=='listen'||getSub('listen')!==m)show('listen',m);return;}
-    if(m==='grammar'||m==='writing'){var sb=m==='grammar'?'grammar':'writing';if(CUR!=='write'||getSub('write')!==sb)show('write',sb);return;}
+    if(m==='grammar'){if(CUR!=='basic'||getSub('basic')!=='grammar')show('basic','grammar');return;}
+    if(m==='writing'){if(CUR!=='write')show('write');return;}
     if(m==='pump'&&CUR==='listen')return;
     if(CUR!=='notebook')show('notebook');
   };
@@ -1933,6 +1946,7 @@ refresh(); // show seed words immediately, no waiting on storage
   if(tIelts)tIelts.onclick=function(){show('ielts');};
   if(tSpeak)tSpeak.onclick=function(){show('speak');};
   if(tDaily)tDaily.onclick=function(){show('daily');};
+  if(tBasic)tBasic.onclick=function(){show('basic');};
   if(tListen)tListen.onclick=function(){show('listen');};
   if(tRead)tRead.onclick=function(){show('read');};
   if(tWrite)tWrite.onclick=function(){show('write');};
@@ -1950,8 +1964,9 @@ refresh(); // show seed words immediately, no waiting on storage
   var saved='';try{saved=localStorage.getItem('vocab_tab')||'';}catch(e){}
   if(saved==='xsaved'||saved==='xreview'){try{localStorage.setItem('vocab_mode',saved==='xsaved'?'saved':'pump');localStorage.setItem('vocab_tab','notebook');}catch(e){} saved='notebook';} // 以前的「已保存 / 复习」入口已并进生词本
   var vsub='';try{if(localStorage.getItem('wt:tab')==='1'){saved='listen';vsub='video';}}catch(e){} // 以前一级标签「🎬 视频」上次开着：现在在「🎧 听 → 🎬 视频」
-  if(saved==='notebook'){try{var om=localStorage.getItem('vocab_mode')||'';if(om==='reading')saved='read';else if(om==='grammar')saved='write',vsub='grammar';}catch(e){}} // 以前停在生词本的「阅读 / 语法」：现在是「📰 读」「✍️ 写」
-  var g='';try{g=new URLSearchParams(location.search).get('go');if(g==='speak'||g==='daily'||g==='listen'||g==='read'||g==='write'||g==='ielts')saved=g,vsub='';if(g==='video')saved='listen',vsub='video';}catch(e){} // 直达链接 ?go=speak / daily / listen / read / write / video
+  if(saved==='notebook'){try{var om=localStorage.getItem('vocab_mode')||'';if(om==='reading')saved='read';else if(om==='grammar')saved='basic',vsub='grammar';}catch(e){}} // 以前停在生词本的「阅读 / 语法」：现在是「📰 读」「✍️ 写」
+  try{if(saved==='write'&&localStorage.getItem('en_sub_write')==='grammar')saved='basic',vsub='grammar';}catch(e){} // 上次停在「✍️ 写 → 📐 语法」：语法现在在「🌱 入门」
+  var g='';try{g=new URLSearchParams(location.search).get('go');if(g==='speak'||g==='daily'||g==='listen'||g==='read'||g==='write'||g==='ielts'||g==='basic')saved=g,vsub='';if(g==='video')saved='listen',vsub='video';}catch(e){} // 直达链接 ?go=speak / daily / listen / read / write / video
   if(!saved&&!g&&!/^#article\//.test(location.hash))saved='daily'; // 第一次来（没存过标签）：先进「📅 每日一练」
   if(L2_OWNER[saved]&&!root.classList.contains('collect-mode'))show(saved,vsub);
 })();
@@ -1990,7 +2005,8 @@ refresh(); // show seed words immediately, no waiting on storage
 <script src="watch.js?v=18"></script>
 <script src="channels.js?v=3"></script>
 <script src="pump.js?v=30"></script>
-<script src="speak.js?v=11"></script>
+<script src="speak.js?v=12"></script>
+<script src="basic.js?v=1"></script>
 <script src="daily.js?v=9"></script>
 <script src="read.js?v=13"></script>
 <script src="listen.js?v=16"></script>
