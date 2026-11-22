@@ -87,7 +87,7 @@
     const W = sentWords(), S = sentDay();
     if (!W.length) return '<div class="dy-sent"><div class="s">生词本里还没有可以造句的词。</div></div>';
     return '<div class="dy-sent">' + W.map((w, i) => { const x = S[w.word], r = x && x.r;
-      return '<div class="row1"><b data-to="word:' + esc(w.word) + '" title="查这个词">' + esc(w.word) + "</b><small>" + esc(w.zh) + "</small>" +
+      return '<div class="row1"><b data-w="' + esc(w.word) + '">' + esc(w.word) + "</b><small>" + esc(w.zh) + "</small>" +
         (x ? '<div class="mine">' + esc(x.t) + "</div>" + (r ? '<div class="' + (r.correct ? "good" : "bad") + '">' + (r.correct ? "✅ 用对了" : "✏️ 改一下：" + esc(r.fixed)) + (r.why_zh ? "<br><small>" + esc(r.why_zh) + "</small>" : "") + (r.better ? '<br><small>更地道：' + esc(r.better) + (r.better_zh ? "（" + esc(r.better_zh) + "）" : "") + "</small>" : "") + "</div>" : '<div class="s">（AI 没看到，算你写过了）</div>') + '<button class="dy-chk" data-sredo="' + i + '">重写</button>'
           : '<div class="in"><input data-sin="' + i + '" placeholder="用 ' + esc(w.word) + ' 造一个句子" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="ui-btn" data-scheck="' + i + '"' + (sentBusy[w.word] ? " disabled" : "") + ">" + (sentBusy[w.word] ? "检查中…" : "检查") + "</button></div>") + "</div>"; }).join("") + "</div>";
   }
@@ -158,7 +158,7 @@
       '<div class="nums"><div data-to="notebook/stats" title="看热力日历"><b>' + w.act + '</b><span>天有练习</span></div><div data-to="notebook/stats" title="看热力日历"><b>' + w.full7 + '</b><span>天全勤</span></div><div data-to="notebook/stats" title="看统计"><b>' + w.cards + '</b><span>张卡片 <em class="' + (diff >= 0 ? "up" : "dn") + '">' + (w.cardsP || diff ? (diff >= 0 ? "↑" : "↓") + Math.abs(diff) : "") + "</em></span></div><div><b>" + (acc ? acc + "%" : "—") + "</b><span>记得率</span></div><div><b>" + w.nw + "</b><span>个新词</span></div><div><b>" + w.mins + "</b><span>分钟背词</span></div></div>" +
       '<div class="areas">' + Object.keys(w.area).map(k => '<span' + (AREA_TO[k] ? ' data-to="' + AREA_TO[k] + '" title="去练「' + k + '」"' : "") + "><b>" + k + "</b> " + w.area[k] + " 天</span>").join("") + "</div>" +
       '<div class="more">' + ['<span data-to="read">读了 ' + w.docsN + " 篇文章</span>", '<span data-to="listen/sme">听了 ' + w.smeN + " 期听力节目</span>", '<span data-to="write">批改了 ' + w.wr + " 篇作文" + (w.band ? "（最高 " + w.band + " 分）" : "") + "</span>"].join(" · ") + "</div>" +
-      (w.hard.length ? '<div class="more">🔥 最难的词：' + w.hard.map(h => '<b data-to="word:' + esc(h.word) + '" title="查这个词">' + esc(h.word) + "</b>" + (h.f ? "（忘了 " + h.f + " 次）" : "")).join("、") + "</div>" : "") +
+      (w.hard.length ? '<div class="more">🔥 最难的词：' + w.hard.map(h => '<b data-w="' + esc(h.word) + '">' + esc(h.word) + "</b>" + (h.f ? "（忘了 " + h.f + " 次）" : "")).join("、") + "</div>" : "") +
       '<div class="adv">💡 ' + esc(tip1) + "</div></div>";
   }
   const AREA_TO = { 词: "notebook/pump", 听: "listen/sme", 说: "speak", 读: "read", 写: "write" }; // 本周小结「词 / 听 / 说 / 读 / 写 N 天」点了去练

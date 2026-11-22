@@ -14,4 +14,7 @@ ok(!/#ra-pop/.test(W("read.js")) && !/function openPop\(/.test(W("read.js")), "r
 ok(/markOf: w =>/.test(wt) && /setMark: \(w, m\) =>/.test(wt) && /next: w => vsNextMark\(w\)/.test(wt), "watch.js exposes mark functions");
 // 上色函数不能和画查词卡片的 html 同名（同名会把卡片盖掉，卡片只剩一个词）
 ok((w.match(/\bfunction html\(/g) || []).length === 1 && /function colorHtml\(t, o\)/.test(w), "only one function html (the lookup card)");
+// 全站兜底：不在任何 WORD.bind / hover 容器里的 data-w 单词也是 点击出卡片 / 停留出气泡 / 右键循环标记；单词不再用 data-to="word:" 另一套
+ok(/document\.addEventListener\("contextmenu", e => \{ const el = loose\(e\.target\)/.test(w) && /hover\(document, \{ global: true/.test(w) && /box\.setAttribute\("data-wd-bound", "1"\)/.test(w), "global fallback for loose words");
+for (const f of fs.readdirSync(path.join(__dirname, "..", "web")).filter(f => /\.js$/.test(f) && f !== "_worker.js")) ok(!/data-to=\\?"word:/.test(fs.readFileSync(path.join(__dirname, "..", "web", f), "utf8")), f + ": words use data-w (same logic everywhere)");
 console.log(fail ? fail + " FAILED" : "t62 word: all ok"); process.exit(fail ? 1 : 0);

@@ -9,6 +9,7 @@
        容器里带 data-w="词" 的元素都按这一套处理（点词 + 右键）；一个容器只 bind 一次
      WORD.open(词, 元素, { sent, quiet, onAdd })、WORD.close()、WORD.mark(词, "learn"|"known"|"ignore"|"")
      WORD.bind(容器, {hover: "rl"}) 停留出 Language Reactor 练习那种小卡片（• 意思 + ✓ 已掌握 + 📖 词典），「🔊 练习」用
+     不在任何容器里的 data-w 单词：全站兜底，也是 点一下出卡片 / 停留出气泡 / 右键循环标记（页面上随便哪里写 <b data-w="词"> 就行）
      WORD.hover(容器) 只加「停留出小气泡」（bind 已经自带）；鼠标停在词上出两三个意思 + 语法 + 注释 + 词频（同插件），手机上没有
      WORD.html(英文, {level, settings, gram}) → 能点、按水平上色的 html（全站单词颜色都用它）
      WORD.add(词, {sent, silent, learn, from}) 加进生词本（全站加词都用它）→ true 加了 / false 本来就有 / null 失败
@@ -251,6 +252,7 @@
   }
   function hover(box, o) { // 给一个容器里的词（data-w）加上停留气泡；bind 会自动加，只要停留不要点词的页面（视频字幕自己管点击）单独调
     if (!box || box.__wdHover) return; box.__wdHover = 1; o = o || {};
+    if (!o.global && box.setAttribute) box.setAttribute("data-wd-bound", "1"); // 这个容器里的词归它自己管，全站兜底不插手
     box.addEventListener("mouseover", e => {
       if (!canHover()) return; const el = e.target.closest && e.target.closest("[data-w]"); if (!el || !box.contains(el) || (o.skip && o.skip(el))) return;
       clearTimeout(xT); if (mini && mini._el === el) return; clearTimeout(hT); hT = setTimeout(() => showMini(el, o.hover), 90);
@@ -263,6 +265,7 @@
   window.addEventListener("scroll", () => { if (mini) hideMini(); }, { passive: true });
   function bind(box, o) {
     if (!box || box.__word) return; box.__word = 1; o = o || {};
+    box.setAttribute("data-wd-bound", "1");
     hover(box, o);
     box.addEventListener("click", e => {
       const el = e.target.closest("[data-w]"); if (!el || !box.contains(el) || (o.skip && o.skip(el))) return;
@@ -276,6 +279,17 @@
       e.preventDefault(); e.stopPropagation(); close(); cycle(el.dataset.w);
     }, true);
   }
+
+  /* 🔤 全站兜底：不在任何 WORD.bind / WORD.hover 容器里的单词（data-w，比如「每日」的难词、背单词首页的队列、写作的高级词、听力生词表），
+     也是同一套：点一下出查词卡片、停留出小气泡、右键按插件规则循环标记 */
+  const loose = t => { const el = t && t.closest && t.closest("[data-w]"); return el && !el.closest("[data-wd-bound]") && !el.closest("#wd-pop, #wd-mini") ? el : null; };
+  document.addEventListener("click", e => {
+    const el = loose(e.target); if (!el || e.defaultPrevented || String(window.getSelection ? getSelection() : "").trim()) return;
+    e.preventDefault(); e.stopPropagation(); open(el.dataset.w, el, { sent: el.dataset.sent || "" });
+  });
+  document.addEventListener("contextmenu", e => { const el = loose(e.target); if (!el) return; e.preventDefault(); close(); cycle(el.dataset.w); });
+  hover(document, { global: true, skip: el => !loose(el) });
+  document.addEventListener("keydown", e => { if (e.key !== "Enter") return; const el = loose(e.target); if (el && el.tabIndex >= 0) { e.preventDefault(); open(el.dataset.w, el, {}); } });
 
   /* 🎨 英文 → 能点、按水平上色的 html（全站共用：阅读、视频字幕、听力文稿、背单词卡片）
      WORD.html(英文, { level 换一个词汇水平（不传 = 跟插件设置）, settings 额外的插件设置, gram:false 不画语法下划线 })

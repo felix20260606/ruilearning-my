@@ -703,7 +703,7 @@
       s += '<div class="wr-lv">' + b.map((x, i) => '<i class="b' + i + '" style="width:' + (x / tt) * 100 + '%" title="' + BANDS[i].t + " " + x + '"></i>').join("") + "</div>";
       s += '<div class="wr-leg">' + b.map((x, i) => '<span><em class="b' + i + '"></em>' + BANDS[i].t + (i < 3 ? "（前 " + BANDS[i].max + "）" : "") + " " + pc(x) + "%</span>").join("") + "</div>";
       s += '<div class="wr-note">中高级 + 高级词占 <b style="color:var(--ui-pur-text)">' + Math.round(adv * 100) + "%</b>（" + (b[2] + b[3]) + " / " + tt + "）。" + aN + "</div>";
-      if (L.level.advWords.length) s += '<div class="wr-words">' + L.level.advWords.slice(0, 24).map(w => '<span class="ui-tag" data-to="word:' + esc(w) + '" title="查这个词">' + esc(w) + "</span>").join("") + "</div>";
+      if (L.level.advWords.length) s += '<div class="wr-words">' + L.level.advWords.slice(0, 24).map(w => '<span class="ui-tag" data-w="' + esc(w) + '">' + esc(w) + "</span>").join("") + "</div>";
     }
     // 重复词
     const O = L.overused;
