@@ -125,9 +125,9 @@ function counts(){
   document.getElementById("num").textContent=vs.total;
   document.getElementById("known-num").textContent=known;
   const tt=(id,t)=>{const e=document.getElementById(id);if(e)e.title=t;};
-  tt("st-total","单词 + 短语 + 句子，共 "+vs.total+" 个（另有 "+vs.patterns+" 条规律是参考资料，不算在里面）");
-  tt("st-learn","练过、还没掌握的；还有 "+vs.fresh+" 个没练过");
-  tt("st-known","掌握进度 100%：标为已掌握，或练到半衰期 42 天（至少 6 周都很可能记得）");
+  tt("st-total","单词 + 短语 + 句子，共 "+vs.total+" 个（另有 "+vs.patterns+" 条规律是参考资料，不算在里面）· 点一下看列表");
+  tt("st-learn","练过、还没掌握的；还有 "+vs.fresh+" 个没练过 · 点一下看是哪些");
+  tt("st-known","掌握进度 100%：标为已掌握，或练到半衰期 42 天（至少 6 周都很可能记得）· 点一下看是哪些");
   const by=t=>words.filter(w=>w.type===t).length;
   document.getElementById("c-all").textContent=words.length;
   document.getElementById("c-word").textContent=by("word");
@@ -314,7 +314,7 @@ function renderList(){
   let arr=sortedWords();
   if(cat!=="all")arr=arr.filter(w=>w.type===cat);
   renderPtags();if(cat==="pattern"&&ptag!=="all")arr=arr.filter(w=>(w.tag||"其他")===ptag);
-  if(filter!=="all")arr=arr.filter(w=>filter==="known"?w.status==="known":w.status!=="known");
+  if(filter!=="all"){const S=state.srs||{},st=w=>masteryOf(w)>=1?"known":S[w.id]?"practicing":"fresh";arr=arr.filter(w=>(w.type||"word")!=="pattern"&&(filter==="learning"?st(w)!=="known":st(w)===filter));} // 学习中 / 没练过 / 已掌握：和上面的数字同一个算法（vocabStats），三个加起来 = 生词（规律不算）；learning = 旧的「未掌握」
   if(query){const q=query.toLowerCase();arr=arr.filter(w=>w.word.toLowerCase().includes(q)||w.zh.includes(query));}
   if(!arr.length){box.innerHTML='<div class="empty">这个分类还没有内容。<br>问我新词/短语/台词，或用“添加”自己加进来。</div>';return;}
   box.innerHTML=arr.map(w=>`

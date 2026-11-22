@@ -1,6 +1,7 @@
 // 🛡 代码检查（GitHub Actions 自动测试跑；本机跑法见 tools/lint.sh）：只查两类会让页面直接报错的问题
 // ① no-undef：用了没定义的变量（比如删掉的函数还有地方在调）
 // ② 页面里的变量和全站公用模块重名（比如 const WORD = 正则，把 word.js 的 WORD 遮住了）
+// ③ 同一个作用域里重复定义（两个同名函数，后面的悄悄盖掉前面的）
 // 跨文件共用的全局变量都要登记在下面；新加一个公用模块 / index.html 的全局函数，记得加进来
 import globals from "globals";
 import fs from "node:fs";
@@ -44,6 +45,8 @@ export default [{
   },
   rules: {
     "no-undef": "error",
+    "no-redeclare": ["error", { builtinGlobals: false }], // 同一个作用域里两个同名函数 / 变量：后面的会悄悄盖掉前面的（word.js 的 html 出过这个事）
+    "no-dupe-keys": "error", "no-func-assign": "error",
     "no-restricted-syntax": ["error",
       { selector: `VariableDeclarator[id.name=/${SHARED_RE}/]`, message: "变量名和全站公用模块重名，会把它遮住（换个名字）" },
       { selector: `FunctionDeclaration[id.name=/${SHARED_RE}/]`, message: "函数名和全站公用模块重名，会把它遮住（换个名字）" },

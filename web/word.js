@@ -201,7 +201,7 @@
   const protect = t => String(t).replace(/&/g, "\u0001").replace(/</g, "\u0002").replace(/>/g, "\u0003").replace(/(^|[\s(\[{—–-])"/g, "$1“").replace(/"/g, "”");
   const unprotect = h => h.replace(/\u0001/g, "&amp;").replace(/\u0002/g, "&lt;").replace(/\u0003/g, "&gt;");
   let colorLoading = null;
-  function html(t, o) {
+  function colorHtml(t, o) { // 别叫 html：上面画查词卡片的函数已经叫 html 了（同名会把它盖掉，卡片就只剩一个词）
     o = o || {}; const pt = protect(t), v = V(); let h = null;
     try {
       if (o.level == null && !o.settings && v && v.ready && v.ready()) h = v.html(pt); // 跟插件设置：直接用视频页那一份（还带你的标记、保存过的短语框）
@@ -221,7 +221,7 @@
     });
     return unprotect(h);
   }
-  window.WORD = { html, bind, open, close, mark, cycle, status, loadBook, dict, add, get openWord() { return pWord; } };
+  window.WORD = { html: colorHtml, bind, open, close, mark, cycle, status, loadBook, dict, add, get openWord() { return pWord; } };
   // 旧接口（read.js / listen.js 以前用的）
   window.readPop = (w, el, opt) => open(w, el, opt || {});
   window.readBook = reload => { if (reload || !book.size) loadBook(); if (typeof vsKeys !== "function") vsLoad(); return status; };

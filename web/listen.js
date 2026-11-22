@@ -665,6 +665,7 @@
       skip: el => !(trShow && EP && el.closest(".sm-tr")),
       sent: el => { const sn = el.closest("[data-si]"), p = el.closest("[data-li]"); return (sn && TIM[EP.id] ? (TIM[EP.id][+sn.dataset.si] || {}).t : p ? (EP.lines[+p.dataset.li] || {}).t : "") || ""; },
       quiet: () => !AU.paused,
+      showCtx: true, // 卡片里显示这个词所在的句子（同看视频）
     });
     document.addEventListener("word-change", () => { if (trShow && view === "ep" && root.getClientRects().length) { const y = window.scrollY; draw(); window.scrollTo(0, y); } });
     // 切标签（#sme 或外面的页面被藏起来）时把播放器挪进悬浮条

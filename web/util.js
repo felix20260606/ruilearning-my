@@ -20,6 +20,10 @@
      U.keepKeys(列表键, id, max, [键前缀…]) 每条单独一个键的缓存（视频字幕、查词）：记最近用过的顺序，超出的连同各自的键一起删
      U.cacheable(键前缀, 名字) 登记「可以丢的缓存」；任何地方 localStorage 存满了（QuotaExceeded）：按登记顺序一组组清掉缓存再试，
        存进去了记日志、提示一次；清完还存不进去照旧抛错（原来的兜底照常走）。生词本、记录这些数据不会被清
+   🔗 跳转（页面之间关联起来）：任何元素加 data-to="去哪"，点了（或 Tab 选中按回车）就跳过去；代码里用 U.go("去哪", 元素)
+     去哪 = "标签/小标签?条件"：标签 daily notebook listen speak read write ielts basic；小标签同 enShow（生词本 list pump stats saved err，听 drill sme video practice……）
+     生词本列表的条件：f=all|learning|known（全部 / 未掌握 / 已掌握）、c=all|word|phrase|sentence|pattern（分类）、q=搜索词；雅思：?sub=lexam|rexam|notes|basics
+     "word:单词" = 就地打开这个词的查词卡片
    🐞 排查：U.log(模块, 事情, 详情) 记一条（内存里最多 300 条，最近 200 条存进这台设备）；在浏览器控制台打 U.logs() 看全部，U.logs("ai") 只看一个模块
      页面上的报错（代码出错、没处理的 Promise 失败）自动记成 "error"；手机上看：生词本「⚙ 设置」→「🐞 问题记录」，或者网址加 ?debug
      U.showLogs() 打开问题记录（能一键复制发给 Claude）；U.clearLogs() 清空
@@ -193,7 +197,34 @@
     };
   } catch (e) {}
 
+  /* ---------- 🔗 跳转 ---------- */
+  function go(spec, el) {
+    spec = String(spec || ""); const qi = spec.indexOf("?"), path = qi < 0 ? spec : spec.slice(0, qi), p = new URLSearchParams(qi < 0 ? "" : spec.slice(qi + 1));
+    log("go", spec);
+    if (/^word:/.test(path)) { const w = path.slice(5); if (window.WORD && w) WORD.open(w, el || document.body, { sent: p.get("sent") || "" }); return; }
+    const [tab, sub] = path.split("/");
+    if (typeof window.enShow !== "function") { log("go", "跳不了：enShow 还没准备好", spec); return; }
+    window.enShow(tab, sub || undefined);
+    const click = sel => { const b = document.querySelector(sel); if (b && !b.classList.contains("on")) b.click(); };
+    if (tab === "notebook" && sub) { const b = document.querySelector('.modes button[data-mode="' + sub + '"]'); if (b && !b.classList.contains("on")) b.click(); } // 生词本的模式（列表、练习、统计、已保存、错题）：enShow 只管切到生词本，模式这里点
+    setTimeout(() => {
+      if (tab === "notebook" && (!sub || sub === "list")) {
+        if (p.has("c")) click('#list-cats [data-c="' + p.get("c") + '"]');
+        if (p.has("f")) click('.filters button[data-f="' + p.get("f") + '"]');
+        if (p.has("q")) { const q = document.getElementById("q"); if (q) { q.value = p.get("q"); q.dispatchEvent(new Event("input", { bubbles: true })); } }
+        const lv = document.getElementById("list-view"); if (lv && (p.has("f") || p.has("c") || p.has("q"))) try { lv.scrollIntoView({ block: "start", behavior: "smooth" }); } catch (e) {}
+      }
+      if (tab === "ielts" && p.has("sub") && window.ieltsSub) window.ieltsSub(p.get("sub"));
+    }, 60);
+  }
+  try {
+    document.addEventListener("click", e => { const t = e.target.closest && e.target.closest("[data-to]"); if (!t || e.defaultPrevented) return; e.preventDefault(); e.stopPropagation(); go(t.dataset.to, t); }, true);
+    document.addEventListener("keydown", e => { if (e.key !== "Enter" || !e.target.closest) return; const t = e.target.closest("[data-to]"); if (!t || /^(INPUT|TEXTAREA|SELECT|BUTTON|A)$/.test(t.tagName)) return; e.preventDefault(); go(t.dataset.to, t); });
+    const st = document.createElement("style"); st.textContent = "[data-to]{cursor:pointer}[data-to]:not(button):not(a):hover{filter:brightness(1.18)}[data-to]:focus-visible{outline:2px solid var(--ui-pur,#9C3FD0);outline-offset:2px}";
+    (document.head || document.documentElement).append(st);
+  } catch (e) {}
+
   const ask = (q, o) => dialog(q, o, false);
   const input = (q, def, o) => dialog(q, o, true, def);
-  window.U = { esc, LG, LS, tip, log, logs, json, day, dayStart, dayAgo, daysBetween, streak, ask, input, copy, download, sents, showLogs, clearLogs, report, keep, kept, keepKeys, cacheable };
+  window.U = { esc, LG, LS, tip, log, logs, json, day, dayStart, dayAgo, daysBetween, streak, ask, input, copy, download, sents, showLogs, clearLogs, report, keep, kept, keepKeys, cacheable, go };
 })();
