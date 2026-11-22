@@ -7,7 +7,7 @@
 #vs-sub .vs-w:hover{background:rgba(15,163,122,.85)}
 #vs-sub .vs-w.vs-lo{box-shadow:inset 0 0 0 1.5px #E9CF8A;background:rgba(255,226,140,.16);border-radius:6px;padding:0 3px;margin:0 -1px}
 #vs-bar{position:absolute;top:10px;right:10px;z-index:65;display:flex;gap:6px;opacity:0;transition:opacity .2s}
-#movie_player:hover #vs-bar,#vs-bar.on{opacity:1}
+.vs-pl:is(#movie_player,.bpx-player-video-area):hover #vs-bar,#vs-bar.on{opacity:1}
 #vs-bar button{border:0;border-radius:8px;background:rgba(14,20,28,.75);color:#fff;font-size:13px;font-weight:700;padding:6px 10px;cursor:pointer}
 #vs-bar button.on{background:#0FA37A}
 #vs-panel{position:fixed;top:64px;right:12px;width:330px;bottom:12px;z-index:2147483000;background:#fff;color:#1E2733;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.3);display:none;flex-direction:column;overflow:hidden;font:14px/1.45 system-ui,"PingFang SC",sans-serif}
@@ -31,7 +31,7 @@ html.vs-on .ytp-caption-window-container{opacity:0!important}
 #vs-sub .vs-note{color:rgba(255,255,255,.6);font-style:italic;font-weight:500}
 #vs-panel .it .nt{color:#7C8794;font-style:italic}
 #vs-nav{position:absolute;left:12px;top:34%;z-index:65;display:flex;flex-direction:column;gap:8px;opacity:0;transition:opacity .2s}
-#movie_player:hover #vs-nav{opacity:1}
+.vs-pl:is(#movie_player,.bpx-player-video-area):hover #vs-nav{opacity:1}
 #vs-nav button{width:34px;height:34px;border:0;border-radius:50%;background:rgba(14,20,28,.72);color:#fff;font-size:19px;font-weight:700;cursor:pointer;line-height:1;padding:0}
 #vs-nav button[data-a=ap]{font-size:11px}
 #vs-nav button:hover{background:rgba(14,20,28,.95)}#vs-nav button.on{background:#0FA37A}
@@ -53,7 +53,7 @@ html.vs-on .ytp-caption-window-container{opacity:0!important}
 #vs-nav button:hover{background:rgba(255,255,255,.15)}
 #vs-nav button[data-a=rep]{font-size:22px}
 #vs-ap{position:absolute;right:12px;bottom:24%;z-index:65;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;opacity:0;transition:opacity .2s}
-#movie_player:hover #vs-ap{opacity:1}
+.vs-pl:is(#movie_player,.bpx-player-video-area):hover #vs-ap{opacity:1}
 #vs-ap .sw{width:36px;height:14px;border-radius:999px;background:rgba(255,255,255,.35);position:relative}
 #vs-ap .sw::after{content:"";position:absolute;left:-2px;top:-3px;width:20px;height:20px;border-radius:50%;background:#bdbdbd;transition:left .15s,background .15s}
 #vs-ap.on .sw{background:rgba(15,163,122,.6)}#vs-ap.on .sw::after{left:18px;background:#0FA37A}
@@ -77,15 +77,15 @@ html.vs-on .ytp-caption-window-container{opacity:0!important}
 #vs-nav button,#vs-ap,#vs-mv{position:relative}
 #vs-ap{position:absolute}
 #vs-mv{position:absolute;right:16px;bottom:13%;z-index:65;display:flex;flex-direction:column;align-items:center;color:#fff;font:700 17px/0.62 system-ui,sans-serif;cursor:ns-resize;padding:8px 6px;border-radius:8px;opacity:0;transition:opacity .2s;text-shadow:0 0 3px #000;user-select:none;touch-action:none}
-#movie_player:hover #vs-mv{opacity:1}#vs-mv:hover,#vs-mv.drag{background:rgba(255,255,255,.15)}
+.vs-pl:is(#movie_player,.bpx-player-video-area):hover #vs-mv{opacity:1}#vs-mv:hover,#vs-mv.drag{background:rgba(255,255,255,.15)}
 [data-tip]:hover::after{content:attr(data-tip);position:absolute;top:50%;transform:translateY(-50%);white-space:nowrap;background:#2F6DB0;color:#fff;font:600 14px/1 system-ui,"PingFang SC",sans-serif;padding:8px 12px;border-radius:5px;box-shadow:0 2px 8px rgba(0,0,0,.35);text-shadow:none;pointer-events:none;z-index:90}
 #vs-nav [data-tip]:hover::after{left:calc(100% + 10px)}
 #vs-ap[data-tip]:hover::after,#vs-mv[data-tip]:hover::after{right:calc(100% + 12px)}
 #vs-mv.drag::after{display:none}
-#movie_player.vs-hidectl #vs-nav,#movie_player.vs-hidectl #vs-ap{display:none}
+.vs-pl:is(#movie_player,.bpx-player-video-area).vs-hidectl #vs-nav,.vs-pl:is(#movie_player,.bpx-player-video-area).vs-hidectl #vs-ap{display:none}
 #vs-sub .vs-h{color:#fff;font-size:calc(clamp(14px,1.8vw,24px) * var(--vs-ts,1));line-height:1.4;margin-top:2px;opacity:.92}
 #vs-sub .vs-h:empty{display:none}
-#movie_player.vs-off #vs-sub,#movie_player.vs-off #vs-nav,#movie_player.vs-off #vs-ap,#movie_player.vs-off #vs-mv,#movie_player.vs-off #vs-tip{display:none!important}
+.vs-pl:is(#movie_player,.bpx-player-video-area).vs-off #vs-sub,.vs-pl:is(#movie_player,.bpx-player-video-area).vs-off #vs-nav,.vs-pl:is(#movie_player,.bpx-player-video-area).vs-off #vs-ap,.vs-pl:is(#movie_player,.bpx-player-video-area).vs-off #vs-mv,.vs-pl:is(#movie_player,.bpx-player-video-area).vs-off #vs-tip{display:none!important}
 #vs-pill{display:inline-flex;align-items:center;gap:8px;height:34px;margin:auto 10px;padding:0 10px 0 4px;border:1.5px solid rgba(255,255,255,.45);border-radius:999px;color:#fff;font:600 13px/1 system-ui,sans-serif;align-self:center;vertical-align:middle;position:relative}
 #vs-pill .tg{display:inline-flex;align-items:center;gap:7px;cursor:pointer;position:relative}
 #vs-pill .ic{width:26px;height:26px;border-radius:50%;background:#0FA37A;display:inline-flex;align-items:center;justify-content:center;font:700 14px/1 "PingFang SC",system-ui,sans-serif}
@@ -99,8 +99,8 @@ html.vs-on .ytp-caption-window-container{opacity:0!important}
 #vs-sub .vs-w.vs-u1,#vs-panel .vs-w.vs-u1,#vs-sub .vs-w.vs-ln,#vs-panel .vs-w.vs-ln{color:var(--vs-cs,#FFB86B)}
 #vs-sub .vs-w.vs-u2,#vs-panel .vs-w.vs-u2{color:var(--vs-ci,#CDA8F7)}
 #vs-sub .vs-w.vs-sp,#vs-panel .vs-w.vs-sp{color:var(--vs-cp,#7CE3B8)}
-#movie_player.vs-hidebar .ytp-chrome-bottom,#movie_player.vs-hidebar .ytp-gradient-bottom{opacity:0!important;transition:opacity .2s}
-#movie_player.vs-hidebar .ytp-chrome-bottom:hover{opacity:1!important}
+.vs-pl:is(#movie_player,.bpx-player-video-area).vs-hidebar .ytp-chrome-bottom,.vs-pl:is(#movie_player,.bpx-player-video-area).vs-hidebar .ytp-gradient-bottom{opacity:0!important;transition:opacity .2s}
+.vs-pl:is(#movie_player,.bpx-player-video-area).vs-hidebar .ytp-chrome-bottom:hover{opacity:1!important}
 #vs-below{margin:10px 0 4px}
 #vs-sub.below{position:static;transform:none;width:100%;max-width:none;left:auto;bottom:auto!important}
 #vs-sub.below .vs-box{display:block;border-radius:12px;padding:10px 16px}
@@ -145,7 +145,7 @@ html.vs-on .ytp-caption-window-container{opacity:0!important}
 #vs-tip .vs-w.hit{background:rgba(205,168,247,.28)}
 #vs-tip .vs-w.vs-k{color:var(--vs-ck,#7CE3B8)}#vs-tip .vs-w.vs-u1,#vs-tip .vs-w.vs-ln{color:var(--vs-cs,#FFB86B)}#vs-tip .vs-w.vs-u2{color:var(--vs-ci,#CDA8F7)}#vs-tip .vs-w.vs-sp{color:var(--vs-cp,#7CE3B8)}
 #vs-tip .vs-w.vs-lo{box-shadow:inset 0 0 0 1.5px #E9CF8A;border-radius:5px;padding:0 3px}
-#movie_player.vs-off #vs-mini{display:none}
+.vs-pl:is(#movie_player,.bpx-player-video-area).vs-off #vs-mini{display:none}
 #vs-mini .hd{background:rgba(255,255,255,.14);color:#BFE3A6;border-radius:8px 8px 0 0;padding:1px 12px;margin:0 -4px 3px;font-size:.88em}
 #vs-mini .pt{font-size:1.08em;margin-bottom:8px}
 #vs-mini .hd.wd{margin-top:2px}
@@ -348,9 +348,9 @@ html.vs-on .ytp-caption-window-container{opacity:0!important}
 #vs-pill .gr{font-size:17px;opacity:.7}#vs-pill .gr:hover{opacity:1}
 /* 播放器右上角：展开 / 收起字幕栏 */
 #vs-tv{position:absolute;right:0;top:35px;z-index:65;width:34px;height:35px;border-radius:15px 0 0 15px;background:rgba(255,255,255,.2);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transition:opacity .2s}
-#movie_player:hover #vs-tv{opacity:.7}#movie_player #vs-tv:hover{opacity:1}
-#movie_player.vs-off #vs-tv{display:none}
-#vs-mv{right:10px;width:44px;align-items:center;opacity:0}#movie_player:hover #vs-mv{opacity:.5}#movie_player #vs-mv:hover{opacity:1}
+.vs-pl:is(#movie_player,.bpx-player-video-area):hover #vs-tv{opacity:.7}.vs-pl:is(#movie_player,.bpx-player-video-area) #vs-tv:hover{opacity:1}
+.vs-pl:is(#movie_player,.bpx-player-video-area).vs-off #vs-tv{display:none}
+#vs-mv{right:10px;width:44px;align-items:center;opacity:0}.vs-pl:is(#movie_player,.bpx-player-video-area):hover #vs-mv{opacity:.5}.vs-pl:is(#movie_player,.bpx-player-video-area) #vs-mv:hover{opacity:1}
 /* 词语页：按 LR 实测值对齐 */
 #vs-panel .wtip{margin:8px 10px 4px;padding:18px 16px 14px;background:#1c1c1c;border-radius:10px;font-size:15px;color:rgba(255,255,255,.667)}
 #vs-panel .wtip b{font-weight:400}#vs-panel .wtip ul{margin:12px 0 0;padding-left:22px;line-height:1.55}
@@ -497,17 +497,27 @@ html.vs-cloze #vs-sub .vs-o .vs-w:is(.vs-u1,.vs-u2,.vs-lo,.vs-ln):hover{color:#f
 #vs-mini .vs-wn>i{background:rgba(0,0,0,.28);color:#fff}#vs-mini .vs-wn.warn>i{color:#ffd77a}
 /* 「展开 / 收起字幕栏」按钮的提示：放在按钮左边、小一号；全屏时只留图标，不弹文字 */
 #vs-tv[data-tip]:hover::after{right:calc(100% + 8px);left:auto;font-size:12px;padding:5px 9px;border-radius:7px}
-#movie_player.ytp-fullscreen #vs-tv[data-tip]::after,:fullscreen #vs-tv[data-tip]::after{display:none!important;content:none!important}
+.vs-pl:is(#movie_player,.bpx-player-video-area).ytp-fullscreen #vs-tv[data-tip]::after,:fullscreen #vs-tv[data-tip]::after{display:none!important;content:none!important}
 /* 收起后：默认视图（停靠在右侧栏）保留「字幕（隐藏）」一条，和 LR 一样；影院模式 / 全屏 / 浮动时整块藏起来，用视频右侧的 ☰ 展开 */
 #vs-panel.min.vv,#vs-panel.min:not(.dock){display:none!important}
 
 /* LR 式垂直视图：影院模式 / 全屏时字幕栏在视频右侧，视频缩窄让位 */
 html{--vs-vvw:400px}
 html.vs-vv-on #full-bleed-container{position:relative}
-html.vs-vv-on #full-bleed-container #movie_player{width:calc(100% - var(--vs-vvw))!important}
+html.vs-vv-on #full-bleed-container .vs-pl:is(#movie_player,.bpx-player-video-area){width:calc(100% - var(--vs-vvw))!important}
 #vs-panel.vv{position:absolute!important;top:0;right:0;bottom:0;left:auto;width:var(--vs-vvw);height:auto!important;margin:0!important;border-radius:0!important;border:0;border-left:1px solid rgba(255,255,255,.12);z-index:2100;box-shadow:none}
 html.vs-vv-on #vs-tv{display:none!important}
 /* 词典面板里的「保存短语」 */
 #vs-tip .mk a.svp{width:auto;height:32px;padding:0 14px;gap:6px;border-radius:30px;font-size:14px;color:#ddd}
 #vs-tip .mk a.svp .vi{font-size:17px}
 #vs-tip .mk a.svp.on{color:#E8A23C;box-shadow:inset 0 0 0 1.5px #E8A23C;background:rgba(232,162,60,.12)}
+
+/* 哔哩哔哩：播放器是 .bpx-player-video-area。插件的字幕出来后藏起 B 站自己的 CC 字幕；控制条自动隐藏；全屏 / 网页全屏时字幕栏放在视频右边，视频让位 */
+html.vs-on.vs-has .bpx-player-subtitle-wrap{opacity:0!important}
+.vs-pl.vs-hidebar .bpx-player-control-wrap{opacity:0!important;transition:opacity .2s}
+.vs-pl.vs-hidebar .bpx-player-control-wrap:hover{opacity:1!important}
+html.vs-bili .vs-pl #vs-sub,html.vs-bili .vs-pl #vs-bar,html.vs-bili .vs-pl #vs-nav,html.vs-bili .vs-pl #vs-ap,html.vs-bili .vs-pl #vs-mv,html.vs-bili .vs-pl #vs-tv{z-index:120}
+html.vs-bili .vs-pl #vs-tip,html.vs-bili .vs-pl #vs-mini,html.vs-bili .vs-pl #vs-toast{z-index:130}
+html.vs-bili #vs-pill{height:26px;margin:auto 6px;gap:6px;font-size:12px}html.vs-bili #vs-pill .ic{width:20px;height:20px;font-size:10px}html.vs-bili #vs-pill .gr{font-size:17px}
+html.vs-vv-on.vs-bili .bpx-player-container{position:relative}
+html.vs-vv-on.vs-bili .bpx-player-container>.bpx-player-primary-area{width:calc(100% - var(--vs-vvw))!important}

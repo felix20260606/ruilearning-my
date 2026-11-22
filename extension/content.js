@@ -7,9 +7,11 @@
   const pendIdx = new Set(), retry = {};
 
   const $ = (s, r) => (r || document).querySelector(s);
-  const video = () => $("video.html5-main-video") || $("video");
-  const player = () => document.getElementById("movie_player");
-  const vId = () => new URLSearchParams(location.search).get("v") || "";
+  // 和网站有关的都在 sites.js 的 VS_SITE 里（YouTube / 哔哩哔哩）：播放器、video、视频 id、浮层挂在哪、右侧栏、全屏
+  const SITE = VS_SITE, BILI = SITE.id === "bili";
+  const video = () => SITE.video();
+  const player = () => SITE.player();
+  const vId = () => SITE.vid();
   // 统一的图标：全部 24×24 画布、2px 圆头描边、跟随文字颜色
   const IC = {
     next: '<path d="M9 5l7 7-7 7"/>', prev: '<path d="M15 5l-7 7 7 7"/>', up: '<path d="M5 15l7-7 7 7"/>', down: '<path d="M5 9l7 7 7-7"/>',
@@ -38,7 +40,7 @@
   const zhFix = t => String(t || "").replace(/([\u3400-\u9fff\u3000-\u303f\uff00-\uffef“”‘’—…])\s+(?=[\u3400-\u9fff\u3000-\u303f\uff00-\uffef“”‘’—…])/g, "$1").trim();
   const tlangOf = t => (t === "zh-CN" ? "zh-Hans" : t === "zh-TW" ? "zh-Hant" : t);
 
-  document.documentElement.classList.add("vs-on");
+  document.documentElement.classList.add("vs-on", "vs-" + SITE.id);
   chrome.storage.sync.get(DEF, v => { S = v; applyBar(); });
   chrome.storage.onChanged.addListener((c, a) => {
     if (a !== "sync") return;
@@ -47,7 +49,7 @@
     applyBar(); { const k0 = cur; cur = -1; if (k0 >= 0 && cues[k0] && root) { cur = k0; render(k0); } }
     if (["level", "ratio", "greenKnown", "fadeRare", "showMarks", "showSuggest", "showLearn", "showLearnOutline", "showIgnore", "showSpecial", "showGram", "gramLabel", "g_pa", "g_pf", "g_pg", "g_md", "g_pv", "g_s3", "g_pl", "g_art", "g_cmp", "g_neg"].some(k => S[k] !== old[k])) refreshMarks();
     if (S.rate !== old.rate) { const v = video(); if (v && v.playbackRate !== S.rate) v.playbackRate = S.rate; }
-    if (S.srcLang !== old.srcLang) { key = ""; loadedLang = ""; askTracks(); }
+    if (S.srcLang !== old.srcLang) { key = ""; loadedLang = ""; if (BILI) biliReload(); else askTracks(); }
     else if (raw.length && (S.engine !== old.engine || S.target !== old.target || S.merge !== old.merge || S.showHuman !== old.showHuman)) buildCues();
   });
   // 别的页面或云端同步改了已保存的词、标记、句子：这里的内存副本跟着换，免得下次保存时用旧的把新的盖掉
@@ -61,7 +63,7 @@
     if (c.tags) wtags = c.tags.newValue || {};
     clearTimeout(syncRT); syncRT = setTimeout(refreshMarks, 300);
   });
-  chrome.storage.onChanged.addListener((c, a) => { if (a === "local" && c.audioPick && c.audioPick.newValue) window.postMessage({ src: "VS-C", type: "set-audio", index: c.audioPick.newValue.i }, "*"); });
+  chrome.storage.onChanged.addListener((c, a) => { if (!BILI && a === "local" && c.audioPick && c.audioPick.newValue) window.postMessage({ src: "VS-C", type: "set-audio", index: c.audioPick.newValue.i }, "*"); });
   // 一次性迁移：旧版本的 ✕ 会把侧栏彻底关掉，新版本改为收起，所以把被关掉的侧栏恢复出来
   chrome.storage.local.get({ pm1: false }, v => { if (!v.pm1) { chrome.storage.local.set({ pm1: true }); chrome.storage.sync.set({ panelOpen: true }); } });
   send({ type: "pageSync" }); // 拿一下云端和生词本的最新状态（别的电脑、网站上的改动）
@@ -79,8 +81,11 @@
     if (e.data.type === "dev-media") { chrome.storage.local.get(null, v => { const m = Object.keys(v).filter(k => k.startsWith("med:")).map(k => k.slice(4) + " img=" + ((v[k].img || "").length > 100 ? 1 : 0) + " aud=" + ((v[k].aud || "").length > 100 ? Math.round(v[k].aud.length / 1024) + "KB" : 0) + " " + new Date(v[k].at).toTimeString().slice(0, 5)); window.postMessage({ src: "VS-M", saveMedia: S.saveMedia, cur, recording: recR ? recR._i : null, clips: Object.keys(clips).map(k => k + ":" + Math.round(clips[k].length / 1024) + "KB"), pend: Object.keys(pendMed), med: m, saved: (v.saved || []).length }, "*"); }); return; }
     if (e.data.type === "reload-ext") { send({ type: "reloadSelf" }); return; } // 开发用：让插件重新加载自身（仅重启插件，不涉及数据）
     if (e.data.type === "audio") { chrome.storage.local.set({ audioTracks: e.data.names || [] }); return; }
-    if (e.data.type === "tracks") { tracks = e.data.tracks || []; chrome.storage.local.set({ trackLangs: tracks.filter(t => t.kind !== "asr").map(t => t.lang) }); pickTrack(e.data.cur); if (pendUrl && tracks.length) { const p = pendUrl; pendUrl = ""; onTimedtext(p); } return; }
-    if (e.data.type === "timedtext") onTimedtext(e.data.url);
+    if (e.data.type === "tracks" && !BILI) { tracks = e.data.tracks || []; chrome.storage.local.set({ trackLangs: tracks.filter(t => t.kind !== "asr").map(t => t.lang) }); pickTrack(e.data.cur); if (pendUrl && tracks.length) { const p = pendUrl; pendUrl = ""; onTimedtext(p); } return; }
+    if (e.data.type === "timedtext" && !BILI) onTimedtext(e.data.url);
+    if (BILI && e.data.type === "bili-tracks") onBiliTracks(e.data);
+    if (BILI && e.data.type === "bili-sub" && e.data.url) { biliSubs.set(e.data.url.split("?")[0], e.data.body); if (biliSubs.size > 12) biliSubs.delete(biliSubs.keys().next().value); }
+    if (BILI && e.data.type === "bili-pl" && !raw.length && !custom && vidId) setTimeout(askBili, 300); // 播放器拿到了字幕列表（比如刚登录、换了分 P）：再问一次
   });
   const dec = s => s.replace(/&#x([0-9a-f]+);/gi, (m, h) => String.fromCodePoint(parseInt(h, 16))).replace(/&#(\d+);/g, (m, d) => String.fromCodePoint(+d)).replace(/&nbsp;/g, " ").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, "&");
   // 清洗字幕文本：实体、不可见字符、说话人标记、音效注释、--、引号、标点前空格
@@ -98,14 +103,14 @@
     const want = baseOf(S.srcLang), c = tracks.filter(t => baseOf(t.lang) === want); if (!c.length) return;
     if (baseOf(curLang) !== want) window.postMessage({ src: "VS-C", type: "set-track", lang: (c.find(t => t.kind !== "asr") || c[0]).lang }, "*");
   }
-  function parse(j) {
+  // YouTube 的 json3 字幕 → 统一的一行一行 {s, e, t}
+  const parse = j => parseLines((j.events || []).filter(e => e.segs).map(e => ({ s: e.tStartMs / 1000, e: (e.tStartMs + (e.dDurationMs || 0)) / 1000, t: e.segs.map(g => g.utf8 || "").join("") })));
+  function parseLines(lines) {
     const out = [];
-    (j.events || []).forEach(e => {
-      if (!e.segs) return;
-      const c = clean(e.segs.map(g => g.utf8 || "").join(""));
+    lines.forEach(x => {
+      const c = clean(x.t);
       if (!c.t) return;
-      const st0 = e.tStartMs / 1000, dur = (e.dDurationMs || 0) / 1000;
-      out.push({ s: st0, e: st0 + (c.note ? Math.min(dur, 2) : dur), t: c.t, note: c.note }); // 音效标记最多显示 2 秒
+      out.push({ s: x.s, e: c.note ? Math.min(x.e, x.s + 2) : x.e, t: c.t, note: c.note }); // 音效标记最多显示 2 秒
     });
     out.sort((a, b) => a.s - b.s);
     const res = [];
@@ -159,7 +164,8 @@
     fr.readAsText(file);
   }
   function repair() {
-    custom = false; key = ""; loadedLang = ""; raw = []; cues = []; trans = []; cur = -1; ver++; if (box) box.style.display = "none"; buildPanel(); toast("正在重新获取字幕…");
+    custom = false; key = ""; loadedLang = ""; raw = []; cues = []; trans = []; cur = -1; ver++; noSubs = ""; if (box) box.style.display = "none"; buildPanel(); toast("正在重新获取字幕…");
+    if (BILI) { biliReload(); return; }
     const b = $(".ytp-subtitles-button"); if (b) { if (b.getAttribute("aria-pressed") === "true") { b.click(); setTimeout(() => b.click(), 400); } else b.click(); }
     setTimeout(askTracks, 1500);
   }
@@ -191,7 +197,7 @@
   }
   const dlBlob = (name, blob) => { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000); };
   async function exportData(kind) {
-    const title = (document.title || "subtitles").replace(/ - YouTube$/, ""), safe = title.replace(/[\\/:*?"<>|]+/g, " ").slice(0, 60);
+    const title = SITE.title() || "subtitles", safe = title.replace(/[\\/:*?"<>|]+/g, " ").slice(0, 60);
     if (kind === "saved") { dlBlob(safe + " - 已保存.xlsx", xlsx([["类型", "内容", "翻译"]].concat([...savedSet].map(w => ["词", w, ""]), savedSents.map(x => ["句子", x.t, x.tr || ""])))); return; }
     toast("正在准备导出…"); await fetchAllForce();
     const rows = cues.filter(c => !c.note).map(c => { const i = cues.indexOf(c); return [fmt(c.s), c.t, S.showTrans ? trans[i] || "" : "", S.showHuman ? human[i] || "" : ""]; });
@@ -242,11 +248,16 @@
   async function buildCues() {
     const my = ++ver;
     cues = S.merge ? groupCues(raw) : asr ? pairCues(raw) : raw.map(x => Object.assign({ n: 1 }, x));
-    trans = []; pendIdx.clear(); for (const k in retry) delete retry[k]; cur = -1; loopIdx = -1; lazy = !(S.engine === "youtube" && baseUrl); // 等 YouTube 翻译取回后再决定哪些句子需要备用引擎
+    // 「视频自带翻译」：YouTube 自动翻译；B 站用视频自己的 AI 中文字幕（不用连谷歌）
+    const bt = BILI && !custom && baseOf(S.srcLang) !== baseOf(S.target) ? vsBiliTrack(tracks, S.target, true) : null;
+    const own = S.engine === "youtube" && (BILI ? !!bt : !!baseUrl);
+    trans = []; pendIdx.clear(); for (const k in retry) delete retry[k]; cur = -1; loopIdx = -1; lazy = !own; // 等视频自带的翻译取回后再决定哪些句子需要备用引擎
 
-    if (S.engine === "youtube" && baseUrl) {
-      const u2 = new URL(baseUrl); if (srcVia && viaBase === baseOf(S.target)) u2.searchParams.delete("tlang"); else u2.searchParams.set("tlang", tlangOf(S.target)); // 原字幕本身就是翻译语言时直接用它
-      const j2 = await getJson(u2.href); const t2 = j2 ? parse(j2) : [];
+    if (own) {
+      let t2 = [];
+      if (BILI) t2 = await biliLoad(bt, S.target);
+      else { const u2 = new URL(baseUrl); if (srcVia && viaBase === baseOf(S.target)) u2.searchParams.delete("tlang"); else u2.searchParams.set("tlang", tlangOf(S.target)); // 原字幕本身就是翻译语言时直接用它
+        const j2 = await getJson(u2.href); t2 = j2 ? parse(j2) : []; }
       if (my !== ver) return;
       if (t2.length) {
         trans = cues.map((g, i) => zhFix(t2.filter(x => x.s >= g.s - 0.05 && x.s < g.e - 0.01).map(x => x.t).join(" ")) || undefined); // 没对上的句子稍后用备用引擎补
@@ -254,7 +265,10 @@
     }
     lazy = true;
     human = []; humanAt = {};
-    if (S.showHuman) {
+    if (S.showHuman && BILI && !custom && baseOf(S.srcLang) !== baseOf(S.target)) { // B 站视频自带的人工中文字幕
+      const ht = vsBiliTrack(tracks, S.target, false), h = ht ? await biliLoad(ht, S.target) : []; if (my !== ver) return;
+      cues.forEach((g, i) => { const x = zhFix(h.filter(x => !x.note && x.s >= g.s - 0.3 && x.s < g.e - 0.2).map(x => x.t).join(" ")); if (x) { trans[i] = x; humanAt[i] = 1; } });
+    } else if (S.showHuman && !BILI) {
       const tb = baseOf(S.target), ht = tracks.find(t => t.kind !== "asr" && t.lang.toLowerCase() === String(S.target).toLowerCase()) || tracks.find(t => t.kind !== "asr" && baseOf(t.lang) === tb);
       if (ht && ht.baseUrl && baseUrl && baseOf(S.srcLang) !== tb && !srcVia) {
         const u3 = new URL(ht.baseUrl, location.href);
@@ -282,11 +296,47 @@
     }, ms));
   }
 
+  // ---------- B 站字幕：页面脚本 bili-inject.js 带着登录 cookie 取字幕列表，这里挑学习语言的轨、下载、解析 ----------
+  // 没有字幕时说清楚原因：没登录（B 站的 AI 字幕要登录才给）/ 这个视频没有 CC 字幕（英文多半是烧在画面里的硬字幕）/ 只有别的语言
+  const biliSubs = new Map(); // 播放器自己下载过的字幕文件（拦下来的），省一次请求
+  let biliTry = 0, noSubs = "";
+  const askBili = () => { if (vidId) window.postMessage({ src: "VS-C", type: "bili-tracks", vid: vidId }, "*"); };
+  function biliStart() { biliTry = 0; noSubs = ""; [800, 3000].forEach(ms => setTimeout(() => { if (!raw.length && !custom) askBili(); }, ms)); }
+  function biliReload() { raw = []; cues = []; trans = []; human = []; cur = -1; key = ""; loadedLang = ""; ver++; noSubs = ""; biliTry = 0; askBili(); }
+  async function biliLoad(t, lang) { // 一条字幕轨 → 清洗过的句子；内容和标的语言对不上（上传者标错）当作没有
+    let body = biliSubs.get(t.url.split("?")[0]);
+    if (!body) { const j = await getJson(t.url); body = j && j.body; if (!body) return []; }
+    const lines = vsBiliLines({ body }); return lines.length && vsLooksLang(lines, lang) ? parseLines(lines) : [];
+  }
+  async function onBiliTracks(d) {
+    if (custom || d.vid !== vidId || raw.length) return;
+    if (!vsBiliSame(vidId, d.info)) { if (++biliTry < 8) setTimeout(askBili, 1200); return; } // 播放器还没换到这个视频
+    tracks = vsBiliTracks(d.list); chrome.storage.local.set({ trackLangs: tracks.filter(t => t.kind !== "asr").map(t => t.lang) });
+    const my = vidId;
+    for (const t of vsBiliCands(tracks, S.srcLang)) {
+      const c = await biliLoad(t, S.srcLang); if (my !== vidId || custom || raw.length) return;
+      if (!c.length) continue;
+      raw = c; baseUrl = ""; asr = !!t.kind; loadedLang = baseOf(t.lang); srcVia = false; noSubs = "";
+      await buildCues(); toast("已载入 " + cues.length + " 句字幕（" + t.name + "）"); return;
+    }
+    const other = tracks.filter(t => baseOf(t.lang) !== baseOf(S.srcLang)).map(t => t.name);
+    noSubs = !tracks.length && !d.login ? "login" : other.length && !tracks.some(t => baseOf(t.lang) === baseOf(S.srcLang)) ? "other:" + [...new Set(other)].join("、") : "none";
+    if (noSubs === "login" && ++biliTry < 3) setTimeout(askBili, 4000); // 刚打开时播放器可能还没拿到登录信息
+    buildPanel(); toast(noSubsMsg());
+  }
+  function noSubsMsg() {
+    if (!BILI) return "还没有字幕。请打开视频的 CC 字幕。";
+    if (!noSubs) return "正在读取 B 站字幕…";
+    if (noSubs === "login") return "没有拿到字幕：登录 B 站后才有字幕（包括「英语（自动生成）」AI 字幕）。登录后刷新页面。";
+    if (noSubs.startsWith("other:")) return "这个视频没有英文 CC 字幕（只有：" + noSubs.slice(6) + "）。可以点 📄 载入字幕文件。";
+    return "这个视频没有 CC 字幕。画面里的英文多半是烧在视频上的硬字幕，插件拿不到；可以点 📄 载入字幕文件（.srt / .vtt / .ass）。";
+  }
+
   // ---------- 界面 ----------
   function build() {
     const p = player(); if (!p) return false;
-    let host = p;
-    if (S.below && $("#below")) { host = document.getElementById("vs-below"); if (!host) { host = document.createElement("div"); host.id = "vs-below"; } const bl = $("#below"); if (host.nextElementSibling !== bl) bl.parentNode.insertBefore(host, bl); }
+    let host = p; p.classList.add("vs-pl"); // 播放器（YouTube 的 #movie_player / B 站的 .bpx-player-video-area）：样式表用 .vs-pl 找它
+    { const bl = S.below && SITE.below(); if (bl) { host = document.getElementById("vs-below"); if (!host) { host = document.createElement("div"); host.id = "vs-below"; } if (host.nextElementSibling !== bl) bl.parentNode.insertBefore(host, bl); } }
     if (root && root.isConnected && nav && nav.isConnected) { if (root.parentNode !== host) { host.append(root); root.classList.toggle("below", host !== p); } return true; }
     if (root) [root, bar, nav, document.getElementById("vs-ap"), document.getElementById("vs-mv")].forEach(x => x && x.remove());
     root = document.createElement("div"); root.id = "vs-sub";
@@ -349,10 +399,12 @@
     mv.addEventListener("pointerup", end); mv.addEventListener("pointercancel", end);
     mv.addEventListener("click", e => e.stopPropagation());
     p.append(mv); mountPill(); applyBar();
+    // B 站播放器在整个画面上监听点击（单击暂停、双击全屏）：点插件的字幕、按钮时不要传给它
+    if (BILI) [root, bar, nav, apEl, mv, document.getElementById("vs-tv")].forEach(x => x && ["click", "dblclick", "mousedown", "mouseup", "pointerdown", "pointerup"].forEach(ev => x.addEventListener(ev, e => e.stopPropagation())));
     return true;
   }
   function mountPill() {
-    const lc = $(".ytp-left-controls"); if (!lc) return;
+    const lc = SITE.ctlLeft(); if (!lc) return;
     if (!pill) {
       pill = document.createElement("div"); pill.id = "vs-pill";
       pill.innerHTML = '<span class="tg" data-a="tg" data-tip="双语字幕 - 开/关"><span class="ic" data-a="tg">BAN</span><span class="st" data-a="tg">ON</span></span><span class="gr" data-a="set" data-tip="双语字幕 - 设置">' + I("gear") + "</span>";
@@ -399,18 +451,18 @@
     bar.querySelector('[data-a="loop"]').classList.toggle("on", loopOn);
     bar.querySelector('[data-a="list"]').classList.toggle("on", !!(panel && panel.classList.contains("show")));
     { const ap = document.getElementById("vs-ap"); if (ap) ap.classList.toggle("on", !!S.autoPause); }
-    { const p = player(); if (p) { p.classList.toggle("vs-hidectl", !!S.ctlHidden); p.classList.toggle("vs-off", !S.enabled); p.classList.toggle("vs-hidebar", !!S.hideBar && !!S.enabled); } }
+    { const p = player(); if (p) { p.classList.add("vs-pl"); p.classList.toggle("vs-hidectl", !!S.ctlHidden); p.classList.toggle("vs-off", !S.enabled); p.classList.toggle("vs-hidebar", !!S.hideBar && !!S.enabled); } }
     document.documentElement.classList.toggle("vs-on", !!S.enabled);
     document.documentElement.classList.toggle("vs-cloze", !!S.cloze); { const m = S.showGram === false ? "off" : (S.gramLabel || "abbr"), H = document.documentElement; H.classList.toggle("vs-gab", m !== "off"); ["zh", "en", "abbr"].forEach(x => H.classList.toggle("vs-gl-" + x, m === x)); }
     if (pill) { pill.classList.toggle("off", !S.enabled); pill.querySelector(".st").textContent = S.enabled ? "ON" : "OFF"; }
     if (tEl) tEl.style.display = S.showTrans ? "" : "none";
     if (hEl) hEl.style.display = S.showHuman ? "" : "none";
   }
-  function toast(msg) {
+  function toast(msg, ms) {
     const p = player(); if (!p) return;
     let t = $("#vs-toast", p); if (t) t.remove();
     t = document.createElement("div"); t.id = "vs-toast"; t.textContent = msg; p.append(t);
-    setTimeout(() => t.remove(), 1800);
+    setTimeout(() => t.remove(), ms || (msg.length > 40 ? 6000 : 1800));
   }
 
   const WORD_RE = VS_WORD_RE;
@@ -500,8 +552,9 @@
     return r; // 一句结束后停在这一句，直到下一句开始才切换
   }
   function tick() {
-    if (vId() !== vidId) { vidId = vId(); raw = []; cues = []; trans = []; key = ""; loadedLang = ""; cur = -1; loopIdx = -1; loopOn = false; lazy = false; ver++; if (panel) buildPanel(); tracks = []; human = []; custom = false; if (vidId && /\/watch/.test(location.pathname)) { ensureCaptionsOn(); setTimeout(askTracks, 1500); setTimeout(askTracks, 4500); setTimeout(() => window.postMessage({ src: "VS-C", type: "get-audio" }, "*"), 3000); setTimeout(() => { const v = video(); if (v && S.rate && S.rate !== 1) v.playbackRate = S.rate; }, 1200); } }
-    const v = video(); if (!v || !cues.length || !/\/watch/.test(location.pathname)) return;
+    if (vId() !== vidId) { vidId = vId(); raw = []; cues = []; trans = []; key = ""; loadedLang = ""; cur = -1; loopIdx = -1; loopOn = false; lazy = false; ver++; if (panel) buildPanel(); tracks = []; human = []; custom = false; noSubs = ""; if (vidId && BILI) { biliStart(); setTimeout(() => { const v = video(); if (v && S.rate && S.rate !== 1) v.playbackRate = S.rate; }, 1200); } else if (vidId && SITE.isWatch()) { ensureCaptionsOn(); setTimeout(askTracks, 1500); setTimeout(askTracks, 4500); setTimeout(() => window.postMessage({ src: "VS-C", type: "get-audio" }, "*"), 3000); setTimeout(() => { const v = video(); if (v && S.rate && S.rate !== 1) v.playbackRate = S.rate; }, 1200); } }
+    document.documentElement.classList.toggle("vs-has", cues.length > 0); // B 站：有了插件的字幕才藏起播放器自己的 CC 字幕
+    const v = video(); if (!v || !cues.length || !SITE.isWatch()) return;
     if (tk % 50 === 0) capSync(v);
     if (++tk % 10 === 0) { checkVV(); const pp = player(); if (pp && root) root.style.setProperty("--vs-fs", Math.max(13, pp.offsetHeight * 0.0373).toFixed(2) + "px"); // 字号跟播放器高度走，和 LR 同一比例
       mountPill(); const shown = !!(panel && panel.classList.contains("show")), wantP = !!(S.panelOpen && S.enabled); if (wantP !== shown) { if (panel) { panel.classList.toggle("show", wantP); if (wantP) { mountPanel(); markPanel(cur, true); } } else if (wantP) togglePanel(); } else if (panel && panel.classList.contains("show")) mountPanel(); }
@@ -542,15 +595,18 @@
   }
   // 后台连不上（插件刚更新、后台休眠出错）或请求失败时，页面自己直接查一次；失败的结果不缓存，下次悬停会重查
   const alive = () => { try { return !!chrome.runtime.id; } catch (e) { return false; } };
-  let warned = false;
+  let warned = false, gDown = 0;
   async function gDirect(text, isWord) {
     if (!alive() && !warned) { warned = true; toast("插件已更新，刷新页面后查词更快"); }
+    if (Date.now() < gDown) return null; // 谷歌连不上（中国大陆）：10 分钟内不再直连，免得每次白等
+    if (alive()) { try { const b = (await chrome.storage.local.get({ netBad: {} })).netBad || {}, t = b["translate.googleapis.com"]; if (t && Date.now() - t < 6 * 3600e3) return null; } catch (e) {} } // 后台记着谷歌不通
+    const ac = new AbortController(), tm = setTimeout(() => ac.abort(), 4000);
     try {
-      const r = await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + encodeURIComponent(S.srcLang || "auto") + "&tl=" + encodeURIComponent(S.target) + "&dt=t" + (isWord ? "&dt=bd" : "") + "&q=" + encodeURIComponent(text));
+      const r = await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + encodeURIComponent(S.srcLang || "auto") + "&tl=" + encodeURIComponent(S.target) + "&dt=t" + (isWord ? "&dt=bd" : "") + "&q=" + encodeURIComponent(text), { signal: ac.signal }).finally(() => clearTimeout(tm));
       if (!r.ok) return null; const j = await r.json(), t = (j[0] || []).map(x => x[0]).join("");
       const zh = !isWord || /['’]/.test(text) ? [] : (j[1] || []).slice(0, 4).map(e => ({ pos: e[0], words: (e[1] || []).filter(x => !/[。！？.!?]$/.test(x) && x.length <= 12).slice(0, 5) })).filter(z => z.words.length);
       return t ? { t, zh } : null;
-    } catch (e) { return null; }
+    } catch (e) { gDown = Date.now() + 600000; return null; }
   }
   const okG = g => !!(g && (g.t || (g.zh || []).length));
   const liteLookup = w => { const k0 = w.toLowerCase() + "|" + S.target, p = liteLookup0(w); p.then(g => { if (!okG(g) && lite.get(k0) === p) lite.delete(k0); }); return p; };
@@ -722,7 +778,7 @@
   function needCapture(key, ci) { if (!capQ.some(x => x.key === key)) capQ.push({ key, ci, vid: vidId, n: 0 }); capSoon(1500); }
   ["keydown", "mousedown", "wheel", "touchstart"].forEach(t => document.addEventListener(t, () => { if (capBusy) capAbort = true; }, true)); // 补录时用户一动手就立刻让开
   async function runCap() {
-    if (capBusy || !capQ.length) return; const v = video(); if (!v || !v.captureStream || $(".ad-showing")) return;
+    if (capBusy || !capQ.length) return; const v = video(); if (!v || !v.captureStream || SITE.ad()) return;
     if (!capIdle(v)) { if (v.paused && !pausedByUs) capSoon(2000); return; } // 现在不合适：留在队列里，等下次暂停再试；这一句之后正常播到的话会自动录上
     const job = capQ.shift(); if (job.vid !== vidId || !cues[job.ci]) return runCap();
     if (clips[job.ci]) { attach(job.key, clips[job.ci], job.ci); return runCap(); }
@@ -779,7 +835,7 @@
   // 把这个视频的字幕 + 译文存到生词本网站，手机上打开就能边看边学
   let capSent = "", capSeen = "", capSince = 0;
   function capSync(v) {
-    if (S.capSync === false || custom || !vidId || capSent === vidId || cues.length < 10 || v.paused) return;
+    if (!SITE.capSync || S.capSync === false || custom || !vidId || capSent === vidId || cues.length < 10 || v.paused) return;
     if (capSeen !== vidId) { capSeen = vidId; capSince = Date.now(); return; }
     if (Date.now() - capSince < 20000) return; // 真的在看才同步
     capSent = vidId; const my = vidId, mv = ver, k = "cap:" + my;
@@ -787,16 +843,14 @@
       if (o[k] && o[k].n === cues.length && o[k].tr >= cues.length * 0.9) return;
       try { await fetchAllForce(); } catch (e) {}
       if (vidId !== my || ver !== mv) { capSent = ""; return; }
-      const ch = $("ytd-watch-metadata ytd-channel-name a, #owner ytd-channel-name a, #upload-info a");
-      const body = { v: my, title: document.title.replace(/^\(\d+\)\s*/, "").replace(/ - YouTube$/, ""), author: ch ? ch.textContent.trim() : "", lang: S.srcLang, tl: S.target, cues: cues.filter(c => !c.note).map(c => ({ s: +c.s.toFixed(2), e: +cueEnd(cues.indexOf(c)).toFixed(2), t: c.t, r: trans[cues.indexOf(c)] || "" })) };
+      const body = { v: my, title: SITE.title(), author: SITE.channel(), lang: S.srcLang, tl: S.target, cues: cues.filter(c => !c.note).map(c => ({ s: +c.s.toFixed(2), e: +cueEnd(cues.indexOf(c)).toFixed(2), t: c.t, r: trans[cues.indexOf(c)] || "" })) };
       send({ type: "capUp", body }).then(r => { if (r && r.ok) chrome.storage.local.set({ [k]: { n: cues.length, tr: body.cues.filter(c => c.r).length, at: Date.now() } }); else capSent = ""; });
     });
   }
   function saveMedia(key, ci) {
     try {
       if (S.saveMedia === false || ci < 0 || !cues[ci] || custom) return; const cu = cues[ci], v = video(), near = v && v.currentTime >= cu.s - 0.3 && v.currentTime <= cu.e + 1.5;
-      const ch = $("ytd-watch-metadata ytd-channel-name a, #owner ytd-channel-name a, #upload-info a");
-      const o = { t: cu.t, tr: trans[ci] || "", v: vidId, s: cu.s, e: cu.e, title: document.title.replace(/^\(\d+\)\s*/, "").replace(/ - YouTube$/, ""), ch: ch ? ch.textContent.trim() : "", img: (shots[ci] && shots[ci][0]) || (near ? frameShot() : ""), img2: (shots[ci] && shots[ci][1]) || "", hu: human[ci] || "", aud: clips[ci] || "", at: Date.now() }; // hu：视频自带的人工翻译
+      const o = { t: cu.t, tr: trans[ci] || "", v: vidId, s: cu.s, e: cu.e, title: SITE.title(), ch: SITE.channel(), site: SITE.id, img: (shots[ci] && shots[ci][0]) || (near ? frameShot() : ""), img2: (shots[ci] && shots[ci][1]) || "", hu: human[ci] || "", aud: clips[ci] || "", at: Date.now() }; // hu：视频自带的人工翻译
       chrome.storage.local.set({ [key]: o }, () => {
         if (o.aud) return;
         (pendMed[ci] = pendMed[ci] || []).push(key);          // 这一句正在录：录完后自动补上
@@ -968,13 +1022,13 @@
     if (open) { mountPanel(); markPanel(cur, true); fetchAll(); }
   }
   // 和 LR 的「垂直视图」一样：影院模式 / 全屏时，字幕栏放在视频右侧、和视频一样高，视频缩窄让位
-  const vvHost = () => { const f = $("ytd-watch-flexy"), fb = $("#full-bleed-container"); return /\/watch/.test(location.pathname) && f && fb && (f.hasAttribute("theater") || f.hasAttribute("fullscreen") || !!document.fullscreenElement) && fb.offsetWidth > 0 && fb.contains(player()) ? fb : null; };
+  const vvHost = () => SITE.wide(); // YouTube 影院 / 全屏、B 站全屏 / 网页全屏
   let vvWas = null;
   function updateVV() {
     const on = !!(panel && panel.classList.contains("vv") && panel.classList.contains("show") && !panelMin);
     if (document.documentElement.classList.contains("vs-vv-on") === on) return;
     document.documentElement.classList.toggle("vs-vv-on", on);
-    setTimeout(() => window.dispatchEvent(new Event("resize")), 30); // 让 YouTube 按新宽度重排视频
+    setTimeout(() => window.dispatchEvent(new Event("resize")), 30); // 让播放器按新宽度重排视频
   }
   function checkVV() { const h = vvHost(); if (h !== vvWas) { vvWas = h; mountPanel(); } }
   document.addEventListener("fullscreenchange", () => [60, 400, 1200].forEach(t => setTimeout(checkVV, t)));
@@ -982,7 +1036,8 @@
   function mountPanel() {
     if (!panel) return;
     const vv = vvHost(); vvWas = vv;
-    const sec = /\/watch/.test(location.pathname) && ($("#secondary-inner") || $("#secondary"));
+    if (!vv && SITE.sideWait && SITE.sideWait()) { if (panel.parentNode) panel.remove(); return; } // B 站页面还没渲染完：先不放（每秒再试）
+    const sec = SITE.isWatch() && SITE.side();
     const host = vv || (sec && sec.offsetWidth > 200 ? sec : document.body);
     panel.classList.toggle("vv", !!vv);
     if (panel.parentNode !== host || (host !== document.body && host.firstElementChild !== panel)) host.prepend(panel);
@@ -1029,7 +1084,7 @@
     if (!panel) return;
     if (tab === "subs") {
       const sk = new Set(savedSents.map(x => x.k));
-      listEl.innerHTML = cues.map((c, i) => rowHtml(i, sk)).join("") || '<div class="it">还没有字幕。请打开视频的 CC 字幕。</div>';
+      listEl.innerHTML = cues.map((c, i) => rowHtml(i, sk)).join("") || '<div class="it">' + esc(noSubsMsg()) + "</div>";
       if (panel.classList.contains("show")) fetchAll();
     } else if (tab === "words") {
       const { m, tot } = videoWords(), all = [...m.values()], sk = new Set(savedSents.map(x => x.k));
@@ -1037,7 +1092,7 @@
       const disp = o => wordsHtml(o.w === "i" ? "I" : o.w);
       let h = (wtip ? '<div class="wtip"><b>按频率排序的视频词汇</b><ul><li>右键点击标记单词</li><li>左键点击，打开词典。</li></ul><button class="ok">好的</button></div>' : "") + '<div class="wv">' + [["learn", "学习"], ["rank", "词频排名"], ["count", "视频中出现次数"]].map(x => '<b data-v="' + x[0] + '"' + (wview === x[0] ? ' class="on"' : "") + ">" + x[1] + "</b>").join("") + "</div>";
       wlist = [];
-      if (!all.length) h += '<div class="it">还没有字幕。请打开视频的 CC 字幕。</div>';
+      if (!all.length) h += '<div class="it">' + esc(noSubsMsg()) + "</div>";
       else if (wview === "learn") {
         const sc = o => o.n / Math.pow(Math.log(Math.max(3, Math.min(o.r, 25000))), 0.9);
         const cand = all.filter(o => o.ct === "suggest" || o.ct === "rare").sort((a, b) => sc(b) - sc(a) || a.r - b.r);

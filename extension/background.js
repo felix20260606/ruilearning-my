@@ -7,49 +7,108 @@ const siteUserP = chrome.storage.local.get({ siteUser: "" }).then(v => (siteUser
 const fetch0 = self.fetch.bind(self);
 self.fetch = async (u, o) => {
   if (typeof u === "string" && u.startsWith(SITE + "/api/") && /^\/api\/(vocab|ext|media)(\?|$)/.test(u.slice(SITE.length))) { if (siteUser == null) await siteUserP; if (siteUser) u += (u.includes("?") ? "&" : "?") + "u=" + siteUser; }
+  // 网站请求也有超时（中国大陆多数地方打不开 *.pages.dev，连不上时会一直挂着）：上传录音最多等 90 秒，其它 25 秒
+  if (typeof u === "string" && u.startsWith(SITE + "/") && !(o && o.signal) && typeof AbortController === "function") {
+    const ac = new AbortController(), t = setTimeout(() => ac.abort(), /\/api\/media/.test(u) && o && o.method === "POST" ? 90000 : 25000);
+    return fetch0(u, Object.assign({}, o, { signal: ac.signal })).finally(() => clearTimeout(t));
+  }
   return fetch0(u, o);
 };
+
+// ---------- 外部服务通不通（中国大陆打不开谷歌翻译 / 谷歌发音、维基词典） ----------
+// 每个请求都有超时；连不上（网络错误或超时）的网站记下来，6 小时内直接用备用的，不再每次白等（同网站 index.html 开头的 window.NET）。
+// 备用：翻译 → 微软翻译（大陆能用）→ 网站后台 /api/ai {task:"tr"}；查词 → 有道词典（国内）→ 网站后台 /api/dict；
+// 维基词典 → 网站后台中转 /api/px → 有道；发音 → 有道真人发音 → 浏览器自带语音（content.js 的 speakLocal）
+const NET_KEY = "netBad", NET_TTL = 6 * 3600e3, G_HOST = "translate.googleapis.com";
+let netBad = null;
+const netP = chrome.storage.local.get({ [NET_KEY]: {} }).then(v => (netBad = v[NET_KEY] || {})).catch(() => (netBad = {}));
+const hostOf = u => { try { return new URL(u).hostname; } catch (e) { return ""; } };
+async function isDown(h) { if (!netBad) await netP; const t = netBad[h]; return !!t && Date.now() - t < NET_TTL; }
+function netMark(h, ok) {
+  if (!netBad || !h) return;
+  if (ok) { if (!(h in netBad)) return; delete netBad[h]; } else netBad[h] = Date.now();
+  chrome.storage.local.set({ [NET_KEY]: netBad }).catch(() => {});
+}
+// 带超时的请求：已知不通直接报错；连不上 / 超时记为不通；HTTP 出错（404、429…）说明网站是通的
+async function nfetch(u, o, ms) {
+  const h = hostOf(u); if (await isDown(h)) throw new Error("down " + h);
+  const ac = typeof AbortController === "function" ? new AbortController() : null, t = setTimeout(() => ac && ac.abort(), ms || 6000);
+  try { const r = await fetch(u, Object.assign({}, o, ac ? { signal: ac.signal } : {})); netMark(h, true); return r; }
+  catch (e) { netMark(h, false); throw e; }
+  finally { clearTimeout(t); }
+}
 const vocabGet = () => fetch(VOCAB).then(r => { if (!r.ok) throw 0; return r.json(); });
 
 // ---------- 翻译 ----------
 async function gTranslate(text, tl, sl) {
   const u = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + encodeURIComponent(sl || "auto") + "&tl=" + encodeURIComponent(tl) + "&dt=t&q=" + encodeURIComponent(text);
-  const r = await fetch(u); if (!r.ok) throw new Error("g" + r.status);
+  const r = await nfetch(u, {}, 5000); if (!r.ok) throw new Error("g" + r.status);
   const j = await r.json();
   return (j[0] || []).map(x => x[0]).join("");
 }
 let msTok = null, msExp = 0;
 async function msToken() {
   if (msTok && Date.now() < msExp) return msTok;
-  const r = await fetch("https://edge.microsoft.com/translate/auth"); if (!r.ok) throw new Error("auth");
+  const r = await nfetch("https://edge.microsoft.com/translate/auth", {}, 6000);
+  if (!r.ok) { if (r.status === 404 || r.status === 403) netMark("edge.microsoft.com", false); throw new Error("auth"); } // 取令牌的接口只认 Edge 浏览器（Chrome / Brave 里 404）：6 小时内不再试
   msTok = (await r.text()).trim(); msExp = Date.now() + 8 * 60 * 1000; return msTok;
 }
 async function msTranslate(texts, tl, sl) {
   const to = { "zh-CN": "zh-Hans", "zh-TW": "zh-Hant" }[tl] || tl;
   const tok = await msToken();
-  const r = await fetch("https://api-edge.cognitive.microsofttranslator.com/translate?" + (sl ? "from=" + encodeURIComponent(sl) + "&" : "") + "to=" + to + "&api-version=3.0&includeSentenceLength=true", {
+  const r = await nfetch("https://api-edge.cognitive.microsofttranslator.com/translate?" + (sl && sl !== "auto" ? "from=" + encodeURIComponent(sl) + "&" : "") + "to=" + to + "&api-version=3.0&includeSentenceLength=true", {
     method: "POST", headers: { Authorization: "Bearer " + tok, "Content-Type": "application/json" }, body: JSON.stringify(texts.map(Text => ({ Text })))
-  });
+  }, 8000);
   if (!r.ok) { msTok = null; throw new Error("ms" + r.status); }
   const j = await r.json(); return j.map(x => (x.translations && x.translations[0] && x.translations[0].text) || "");
 }
+// 网站后台翻译（后台在 Cloudflare，谷歌 / Workers AI 都能用；只翻成简体中文）
+async function siteTranslate(texts) {
+  const r = await nfetch(SITE + "/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "tr", texts }) }, 20000);
+  const j = await r.json().catch(() => null); if (!j || !j.ok || !Array.isArray(j.zh)) throw new Error("site tr"); return j.zh;
+}
+// MyMemory 公开翻译接口（免费、不用密钥，每天每个 IP 有额度；一次一句，500 字以内）：最后一道
+async function mmTranslate(texts, tl, sl) {
+  const out = [];
+  for (let i = 0; i < texts.length; i += 3) out.push(...await Promise.all(texts.slice(i, i + 3).map(async t => {
+    if (t.length > 480) return "";
+    const r = await nfetch("https://api.mymemory.translated.net/get?q=" + encodeURIComponent(t) + "&langpair=" + encodeURIComponent((sl && sl !== "auto" ? sl : "en") + "|" + tl), {}, 8000);
+    const j = r.ok ? await r.json().catch(() => null) : null, x = j && j.responseData && j.responseData.translatedText;
+    if (j && (j.quotaFinished || /MYMEMORY WARNING/i.test(x || ""))) { netMark("api.mymemory.translated.net", false); throw new Error("quota"); } // 今天的额度用完了
+    return x && +j.responseStatus === 200 ? strip(x) : "";
+  })));
+  return out;
+}
+// 一批句子：按顺序换引擎，前一个没翻出来的句子交给下一个（谷歌 → 微软 → 网站后台 → MyMemory；选了微软就微软在前）
 async function translateMany(texts, tl, engine, sl) {
-  if (engine === "ms") { try { return await msTranslate(texts, tl, sl); } catch (e) { /* 回退到 Google */ } }
-  return Promise.all(texts.map(t => gTranslate(t, tl, sl).catch(() => "")));
+  texts = (texts || []).map(t => String(t == null ? "" : t)); const out = texts.map(() => "");
+  for (const e of engine === "ms" ? ["ms", "g", "site", "mm"] : ["g", "ms", "site", "mm"]) {
+    const idx = []; out.forEach((x, i) => { if (!x && texts[i].trim()) idx.push(i); }); if (!idx.length) break;
+    const part = idx.map(i => texts[i]); let got = [];
+    try {
+      if (e === "g") { if (await isDown(G_HOST)) continue; got = await Promise.all(part.map(t => gTranslate(t, tl, sl).catch(() => ""))); }
+      else if (e === "ms") got = await msTranslate(part, tl, sl);
+      else if (e === "site") { if (!/^zh(-cn|-hans)?$/i.test(tl || "") || (sl && !/^(en|auto)$/i.test(sl))) continue; got = await siteTranslate(part); }
+      else got = await mmTranslate(part, tl, sl);
+    } catch (x) { continue; }
+    idx.forEach((i, n) => { if (got[n]) out[i] = String(got[n]); });
+  }
+  return out;
 }
 
 // ---------- 查词 ----------
 const POS_ZH = { noun: "n.", verb: "v.", adjective: "adj.", adverb: "adv.", pronoun: "pron.", preposition: "prep.", conjunction: "conj.", interjection: "int.", determiner: "det.", exclamation: "excl.", abbreviation: "abbr.", article: "art.", numeral: "num.", particle: "part.", prefix: "pref.", suffix: "suf.", phrase: "phr." };
-// 朗读：单个英文单词优先用词典的真人录音，其余用 Google 的在线朗读；浏览器自带的合成语音只作最后的后备
+// 朗读：单个英文单词优先用词典的真人录音，其余用 Google 的在线朗读；谷歌不通（中国大陆）用有道的真人发音；都不行返回空，页面用浏览器自带的合成语音
 const ttsMem = new Map();
 async function tts(text, lang) {
   text = String(text || "").trim().slice(0, 190); if (!text) return ""; lang = String(lang || "en").split("-")[0];
   const k = lang + "|" + text.toLowerCase(); if (ttsMem.has(k)) return ttsMem.get(k);
   const urls = []; if (lang === "en" && /^[a-z]+$/i.test(text)) urls.push("https://ssl.gstatic.com/dictionary/static/sounds/oxford/" + text.toLowerCase() + "--_us_1.mp3");
   urls.push("https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=" + encodeURIComponent(lang) + "&q=" + encodeURIComponent(text));
+  if (lang === "en") urls.push("https://dict.youdao.com/dictvoice?type=2&audio=" + encodeURIComponent(text)); // type=2 美音
   for (const u of urls) {
     try {
-      const r = await fetch(u, { referrerPolicy: "no-referrer" }); if (!r.ok) continue;
+      const r = await nfetch(u, { referrerPolicy: "no-referrer" }, 5000); if (!r.ok) continue;
       const u8 = new Uint8Array(await r.arrayBuffer()); if (u8.length < 500) continue;
       let bin = ""; for (let i = 0; i < u8.length; i += 0x8000) bin += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000));
       const d = "data:audio/mpeg;base64," + btoa(bin); ttsMem.set(k, d); if (ttsMem.size > 150) ttsMem.delete(ttsMem.keys().next().value); return d;
@@ -62,8 +121,7 @@ async function sentences(word, tl, sl) {
   if (sl && sl !== "en") return [];
   const k = "sent:" + tl + ":" + word, c = await chrome.storage.local.get(k); if (c[k]) return c[k];
   const zh = /^zh/i.test(tl || "");
-  const ac = new AbortController(), tm = setTimeout(() => ac.abort(), 6000); // 例句库有时很慢，最多等 6 秒
-  const r = await fetch("https://tatoeba.org/en/api_v0/search?from=eng&query=" + encodeURIComponent(word) + "&sort=relevance&word_count_max=14" + (zh ? "&to=cmn&trans_filter=limit&trans_to=cmn" : ""), { signal: ac.signal }).finally(() => clearTimeout(tm));
+  const r = await nfetch("https://tatoeba.org/en/api_v0/search?from=eng&query=" + encodeURIComponent(word) + "&sort=relevance&word_count_max=14" + (zh ? "&to=cmn&trans_filter=limit&trans_to=cmn" : ""), {}, 6000); // 例句库有时很慢，最多等 6 秒
   if (!r.ok) throw new Error("t" + r.status);
   const j = await r.json();
   const out = (j.results || []).map(x => { const ts = (x.translations || []).flat().filter(t => t && t.lang === "cmn"), t = ts.find(t => t.script === "Hans") || ts[0]; return { en: x.text, tr: zh && t ? t.text : "" }; }).filter(x => x.en && x.en.length <= 90).slice(0, 8);
@@ -77,14 +135,53 @@ async function gWord(word, tl, sl) {
   if (g && g.t) chrome.storage.local.set({ [k]: g });
   return g;
 }
+// 查一个词的中文：谷歌（带词性的几个意思）→ 谷歌不通时有道词典（英文查中文，国内能用）+ 微软翻译 → 网站后台 /api/dict
 async function gWordRaw(word, tl, sl) {
+  try { return await gWordGoogle(word, tl, sl); } catch (e) {}
+  const en = !sl || sl === "en" || sl === "auto", zhT = /^zh/i.test(tl || "");
+  if (en && zhT) { const y = await youdao(word).catch(() => null), z = y ? ydZh(y) : []; if (z.length) { let t = ""; try { t = (await msTranslate([word], tl, "en"))[0] || ""; } catch (e) {} return { t: t || z[0].words[0], zh: /\s/.test(word) && t ? [] : z }; } }
+  { const t = (await translateMany([word], tl, "ms", sl).catch(() => [""]))[0]; if (t) return { t, zh: [] }; } // 微软 → 网站后台 → MyMemory
+  if (en && /^zh(-cn|-hans)?$/i.test(tl || "")) { const d = await siteDict(word); if (d && (d.zh || (d.zhs || []).length)) return { t: d.zh || "", zh: (d.zhs || []).map(x => ({ pos: POS_ZH[x.pos] || x.pos, words: (x.terms || []).slice(0, 5) })).filter(z => z.words.length).slice(0, 4) }; }
+  throw new Error("no word");
+}
+async function gWordGoogle(word, tl, sl) {
   const u = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + encodeURIComponent(sl || "auto") + "&tl=" + encodeURIComponent(tl) + "&dt=t&dt=bd&q=" + encodeURIComponent(word);
-  const r = await fetch(u); if (!r.ok) throw new Error("g" + r.status);
+  const r = await nfetch(u, {}, 5000); if (!r.ok) throw new Error("g" + r.status);
   const j = await r.json();
   const t = (j[0] || []).map(x => x[0]).join("");
   const zh = /['’]/.test(word) ? [] : (j[1] || []).slice(0, 4).map(e => ({ pos: POS_ZH[e[0]] || e[0], words: (e[1] || []).filter(x => !/[。！？.!?]$/.test(x) && x.length <= 12).slice(0, 5) })).filter(z => z.words.length);
   return { t, zh };
 }
+// 有道词典 jsonapi（国内服务）：ec = 英汉（音标、按词性的中文），ee = 英英（WordNet 释义和例句），rel_word.stem = 原形；结果存本地
+const ydMem = new Map();
+async function youdao(w) {
+  w = String(w || "").toLowerCase().trim(); if (!w || w.length > 60) return null; if (ydMem.has(w)) return ydMem.get(w);
+  const r = await nfetch("https://dict.youdao.com/jsonapi?q=" + encodeURIComponent(w), {}, 6000); if (!r.ok) return null;
+  const j = await r.json(); ydMem.set(w, j); if (ydMem.size > 200) ydMem.delete(ydMem.keys().next().value); return j;
+}
+const ydText = x => { const i = x && x.l && x.l.i; return strip(Array.isArray(i) ? i.map(y => (typeof y === "string" ? y : (y && y["#text"]) || "")).join("") : typeof i === "string" ? i : ""); };
+// "n. 跑步，赛跑；管理" → [{pos:"n.", words:["跑步","赛跑","管理"]}]
+function ydZh(j) {
+  const ws = (j && j.ec && j.ec.word) || [], w0 = Array.isArray(ws) ? ws[0] : ws, out = [];
+  ((w0 && w0.trs) || []).forEach(t => ((t && t.tr) || []).forEach(x => {
+    const s = ydText(x).replace(/【[^】]*】.*$/, "").trim(); if (!s) return; const m = /^([a-z]+\.(?:\s*&\s*[a-z]+\.)?)\s*(.*)$/i.exec(s);
+    const words = (m ? m[2] : s).replace(/（[^）]*）|\([^)]*\)|<[^>]*>/g, "").split(/[，；,;]/).map(y => y.trim()).filter(y => y && y.length <= 12).slice(0, 5);
+    if (words.length) out.push({ pos: m ? m[1].replace(/\s+/g, "") : "", words });
+  }));
+  return out.slice(0, 4);
+}
+function ydPhon(j) { const ws = (j && j.ec && j.ec.word) || [], w0 = Array.isArray(ws) ? ws[0] : ws, p = w0 && (w0.usphone || w0.phone || w0.ukphone); return p ? "/" + String(p).replace(/^\/|\/$/g, "") + "/" : ""; }
+function ydMeanings(j) { // 英英释义 → 和维基词典一样的 [{pos, defs:[{def, example}]}]：柯林斯（学习者释义，带例句）优先，其次 WordNet；维基百科摘要不要
+  const pos = p => POS_ZH[String(p || "").replace(/\.$/, "").toLowerCase()] || String(p || "").replace(/:$/, "");
+  const cg = (j && j.collins_primary && j.collins_primary.gramcat) || [];
+  const co = cg.slice(0, 3).map(g => ({ pos: pos(g.partofspeech), defs: (g.senses || []).slice(0, 2).map(x => ({ def: cut(strip(x.definition || ""), 150), example: cut(strip(((x.examples || [])[0] || {}).example || ""), 120) })).filter(d => d.def) })).filter(m => m.defs.length);
+  if (co.length) return co;
+  const ee = j && j.ee; if (!ee || !ee.source || ee.source.name !== "WordNet") return [];
+  return ((ee.word && ee.word.trs) || []).slice(0, 3).map(t => ({ pos: pos(t.pos), defs: (t.tr || []).slice(0, 2).map(x => { const e = x && x.exam && x.exam.i && x.exam.i.f && x.exam.i.f.l; return { def: cut(ydText(x), 150), example: cut(strip(Array.isArray(e) ? (e[0] && e[0].i) || "" : (e && e.i) || ""), 120) }; }).filter(d => d.def) })).filter(m => m.defs.length);
+}
+const ydLemma = j => String((j && ((j.collins_primary && j.collins_primary.words && j.collins_primary.words.word) || (j.rel_word && j.rel_word.stem))) || "").toLowerCase();
+// 网站后台查词 /api/dict（谷歌 + dictionaryapi.dev，后台缓存 30 天）
+async function siteDict(w) { try { const r = await nfetch(SITE + "/api/dict?w=" + encodeURIComponent(w), {}, 12000); return r.ok ? await r.json() : null; } catch (e) { return null; } }
 function stems(w) {
   const c = []; const add = x => { if (x.length > 1 && x !== w) c.push(x); };
   if (/ies$/.test(w)) add(w.slice(0, -3) + "y");
@@ -110,15 +207,19 @@ function arpaToIpa(pron) {
 }
 async function phonetic(w) {
   try {
-    const r = await fetch("https://api.datamuse.com/words?sp=" + encodeURIComponent(w) + "&md=r&max=1"); if (!r.ok) return "";
+    const r = await nfetch("https://api.datamuse.com/words?sp=" + encodeURIComponent(w) + "&md=r&max=1", {}, 5000); if (!r.ok) return "";
     const j = await r.json(); const e = j[0]; if (!e || e.word !== w) return "";
     const t = (e.tags || []).find(x => x.startsWith("pron:")); return t ? arpaToIpa(t.slice(5)) : "";
   } catch (e) { return ""; }
 }
 const strip = h => String(h || "").replace(/<(style|script)[^>]*>[\s\S]*?<\/\1>/gi, "").replace(/<[^>]*>/g, "").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;|&#x27;/g, "'").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
 const cut = (s, n) => (s.length > n ? s.slice(0, n).replace(/\s+\S*$/, "") + "…" : s);
+// 维基词典：直连不通（中国大陆）就经网站后台中转（/api/px，只转白名单里的网站）
+async function wfetch(u, ms) {
+  try { return await nfetch(u, {}, ms || 6000); } catch (e) { return nfetch(SITE + "/api/px?u=" + encodeURIComponent(u), {}, 12000); }
+}
 async function wikt(w) {
-  const r = await fetch("https://en.wiktionary.org/api/rest_v1/page/definition/" + encodeURIComponent(w));
+  const r = await wfetch("https://en.wiktionary.org/api/rest_v1/page/definition/" + encodeURIComponent(w));
   if (!r.ok) return null;
   const j = await r.json(); const en = (j.en || []);
   const meanings = en.filter(m => !/^(symbol|letter|number|punctuation mark)$/i.test(m.partOfSpeech || "")).slice(0, 3).map(m => ({
@@ -130,11 +231,14 @@ async function wikt(w) {
 async function dict(word) {
   const w = word.toLowerCase();
   try {
-    let meanings = await wikt(w).catch(() => null), lemma = "";
-    if (!meanings) for (const s of stems(w)) { meanings = await wikt(s).catch(() => null); if (meanings) { lemma = s; break; } }
+    let meanings = await wikt(w).catch(() => null), lemma = "", yd = null;
+    const wkDown = !meanings && (await isDown("en.wiktionary.org")) && (await isDown(hostOf(SITE))); // 维基词典和中转都不通：不再一个个试词形，直接问有道
+    if (!meanings && !wkDown) for (const s of stems(w)) { meanings = await wikt(s).catch(() => null); if (meanings) { lemma = s; break; } }
+    if (!meanings) { yd = await youdao(w).catch(() => null); const m = ydMeanings(yd); if (m.length) { meanings = m; const st = ydLemma(yd); if (st && st !== w && /^[a-z][a-z'-]*$/.test(st)) lemma = st; } }
     const first = meanings && meanings[0] && meanings[0].defs[0] && meanings[0].defs[0].def || "";
     const lm = /\bof ([A-Za-z'-]+)\.?$/.exec(first); if (!lemma && lm && /(past|participle|plural|person|form|comparative|superlative|spelling)/i.test(first)) lemma = lm[1].toLowerCase();
-    const ph = await phonetic(lemma && !/^\s*$/.test(lemma) && w !== lemma ? w : w);
+    let ph = await phonetic(w);
+    if (!ph) { if (!yd) yd = await youdao(w).catch(() => null); ph = ydPhon(yd); }
     if (!meanings && !ph) return null;
     return { phonetic: ph, audio: "", meanings: meanings || [], lemma };
   } catch (e) { return null; }
@@ -226,15 +330,24 @@ async function syncAll(tl) {
   const r = await cloudAdd(out); r.found = items.size; return r;
 }
 
+// 哪些词组是固定短语：问维基词典有没有这个词条；维基词典不通（中转也不通）就问有道词典有没有英汉释义
 async function phrases(titles) {
   const out = [];
-  for (let i = 0; i < titles.length; i += 45) {
-    const part = titles.slice(i, i + 45);
-    const r = await fetch("https://en.wiktionary.org/w/api.php?action=query&format=json&origin=*&titles=" + encodeURIComponent(part.join("|")));
-    const j = await r.json(), norm = {}; ((j.query && j.query.normalized) || []).forEach(n => (norm[n.to] = n.from));
-    Object.values((j.query && j.query.pages) || {}).forEach(p => { if (p.missing === undefined && p.invalid === undefined) out.push(norm[p.title] || p.title); });
+  try {
+    for (let i = 0; i < titles.length; i += 45) {
+      const part = titles.slice(i, i + 45);
+      const r = await wfetch("https://en.wiktionary.org/w/api.php?action=query&format=json&origin=*&titles=" + encodeURIComponent(part.join("|")));
+      if (!r.ok) throw new Error("wk" + r.status);
+      const j = await r.json(), norm = {}; ((j.query && j.query.normalized) || []).forEach(n => (norm[n.to] = n.from));
+      Object.values((j.query && j.query.pages) || {}).forEach(p => { if (p.missing === undefined && p.invalid === undefined) out.push(norm[p.title] || p.title); });
+    }
+    return out;
+  } catch (e) {
+    if (await isDown("dict.youdao.com")) throw e;
+    const list = titles.slice(0, 16);
+    for (let i = 0; i < list.length; i += 4) await Promise.all(list.slice(i, i + 4).map(t => youdao(t).then(j => { if (ydZh(j).length) out.push(t); }).catch(() => {})));
+    return out;
   }
-  return out;
 }
 chrome.runtime.onMessage.addListener((m, _s, send) => {
   if (m.type === "translateMany") translateMany(m.texts, m.tl, m.engine, m.sl).then(t => send({ t })).catch(() => send({}));

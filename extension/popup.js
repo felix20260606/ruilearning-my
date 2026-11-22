@@ -46,7 +46,7 @@ chrome.storage.local.get({ siteUser: "" }, v => {
     sel.disabled = true; $("sur").style.display = ""; $("sur").textContent = "切换中…（录音截图多的话要一会儿）";
     chrome.runtime.sendMessage({ type: "setSiteUser", id }, r => {
       sel.disabled = false;
-      if (r && r.ok) { $("sur").textContent = "已切换到「" + name + "」，打开的 YouTube 页面刷新一下"; chrome.storage.local.get({ saved: [] }, x => ($("n").textContent = x.saved.length)); }
+      if (r && r.ok) { $("sur").textContent = "已切换到「" + name + "」，打开的视频页面刷新一下"; chrome.storage.local.get({ saved: [] }, x => ($("n").textContent = x.saved.length)); }
       else { $("sur").textContent = "没有切换：" + ((r && r.error) || "出错了"); sel.value = cur; }
     });
   };

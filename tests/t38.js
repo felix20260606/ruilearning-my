@@ -5,7 +5,7 @@ const W=fs.readFileSync(path.join(__dirname,'..','web','_worker.js'),'utf8');
 const { vadd }=new Function(W.slice(W.indexOf('const vnorm'),W.indexOf('async function vocab'))+';return {vadd};')();
 let bin={custom:[{id:"u_1",word:"tire"}],progress:{a:"known"},deleted:["v_growth"],pending:["growth","thesis","wake up"]},posts=0;
 const store={saved:["growth","Tire"],savedSents:[{k:"ph|wake up",t:"wake up",tr:"醒来",ph:1,ctx:"And one day I woke up"}],savedCtx:{growth:{t:"The growth  mindset matters."}},"med:w:thesis":{t:"I wrote my thesis.",tr:"我写了论文。"}};
-const ctx={console,setTimeout,URL,encodeURIComponent,Promise,
+const ctx={console,setTimeout,clearTimeout,URL,encodeURIComponent,Promise,
  importScripts(){},
  chrome:{storage:{local:{get:async k=>{if(typeof k==="string")return{[k]:store[k]};const o={};for(const x in k)o[x]=store[x]??k[x];return o},set:async()=>{}},sync:{get:async d=>d},onChanged:{addListener(){}}},runtime:{onMessage:{addListener(){}},onInstalled:{addListener(){}},onStartup:{addListener(){}},getURL:x=>x},alarms:{create(){},onAlarm:{addListener(){}}},tabs:{create(){}},action:{onClicked:{addListener(){}}}},
  fetch:async(u,o)=>{u=String(u);

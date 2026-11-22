@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "双语字幕 · 生词收集",
-  "version": "1.24.1",
-  "description": "YouTube 双语字幕、悬停查词、字幕列表、单句循环，一键把生词收进你的生词本。",
+  "version": "1.25.0",
+  "description": "YouTube / 哔哩哔哩双语字幕、悬停查词、字幕列表、单句循环，一键把生词收进你的生词本。",
   "permissions": [
     "storage",
     "unlimitedStorage",
@@ -16,7 +16,12 @@
     "https://api.datamuse.com/*",
     "https://tatoeba.org/*",
     "https://ssl.gstatic.com/*",
-    "https://*.pages.dev/*"
+    "https://*.pages.dev/*",
+    "https://dict.youdao.com/*",
+    "https://api.mymemory.translated.net/*",
+    "https://*.bilibili.com/*",
+    "https://*.hdslb.com/*",
+    "https://api.bilibili.com/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -43,7 +48,18 @@
     },
     {
       "matches": [
-        "https://www.youtube.com/*"
+        "https://www.bilibili.com/*"
+      ],
+      "js": [
+        "bili-inject.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://www.youtube.com/*",
+        "https://www.bilibili.com/*"
       ],
       "js": [
         "freq.js",
@@ -54,6 +70,7 @@
         "data-words.js",
         "data-morph.js",
         "notes.js",
+        "sites.js",
         "content.js"
       ],
       "css": [
@@ -89,7 +106,8 @@
         "popup.js"
       ],
       "matches": [
-        "https://www.youtube.com/*"
+        "https://www.youtube.com/*",
+        "https://www.bilibili.com/*"
       ]
     },
     {

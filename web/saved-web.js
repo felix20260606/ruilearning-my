@@ -77,6 +77,9 @@
     const b = e.target.closest("[data-b]"); if (!b) return; const el = b.closest(".sw-it"), o = list()[+el.dataset.i];
     if (b.dataset.b === "say") { try { speak(o.w); } catch (er) {} }
     else if (b.dataset.b === "aud") { const r = medRec[el.dataset.mk]; if (r && r.aud) { if (player) player.pause(); player = new Audio(r.aud); player.play().catch(() => {}); } }
+    else if (b.dataset.b === "vid" && /^(BV[0-9A-Za-z]{10}|ep\d+$|ss\d+$)/.test(b.dataset.v)) { // 插件在 B 站保存的：网站视频页放不了，直接打开 B 站（从这句开始）
+      const m = /^(BV[0-9A-Za-z]{10})(?:\?p=(\d+))?$/.exec(b.dataset.v), t = Math.floor(+b.dataset.t || 0);
+      window.open(m ? "https://www.bilibili.com/video/" + m[1] + "/?" + (m[2] && m[2] !== "1" ? "p=" + m[2] + "&" : "") + "t=" + t : "https://www.bilibili.com/bangumi/play/" + b.dataset.v + "?t=" + t, "_blank", "noopener"); }
     else if (b.dataset.b === "vid") { if (window.__wt && window.__wt.enter) { window.__wt.enter(); window.__wt.open(b.dataset.v, +b.dataset.t || 0); } else location.href = "?v=" + b.dataset.v; }
   }
   window.savedWeb = {

@@ -68,8 +68,8 @@ function say(text, m) {
 }
 function srcCell(m, c) {
   const o = m || c; if (!o || !o.v) return '<span class="no">—</span>';
-  const url = "https://www.youtube.com/watch?v=" + encodeURIComponent(o.v) + "&t=" + Math.max(0, Math.floor(o.s || 0)) + "s", title = (m && m.title) || "YouTube";
-  return '<a href="' + url + '" target="_blank" rel="noopener" title="' + esc(title + (m && m.ch ? " · " + m.ch : "") + " · " + tm(o.s || 0)) + '">' + (m && m.img ? '<img src="' + m.img + '" alt="">' : '<span class="yt">' + I("play") + "</span>") + '<span class="ti">' + esc(title) + "</span></a>";
+  const url = vsVidUrl(o.v, o.s), title = (m && m.title) || (vsVidSite(o.v) === "bili" ? "哔哩哔哩" : "YouTube"); // 出处：YouTube 或 B 站，从这句开始播
+  return '<a href="' + url + '" target="_blank" rel="noopener" title="' + esc(title + (m && m.ch ? " · " + m.ch : "") + " · " + tm(o.s || 0)) + '">' + (m && m.img ? '<img src="' + m.img + '" alt="">' : '<span class="yt' + (vsVidSite(o.v) === "bili" ? " bl" : "") + '">' + I("play") + "</span>") + '<span class="ti">' + esc(title) + "</span></a>";
 }
 // 掌握进度：和网站「🔊 练习」、列表同一个算法——Ebisu 半衰期到 42 天（6 周，同 Language Reactor）= 100 % 已掌握，中间按对数换算
 const mastOf = w => { const r = srs[w]; if (marks[w] === "known" || (r && ((r.h || r.s) ? (r.h || r.s) >= 42 : r.b >= DONE))) return 1; if (!r || !(r.h || r.s || r.b)) return 0; const h = r.h || r.s || [0.5, 1, 3, 7, 16, 35, 90][r.b || 0] || 0.5; return Math.min(1, Math.log(1 + h) / Math.log(43)); };
@@ -217,7 +217,7 @@ $("#exp").onclick = async () => {
   const b = $("#exp"); b.disabled = true; const rows = [], clean = x => String(x || "").replace(/[\t\r\n]+/g, " ");
   const tagName = k => ({ g: "green", y: "yellow", r: "red", b: "blue" }[tags[k]] || "");
   for (const w of saved) { b.textContent = "导出中 " + (rows.length + 1) + "/" + (saved.length + sents.length); const r = await send({ type: "wordLite", word: w, tl: S.target, sl: S.srcLang }), m = mOf(w) || ctx[w] || {}; rows.push([w, meaningsOf(r.g).slice(0, 4).join(", "), m.t || "", m.tr || "", m.v ? "https://www.youtube.com/watch?v=" + m.v + "&t=" + Math.floor(m.s || 0) + "s" : "", tagName(w)].map(clean).join("\t")); }
-  sents.forEach(x => { const m = sOf(x) || {}; rows.push([x.t, x.tr || m.tr || "", x.ctx || "", "", x.v ? "https://www.youtube.com/watch?v=" + x.v + "&t=" + Math.floor(x.s || 0) + "s" : "", tagName(x.k)].map(clean).join("\t")); });
+  sents.forEach(x => { const m = sOf(x) || {}; rows.push([x.t, x.tr || m.tr || "", x.ctx || "", "", x.v ? vsVidUrl(x.v, x.s) : "", tagName(x.k)].map(clean).join("\t")); });
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["#separator:tab\n#html:false\n#tags column:6\n" + rows.join("\n") + "\n"], { type: "text/tab-separated-values" })); a.download = "saved-items-anki.txt"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   b.disabled = false; b.innerHTML = I("exp") + "导出";
 };
