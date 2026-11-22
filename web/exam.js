@@ -217,14 +217,14 @@
   function startAudio() {
     S.phase = "play";
     try { if (window.TTS) TTS.stop(); if (window.videoCore && videoCore.pause) videoCore.pause(); document.querySelectorAll("audio,video").forEach(a => { if (a !== audio) try { a.pause(); } catch (e) {} }); } catch (e) {}
-    if (!audio) { audio = new Audio(); audio.preload = "auto"; }
+    if (!audio) { audio = new Audio(); audio.preload = "auto"; if (window.NET) NET.audio(audio); }
     if (S.src.kind === "ai") {
       li = 0; audio.onended = () => { li++; setTimeout(playLine, 450); }; audio.onerror = () => { li++; setTimeout(playLine, 200); };
       audio.onplaying = () => { if (S.view === "do" && !S.practice && root && root.querySelector('[data-a="resume"]')) { collect(); draw(); } };
       playLine(); draw(); return;
     }
     audio.onerror = null;
-    audio.src = S.src.mp3; audio.currentTime = 0; audio.onplaying = () => { if (S.view === "do" && !S.practice && root && root.querySelector('[data-a="resume"]')) { collect(); draw(); } };
+    audio.src = window.NET ? NET.src(S.src.mp3) : S.src.mp3; audio.currentTime = 0; audio.onplaying = () => { if (S.view === "do" && !S.practice && root && root.querySelector('[data-a="resume"]')) { collect(); draw(); } };
     audio.onended = () => { if (S.view === "do" && S.mode === "listening") { S.phase = "end"; draw(); } };
     audio.play().catch(() => tip("点一下页面上的「▶ 开始放」"));
     draw();

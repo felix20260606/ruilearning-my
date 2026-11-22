@@ -76,7 +76,7 @@
   let root = null, ser = SM[LG("sme:s", "")] ? LG("sme:s", "") : SER[0][0], view = "home", trShow = false, rate = +LG("sme:rate", 1) || 1, zhOn = !!LG("sme:zh", false), follow = LG("sme:follow", true) !== false, fword = LG("sme:fword", true) !== false, cont = !!LG("sme:cont", false);
   const LISTS = {}, listBusy = {}, EPS = {}, ZH = {}, zhBusy = {}; let EP = null, epBusy = false;
   // ---------- 一个一直在的 <audio>：在节目页里显示，切走了就挪进悬浮条 ----------
-  const AU = document.createElement("audio"); AU.controls = true; AU.preload = "metadata"; AU.id = "sm-audio";
+  const AU = document.createElement("audio"); AU.controls = true; AU.preload = "metadata"; AU.id = "sm-audio"; if (window.NET) NET.audio(AU); // 大陆打不开 BBC：自动改走后台中转
   let fl = null, flClosed = false, auTitle = "";
   function flEl() {
     if (fl) return fl; fl = document.createElement("div"); fl.id = "sm-float";
@@ -171,7 +171,7 @@
   // 🀄 中文：先找后台（翻过的存 KV，全家共用）；后台翻不了（谷歌拦了 Cloudflare 机房的 IP）就在浏览器里直接问谷歌，和阅读、视频字幕一样
   async function gtx(arr) {
     const out = arr.map(() => ""), go = async idx => {
-      const r = await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q=" + encodeURIComponent(idx.map(i => arr[i].replace(/\s+/g, " ")).join("\n")));
+      const r = await NET.g("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q=" + encodeURIComponent(idx.map(i => arr[i].replace(/\s+/g, " ")).join("\n")));
       const zh = ((await r.json())[0] || []).map(x => x[0] || "").join("").split("\n").map(x => x.trim());
       if (zh.length === idx.length) idx.forEach((i, k) => { out[i] = zh[k]; }); else if (idx.length === 1) out[idx[0]] = zh.join(" ").trim(); else for (const i of idx) await go([i]); // 行数对不上就一行一行翻
     };
@@ -236,7 +236,7 @@
   function durOf(id, mp3) {
     return new Promise(res => {
       if (AU.dataset.id === id && isFinite(AU.duration) && AU.duration > 0) return res(AU.duration);
-      const a = AU.dataset.id === id ? AU : new Audio(); if (a !== AU) { a.preload = "metadata"; a.src = mp3; }
+      const a = AU.dataset.id === id ? AU : new Audio(); if (a !== AU) { a.preload = "metadata"; if (window.NET) NET.audio(a); a.src = mp3; }
       let t = setTimeout(() => res(0), 15000); a.addEventListener("loadedmetadata", () => { clearTimeout(t); res(a.duration || 0); }, { once: true }); if (a !== AU) try { a.load(); } catch (e) {} // 别 load 正在用的播放器：会打断正在放的
     });
   }
@@ -276,7 +276,7 @@
   }
   // ---------- 📥 离线下载（Cache Storage「sme-off-v1」：/off/期号.mp3 + /off/期号.json {ep, sents, zh}） ----------
   const OFFC = "sme-off-v1", OFF = () => LG("sme:off", {}) || {}, BLOB = {}, OFFB = {};
-  const srcOf = (id, ep) => BLOB[id] || (ep || EPS[id] || EP || {}).mp3 || "";
+  const srcOf = (id, ep) => { const u = (ep || EPS[id] || EP || {}).mp3 || ""; return BLOB[id] || (window.NET && u ? NET.src(u) : u); }; // 已知连不上 BBC 就直接走中转
   async function offBlob(id) { // 下载过的这期 → 本机的 blob: 地址（Safari 也能拖进度条）
     if (id in BLOB) return BLOB[id];
     try { const r = await (await caches.open(OFFC)).match("/off/" + id + ".mp3"); BLOB[id] = r ? URL.createObjectURL(await r.blob()) : ""; } catch (e) { BLOB[id] = ""; }

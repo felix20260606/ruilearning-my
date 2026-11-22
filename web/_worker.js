@@ -901,7 +901,10 @@ async function ai(req, env) {
     if (b.task === "tr") { // 浏览器翻不了（谷歌连不上）时最后一道：后台翻一批句子（谷歌 → Workers AI）
       const T = (Array.isArray(b.texts) ? b.texts : []).slice(0, 200).map(x => clip(x, 1000));
       if (!T.length || T.join("").length > 40000) return json({ ok: false, error: "bad body" }, 400);
-      const zh = await smeZh(T, env); return json({ ok: zh.some(Boolean), zh });
+      const kv = env.CAPTIONS, ck = T.length <= 3 ? "trc/" + (await sha(T.join("\n"))).slice(0, 32) : ""; // 查词这种一两个词的存起来（KV 每天写入有限，长的不存）
+      if (kv && ck) { const hit = await kv.get(ck, "json"); if (hit) return json({ ok: true, zh: hit, cached: true }); }
+      const zh = await smeZh(T, env); if (kv && ck && zh.every((x, i) => x || !T[i])) await kv.put(ck, JSON.stringify(zh), { expirationTtl: 180 * 86400 });
+      return json({ ok: zh.some(Boolean), zh });
     }
     if (b.task === "lquiz") {
       const t = clip(b.text, 12000).trim(); if (t.split(/\s+/).length < 150) return json({ ok: false, error: "too short" }, 400);
@@ -985,6 +988,23 @@ async function tts(req, env, u, ctx) {
   } catch (e) { return json({ ok: false, error: String(e && e.message || e) }, 502); }
 }
 
+// GET/POST /api/px?u=<网址>：中国大陆打不开的几个外部服务（维基百科、BBC 的图和音频、YouTube 缩略图、英文词典、LanguageTool）经后台转一手
+// 只转名单里的网站；音频带 Range（能拖进度条）；图片在 Cloudflare 边缘缓存一天
+const PX_HOSTS = { "en.wikipedia.org": /^\/w\/api\.php$/, "zh.wikipedia.org": /^\/w\/api\.php$/, "commons.wikimedia.org": /^\/w\/api\.php$/, "upload.wikimedia.org": /^\//, "thumb.wikimedia.org": /^\//, "ichef.bbci.co.uk": /^\//, "downloads.bbc.co.uk": /\.mp3$/, "i.ytimg.com": /^\/vi\//, "api.dictionaryapi.dev": /^\/(api\/v2\/entries|media)\//, "api.languagetool.org": /^\/v2\/check$/ };
+async function px(req, u) {
+  if (req.method === "OPTIONS") return new Response(null, { headers: { "access-control-allow-origin": "*", "access-control-allow-methods": "GET,POST", "access-control-allow-headers": "content-type,range" } });
+  let t; try { t = new URL(u.searchParams.get("u") || ""); } catch (e) { return json({ ok: false, error: "bad url" }, 400); }
+  const rule = PX_HOSTS[t.hostname]; if (t.protocol !== "https:" || !rule || !rule.test(t.pathname)) return json({ ok: false, error: "not allowed" }, 403);
+  const post = req.method === "POST"; if (post && t.hostname !== "api.languagetool.org") return json({ ok: false, error: "method" }, 405);
+  const h = { "User-Agent": "ruilearning/1.0 (family English learning site; proxy)", "Accept": req.headers.get("accept") || "*/*" }, range = req.headers.get("range");
+  if (range) h.Range = range; if (post) h["Content-Type"] = req.headers.get("content-type") || "application/x-www-form-urlencoded";
+  const img = /^(upload\.wikimedia\.org|thumb\.wikimedia\.org|ichef\.bbci\.co\.uk|i\.ytimg\.com)$/.test(t.hostname);
+  let r; try { r = await fetch(t.toString(), { method: post ? "POST" : "GET", headers: h, body: post ? await req.text() : undefined, cf: img && !range ? { cacheEverything: true, cacheTtl: 86400 } : undefined }); } catch (e) { return json({ ok: false, error: "fetch failed" }, 502); }
+  const out = new Headers({ "access-control-allow-origin": "*", "cache-control": img ? "public, max-age=86400" : "private, max-age=600" });
+  for (const k of ["content-type", "content-length", "content-range", "accept-ranges", "last-modified", "etag"]) { const v = r.headers.get(k); if (v) out.set(k, v); }
+  return new Response(r.body, { status: r.status, headers: out });
+}
+
 export default {
   async fetch(req, env, ctx) {
     const u = new URL(req.url);
@@ -1003,6 +1023,7 @@ export default {
     if (u.pathname === "/api/ai") return ai(req, env);
     if (u.pathname === "/api/stt") return stt(req, env);
     if (u.pathname === "/api/tts") return tts(req, env, u, ctx);
+    if (u.pathname === "/api/px") return px(req, u);
     return env.ASSETS.fetch(req);
   }
 };

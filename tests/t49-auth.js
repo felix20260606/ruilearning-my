@@ -144,6 +144,13 @@ const path = require("path");
     globalThis.fetch = realFetch; env.AI.run = realRun;
   }
 
+  // ---- 🇨🇳 /api/px 中转：只转名单里的网站和路径 ----
+  r = await call("/api/px?u=" + encodeURIComponent("https://evil.example.com/x")); ok(r.status === 403, "px not allowed host");
+  r = await call("/api/px?u=" + encodeURIComponent("https://en.wikipedia.org/wiki/Cat")); ok(r.status === 403, "px wikipedia only api.php");
+  r = await call("/api/px?u=" + encodeURIComponent("http://ichef.bbci.co.uk/x.jpg")); ok(r.status === 403, "px https only");
+  r = await call("/api/px?u=" + encodeURIComponent("https://ichef.bbci.co.uk/x.jpg"), "POST", {}); ok(r.status === 405, "px post only for languagetool");
+  r = await call("/api/px?u=notaurl"); ok(r.status === 400, "px bad url");
+
   console.log(fail ? fail + " FAILED" : "t49 auth + exam: all passed");
   process.exit(fail ? 1 : 0);
 })();

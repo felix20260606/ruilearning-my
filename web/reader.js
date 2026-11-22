@@ -37,7 +37,7 @@
   const saveImg = () => { try { localStorage.setItem("reader:img", JSON.stringify(IMG)); } catch (e) {} };
   function wikiImg(title, size) {
     const k = size + "|" + title; if (k in IMG) return Promise.resolve(IMG[k]);
-    return fetch("https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=" + size + "&titles=" + encodeURIComponent(title))
+    return NET.fetch("https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=" + size + "&titles=" + encodeURIComponent(title))
       .then(r => r.json()).then(j => { const p = Object.values((j.query && j.query.pages) || {})[0] || {}; IMG[k] = (p.thumbnail && p.thumbnail.source) || null; saveImg(); return IMG[k]; }).catch(() => null);
   }
   // 生词本词条 → 查看页条目

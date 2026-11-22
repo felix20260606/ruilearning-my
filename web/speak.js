@@ -485,7 +485,7 @@
     } catch (e) { if (CH === my) { CH.sumBusy = false; tip("总结没出来，再点一次"); draw(); } }
   }
   async function zhOf(en) { // 谷歌翻译（同阅读页）
-    try { const j = await (await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q=" + encodeURIComponent(en))).json(); return (j[0] || []).map(x => x[0] || "").join(""); } catch (e) { return ""; }
+    try { const j = await (await NET.g("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q=" + encodeURIComponent(en))).json(); return (j[0] || []).map(x => x[0] || "").join(""); } catch (e) { return ""; }
   }
 
   // ===== 🎬 原声跟读 =====

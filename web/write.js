@@ -801,7 +801,7 @@
       const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 30000);
       const body = new URLSearchParams({ text: r.text, language: r.lang || "en-US" });
       let resp;
-      try { resp = await fetch("https://api.languagetool.org/v2/check", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body.toString(), signal: ctl.signal }); }
+      try { resp = await NET.fetch("https://api.languagetool.org/v2/check", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body.toString(), signal: ctl.signal }); }
       catch (e) { throw new Error(e.name === "AbortError" ? "LanguageTool 超时没有响应，请稍后重试" : "连不上 LanguageTool（网络问题或被拦截），请稍后重试"); }
       finally { clearTimeout(to); }
       if (resp.status === 429) throw new Error("LanguageTool 说请求太频繁了（限 20 次/分钟），请等一分钟再试");

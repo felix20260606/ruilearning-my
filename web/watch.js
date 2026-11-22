@@ -608,7 +608,7 @@
   const tidy = list => { const o = []; (list || []).forEach(c => { const t = clean(c.t); if (t) o.push({ s: +c.s || 0, e: +c.e || 0, t, r: clean(c.r) }); }); for (let i = 0; i < o.length - 1; i++) if (o[i].e > o[i + 1].s) o[i].e = Math.max(o[i].s + 0.2, o[i + 1].s); return o; };
   const note = (html) => { const n = $("#wt-note"); if (!n) return; n.innerHTML = html || ""; n.style.display = html ? "" : "none"; fit(); };
   async function gtLines(lines, tl) { // 一批句子合并成一次请求；行数对不上就返回 null
-    const r = await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=" + encodeURIComponent(tl) + "&dt=t&q=" + encodeURIComponent(lines.map(x => x.replace(/\n/g, " ")).join("\n")));
+    const r = await NET.g("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=" + encodeURIComponent(tl) + "&dt=t&q=" + encodeURIComponent(lines.map(x => x.replace(/\n/g, " ")).join("\n")));
     if (!r.ok) throw new Error("http " + r.status);
     const j = await r.json(), parts = (j[0] || []).map(x => x[0]).join("").split("\n");
     return parts.length === lines.length ? parts.map(x => x.trim()) : null;
@@ -639,13 +639,17 @@
   /* ---------- 播放器 ---------- */
   function loadApi() {
     if (apiP) return apiP;
-    apiP = new Promise(res => { if (window.YT && YT.Player) return res(); const old = window.onYouTubeIframeAPIReady; window.onYouTubeIframeAPIReady = () => { try { old && old(); } catch (e) {} res(); }; const s = document.createElement("script"); s.src = "https://www.youtube.com/iframe_api"; s.onerror = () => { apiP = null; tip("播放器加载失败，请检查网络"); }; document.head.append(s); });
+    apiP = new Promise(res => { if (window.YT && YT.Player) return res(); const old = window.onYouTubeIframeAPIReady; window.onYouTubeIframeAPIReady = () => { try { old && old(); } catch (e) {} res(); }; const s = document.createElement("script"); s.src = "https://www.youtube.com/iframe_api"; s.onerror = () => { apiP = null; try { NET.mark("www.youtube.com", 0); } catch (e) {} const vb = root && $(".wt-video", root); if (vb) vb.innerHTML = ytMsg; }; document.head.append(s); });
     return apiP;
   }
+  // 🇨🇳 大陆打不开 YouTube：说清楚，别让人对着黑框干等
+  const ytMsg = '<div style="padding:28px 18px;text-align:center;line-height:1.7;color:var(--ui-ink-2,#cfd2d6)"><div style="font-size:30px">🚫</div><b>现在的网络连不上 YouTube</b><br>在中国大陆要开 VPN 才能看视频。<br><small style="color:var(--ui-muted,#9aa0a6)">BBC 听力、阅读、口语、写作、生词本这些不受影响。</small><br><button type="button" class="ui-btn" style="margin-top:10px" onclick="try{NET.mark(\'www.youtube.com\',1)}catch(e){}location.reload()">已经开了 VPN，重试</button></div>';
   async function startPlayer(v) {
     stopTick(); ready = false; try { player && player.destroy && player.destroy(); } catch (e) {} player = null;
     $(".wt-video", root).innerHTML = '<div id="wt-yt"></div>';
-    await loadApi(); if (!doc || doc.v !== v) return;
+    if (window.NET && NET.isBad("www.youtube.com") && !(window.YT && YT.Player)) { $(".wt-video", root).innerHTML = ytMsg; return; }
+    const slow = setTimeout(() => { if (!(window.YT && YT.Player) && doc && doc.v === v) { try { NET.mark("www.youtube.com", 0); } catch (e) {} $(".wt-video", root).innerHTML = ytMsg; } }, 10000); // 10 秒还没连上 YouTube
+    await loadApi(); clearTimeout(slow); if (!doc || doc.v !== v) return;
     player = new YT.Player("wt-yt", { videoId: v, playerVars: { playsinline: 1, rel: 0, modestbranding: 1, cc_load_policy: 0, iv_load_policy: 3, start: Math.floor(resumeAt) }, events: {
       onReady: () => { ready = true; try { player.setPlaybackRate(set.rate); } catch (e) {} startTick(); },
       onStateChange: e => {
@@ -706,13 +710,13 @@
     const c = LS.get("wt:w:" + k, null); if (c) return dc[k] = c;
     const o = { zh: [], phon: "", en: "" };
     try {
-      const j = await (await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=" + encodeURIComponent((VS && VS.S.target) || "zh-CN") + "&dt=t&dt=bd&q=" + encodeURIComponent(k))).json();
+      const j = await (await NET.g("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=" + encodeURIComponent((VS && VS.S.target) || "zh-CN") + "&dt=t&dt=bd&q=" + encodeURIComponent(k))).json();
       const add = x => { x = String(x || "").trim(); if (x && x.toLowerCase() !== k && !o.zh.includes(x)) o.zh.push(x); };
       add((j[0] || []).map(x => x[0]).join("")); (j[1] || []).forEach(e => (e[1] || []).slice(0, 4).forEach(add));
       o.pos = (j[1] || []).slice(0, 3).map(e => ({ p: e[0], w: (e[1] || []).slice(0, 4) }));
     } catch (e) {}
     if (!/\s/.test(k)) try {
-      const r = await fetch("https://api.dictionaryapi.dev/api/v2/entries/en/" + encodeURIComponent(k)); if (r.ok) { const j = await r.json(); const e = j[0] || {}; o.phon = e.phonetic || ((e.phonetics || []).find(p => p.text) || {}).text || ""; const d = ((e.meanings || [])[0] || {}).definitions; o.en = (d && d[0] && d[0].definition) || ""; }
+      const r = await NET.fetch("https://api.dictionaryapi.dev/api/v2/entries/en/" + encodeURIComponent(k)); if (r.ok) { const j = await r.json(); const e = j[0] || {}; o.phon = e.phonetic || ((e.phonetics || []).find(p => p.text) || {}).text || ""; const d = ((e.meanings || [])[0] || {}).definitions; o.en = (d && d[0] && d[0].definition) || ""; }
     } catch (e) {}
     if (o.zh.length) LS.set("wt:w:" + k, o);
     return dc[k] = o;

@@ -229,7 +229,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
     (o[id] = o[id] || {})[k] = v; if (!LS(TRK, o)) { const n = {}; n[id] = o[id]; LS(TRK, n); }
   }
   async function gtx(q) { // 谷歌翻译（浏览器直接调，和生词本加词同一个入口）
-    const r = await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q=" + encodeURIComponent(q));
+    const r = await NET.g("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q=" + encodeURIComponent(q));
     if (!r.ok) throw new Error("g" + r.status); const j = await r.json();
     const t = (j[0] || []).map(x => x[0] || "").join(""); if (!t) throw new Error("empty"); return t;
   }
