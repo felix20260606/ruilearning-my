@@ -111,5 +111,5 @@ const path = require("path");
   r = await call("/api/dict?w=banana"); ok(kv.has("d/banana") && meta.get("d/banana") === undefined, "dict cached after quota back");
   globalThis.fetch = of;
 
-  console.log(fail ? fail + " FAILED" : "t59 sync fixes: all ok"); process.exit(fail ? 1 : 0);
+  console.log(fail ? fail + " FAILED" : "t64 sync fixes: all ok"); process.exit(fail ? 1 : 0);
 })();
