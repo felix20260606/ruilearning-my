@@ -75,6 +75,9 @@
   .sk-pairs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .sk-pair{display:flex;gap:6px}.sk-pair button{flex:1 1 0;border:1px solid var(--ui-line-2);background:var(--ui-surface-2);color:var(--ui-ink);border-radius:10px;min-height:44px;font:inherit;font-size:16px;font-weight:700;cursor:pointer}
   .sk-pair button:hover{border-color:var(--ui-pur)}
+  .sk-pair .sk-ai{margin-left:5px;font-size:10.5px;font-weight:800;color:var(--ui-muted);border:1px solid var(--ui-line-2);border-radius:999px;padding:0 5px;vertical-align:2px}
+  .sk-h3n{margin-left:8px;font-size:12px;font-weight:600;color:var(--ui-muted)}
+  .sk-cred{margin-top:10px;font-size:12px;color:var(--ui-muted);line-height:1.9}.sk-cred summary{cursor:pointer}.sk-cred a{color:var(--ui-pur-text)}.sk-cred small{margin-left:3px;opacity:.75}
   .sk-quiz{text-align:center;padding:16px}.sk-quiz .q{font-size:15px;color:var(--ui-ink-2);margin-bottom:12px}.sk-quiz .ch{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
   .sk-quiz .ch button{min-width:120px;min-height:52px;font-size:19px;font-weight:800;border-radius:12px;border:1px solid var(--ui-line-2);background:var(--ui-surface-2);color:var(--ui-ink);cursor:pointer;font-family:inherit}
   .sk-quiz .ch button.r{background:rgba(124,227,184,.18);border-color:#7CE3B8}.sk-quiz .ch button.w{background:rgba(255,128,128,.16);border-color:#ff8080}
@@ -140,12 +143,28 @@
   }
   function say(text, o) {
     o = o || {}; const my = ++sayId, t = clean(text);
-    if (window.TTS) TTS.stop();
+    realStop(); if (window.TTS) TTS.stop();
     try { speechSynthesis.cancel(); } catch (e) {}
     if (window.TTS && TTS.play(t, { who: o.who, rate: (o.rate || opt.rate) * (o.slow ? 0.75 : 1), end: () => { if (my === sayId && o.end) o.end(); }, fallback: () => { if (my === sayId) sysSay(t, o, my); } })) return;
     sysSay(t, o, my);
   }
-  function hush() { sayId++; if (window.TTS) TTS.stop(); try { speechSynthesis.cancel(); } catch (e) {} }
+  function hush() { sayId++; realStop(); if (window.TTS) TTS.stop(); try { speechSynthesis.cancel(); } catch (e) {} }
+  /* 「🔊 发音」最小对立词的真人录音：web/pron-real.json（tools/gen-pron.mjs 从维基词典找的 Wikimedia Commons 录音，CC BY-SA 等授权）
+     点词、听音辨词优先播真人录音；没有录音的词（少数几个）才用 AI 声音。upload.wikimedia.org 在大陆打不开时 NET 会换成后台中转 */
+  let REAL = null, realLoading = null, realA = null;
+  function realLoad() { if (!realLoading) realLoading = fetch("pron-real.json?v=1").then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => { REAL = j || {}; if (view && view.t === "pair") draw(); }); return realLoading; }
+  const realOf = w => (REAL && REAL[String(w || "").toLowerCase().trim()]) || null;
+  function realStop() { if (realA) { try { realA.pause(); } catch (e) {} realA = null; } }
+  function sayWord(w, o) { // 真人录音；没有 / 播不了就用 say()
+    o = o || {}; const x = realOf(w); if (!x) { say(w, o); return; }
+    hush(); const my = sayId, a = new Audio(window.NET ? NET.src(x.u) : x.u); realA = a;
+    a.playbackRate = Math.max(0.7, Math.min(1, (o.rate || 1) * (o.slow ? 0.75 : 1)));
+    let fell = false; const fall = () => { if (fell || my !== sayId || realA !== a) return; fell = true; realA = null; say(w, o); };
+    a.onended = () => { if (my === sayId && realA === a) realA = null; };
+    a.addEventListener("error", () => { if (!window.NET || /\/api\/px\?/.test(a.src)) fall(); }); // 直连出错 NET 会换成中转再试；中转也不行才用 AI 声音
+    if (window.NET) NET.audio(a); // 要在上面那个监听之后加：NET 换地址前，上面先看到的还是直连地址
+    a.play().catch(e => { if (e && e.name === "NotAllowedError") fall(); });
+  }
 
   /* ---------- 录音和打分（同「🔊 练习」的跟读卡） ---------- */
   const toks = t => String(t || "").toLowerCase().replace(/[’‘]/g, "'").replace(/[^a-z0-9'\s-]+/g, " ").split(/[\s-]+/).map(x => x.replace(/^'+|'+$/g, "")).filter(Boolean);
@@ -317,12 +336,22 @@
   // ===== 🔊 发音 =====
   function pronList() {
     const P = D.pron || {}, L = P.pairs || [];
-    return '<div class="sk-intro"><b>怎么练：</b>中国人最容易混的音，一组一组练：先看嘴型说明，点两个词对比着听，再做「听音辨词」小测（听到哪个点哪个），最后跟读例句。已练 ' + doneCount("p:") + " / " + L.length + " 组。</div>" +
+    return '<div class="sk-intro"><b>怎么练：</b>中国人最容易混的音，一组一组练：先看嘴型说明，点两个词对比着听（单词都是<b>真人录音</b>，来自维基词典），再做「听音辨词」小测（听到哪个点哪个），最后跟读例句。已练 ' + doneCount("p:") + " / " + L.length + " 组。</div>" +
       '<div class="sk-grid three">' + L.map(p => card("pair", p.id, p.title, p.a + " vs " + p.b, (p.words || []).slice(0, 4).map(w => w[0] + "/" + w[1]).join(" · "), isDone("p:" + p.id))).join("") + "</div>" +
       '<div class="sk-sub">连读、弱读、吞音<small>母语者说快了为什么听不懂</small></div><div class="sk-grid">' + card("conn", "all", "连读和弱读 " + ((P.connected || []).length) + " 条", "gonna、wanna、didja、pick it up……", "听慢速和正常速度对比，跟读", isDone("p:conn")) +
       card("stress", "all", "重音和语调 " + (D.stress || []).length + " 句", "重读不同的词，意思就变了", "I didn't say he stole it.", false) +
       card("twist", "all", "绕口令 " + (D.twisters || []).length + " 条", "th、r/l、v/w、s/sh", "She sells seashells…", false) +
       card("num", "all", "数字和价格", "电话、价格、时间、年份、大数、日期", "听写 + 说出来", false) + "</div>";
+  }
+  function realNote(p) {
+    if (!REAL) { realLoad(); return '<small class="sk-h3n">载入真人录音…</small>'; }
+    const W = (p.words || []).flat(), n = W.filter(realOf).length;
+    return '<small class="sk-h3n">' + (n === W.length ? "🎙 全部是真人录音" : n ? "🎙 真人录音（标 AI 的 " + (W.length - n) + " 个词没找到真人录音）" : "AI 声音") + "</small>";
+  }
+  function realCredit(p) {
+    if (!REAL) return ""; const L = (p.words || []).flat().map(w => [w, realOf(w)]).filter(x => x[1]); if (!L.length) return "";
+    const acc = { us: "美音", uk: "英音", au: "澳音", ll: "Lingua Libre 志愿者" };
+    return '<details class="sk-cred"><summary>录音来源：维基词典 / Wikimedia Commons（志愿者录制，CC BY-SA 等自由授权）</summary>' + L.map(x => '<a href="https://commons.wikimedia.org/wiki/' + esc(encodeURI(x[1].f.replace(/ /g, "_"))) + '" target="_blank" rel="noopener">' + esc(x[0]) + "</a>" + '<small>' + esc(acc[x[1].a] || "") + "</small>").join(" · ") + "</details>";
   }
   let QZ = null; // 听音辨词：{id, n, ok, cur:[a,b,ans], picked}
   function pairView() {
@@ -330,14 +359,15 @@
     return '<div class="sk-bar">' + back + "</div>" + '<h2 class="sk-title">' + esc(p.title) + "<small>" + esc(p.a) + " vs " + esc(p.b) + "</small></h2>" +
       '<div class="sk-scene">👄 ' + esc(p.how) + "</div>" +
       '<div class="sk-box"><h3>🎧 听音辨词</h3><div class="sk-quiz" id="sk-quiz"></div></div>' +
-      '<div class="sk-box"><h3>对比着听（点词就读）</h3><div class="sk-pairs">' + (p.words || []).map(w => '<div class="sk-pair"><button data-say="' + esc(w[0]) + '">' + esc(w[0]) + '</button><button data-say="' + esc(w[1]) + '">' + esc(w[1]) + "</button></div>").join("") + "</div></div>" +
-      '<div class="sk-box"><h3>例句跟读</h3>' + (p.sent || []).flat().map((s, i) => '<div class="sk-ph" style="display:block"><div class="e">' + esc(s) + "</div>" + ops("p:" + p.id + ":" + i, s) + "</div>").join("") + "</div>";
+      '<div class="sk-box"><h3>对比着听（点词就读）' + realNote(p) + '</h3><div class="sk-pairs">' + (p.words || []).map(w => '<div class="sk-pair">' + w.map(x => '<button data-word="' + esc(x) + '">' + esc(x) + (REAL && !realOf(x) ? '<small class="sk-ai">AI</small>' : "") + "</button>").join("") + "</div>").join("") + "</div>" + realCredit(p) + "</div>" +
+      '<div class="sk-box"><h3>例句跟读<small class="sk-h3n">句子是 AI 声音（这些句子没有能用的真人录音）</small></h3>' + (p.sent || []).flat().map((s, i) => '<div class="sk-ph" style="display:block"><div class="e">' + esc(s) + "</div>" + ops("p:" + p.id + ":" + i, s) + "</div>").join("") + "</div>";
   }
   function quizNew() {
     const p = ((D.pron || {}).pairs || []).find(x => view && x.id === view.id); if (!p) return;
     if (!QZ || QZ.id !== p.id) QZ = { id: p.id, n: 0, ok: 0 };
-    const w = p.words[Math.floor(Math.random() * p.words.length)], ans = Math.random() < .5 ? 0 : 1;
-    QZ.cur = [w[0], w[1], ans]; QZ.picked = null; quizPaint(); setTimeout(() => say(w[ans], { rate: Math.min(opt.rate, 1) }), 150);
+    const both = p.words.filter(w => realOf(w[0]) && realOf(w[1])), L = both.length >= 3 ? both : p.words; // 一个真人一个 AI 的话，听声音就知道答案了：有足够多两个都是真人录音的就只出这些
+    const w = L[Math.floor(Math.random() * L.length)], ans = Math.random() < .5 ? 0 : 1;
+    QZ.cur = [w[0], w[1], ans]; QZ.picked = null; quizPaint(); setTimeout(() => sayWord(w[ans], { rate: Math.min(opt.rate, 1) }), 150);
   }
   function quizPaint() {
     const el = root && root.querySelector("#sk-quiz"); if (!el) return;
@@ -853,6 +883,7 @@
       const co = t.closest("[data-coach]"); if (co) { coachAns[co.dataset.coach] = co.dataset.v; LS("speak:coachAns", coachAns); draw(); return; }
       const hq = t.closest("[data-howq]"); if (hq) { howGo(hq.dataset.howq); return; }
       const ar = t.closest("[data-arch]"); if (ar) { playArchived(ar.dataset.arch); return; }
+      const wd = t.closest("[data-word]"); if (wd) { sayWord(wd.dataset.word); return; }
       const sy = t.closest("[data-say]"); if (sy) { if (RP || SH) { RP = null; SH = null; } say(sy.dataset.say, { slow: !!sy.dataset.slow, who: sy.dataset.who || "" }); return; }
       const rb = t.closest("[data-rec]"); if (rb) {
         const key = rb.dataset.rec, tgt = rb.dataset.t, max = +rb.dataset.max || 20;
@@ -876,7 +907,7 @@
       const rt = t.closest("[data-rate]"); if (rt) { opt.rate = +rt.dataset.rate; LS("speak:opt", opt); draw(); return; }
       const zh = t.closest("[data-zh]"); if (zh) { opt.zh = zh.dataset.zh === "1"; LS("speak:opt", opt); draw(); return; }
       const sg = t.closest("[data-sg]"); if (sg) { stopAll(); shadowGroup = +sg.dataset.sg; draw(); return; }
-      const qz = t.closest("[data-qz]"); if (qz && QZ && QZ.cur && QZ.picked == null) { QZ.picked = +qz.dataset.qz; QZ.n++; if (QZ.picked === QZ.cur[2]) QZ.ok++; if (QZ.n >= 10) { markDone("p:" + QZ.id); tip("10 题答对 " + QZ.ok + " 题"); } quizPaint(); say(QZ.cur[QZ.cur[2]]); return; }
+      const qz = t.closest("[data-qz]"); if (qz && QZ && QZ.cur && QZ.picked == null) { QZ.picked = +qz.dataset.qz; QZ.n++; if (QZ.picked === QZ.cur[2]) QZ.ok++; if (QZ.n >= 10) { markDone("p:" + QZ.id); tip("10 题答对 " + QZ.ok + " 题"); } quizPaint(); sayWord(QZ.cur[QZ.cur[2]]); return; }
       const b = t.closest("[data-act]"); if (!b) return; const a = b.dataset.act;
       if (a === "chat-go") { const c = chatScenes().find(x => x.id === b.dataset.id); if (!c) return; stopAll(); CH = { id: c.id, title: c.title, scene: c.scene, msgs: [] }; chatAsk(); return; }
       if (a === "chat-end") { stopAll(); CH = null; draw(); return; }
@@ -913,7 +944,7 @@
       if (a === "sh") { if (SH) { stopAll(); draw(); } else { stopAll(); SH = { g: shadowGroup, i: 0 }; shStep(); } return; }
       if (a === "qz-go") { QZ = null; quizNew(); return; }
       if (a === "qz-next") { quizNew(); return; }
-      if (a === "qz-again") { if (QZ && QZ.cur) say(QZ.cur[QZ.cur[2]], { rate: Math.min(opt.rate, 1) }); return; }
+      if (a === "qz-again") { if (QZ && QZ.cur) sayWord(QZ.cur[QZ.cur[2]], { rate: Math.min(opt.rate, 1) }); return; }
       if (a === "tm") { stopAll(); const total = +b.dataset.s || 60; TM = { id: view.id, phase: total > 60 ? "talk" : "prep", left: total > 60 ? total : 15, total }; if (TM.phase === "talk") recStart("t:" + TM.id, "", total + 5, () => { TM = null; markDone("t:" + view.id); draw(); }); TM.t = setInterval(tmTick, 1000); timerPaint(); return; }
       if (a === "tm-stop") { if (!TM) return; if (TM.phase === "prep") { TM.left = 1; tmTick(); } else { clearInterval(TM.t); recStop(false); } return; }
     });
