@@ -2,7 +2,7 @@
    带视频截图、原声、配图、出处和中文；数据来自 Cloudflare 的 /api/ext 和 /api/media，和插件是同一份。
    生词本「⭐ 已保存」模式：装了插件的电脑上仍然直接嵌入插件自己的页面（能编辑）。 */
 (function () {
-  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const { esc } = U; // 全站共用的小工具（util.js）
   const CSS = `
   #ext-web{display:none;padding:6px 0 30px}#savedbox.web #ext-web{display:block}
   .sw{max-width:1200px;margin:0 auto}
@@ -29,7 +29,7 @@
   const medRec = {}, medPr = {};
   const medGet = k => medPr[k] || (medPr[k] = fetch("/api/media?k=" + encodeURIComponent(k)).then(r => (r.ok ? r.json() : null)).then(j => (medRec[k] = (j && j.rec) || null)).catch(() => (medRec[k] = null)));
   async function load() {
-    const j = await (await fetch("/api/ext", { cache: "no-store" })).json(), it = (j && j.items) || {};
+    const it = await CLOUD.chan("ext").get(0); // 全站共用的同步（cloud.js）
     const ws = [], ss = [], ctx = {}, wimg = {}, med = new Set(), tags = {};
     for (const k in it) { const i = k.indexOf("|"), n = k.slice(0, i), id = k.slice(i + 1), v = it[k].v;
       if (n === "saved") ws.push(String(v)); else if (n === "savedSents" && v && v.t) ss.push(v); else if (n === "savedCtx") ctx[id] = v; else if (n === "wimg") wimg[id] = v; else if (n === "med") med.add(id); else if (n === "tags") tags[id] = v; }
@@ -76,7 +76,7 @@
     const img = e.target.closest(".sw-im img"); if (img) { const v = document.createElement("div"); v.className = "sw-view"; v.innerHTML = '<img src="' + esc(img.src) + '">'; v.onclick = () => v.remove(); document.body.append(v); return; }
     const b = e.target.closest("[data-b]"); if (!b) return; const el = b.closest(".sw-it"), o = list()[+el.dataset.i];
     if (b.dataset.b === "say") { try { speak(o.w); } catch (er) {} }
-    else if (b.dataset.b === "aud") { const r = medRec[el.dataset.mk]; if (r && r.aud) { if (player) player.pause(); player = new Audio(r.aud); player.play().catch(() => {}); } }
+    else if (b.dataset.b === "aud") { const r = medRec[el.dataset.mk]; if (r && r.aud) { player = MEDIA.play(r.aud); } }
     else if (b.dataset.b === "vid" && /^(BV[0-9A-Za-z]{10}|ep\d+$|ss\d+$)/.test(b.dataset.v)) { // 插件在 B 站保存的：网站视频页放不了，直接打开 B 站（从这句开始）
       const m = /^(BV[0-9A-Za-z]{10})(?:\?p=(\d+))?$/.exec(b.dataset.v), t = Math.floor(+b.dataset.t || 0);
       window.open(m ? "https://www.bilibili.com/video/" + m[1] + "/?" + (m[2] && m[2] !== "1" ? "p=" + m[2] + "&" : "") + "t=" + t : "https://www.bilibili.com/bangumi/play/" + b.dataset.v + "?t=" + t, "_blank", "noopener"); }

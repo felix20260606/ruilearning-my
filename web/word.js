@@ -8,14 +8,14 @@
      WORD.bind(容器, { sent(el) → 这个词所在的句子, quiet() → true 时点词不自动朗读, onOpen(w, el) 打开卡片前（比如暂停视频）, onAdd(w) })
        容器里带 data-w="词" 的元素都按这一套处理（点词 + 右键）；一个容器只 bind 一次
      WORD.open(词, 元素, { sent, quiet, onAdd })、WORD.close()、WORD.mark(词, "learn"|"known"|"ignore"|"")
+     WORD.add(词, {sent, silent, learn, from}) 加进生词本（全站加词都用它）→ true 加了 / false 本来就有 / null 失败
      WORD.status(词) → "kn" 已掌握 / "lr" 在学 / ""（按原形匹配生词本，收了 go，went / goes 也算）；WORD.loadBook() 生词本变了以后重读
    旧接口照旧能用：window.readPop(词, 元素, opt)、window.readBook(reload) → status 函数（听力文稿上色用）
-   依赖 index.html 的全局：words（生词本）、speak、toast、window.vocabAddWord(词, 例句)、window.dictGet（查词，没有就直接 /api/dict）；watch.js 的 window.__vs */
+   依赖 util.js（U）；index.html 的全局：words（生词本）、speak、toast、quickAdd(词, 例句)、window.dictGet（查词，没有就直接 /api/dict）；watch.js 的 window.__vs */
 (function () {
   "use strict";
   if (window.WORD) return;
-  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const tip = m => { try { toast(m); } catch (e) {} };
+  const { esc, tip } = U; // util.js
   const say = t => { try { speak(t); } catch (e) {} };
   const reEsc = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const isSheet = () => { try { return matchMedia("(max-width: 600px)").matches; } catch (e) { return innerWidth <= 600; } };
@@ -127,18 +127,29 @@
   }
   function close() { if (!pop) return; req++; pWord = ""; pEl = null; pop.classList.remove("on", "sheet"); mask.classList.remove("on"); }
   const changed = (w, m) => { try { document.dispatchEvent(new CustomEvent("word-change", { detail: { w, m } })); } catch (e) {} };
-  function addWord(b) {
-    const d = DC.get(pWord.toLowerCase()), w = String((d && d.word) || pWord).toLowerCase(), f = window.vocabAddWord, cb = pOpt && pOpt.onAdd;
-    if (typeof f !== "function") { tip("生词本还没准备好，暂时加不了"); return; }
-    b.disabled = true; b.textContent = "加入中…";
-    let r; try { r = f(w, pSent); } catch (e) { r = Promise.reject(e); }
-    Promise.resolve(r).then(res => {
-      if (res === false) { b.disabled = false; b.textContent = "＋ 加入生词本"; return; }
-      b.className = "ui-btn in"; b.textContent = "已在生词本";
-      if (vsOk() && V().markOf(w) !== "learn") { V().setMark(w, "learn"); const lb = pop && pop.querySelector("[data-m=learn]"); if (lb) lb.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === lb)); } // 加进生词本 = 将要学习
-      setTimeout(() => { loadBook(); if (book.size && !status(w)) book.set(w, "lr"); bookK = null; changed(w, "learn"); if (cb) try { cb(w); } catch (e) {} }, 300);
-    }).catch(() => { b.disabled = false; b.textContent = "＋ 加入生词本"; tip("加入失败，请再试一次"); });
+  // ＋ 加入生词本（全站共用：查词卡片、阅读关键词、听力 / 练习课的词汇、口语的「更好的说法」、背单词的推荐生词都走这里）
+  // WORD.add(词, { sent 例句, silent 不弹提示, learn:false 不标「将要学习」, from 哪来的（记日志用）}) → true 加进去了 / false 本来就有 / null 失败
+  async function add(w, o) {
+    o = o || {}; w = String(w || "").trim(); if (!w) return false;
+    const qa = typeof quickAdd === "function" ? quickAdd : null, lw = w.toLowerCase();
+    if (!qa) { if (!o.silent) tip("生词本还没准备好，暂时加不了"); U.log("word", "加词失败：生词本还没加载", w); return null; }
+    let ok; try { ok = await qa(w, o.sent || ""); } catch (e) { U.log("word", "加词失败：" + w, String(e && e.message || e)); if (!o.silent) tip("加入失败，请再试一次"); return null; }
+    U.log("word", (ok ? "加入生词本 " : "已在生词本 ") + w, o.from || "");
+    if (!o.silent) tip(ok ? "已加入生词本：" + w : "已在生词本里");
+    if (o.learn !== false && vsOk() && V().markOf(lw) !== "learn") { V().setMark(lw, "learn"); const lb = pop && pWord.toLowerCase() === lw && pop.querySelector("[data-m=learn]"); if (lb) lb.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === lb)); } // 加进生词本 = 将要学习
+    setTimeout(() => { loadBook(); if (book.size && !status(lw)) book.set(lw, "lr"); bookK = null; changed(lw, "learn"); }, 300);
+    return ok;
   }
+  function addWord(b) { // 查词卡片上的「＋ 加入生词本」
+    const d = DC.get(pWord.toLowerCase()), w = String((d && d.word) || pWord).toLowerCase(), cb = pOpt && pOpt.onAdd;
+    b.disabled = true; b.textContent = "加入中…";
+    add(w, { sent: pSent, from: "查词卡片" }).then(res => {
+      if (res == null) { b.disabled = false; b.textContent = "＋ 加入生词本"; return; }
+      b.className = "ui-btn in"; b.textContent = "已在生词本";
+      if (cb) setTimeout(() => { try { cb(w); } catch (e) {} }, 300);
+    });
+  }
+
   const MK_NAME = { learn: "将要学习", known: "已掌握", ignore: "不学习", "": "恢复默认" };
   async function mark(w, m, toastIt) {
     await vsLoad(); if (!(V() && V().setMark)) { tip("标记功能还没加载好"); return; }
@@ -167,7 +178,7 @@
     }, true);
   }
 
-  window.WORD = { bind, open, close, mark, cycle, status, loadBook, dict, get openWord() { return pWord; } };
+  window.WORD = { bind, open, close, mark, cycle, status, loadBook, dict, add, get openWord() { return pWord; } };
   // 旧接口（read.js / listen.js 以前用的）
   window.readPop = (w, el, opt) => open(w, el, opt || {});
   window.readBook = reload => { if (reload || !book.size) loadBook(); if (typeof vsKeys !== "function") vsLoad(); return status; };

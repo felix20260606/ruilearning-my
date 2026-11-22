@@ -7,7 +7,7 @@
 (function () {
   "use strict";
   if (window.quotaHtml) return;
-  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const { esc } = U; // 全站共用的小工具（util.js）
   const fmt = n => Math.round(n).toLocaleString("en-US");
   const LIMIT = 10000;
   const MODELS = [ // 页面上一直列出所有模型（没用到的显示 0）
@@ -103,9 +103,11 @@
   let opened = false; const isOpen = () => opened; // 默认收起，不记住
   function load(force) {
     if (busy || (!force && Date.now() - at < 60e3)) return; busy = true;
-    fetch("/api/usage").then(r => r.json()).then(j => { if (j && j.ok) { J = j; err = ""; } else err = "读不到用量"; }).catch(() => { err = "读不到用量（网络不通）"; })
+    U.json("/api/usage").then(j => { if (j.ok) { J = j; err = ""; } else err = j.error === "net" ? "读不到用量（网络不通）" : "读不到用量"; })
       .then(() => { busy = false; at = Date.now(); paint(); });
   }
+  // 别的页面用了 AI（ai.js 发 "ai-used"）：后台大约 15 秒后记账，20 秒后面板在的话刷新一次
+  let aiT = 0; document.addEventListener("ai-used", () => { at = 0; clearTimeout(aiT); aiT = setTimeout(() => { if (document.getElementById("dy-quota")) load(true); }, 20000); });
   function paint() { const el = document.getElementById("dy-quota"); if (el) el.innerHTML = html(); }
   const day = (j, d) => (j.days && j.days[d]) || { m: {}, f: {}, e: 0 };
   const sum = o => Object.values(o || {}).reduce((a, x) => a + (+x[1] || 0), 0);

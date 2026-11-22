@@ -3,10 +3,10 @@
    依赖 index.html 里的全局：state / words / refresh / save / speak / toast */
 (function () {
   "use strict";
+  const { esc, tip } = U; // 全站共用的小工具（util.js）
   const API = "/api/cap";
   const $ = (s, r) => (r || document).querySelector(s);
-  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const LS = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+  const LS = { get: U.LG, set: U.LS }; // util.js
   // 本机缓存（字幕、翻译、查词）只留最近用过的那些：以前每看一个视频存一份（约 50KB）永不清理，存储满了生词本、练习记录都存不进去
   //   key = 记最近顺序的列表，v = 这次用到的，n = 留几个，pre = 要跟着删的键前缀；第一次用时把以前留下的同类缓存都清掉
   function wtKeep(key, v, n, pre) {
@@ -19,7 +19,6 @@
   }
   const fmt = t => { t = Math.max(0, Math.floor(t)); const m = Math.floor(t / 60), s = t % 60; return (m >= 60 ? Math.floor(m / 60) + ":" + String(m % 60).padStart(2, "0") : m) + ":" + String(s).padStart(2, "0"); };
   const WORD = /[A-Za-z][A-Za-z'’-]*/g;
-  const tip = m => { try { toast(m); } catch (e) {} };
 
   let set = Object.assign({ autoPause: false, hideTr: false, hideEn: false, rate: 1, fs: 1 }, LS.get("wt:set", {}));
   let doc = null, cues = [], cur = -1, player = null, ready = false, timer = null, pausedFor = -1, lock = false, follow = true, userScroll = 0, apiP = null, sheetWord = "";
@@ -272,7 +271,7 @@
     return mk === "learn" ? (plain ? "" : "known") : mk === "known" ? (plain ? "learn" : "") : "learn";
   }
   async function vsData() {
-    let it = {}; try { it = (await (await fetch("/api/ext", { cache: "no-store" })).json()).items || {}; } catch (e) {}
+    const it = await CLOUD.chan("ext").get(); // 全站共用的同步（cloud.js）
     const S = Object.assign({}, VS_DEF), marks = {}, saved = new Set(), sents = [];
     for (const k in it) { const i = k.indexOf("|"), n = k.slice(0, i), id = k.slice(i + 1), v = it[k].v;
       if (n === "set") S[id] = v; else if (n === "marks" && (v === "known" || v === "ignore")) marks[id] = v; else if (n === "saved") saved.add(id); else if (n === "savedSents" && v && v.ph && v.t) sents.push(String(v.t).toLowerCase().split(/\s+/)); }
@@ -331,7 +330,7 @@
       if (e && (m === "known" || m === "learn")) { state.progress = state.progress || {}; state.progress[e.id] = m === "known" ? "known" : "learning"; /* 写 learning 不是删掉：带着修改时间才能盖过别处的「已掌握」 */ refresh(); save(state); loadBook(); }
     } catch (er) {}
     vsRedraw();
-    try { await fetch("/api/ext", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ changes: ch }) }); } catch (er) { tip("没连上网络，标记只在这台设备生效"); }
+    if (!(await CLOUD.chan("ext").send(ch))) tip("没连上网络，标记先记在这台设备，连上网会自动同步"); // 全站共用的同步（cloud.js）：没发出去会自动重发
   }
 
   /* ---------- 搭界面 ---------- */
@@ -641,11 +640,10 @@
   const clean = t => { t = String(t || "").replace(/\[[^\]]*\]|\u266a|>>+|\u00bb|&gt;&gt;/g, " ").replace(/\s+/g, " ").trim(); return /^\([^)]*\)$/.test(t) ? "" : t; };
   const tidy = list => { const o = []; (list || []).forEach(c => { const t = clean(c.t); if (t) o.push({ s: +c.s || 0, e: +c.e || 0, t, r: clean(c.r) }); }); for (let i = 0; i < o.length - 1; i++) if (o[i].e > o[i + 1].s) o[i].e = Math.max(o[i].s + 0.2, o[i + 1].s); return o; };
   const note = (html) => { const n = $("#wt-note"); if (!n) return; n.innerHTML = html || ""; n.style.display = html ? "" : "none"; fit(); };
-  async function gtLines(lines, tl) { // 一批句子合并成一次请求；行数对不上就返回 null
-    const r = await NET.g("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=" + encodeURIComponent(tl) + "&dt=t&q=" + encodeURIComponent(lines.map(x => x.replace(/\n/g, " ")).join("\n")));
-    if (!r.ok) throw new Error("http " + r.status);
-    const j = await r.json(), parts = (j[0] || []).map(x => x[0]).join("").split("\n");
-    return parts.length === lines.length ? parts.map(x => x.trim()) : null;
+  async function gtLines(lines, tl) { // 全站共用的翻译（tr.js）：一批合并成一次请求，行数对不上它自己一行行翻；有翻不出的就算这批失败（下面会重试）
+    const out = await TR.lines(lines, { tl, ai: false });
+    if (out.some((x, i) => lines[i] && !x)) throw new Error("some lines failed");
+    return out;
   }
   let fillBusy = false;
   async function fillTrans(v) { // 没有译文的句子：在浏览器里分批翻译、缓存，全部补齐后存回网站
@@ -687,7 +685,7 @@
     player = new YT.Player("wt-yt", { videoId: v, playerVars: { playsinline: 1, rel: 0, modestbranding: 1, cc_load_policy: 0, iv_load_policy: 3, start: Math.floor(resumeAt) }, events: {
       onReady: () => { ready = true; try { player.setPlaybackRate(set.rate); } catch (e) {} startTick(); },
       onStateChange: e => {
-        if (e.data === 1) { if (lock) { lock = false; } started = true; try { window.smePause && window.smePause(); } catch (er) {} startTick(); if (!cues.length || cur < 0) showSub(cur); }
+        if (e.data === 1) { if (lock) { lock = false; } started = true; MEDIA.solo("video"); /* 全站共用的放音（media.js）：听力节目、练习课、朗读都停 */ startTick(); if (!cues.length || cur < 0) showSub(cur); }
         else if (e.data === 2) savePos(false);
         else if (e.data === 0 && doc) { const m = meta(doc.v); m.w = 1; m.p = 0; saveMeta(); }
       },
@@ -742,13 +740,8 @@
   async function gword(w) {
     const k = w.toLowerCase(); if (dc[k]) return dc[k];
     const c = LS.get("wt:w:" + k, null); if (c) return dc[k] = c;
-    const o = { zh: [], phon: "", en: "" };
-    try {
-      const j = await (await NET.g("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=" + encodeURIComponent((VS && VS.S.target) || "zh-CN") + "&dt=t&dt=bd&q=" + encodeURIComponent(k))).json();
-      const add = x => { x = String(x || "").trim(); if (x && x.toLowerCase() !== k && !o.zh.includes(x)) o.zh.push(x); };
-      add((j[0] || []).map(x => x[0]).join("")); (j[1] || []).forEach(e => (e[1] || []).slice(0, 4).forEach(add));
-      o.pos = (j[1] || []).slice(0, 3).map(e => ({ p: e[0], w: (e[1] || []).slice(0, 4) }));
-    } catch (e) {}
+    const o = { zh: [], phon: "", en: "" }, t = await TR.word(k, { tl: (VS && VS.S.target) || "zh-CN" }); // 全站共用的翻译（tr.js）
+    o.zh = t.zh.slice(0, 13); o.pos = t.pos.slice(0, 3).map(x => ({ p: x.p, w: x.w.slice(0, 4) }));
     if (!/\s/.test(k)) try {
       const r = await NET.fetch("https://api.dictionaryapi.dev/api/v2/entries/en/" + encodeURIComponent(k)); if (r.ok) { const j = await r.json(); const e = j[0] || {}; o.phon = e.phonetic || ((e.phonetics || []).find(p => p.text) || {}).text || ""; const d = ((e.meanings || [])[0] || {}).definitions; o.en = (d && d[0] && d[0].definition) || ""; }
     } catch (e) {}

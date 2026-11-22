@@ -9,6 +9,7 @@
    本地分析部分是纯函数（不碰 DOM），在 node 里 require 本文件可以拿到它们单独测试。 */
 (function () {
   "use strict";
+  const { esc, LG, LS } = U; // 全站共用的小工具（util.js）
 
   /* ================= 一、内置数据 ================= */
   const TYPES = {
@@ -404,9 +405,6 @@
   if (typeof window === "undefined" || typeof document === "undefined") return;
 
   /* ================= 三、界面 ================= */
-  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const LG = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
-  const LS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } };
   const say = m => { if (typeof window.toast === "function") window.toast(m); else if (typeof toast === "function") toast(m); };
   const talk = t => { if (typeof window.speak === "function") window.speak(t); else if (typeof speak === "function") speak(t); else say("这个页面没有朗读功能"); };
   const CAT = { spell: "拼写", grammar: "语法", punct: "标点", style: "风格" };
@@ -819,14 +817,8 @@
   async function callAI(r) {
     r.aiLoading = true; r.aiErr = ""; r.ai = null; redrawRes();
     try {
-      const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 120000);
-      let resp;
-      try { resp = await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "write", type: r.type, prompt: r.prompt, text: r.text }), signal: ctl.signal }); }
-      catch (e) { throw e.name === "AbortError" ? "AI 评分超时，请稍后重试" : "noai"; }
-      finally { clearTimeout(to); }
-      if (resp.status === 404 || resp.status === 405 || resp.status === 501) throw "noai"; // 后台还没有这个接口
-      let j = null; try { j = await resp.json(); } catch (e) { throw resp.ok ? "noai" : "后台返回错误（HTTP " + resp.status + "）"; }
-      if (!j || j.ok === false) throw (j && j.error) || "noai";
+      const j = await AI.ask("write", { type: r.type, prompt: r.prompt, text: r.text }, { timeout: 120000 }); // 全站共用的调 AI（ai.js）
+      if (!j.ok) throw j.error === "noai" || j.status === 404 || j.status === 405 || j.status === 501 ? "noai" : AI.msg(j, "AI 评分失败，请稍后重试");
       if (!j.band && !j.summary_zh && !j.rewrite) throw "AI 返回的格式不对";
       const nb = x => { const v = parseFloat(x); return isFinite(v) ? Math.max(0, Math.min(9, Math.round(v * 2) / 2)) : null; };
       const B = j.band || {}, arr = a => (Array.isArray(a) ? a : a ? [a] : []).map(String).filter(Boolean).slice(0, 10);

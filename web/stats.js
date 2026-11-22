@@ -10,9 +10,9 @@
    ④ 装到桌面：支持 beforeinstallprompt 的浏览器直接给安装按钮；iPhone 给「分享 → 添加到主屏幕」的步骤
    依赖 index.html 的全局：words / state / toast（masteryOf 有就用，没有用同一个算法） */
 (function () {
+  const { esc } = U; // 全站共用的小工具（util.js）
   const DAY = 864e5, HEAT_WEEKS = 26, AHEAD = 14, KNOWN_H = 42;
   const SITE = "https://ruilearning-my.pages.dev", PUMP_URL = SITE + "/?go=pump";
-  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const hasLS = typeof localStorage !== "undefined";
   const LG = (k, d) => { try { const v = hasLS ? localStorage.getItem(k) : null; return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
   const LS = (k, v) => { try { if (hasLS) localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
@@ -198,8 +198,8 @@
   function loadServer(force) { // /api/ext 里的 stat|YYYY-MM-DD（每台设备练完写进去），60 秒内不重复取
     if (!force && SRV && Date.now() - srvAt < 60e3) return Promise.resolve();
     srvAt = Date.now();
-    return fetch("/api/ext").then(r => r.json()).then(j => {
-      const it = (j && j.items) || {}, m = {};
+    return CLOUD.chan("ext").get().then(it => { // 全站共用的同步（cloud.js）
+      const m = {};
       for (const k in it) if (k.indexOf("stat|") === 0 && it[k] && !it[k].del && it[k].v) m[k.slice(5)] = it[k].v;
       SRV = m;
     }).catch(() => { SRV = SRV || {}; });

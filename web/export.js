@@ -4,6 +4,7 @@
    数据：词条 = index.html 的全局 words / state；原声截图 = /api/ext 里的索引（"med|med:w:单词"、"med|med:s:k"）+ /api/media；
          维基配图 = /api/ext 里的 "wimg|单词"（{c:[网址], o, off}）。只读，不写任何数据。ZIP 用 cdnjs 的 JSZip，点导出时才加载。 */
 (function () {
+  const { esc } = U; // 全站共用的小工具（util.js）
   const FORMATS = [
     ["anki", "📇 Anki", "ZIP：卡片文字 + 图片 + 原声，按里面的说明导入 Anki"],
     ["csv", "📊 表格 CSV", "Excel / Google Sheets 打开；勾了图片或原声就打成 ZIP，表格里写文件名"],
@@ -14,7 +15,6 @@
   const SCOPES = [["all", "全部"], ["learning", "未掌握"], ["known", "已掌握"]];
   const LS = (k, v) => { try { if (v === undefined) return JSON.parse(localStorage.getItem(k) || "null"); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } };
   const opt = Object.assign({ fmt: "anki", scope: "all", img: true, aud: true }, LS("exp:opt") || {});
-  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const noBr = s => String(s || "").replace(/[{}]/g, "");
   const hl = s => esc(s).replace(/\{([^}]+)\}/g, "<b>$1</b>");
   const today = () => new Date().toISOString().slice(0, 10);

@@ -6,13 +6,14 @@
    - 我的文章：最近读过的存在本机 localStorage「reading:docs」（最多 20 篇，{id, title, text, at, pos}，pos = 读到第几句）
    - 译文：阅读栏「译文」按钮显示 / 隐藏每段下面的中文（记在本机「reading:trOn」）；按段翻译（浏览器直接调谷歌翻译，失败退到 MyMemory），
      译好的存在本机「reading:tr」（{文章 id: {段号: 中文, t: 标题中文}}，只留「我的文章」里还在的），再打开不用重新翻
-   依赖 index.html 的全局：words / speak / toast；生词本加词用 window.vocabAddWord(word, sentence)
+   依赖 index.html 的全局：words / speak / toast；生词本加词用 word.js 的 WORD.add(word, {sent})
    - 📰 今日新闻（首页最上面，每天一篇）：GET /api/news?d=今天 → 后台从 BBC / Guardian / NPR 的头条里按日期挑一篇（同一天家里人拿到同一篇），
      本机记在「reading:news」；「🎲 换一篇」「其它头条」从当天的头条列表里另抓一篇（/api/readurl）；读过的进「我的文章」（id = "n:" + 网址哈希）
    依赖后台：GET /api/readurl?url=… → {ok, title, text}；GET /api/news?d=… → {ok, date, src, url, title, text, words, list}；GET /api/dict?w=… → {ok, word, phon, zh, en, examples:[[en, zh]]}；
             GET /api/ext（只读，取插件设置里的词汇水平，和 watch.js 同一个接口） */
 (function () {
   "use strict";
+  const { esc, LG, LS, tip } = U; // 全站共用的小工具（util.js）
 
   /* ================= 纯函数：清理文本、分段、分句、分词（不碰页面，node 里也能测） ================= */
   // 不算句末的缩写（后面跟大写也不断句）："Mr. Lee"、"Dr. Tan"、"St. Paul"
@@ -125,10 +126,6 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
   if (typeof document === "undefined") return; // node 测试：只要上面的纯函数
 
   /* ================= 页面部分 ================= */
-  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const LG = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
-  const LS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } };
-  const tip = m => { try { toast(m); } catch (e) {} };
   const say = t => { try { speak(t); } catch (e) {} };
   const reEsc = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const isSheet = () => { try { return matchMedia("(max-width: 600px)").matches; } catch (e) { return innerWidth <= 600; } };
@@ -215,22 +212,9 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
     for (const x in o) if (!keep.has(x)) delete o[x];
     (o[id] = o[id] || {})[k] = v; if (!LS(TRK, o)) { const n = {}; n[id] = o[id]; LS(TRK, n); }
   }
-  async function gtx(q) { // 谷歌翻译（浏览器直接调，和生词本加词同一个入口）
-    const r = await NET.g("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q=" + encodeURIComponent(q));
-    if (!r.ok) throw new Error("g" + r.status); const j = await r.json();
-    const t = (j[0] || []).map(x => x[0] || "").join(""); if (!t) throw new Error("empty"); return t;
-  }
-  async function mym(q) { // 备用：MyMemory（每次最多 500 个字）
-    const r = await fetch("https://api.mymemory.translated.net/get?q=" + encodeURIComponent(q.slice(0, 480)) + "&langpair=en|zh-CN");
-    const j = r.ok && (await r.json()), t = j && j.responseData && j.responseData.translatedText; if (!t || /MYMEMORY WARNING/i.test(t)) throw new Error("mm"); return t;
-  }
-  async function translate(sents) { // 一段（几句）→ 中文；太长的段按句子拆成 1500 字以内几块翻
-    const parts = []; let cur = "";
-    sents.forEach(x => { if (cur && (cur + " " + x).length > 1500) { parts.push(cur); cur = x; } else cur = cur ? cur + " " + x : x; }); if (cur) parts.push(cur);
-    const out = [];
-    for (const q of parts) { try { out.push(await gtx(q)); } catch (e) { const ss = q.match(/[^.!?…]+[.!?…]*["'”’)\]]*\s*/g) || [q], z = []; for (const x of ss) z.push(await mym(x.trim())); out.push(z.join("")); } }
-    return out.join("");
-  }
+  // 一段（几句）→ 中文：全站共用的翻译（tr.js：谷歌，不行用 MyMemory；太长自动按句子拆开）
+  const translate = sents => TR.text(sents.join(" "));
+
   // 把当前文章没翻的段翻出来（两段同时翻），翻好一段填一段
   function fillTr() {
     if (!trOn || !doc || !root || view !== "read") return;
@@ -268,7 +252,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
         await new Promise(res => F.forEach((f, i) => { const s = document.createElement("script"); s.src = "vs/" + f + "?v=" + ver; s.async = false; if (i === F.length - 1) s.onload = s.onerror = res; document.head.append(s); }));
       }
       // 插件设置（词汇水平、颜色、开关）：只读，和 watch.js 读的是同一份
-      try { const it = (await (await fetch("/api/ext", { cache: "no-store" })).json()).items || {}; for (const k in it) if (k.indexOf("set|") === 0) PS[k.slice(4)] = it[k].v; } catch (e) {}
+      try { const it = await CLOUD.chan("ext").get(); for (const k in it) if (k.indexOf("set|") === 0) PS[k.slice(4)] = it[k].v; } catch (e) {}
       vsDone = true;
     })().catch(() => { vsDone = true; });
     return vsP;
@@ -412,9 +396,9 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
   async function newsSimp() {
     if (!NEWS) return; const have = simpOf(NEWS); if (have) { openDoc(have.simple, "（简单版）" + NEWS.title, newsId(NEWS) + ":s"); return; }
     if (simpBusy) return; simpBusy = true; paintNews(); tip("AI 正在改写成简单版，大约半分钟…");
-    let j = null; try { const r = await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "newsimp", url: NEWS.url, title: NEWS.title, text: NEWS.text }) }); j = await r.json(); } catch (e) { j = null; }
+    const j = await AI.ask("newsimp", { url: NEWS.url, title: NEWS.title, text: NEWS.text });
     simpBusy = false;
-    if (!(j && j.ok && j.simple)) { paintNews(); tip(j && j.error === "noai" ? "AI 没开（Workers AI 绑定），用不了简单版" : "AI 改写失败了，过一会儿再试（可能今天的免费额度用完了）"); return; }
+    if (!(j && j.ok && j.simple)) { paintNews(); tip(j.ok ? "AI 改写失败了，过一会儿再试" : AI.msg(j, "AI 改写失败了，过一会儿再试")); return; }
     const A = simpAll(), id = newsId(NEWS); A[id] = { simple: j.simple, summary_zh: j.summary_zh || "", quiz: j.quiz || [], words: j.words || [], at: Date.now() };
     const ks = Object.keys(A).sort((a, b) => (A[b].at || 0) - (A[a].at || 0)); ks.slice(20).forEach(k => delete A[k]); LS("reading:newsq", A);
     paintNews(); if (view === "home") openDoc(j.simple, "（简单版）" + NEWS.title, id + ":s");
@@ -524,7 +508,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
       if (a === "news-alt") { newsAlt(); return; }
       if (a === "news-simp") { newsSimp(); return; }
       if (a === "qz") { const k = doc.id + b.dataset.q; if (quizPick[k] == null) { quizPick[k] = +b.dataset.o; quizErr(+b.dataset.q, +b.dataset.o); const y = window.scrollY; drawRead(); window.scrollTo(0, y); } return; }
-      if (a === "kw-add") { const Q = simpAll()[baseId(doc.id)]; if (!Q || !window.vocabAddWord) return; b.disabled = true; b.textContent = "加入中…"; (async () => { let n = 0; for (const w of Q.words || []) { const sent = P.sents.find(x => x.toLowerCase().includes(String(w.en).toLowerCase())) || ""; try { if (await window.vocabAddWord(w.en, sent)) n++; } catch (e) {} } b.textContent = "已加入 " + n + " 个"; })(); return; }
+      if (a === "kw-add") { const Q = simpAll()[baseId(doc.id)]; if (!Q) return; b.disabled = true; b.textContent = "加入中…"; (async () => { let n = 0; for (const w of Q.words || []) { const sent = P.sents.find(x => x.toLowerCase().includes(String(w.en).toLowerCase())) || ""; if (await WORD.add(w.en, { sent, silent: true, from: "阅读·关键词" })) n++; } b.textContent = "已加入 " + n + " 个"; tip("已加入生词本 " + n + " 个"); })(); return; } /* 全站共用的加词（word.js） */
       if (a === "sw") { const Q = simpAll()[baseId(doc.id)], bid = baseId(doc.id); if (!Q) return; if (/:s$/.test(doc.id)) { const d = docs().find(x => x.id === bid); if (d) openDoc(d.text, d.title, d.id); else if (NEWS && newsId(NEWS) === bid) newsRead(); } else openDoc(Q.simple, "（简单版）" + doc.title, bid + ":s"); return; }
       if (a === "news-list") { newsList = !newsList; paintNews(); return; }
       if (a === "news-retry") { newsLoad(true); return; }

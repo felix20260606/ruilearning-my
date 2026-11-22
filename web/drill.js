@@ -20,10 +20,7 @@
 (function () {
   "use strict";
   if (window.drillShow) return;
-  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const LG = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
-  const LS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
-  const tip = m => { try { (window.toast || (() => {}))(m); } catch (e) {} };
+  const { esc, LG, LS, tip } = U; // 全站共用的小工具（util.js）
   const LANG = () => window.LANG || { cur: () => "en", cfg: () => ({ code: "en", name: "英语", flag: "🇬🇧", bcp: "en-GB", ready: true }), words: s => String(s || "").match(/[A-Za-z0-9]+(?:'[A-Za-z]+)?/g) || [], check: (a, b) => ({ ok: String(a).trim().toLowerCase() === String(b).trim().toLowerCase(), note: "" }), stop: () => new Set() };
   const getJ = async u => { const r = await fetch(u); return r.json(); };
 
@@ -44,18 +41,8 @@
     return out;
   }
   const within = (ms, p) => Promise.race([p, new Promise(res => setTimeout(() => res(null), ms))]);
-  // 一句一句翻成中文：每批 1500 字左右，一行一句；对不上行数的那批不要（还用整段的中文）
-  async function trSents(arr) {
-    const out = arr.map(() => ""), sl = LANG().cur(), B = []; let cur = [], len = 0;
-    arr.forEach((t, i) => { if (cur.length && len + t.length > 1500) { B.push(cur); cur = []; len = 0; } cur.push(i); len += t.length + 1; }); if (cur.length) B.push(cur);
-    await Promise.all(B.map(async b => {
-      const u = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + sl + "&tl=zh-CN&dt=t&dj=1&q=" + encodeURIComponent(b.map(i => arr[i].replace(/\s+/g, " ")).join("\n"));
-      const r = await (window.NET && NET.g ? NET.g(u) : fetch(u)); if (!r.ok) return;
-      const j = await r.json(), z = (j.sentences || []).map(x => x.trans || "").join("").split("\n").map(x => x.trim());
-      if (z.length === b.length) b.forEach((i, k) => { out[i] = z[k]; });
-    }).map(p => p.catch(() => {})));
-    return out;
-  }
+  // 一句一句翻成中文：全站共用的翻译（tr.js），按学的语言翻；翻不出的是 ""（还用整段的中文）
+  const trSents = arr => TR.lines(arr, { sl: LANG().cur(), ai: false });
   // 一期的素材（文稿 + 中文 + 每句时间）整理成「课」：英语、德语共用
   async function finish(base, id, ep, zh, prog) {
     const raw = splitSents(ep.lines), per = {}; raw.forEach(x => { per[x.li] = (per[x.li] || 0) + 1; });
@@ -255,15 +242,11 @@
     return w;
   }
 
-  // ---------- 放音：原声的一段（[s, e]），没时间就用浏览器朗读；onEnd = 这段放完（角色扮演用） ----------
-  const AU = new Audio(); AU.preload = "auto"; if (window.NET && NET.audio) try { NET.audio(AU); } catch (e) {}
-  let stopAt = 0, raf = 0, endCb = null; window.DRILL.au = AU; // 测试用
-  const fire = () => { const f = endCb; endCb = null; if (f) f(); };
-  function tick() { if (!AU.paused && stopAt && AU.currentTime >= stopAt) { AU.pause(); stopAt = 0; fire(); } if (!AU.paused) raf = requestAnimationFrame(tick); }
-  AU.addEventListener("ended", fire);
-  AU.addEventListener("timeupdate", () => { if (stopAt && AU.currentTime >= stopAt) { AU.pause(); stopAt = 0; fire(); } }); // 后台标签页里没有帧：靠这个停
-  function hush() { endCb = null; try { AU.pause(); } catch (e) {} stopAt = 0; if (window.TTS) TTS.hush(); else try { speechSynthesis.cancel(); } catch (e) {} }
-  function others() { try { if (window.smePause) smePause(); } catch (e) {} try { if (window.videoCore && videoCore.pause) videoCore.pause(); } catch (e) {} }
+  // ---------- 放音：原声的一段（[s, e]，media.js 的 MEDIA.seg），没时间就用全站朗读（tts.js）；onEnd = 这段放完（角色扮演用） ----------
+  const AU = MEDIA.reg(new Audio()); AU.preload = "auto"; if (window.NET && NET.audio) try { NET.audio(AU); } catch (e) {}
+  window.DRILL.au = AU; // 测试用
+  function hush() { MEDIA.stop(AU); try { AU.pause(); } catch (e) {} if (window.TTS) TTS.hush(); }
+  const others = () => MEDIA.solo(AU); // 全站共用的放音（media.js）：别的声音（听力节目、视频、朗读）都停掉
   // 没有原声时间的句子：全站共用的朗读（tts.js：英语先 AI 真人声，其它语言 / 播不了用系统语音）
   function sayTTS(t, rate, onEnd) { if (window.TTS) TTS.say(t, { lang: LANG().cur(), rate: rate || 1, base: 0.95, end: onEnd ? () => onEnd() : null }); else tip("这个浏览器不能朗读"); }
   function play(si, slow, onEnd) {
@@ -272,9 +255,7 @@
     if (x.s == null) return sayTTS(x.t, rate, onEnd);
     const src = x.src || M.src; // 复习：每句可能来自不同的一期
     if (AU.getAttribute("src") !== src) AU.src = src;
-    endCb = onEnd || null;
-    const go = () => { try { AU.currentTime = x.s; } catch (e) {} AU.playbackRate = rate; stopAt = x.e; AU.play().then(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(tick); }).catch(() => tip("原声放不出来，点一下 🔊 再试")); };
-    if (AU.readyState >= 1) go(); else AU.addEventListener("loadedmetadata", go, { once: true });
+    MEDIA.seg(AU, x.s, x.e, { rate, end: onEnd }); // 全站共用的放一段原声（media.js）：放到这句结尾自动停
   }
   function sayWord(w) { others(); hush(); if (window.TTS) TTS.say(w, { lang: LANG().cur() }); }
 
@@ -326,8 +307,8 @@
     const missed = c.k === "gap" ? [c.word] : LANG().words(x.t).filter((w, i) => R.hit && !R.hit[i]);
     if (!missed.length) return; WHY[key] = { busy: true }; draw();
     try {
-      const j = await (await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "whymiss", sent: x.t, typed: R.typed || "", missed: [...new Set(missed)].slice(0, 8) }) })).json();
-      if (!j || !j.ok || !(j.items || []).length) throw new Error(j && j.error === "noai" ? "AI 没开" : "这次没讲好，再点一次");
+      const j = await AI.ask("whymiss", { sent: x.t, typed: R.typed || "", missed: [...new Set(missed)].slice(0, 8) });
+      if (!j.ok || !(j.items || []).length) throw new Error(AI.msg(j, "这次没讲好，再点一次"));
       WHY[key] = { items: j.items, tip: j.tip_zh || "" };
     } catch (e) { WHY[key] = { err: e.message || String(e) }; }
     draw();
@@ -669,12 +650,12 @@
     if (a === "zh") { setOpt({ zh: !opt().zh }); return draw(); }
     if (a === "rate") { const R = [1.15, 1, 0.85, 0.7], r = R[(R.indexOf(opt().rate) + 1) % R.length]; setOpt({ rate: r }); tip("原声速度 " + r + "×"); return draw(); }
     if (a === "sayw" && c && c.k === "voc") return sayWord(M.vocab[c.v].w);
-    if (a === "addw" && c && c.k === "voc") { const v = M.vocab[c.v], w = v.w.replace(/\s*\(.*?\)\s*/g, " ").trim(), line = M.sents.find(x => x.t.toLowerCase().includes(w.split(/\s+/)[0].toLowerCase())); if (window.vocabAddWord) { b.disabled = true; window.vocabAddWord(w, v.ex || (line ? line.t : "")).then(ok => { b.textContent = ok ? "✓ 已加" : "已在本里"; }); } return; }
+    if (a === "addw" && c && c.k === "voc") { const v = M.vocab[c.v], w = v.w.replace(/\s*\(.*?\)\s*/g, " ").trim(), line = M.sents.find(x => x.t.toLowerCase().includes(w.split(/\s+/)[0].toLowerCase())); b.disabled = true; WORD.add(w, { sent: v.ex || (line ? line.t : ""), from: "练习课·词汇" }).then(ok => { if (ok == null) b.disabled = false; else b.textContent = ok ? "✓ 已加" : "已在本里"; }); return; } /* 全站共用的加词（word.js） */
     if (a === "check") return c && c.k === "dict" ? answerDict(false) : answerGap(false);
     if (a === "giveup") { if (!c || res[ci]) return; if (c.k === "dict") return answerDict(true); if (c.k === "ord") return judged(c, false, { typed: "" }); return answerGap(true); }
     if (a === "ordclr") { ORD[ci] = []; return draw(); }
     if (a === "rec") return recToggle();
-    if (a === "myrec") { const R = RS[ci]; if (R && R.url) { hush(); new Audio(R.url).play().catch(() => {}); } return; }
+    if (a === "myrec") { const R = RS[ci]; if (R && R.url) { hush(); MEDIA.play(R.url); } return; }
     if (a === "reveal" && c && c.k === "zh") { res[ci] = { seen: true }; draw(); return play(c.s); }
     if (a === "why") return whyLoad();
     if (a === "rp-go") return rpGo();

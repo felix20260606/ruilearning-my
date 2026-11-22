@@ -8,9 +8,7 @@
 (function () {
   "use strict";
   if (window.basicShow) return;
-  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const LG = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
-  const LS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+  const { esc, LG, LS } = U; // 全站共用的小工具（util.js）
   const CSS = `
   #view-basic{display:none;background:var(--ui-bg,var(--bg));color:var(--ui-ink);min-height:100vh;font-family:var(--ui-font)}
   html.show-basic-home #view-en,html.show-basic-home #view-speak{display:none}html.show-basic-home #view-basic{display:block}

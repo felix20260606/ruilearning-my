@@ -5,8 +5,7 @@
    ③ 插件的语法下划线（web/vs/gram.js 的 VS_GRAM_NAME，颜色同插件 content.css）
    依赖 index.html 的全局：words / speak / toast */
 (function () {
-  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const LG = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, LS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+  const { esc, LG, LS } = U; // 全站共用的小工具（util.js）
   const SECTIONS = [
     { k: "grammar", t: "📐 语法速查", tags: ["语法规律"] },
     { k: "colloc", t: "🔗 搭配和易混词", tags: ["搭配易混"] },

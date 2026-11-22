@@ -7,7 +7,7 @@
    依赖 index.html 的全局：words、quickAdd(word, sentence)、refresh、toast */
 (function () {
   "use strict";
-  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const { esc } = U; // 全站共用的小工具（util.js）
   const MAX = 300;
   const clean = w => String(w || "").replace(/^[\s"'“”‘’(\[]+|[\s"'“”‘’)\].,;:!?]+$/g, "").replace(/\s+/g, " ").trim();
   const isWord = w => /^[A-Za-z][A-Za-z'’ -]{0,48}[A-Za-z]$|^[A-Za-z]$/.test(w) && w.split(" ").length <= 5;

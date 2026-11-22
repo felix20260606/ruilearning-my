@@ -78,8 +78,13 @@
   };
 })();
 </script>
+<script src="util.js?v=1"></script>
 <script src="nav.js?v=1"></script>
-<script src="word.js?v=1"></script>
+<script src="word.js?v=2"></script>
+<script src="ai.js?v=1"></script>
+<script src="tr.js?v=1"></script>
+<script src="cloud.js?v=1"></script>
+<script src="media.js?v=1"></script>
 <script>
 /* 🇨🇳 在中国大陆也能用：谷歌、BBC、维基百科、YouTube 这些在大陆打不开（或者一直卡着不回）。
    window.NET：
@@ -1620,8 +1625,8 @@ try{ptag=localStorage.getItem("list:ptag")||"all";}catch(x){}
 window.dictGet=async function(word){
   let j=null;try{const r=await fetch("/api/dict?w="+encodeURIComponent(word));j=await r.json();}catch(e){}
   if(j&&j.ok&&j.zh)return j;
-  try{const g=await (await NET.g("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&dt=bd&dj=1&q="+encodeURIComponent(word))).json();
-    const zh=(g.sentences||[]).map(x=>x.trans||"").join(""),zhs=(g.dict||[]).slice(0,4).map(x=>({pos:x.pos||"",terms:(x.terms||[]).slice(0,6)}));
+  try{const g=await TR.word(word); // 全站共用的翻译（tr.js）
+    const zh=g.zh[0]||"",zhs=g.pos.map(x=>({pos:x.p||"",terms:x.w}));
     if(zh){j=j&&j.ok?j:{ok:true,word:word,phon:"",audio:"",en:[],examples:[]};j.zh=zh;j.zhs=zhs;}}catch(e){}
   return j&&j.ok?j:null;
 };
@@ -2061,21 +2066,21 @@ refresh(); // show seed words immediately, no waiting on storage
 <script src="lang.js?v=3"></script>
 <script src="tts.js?v=3"></script>
 <script src="rec.js?v=1"></script>
-<script src="watch.js?v=22"></script>
-<script src="channels.js?v=3"></script>
-<script src="pump.js?v=34"></script>
-<script src="speak.js?v=16"></script>
-<script src="basic.js?v=1"></script>
-<script src="quota.js?v=4"></script>
-<script src="daily.js?v=11"></script>
-<script src="read.js?v=18"></script>
-<script src="listen.js?v=20"></script>
-<script src="drill.js?v=6"></script>
-<script src="errbook.js?v=3"></script>
-<script src="exam.js?v=5"></script>
-<script src="import.js?v=1"></script>
-<script src="write.js?v=4"></script>
-<script src="stats.js?v=2"></script>
+<script src="watch.js?v=23"></script>
+<script src="channels.js?v=4"></script>
+<script src="pump.js?v=35"></script>
+<script src="speak.js?v=17"></script>
+<script src="basic.js?v=2"></script>
+<script src="quota.js?v=5"></script>
+<script src="daily.js?v=12"></script>
+<script src="read.js?v=19"></script>
+<script src="listen.js?v=21"></script>
+<script src="drill.js?v=7"></script>
+<script src="errbook.js?v=4"></script>
+<script src="exam.js?v=6"></script>
+<script src="import.js?v=2"></script>
+<script src="write.js?v=5"></script>
+<script src="stats.js?v=3"></script>
 <script>
 /* 个人学习资料换设备也在：阅读的文章（reading:docs）、作文批改历史（writing:history）、词汇量测试（vocab:test）
    这三页照旧存本机；这里在本机存储这一层盯着：哪一条变了就传到后台 /api/mine（按人分开），删掉的传删除记号；
@@ -2129,9 +2134,9 @@ refresh(); // show seed words immediately, no waiting on storage
 })();
 </script>
 <script>if('serviceWorker' in navigator&&location.protocol!=='file:'){navigator.serviceWorker.register('/sw.js').catch(function(){});} // 装到手机桌面后离线也能打开（sw.js：网络优先，断网用上次的）</script>
-<script src="export.js?v=2"></script>
-<script src="saved-web.js?v=6"></script>
-<script src="reader.js?v=3"></script>
-<script src="grammar.js?v=5"></script>
+<script src="export.js?v=3"></script>
+<script src="saved-web.js?v=7"></script>
+<script src="reader.js?v=4"></script>
+<script src="grammar.js?v=6"></script>
 </body>
 </html>

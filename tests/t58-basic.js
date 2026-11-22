@@ -26,7 +26,7 @@ ok(/if \(!sec \|\| MOVED\.includes\(sec\)\) sec = "daily"/.test(sp), "說 defaul
   const root = el();
   const document = { readyState: "complete", head: el(), documentElement: el(), getElementById: id => (id === "view-basic" ? root : null), querySelector: () => null, createElement: el, addEventListener() {} };
   const win = { document, localStorage: { getItem: k => (store.has(k) ? store.get(k) : null), setItem: (k, v) => store.set(k, String(v)) }, setTimeout: () => 0, scrollTo() {}, console, JSON, Object, String, Array };
-  win.window = win; const ctx = vm.createContext(win); vm.runInContext(bs, ctx);
+  win.window = win; const ctx = vm.createContext(win); vm.runInContext(W("util.js"), ctx); vm.runInContext(bs, ctx);
   ctx.basicShow();
   const gos = [...root.innerHTML.matchAll(/data-go="(\w+)"/g)].map(m => m[1]);
   ok(gos.length >= 12 && gos.every(g => typeof ctx.BASIC.GO[g] === "function"), "every card has a target " + gos.filter(g => !ctx.BASIC.GO[g]));

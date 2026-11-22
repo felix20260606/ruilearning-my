@@ -13,10 +13,7 @@
    - 去练了某项之后，页面左下角有「📅 每日一练 2/5」小按钮，点一下回来 */
 (function () {
   "use strict";
-  const LG = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
-  const LS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
-  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const tip = m => (typeof window.toast === "function" ? window.toast(m) : null);
+  const { LG, LS, esc, tip } = U; // 全站共用的小工具（util.js）
   const lday = (t) => { const d = t ? new Date(t) : new Date(); return new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); }; // 本地日期（同 pump.js）
   const kday = (t) => new Date((t || Date.now()) + 8 * 3600e3).toISOString().slice(0, 10); // 吉隆坡 / 北京时间（同 speak.js）
   const ago = (k, n) => { const d = new Date(k + "T12:00:00"); d.setDate(d.getDate() - n); return lday(d.getTime()); };
@@ -29,13 +26,11 @@
   function setOpt(f) { const o = LG("daily:opt", {}); f(o); LS("daily:opt", o); put("opt", o); }
 
   // ---------- 换设备同步：/api/mine k=daily，items：opt、chk:日期、day:日期 ----------
-  let syQ = {}, syT = 0, pulled = 0;
-  function put(key, v) { const S = LG("daily:sat", {}), at = Math.max(Date.now(), (+S[key] || 0) + 1); S[key] = at; LS("daily:sat", S); syQ[key] = { v, at }; clearTimeout(syT); syT = setTimeout(flush, 1500); }
-  function flush() { const ch = syQ; syQ = {}; if (!Object.keys(ch).length) return; fetch("/api/mine", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ k: "daily", changes: ch }) }).catch(() => { Object.assign(syQ, ch); }); }
+  const CL = CLOUD.chan("daily"); // 全站共用的同步（cloud.js）
+  function put(key, v) { const S = LG("daily:sat", {}), at = Math.max(Date.now(), (+S[key] || 0) + 1); S[key] = at; LS("daily:sat", S); CL.put(key, v, at); }
   function pull() {
-    if (Date.now() - pulled < 60e3) return; pulled = Date.now();
-    fetch("/api/mine?k=daily").then(r => r.json()).then(j => {
-      if (!j || !j.ok) return; const S = LG("daily:sat", {}), C = LG("daily:check", {}), D = LG("daily:days", {}); let ch = false;
+    CL.pull().then(items => {
+      if (!items) return; const j = { items }, S = LG("daily:sat", {}), C = LG("daily:check", {}), D = LG("daily:days", {}); let ch = false;
       for (const k in j.items || {}) {
         const x = j.items[k]; if (!x || x.del) continue;
         if (k.startsWith("day:")) { const d = k.slice(4), a = D[d], b = arr(x.v); if (b.length === 2 && (!a || b[0] / (b[1] || 1) > a[0] / (a[1] || 1))) { D[d] = b; ch = true; } continue; } // 每天完成几项：两边取完成得多的
@@ -44,7 +39,7 @@
         else if (k.startsWith("chk:")) C[k.slice(4)] = x.v || {};
       }
       if (ch) { LS("daily:sat", S); LS("daily:check", C); LS("daily:days", D); if (root && document.documentElement.classList.contains("show-daily")) draw(); }
-    }).catch(() => {});
+    });
   }
 
   // ---------- 跳到各模块 ----------
@@ -80,10 +75,10 @@
     text = String(text || "").trim(); if (!text) { tip("先写一句"); return; }
     if (!new RegExp("\\b" + w.word.split(/\s+/)[0].replace(/[.*+?^${}()|[\]\\]/g, "\\$&").slice(0, 5), "i").test(text)) { tip("句子里要用上「" + w.word + "」"); return; }
     sentBusy[w.word] = 1; draw();
-    let j = null; try { const r = await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "useword", word: w.word, zh: w.zh, text }) }); j = await r.json(); } catch (e) { j = null; }
+    const j = await AI.ask("useword", { word: w.word, zh: w.zh, text });
     delete sentBusy[w.word];
     sentSave(w.word, { t: text, r: j && j.ok ? { correct: !!j.correct, fixed: j.fixed || "", why_zh: j.why_zh || "", better: j.better || "", better_zh: j.better_zh || "" } : null, at: Date.now() });
-    if (!(j && j.ok)) tip(j && j.error === "noai" ? "AI 没开，句子先记下了" : "AI 没回应，句子先记下了");
+    if (!j.ok) tip(AI.msg(j, "AI 没回应") + "，句子先记下了");
     draw();
   }
   function sentHtml() {
@@ -280,7 +275,7 @@
       const k = e.target.dataset.on; if (k) { setOpt(o => { o.on = Object.assign({}, DEF.on, o.on || {}); o.on[k] = e.target.checked ? 1 : 0; }); draw(); return; }
       if (e.target.hasAttribute("data-exam")) { const v = e.target.value; setOpt(o => { if (/^\d{4}-\d{2}-\d{2}$/.test(v)) o.exam = v; else delete o.exam; }); draw(); }
     });
-    document.addEventListener("visibilitychange", () => { if (!document.hidden) { if (document.documentElement.classList.contains("show-daily")) { pull(); draw(); } else paintBack(); } else flush(); });
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) { if (document.documentElement.classList.contains("show-daily")) { pull(); draw(); } else paintBack(); } else CL.flush(); });
     setInterval(() => { if (went && !document.hidden && !document.documentElement.classList.contains("show-daily")) paintBack(); }, 5000); // 在别的模块练的时候，左下角的进度跟着更新
   }
   window.dailyShow = () => { init(); pull(); draw(); };

@@ -2,8 +2,8 @@
    数据：yt-channels.json（整理自 Notion「用油管足不出户自学流利英文·频道通关推荐」）
    依赖 watch.js：插在 .wt-home 的说明文字后面；样片用 window.__wt.open(视频ID, 秒数) 在网站播放器里放 */
 (function () {
-  const LS = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
-  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const { esc } = U; // 全站共用的小工具（util.js）
+  const LS = { get: U.LG, set: U.LS }; // util.js
   const CAT = [["可理解输入", ["可理解输入英文"]], ["生活实用", ["生活实用英文"]], ["小孩家庭", ["小孩家庭日常"]], ["华语地区外国人", ["住在华语地区的外国人"]], ["Vlog", ["Vlog", "大学生活Vlog", "高中生活Vlog", "生活Vlog"]], ["对话 · 脱口秀 · 播客", ["超多对话频道", "脱口秀", "脱口秀访谈", "视频播客", "播客访谈", "Omegle", "游戏连麦", "朋友游戏调侃"]], ["兴趣", ["兴趣频道", "室内设计", "食物", "篮球"]]];
   const LVC = { "0基础": "#3BAA7A", "初阶": "#5BAE4E", "初中阶衔接": "#C9A227", "中阶": "#D9822B", "高阶": "#C8553D" };
   const CSS = `

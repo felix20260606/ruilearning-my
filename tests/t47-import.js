@@ -1,6 +1,7 @@
 // 导入词表的解析（web/import.js 的 parse）：一行一个 / 逗号分隔 / 「1. word - 中文」/ CSV 带例句 / TSV / Kindle My Clippings；去重、跳过中文和长句
 const fs = require("fs"), path = require("path");
 global.window = {}; global.document = { readyState: "complete", getElementById: () => null };
+eval(fs.readFileSync(path.join(__dirname, "..", "web", "util.js"), "utf8")); global.U = window.U;
 eval(fs.readFileSync(path.join(__dirname, "..", "web", "import.js"), "utf8"));
 const P = window.vocabImportParse;
 let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); } };

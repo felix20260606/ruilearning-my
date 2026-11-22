@@ -11,11 +11,8 @@
 (function () {
   "use strict";
   if (window.ERR) return;
+  const { esc, LG, LS, tip } = U; // 全站共用的小工具（util.js）
   const KEY = "err:items", DAY = 864e5, IV = [0, 1, 3, 7, 16, 35];
-  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const LG = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
-  const LS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
-  const tip = m => { try { (window.toast || (() => {}))(m); } catch (e) {} };
   const say = t => { try { if (typeof window.speak === "function") window.speak(t); } catch (e) {} };
   const norm = s => String(s || "").normalize("NFC").toLowerCase().replace(/[’']/g, "'").replace(/[^\p{L}\p{N}' ]+/gu, " ").replace(/\s+/g, " ").trim(); // 字母含 ä ö ü ß é…（德语等其它学习语言的错题也能判）
   function hash(s) { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(36); }
@@ -27,14 +24,11 @@
   function stamp(x) { x.u = Math.max(Date.now(), (+x.u || 0) + 1); return x; }
 
   // ---------- 换设备同步：/api/mine k=err ----------
-  let syQ = {}, syT = 0, pulled = 0;
-  function put(x) { syQ[x.id] = x.del ? { del: 1, at: x.u } : { v: x, at: x.u }; clearTimeout(syT); syT = setTimeout(flush, 1500); }
-  function flush() { const ch = syQ; syQ = {}; if (!Object.keys(ch).length) return; fetch("/api/mine", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ k: "err", changes: ch }) }).then(r => { if (!r.ok) throw 0; }).catch(() => { Object.assign(syQ, ch); }); }
-  window.addEventListener("pagehide", () => { if (Object.keys(syQ).length) try { navigator.sendBeacon("/api/mine", new Blob([JSON.stringify({ k: "err", changes: syQ })], { type: "application/json" })); syQ = {}; } catch (e) {} });
+  const C = CLOUD.chan("err"); // 全站共用的同步（cloud.js）：排队、1.5 秒合并发、失败重发、关页面发完
+  function put(x) { if (x.del) C.del(x.id, x.u); else C.put(x.id, x, x.u); }
   function pull(force) {
-    if (!force && Date.now() - pulled < 60e3) return Promise.resolve(); pulled = Date.now();
-    return fetch("/api/mine?k=err", { cache: "no-store" }).then(r => r.json()).then(j => {
-      if (!j || !j.ok) return; const o = all(); let ch = false;
+    return C.pull({ force }).then(items => {
+      if (!items) return; const j = { items }, o = all(); let ch = false;
       for (const id in j.items || {}) {
         const x = j.items[id], cur = o[id]; if (!x || !(+x.at)) continue;
         if (cur && +cur.u >= +x.at) continue;
@@ -46,7 +40,7 @@
       // 本机有、后台没有的（离线时加的）补传
       for (const id in o) if (!(j.items || {})[id] || +j.items[id].at < +o[id].u) put(o[id]);
       if (ch) { save(o); if (root && root.isConnected) draw(); }
-    }).catch(() => {});
+    });
   }
 
   // ---------- 收错题 ----------

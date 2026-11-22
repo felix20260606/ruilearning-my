@@ -13,10 +13,7 @@
    依赖 index.html 的全局（有才用）：toast、speak；listen.js 播放器、watch.js 的 videoCore（开始放原声前先停掉别的声音） */
 (function () {
   "use strict";
-  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const LG = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
-  const LS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
-  const tip = m => { try { (window.toast || (() => {}))(m); } catch (e) {} };
+  const { esc, LG, LS, tip } = U; // 全站共用的小工具（util.js）
   const nday = () => new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10);
   const norm = s => String(s || "").toLowerCase().replace(/[’']/g, "'").replace(/[^a-z0-9' ]+/g, " ").replace(/\s+/g, " ").trim();
   const noArt = s => norm(s).replace(/^(the|a|an) /, "");
@@ -33,16 +30,15 @@
   const hist = () => { const h = LG("exam:hist", []); return Array.isArray(h) ? h : []; };
   function saveHist(r) {
     const h = hist().filter(x => x.id !== r.id); h.unshift(r); LS("exam:hist", h.slice(0, 50));
-    fetch("/api/mine", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ k: "exam", changes: { [r.id]: { v: r, at: r.at } } }) }).catch(() => {});
+    CL.put(r.id, r, r.at);
   }
-  let pulled = 0;
+  const CL = CLOUD.chan("exam"); // 全站共用的同步（cloud.js）
   function pull() {
-    if (Date.now() - pulled < 60e3) return Promise.resolve(); pulled = Date.now();
-    return fetch("/api/mine?k=exam", { cache: "no-store" }).then(r => r.json()).then(j => {
-      if (!j || !j.ok) return; const h = hist(), have = new Set(h.map(x => x.id)); let ch = false;
+    return CL.pull().then(items => {
+      if (!items) return; const j = { items }, h = hist(), have = new Set(h.map(x => x.id)); let ch = false;
       for (const id in j.items || {}) { const x = j.items[id]; if (x && !x.del && x.v && !have.has(id)) { h.push(x.v); ch = true; } }
       if (ch) { h.sort((a, b) => b.at - a.at); LS("exam:hist", h.slice(0, 50)); if (root && S.view === "home") draw(); }
-    }).catch(() => {});
+    });
   }
 
   /* ---------- 材料 ---------- */
@@ -129,7 +125,7 @@
   const answer = q => q.type === "mcq" ? String.fromCharCode(65 + q.a) + ". " + q.opts[q.a] : q.a;
 
   /* ---------- 准备材料、出题 ---------- */
-  async function getJson(u, o) { const r = await fetch(u, o); return r.json(); }
+  const getJson = (u, o) => U.json(u, o); // util.js：网络不通也不抛错，给 { ok:false }
   async function loadNews(url) {
     S.busy = "取新闻…"; S.err = ""; draw();
     try {
@@ -163,8 +159,8 @@
     S.busy = fresh ? "AI 在写一段新的雅思" + (sec % 2 ? "对话" : "独白") + "（半分钟左右）…" : "取一段雅思" + (sec % 2 ? "对话" : "独白") + "…"; S.err = ""; draw();
     try {
       const done = hist().filter(x => /^i:/.test(x.src || "")).map(x => x.src.slice(2));
-      const j = await getJson("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "ieltsscript", sec, done, fresh: !!fresh }) });
-      if (!j || !j.ok || !(j.lines || []).length) throw new Error(j && j.error === "noai" ? "AI 没开" : "AI 没写好，再试一次（也可能今天的免费额度用完了）");
+      const j = await AI.ask("ieltsscript", { sec, done, fresh: !!fresh });
+      if (!j.ok || !(j.lines || []).length) throw new Error(AI.msg(j, "AI 没写好，再试一次"));
       S.src = { kind: "ai", sec, id: "i:" + j.id, title: "Section " + sec + " · " + j.title, scene: j.scene_zh || "", lines: j.lines.map(l => ({ who: l.who, name: l.name, t: l.t })), left: j.left || 0, words: j.lines.reduce((n, l) => n + words(l.t), 0) };
     } catch (e) { S.err = e.message || String(e); }
     S.busy = ""; draw();
@@ -174,8 +170,8 @@
     S.busy = "AI 在出题（第一次要半分钟左右）…"; S.err = ""; draw();
     const text = S.mode === "reading" ? S.src.secs.map(s => s.L + " " + s.t).join("\n\n") : S.src.lines.map(l => (l.name || l.who || "Speaker") + ": " + l.t).join("\n");
     try {
-      const j = await getJson("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "exam", mode: S.mode, text, title: S.src.title, again: !!again, kind: S.src.kind === "ai" ? "s" + S.src.sec : "" }) });
-      if (!j || !j.ok) throw new Error(j && j.error === "noai" ? "AI 没开" : j && j.error === "too short" ? "材料太短" : "AI 没出好题，再点一次试试（也可能今天的免费额度用完了）");
+      const j = await AI.ask("exam", { mode: S.mode, text, title: S.src.title, again: !!again, kind: S.src.kind === "ai" ? "s" + S.src.sec : "" });
+      if (!j.ok) throw new Error(j.error === "too short" ? "材料太短" : AI.msg(j, "AI 没出好题，再点一次试试"));
       S.Q = j; S.ans = {}; S.res = null; S.view = "do"; S.t0 = Date.now();
       if (S.mode === "reading") { S.left = 20 * 60; tick(); }
       else { S.phase = "read"; S.left = 30; tick(); prefetch(); }
@@ -216,8 +212,8 @@
   }
   function startAudio() {
     S.phase = "play";
-    try { if (window.TTS) TTS.stop(); if (window.videoCore && videoCore.pause) videoCore.pause(); document.querySelectorAll("audio,video").forEach(a => { if (a !== audio) try { a.pause(); } catch (e) {} }); } catch (e) {}
-    if (!audio) { audio = new Audio(); audio.preload = "auto"; if (window.NET) NET.audio(audio); }
+    if (!audio) { audio = MEDIA.reg(new Audio()); audio.preload = "auto"; if (window.NET) NET.audio(audio); }
+    MEDIA.solo(audio); // 全站共用的放音（media.js）：别的声音都停掉
     if (S.src.kind === "ai") {
       li = 0; audio.onended = () => { li++; setTimeout(playLine, 450); }; audio.onerror = () => { li++; setTimeout(playLine, 200); };
       audio.onplaying = () => { if (S.view === "do" && !S.practice && root && root.querySelector('[data-a="resume"]')) { collect(); draw(); } };

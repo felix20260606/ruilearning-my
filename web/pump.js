@@ -5,9 +5,8 @@
    半衰期到 42 天（同 LR「至少 6 周都很可能记得」）自动标为「已掌握」。没有到期的词时，挑现在最可能忘的做「额外练习」。
    依赖 index.html 的全局：state / words / save / speak / toast */
 (function () {
+  const { LG, LS, esc } = U; // 全站共用的小工具（util.js）
   const DAY = 864e5, PER = 3, NUMS = [20, 40, 60, 80, 100], NEWS = [0, 5, 10, 15, 20, 25];
-  const LG = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, LS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
-  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const today = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }; // 本地日期（以前是 UTC：北京时间 8 点才换天）
   // 默认值同 PhrasePump：测验、建议、练习都开，练习数量 60，新项目 15 %（和默认不一样时「会话」旁出现「重置」）；后面几项是我们加的
   const DEF = { quiz: true, sugg: true, listen: true, num: 60, newPct: 15, tags: [], recall: false, dir: "en", types: ["word", "phrase", "sentence"], speed: 1, dict: false, shadow: false, gfill: false }; // 听写、跟读、语法填空也是我们加的，默认关 // 认词卡是我们加的，默认关（RL 没有）
@@ -63,7 +62,7 @@
   const nrm = s => String(s || "").toLowerCase().replace(/[{}]/g, "").replace(/[^a-z0-9']+/g, " ").trim();
   function medMap() {
     if (medP) return medP;
-    medP = fetch("/api/ext").then(r => r.json()).then(j => { const it = (j && j.items) || {}, m = {};
+    medP = CLOUD.chan("ext").get().then(it => { const m = {}; // 全站共用的同步（cloud.js）
       const X = { tags: {}, sugg: {}, marks: {}, saved: new Set(), sents: new Map() }; // sents：收藏的句子（小写原文 → k），和插件的 ☆ 同一份 // 和插件复习页一样的几样：颜色标签、从看过的视频里推荐的生词、标记、已保存
       for (const k in it) { const i = k.indexOf("|"), n = k.slice(0, i), id = k.slice(i + 1), v = it[k].v; if (n === "tags" && v) X.tags[id] = v; else if (n === "sugg" && v && v.t) X.sugg[id] = v; else if (n === "marks") X.marks[id] = v; else if (n === "saved") X.saved.add(id); else if (n === "savedSents" && v && v.t && !v.ph) X.sents.set(String(v.t).replace(/\s+/g, " ").trim().toLowerCase(), v.k); }
       EXT = X;
@@ -195,7 +194,7 @@
     const L = LG("pump:log", {}), d = lday(), x = L[d] || (L[d] = { n: 0, ok: 0, fail: 0, nw: 0, sec: 0 });
     for (const k in add) x[k] = (x[k] || 0) + add[k];
     LS("pump:log", L);
-    clearTimeout(logT); logT = setTimeout(() => { fetch("/api/ext", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ changes: { ["stat|" + d]: { v: x, at: Date.now() } } }) }).catch(() => {}); }, 4000);
+    clearTimeout(logT); logT = setTimeout(() => { CLOUD.chan("ext").send({ ["stat|" + d]: { v: x, at: Date.now() } }); }, 4000);
   }
   const hasEn = w => !/[一-鿿]/.test(w.word); // 「规律」类词条标题是中文：没法听，只能用认词卡练
   const clozes = w => (w.examples || []).filter(x => Array.isArray(x) && /\{[^}]+\}/.test(String(x[0] || "")) && !/[一-鿿]/.test(String(x[0]).match(/\{([^}]+)\}/)[1])); // 语法填空能用的例句（{} 里是英文）
@@ -386,16 +385,14 @@
   }
   // 推荐生词收进生词本：查释义生成词条（同网站视频页），并告诉插件「将要学习」
   async function addSugg(c, silent) {
-    const w = c.w.word, id0 = "v_" + w.replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""), id = window.freshId ? window.freshId(id0) : id0, sg = EXT.sugg[w] || {};
-    let zh = ""; try { const j = await (await NET.g("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&dt=bd&q=" + encodeURIComponent(w))).json(); const L = []; const add = x => { x = String(x || "").trim(); if (x && x.toLowerCase() !== w && !L.includes(x)) L.push(x); }; add((j[0] || []).map(x => x[0]).join("")); (j[1] || []).forEach(e => (e[1] || []).slice(0, 3).forEach(add)); zh = L.slice(0, 4).join("；"); } catch (e) {}
-    const ex = sg.t ? [[String(sg.t).replace(new RegExp("\\b(" + w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")\\b", "i"), "{$1}"), ""]] : [];
-    try { state.custom = state.custom || []; if (!state.custom.some(x => x && (x.id === id || String(x.word || "").toLowerCase() === w))) state.custom.push({ id, type: "word", word: w, phon: "", en: "", zh: zh || "(未查到，可手动补)", tag: "视频", date: window.ymdLocal ? window.ymdLocal() : today(), forms: [], examples: ex, tip: "" }); if (typeof refresh === "function") refresh(); save(state); } catch (e) { toast("收进生词本失败"); return; }
+    const w = c.w.word, sg = EXT.sugg[w] || {};
+    if ((await WORD.add(w, { sent: sg.t || "", silent: true, learn: false, from: "背单词·推荐生词" })) == null) { toast("收进生词本失败"); return; } // 全站共用的加词（word.js）；「将要学习」下面自己告诉插件
     EXT.saved.add(w); c.w.added = true; cards.forEach(x => { if (x.w.word === w) x.w.added = true; });
-    try { await fetch("/api/ext", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ changes: { ["saved|" + w]: { v: w, at: Date.now() } } }) }); } catch (e) {}
+    await CLOUD.chan("ext").send({ ["saved|" + w]: { v: w, at: Date.now() } }); // 全站共用的同步（cloud.js）
     if (!silent) toast("已收进生词本：" + w);
   }
   const sayText = t => { try { speak(t, { rate: opt.speed }); } catch (e) {} }; // speak() 在 index.html：先 AI 真人声（tts.js），不行再系统语音
-  const say = c => { try { if (window.TTS) TTS.hush(); if (player) { player.pause(); player = null; } const m = medOf(c); if (m && m.aud) { player = new Audio(m.aud); player.playbackRate = opt.speed; player.play().catch(() => sayText(plain(c.s.en))); return; } sayText(plain(c.s.en)); } catch (e) {} };
+  const say = c => { try { if (window.TTS) TTS.hush(); if (player) { player.pause(); player = null; } const m = medOf(c); if (m && m.aud) { player = MEDIA.play(m.aud, { rate: opt.speed, fail: () => sayText(plain(c.s.en)) }); return; } /* 全站共用的放音（media.js）；放不出来就朗读 */ sayText(plain(c.s.en)); } catch (e) {} };
   const imgs = c => { const m = medOf(c), L = m ? [m.img, m.img2].filter(Boolean) : []; return L.length ? '<div class="pp-img">' + L.map(u => '<img src="' + esc(u) + '" alt="">').join("") + "</div>" : ""; };
   function show() {
     if (at >= cards.length) return finish();
@@ -432,7 +429,7 @@
       colorEn(c);
     } else if (c.k === "sugg") { // 🌱 建议的单词：你想学这个新词吗？已知 / 学习 / 跳过（同 PhrasePump）
       const w = c.w, rk = window.VS_RANK && (window.VS_RANK[w.word] || (typeof vsLemma === "function" && window.VS_RANK[vsLemma(w.word)]));
-      if (!(w.word in SUGZH)) { SUGZH[w.word] = null; NET.g("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&dt=bd&q=" + encodeURIComponent(w.word)).then(r => r.json()).then(j => { const L = []; const add = x => { x = String(x || "").trim(); if (x && x.toLowerCase() !== w.word && !L.includes(x)) L.push(x); }; add((j[0] || []).map(x => x[0]).join("")); (j[1] || []).forEach(e => (e[1] || []).slice(0, 3).forEach(add)); SUGZH[w.word] = L.slice(0, 4).join("；"); if (cards[at] === c) show(); }).catch(() => {}); }
+      if (!(w.word in SUGZH)) { SUGZH[w.word] = null; TR.word(w.word).then(r => { SUGZH[w.word] = r.zh.slice(0, 4).join("；"); if (cards[at] === c) show(); }); } // 全站共用的翻译（tr.js）
       const lab = { known: "已知", learn: "学习", skip: "跳过" };
       if (!w.stage) { w.stage = "learn"; addSugg(c, true); } // 一显示就自动标成「学习」（同 PhrasePump）；要不学就点已知 / 跳过改掉
       root.innerHTML = top + '<div class="pp-hint"><b>🌱 建议的单词</b>你想学习这个新词吗？</div><div class="pp-sgw"><b>' + esc(w.word) + "</b>" + (rk ? "<small>词频 #" + rk + "</small>" : "") + (SUGZH[w.word] ? '<div class="z">' + esc(SUGZH[w.word]) + "</div>" : "") + "</div>" +
@@ -467,7 +464,7 @@
   const starred = c => !!(EXT && c.s && c.s.en && EXT.sents.has(sentText(c).toLowerCase()));
   async function toggleStar(c) {
     if (!EXT || !c.s || !c.s.en) return; const t = sentText(c), lt = t.toLowerCase(), k0 = EXT.sents.get(lt), now = Date.now();
-    const id0 = "v_" + lt.replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 70), post = ch => fetch("/api/ext", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ changes: ch }) }).catch(() => {});
+    const id0 = "v_" + lt.replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 70), post = ch => CLOUD.chan("ext").send(ch);
     state.custom = state.custom || [];
     if (k0) { EXT.sents.delete(lt); post({ ["savedSents|" + k0]: { del: 1, at: now } }); const e = state.custom.find(x => x && x.type === "sentence" && (x.id === id0 || String(x.word || "").toLowerCase() === lt)); if (e) { state.custom = state.custom.filter(x => x !== e); state.deleted = (state.deleted || []).concat(e.id); } toast("已取消收藏这句"); }
     else { const k = "web|" + lt.replace(/[^a-z0-9]+/g, " ").trim().slice(0, 90); EXT.sents.set(lt, k); post({ ["savedSents|" + k]: { v: { k, t, tr: c.s.zh || "", at: now, v: "", s: 0 }, at: now } }); if (!state.custom.some(x => x && (x.id === id0 || String(x.word || "").toLowerCase() === lt))) state.custom.push({ id: window.freshId ? window.freshId(id0) : id0, type: "sentence", word: t, phon: "", en: "", zh: c.s.zh || "(未查到，可手动补)", tag: "练习", date: window.ymdLocal ? window.ymdLocal() : today(), forms: [], examples: [], tip: "" }); toast("已收藏这句"); }
@@ -490,7 +487,7 @@
   async function chooseSugg(c, st) {
     const w = c.w, word = w.word, prev = w.stage; if (prev === st && st === "learn") return;
     w.stage = st; c.done = true; show();
-    const at0 = Date.now(), post = ch => fetch("/api/ext", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ changes: ch }) }).catch(() => {});
+    const at0 = Date.now(), post = ch => CLOUD.chan("ext").send(ch);
     if (st === "learn") { delete EXT.marks[word]; await addSugg(c, true); post({ ["marks|" + word]: { del: 1, at: at0 } }); }
     else {
       EXT.marks[word] = st === "known" ? "known" : "ignore"; EXT.saved.delete(word);
@@ -576,7 +573,7 @@
         '<div class="pp-xrow"><button id="pp-rec" class="pp-btn rec' + (c.recOn ? " on" : "") + '"' + (c.busy ? " disabled" : "") + ">🎙 " + (c.recOn ? "停止" : r ? "再读一次" : "开始跟读") + "</button>" + (c.myUrl ? '<button id="pp-mine" class="pp-btn">▶ 听我的录音</button>' : "") + "</div>" + chip + "</div>" + ctl("shadow");
       if (!c.done) grade(c, true); // 跟读和听力一样：一显示就算「听过」一次
       root.querySelector("#pp-rec").onclick = () => recStart(c);
-      const mine = root.querySelector("#pp-mine"); if (mine) mine.onclick = () => { stopAudio(); player = new Audio(c.myUrl); player.play().catch(() => {}); };
+      const mine = root.querySelector("#pp-mine"); if (mine) mine.onclick = () => { stopAudio(); player = MEDIA.play(c.myUrl); };
       colorEn(c);
     }
     const inp = root.querySelector("#pp-in");

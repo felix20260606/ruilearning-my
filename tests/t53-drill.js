@@ -10,7 +10,7 @@ function env() {
   const win = { document, localStorage, navigator: {}, addEventListener() {}, dispatchEvent: e => events.push(e), setTimeout: () => 0, clearTimeout() {}, requestAnimationFrame: () => 0, cancelAnimationFrame() {},
     fetch: async () => ({ json: async () => ({ ok: false }) }), CustomEvent: class { constructor(t, o) { this.type = t; this.detail = o && o.detail; } }, Audio: class { constructor() { return el(); } } };
   win.window = win; Object.assign(win, { console, Math, Date, JSON, Object, Array, String, Number, Set, Map, RegExp, Promise, isFinite, encodeURIComponent });
-  const ctx = vm.createContext(win); return { ctx, store, events };
+  const ctx = vm.createContext(win); for (const f of ["util.js", "ai.js", "tr.js", "cloud.js", "media.js"]) vm.runInContext(W(f), ctx); return { ctx, store, events };
 }
 let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); } };
 

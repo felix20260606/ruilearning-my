@@ -10,7 +10,7 @@ function env() {
   const win = { document, localStorage, navigator: {}, addEventListener() {}, dispatchEvent() {}, setTimeout: () => 0, clearTimeout() {}, setInterval: () => 0, clearInterval() {},
     fetch: async (u, o) => { posts.push([u, o && o.body]); return { ok: true, json: async () => ({ ok: true, items: {} }) }; }, Event: class {}, MutationObserver: class { observe() {} }, Blob: class {}, Audio: class { constructor() { return el(); } } };
   win.window = win; Object.assign(win, { console, Math, Date, JSON, Object, Array, String, Number, Set, Map, RegExp, Uint16Array, Promise, isFinite, encodeURIComponent });
-  const ctx = vm.createContext(win); return { ctx, store, posts };
+  const ctx = vm.createContext(win); for (const f of ["util.js", "ai.js", "tr.js", "cloud.js", "media.js"]) vm.runInContext(W(f), ctx); return { ctx, store, posts };
 }
 let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); } };
 

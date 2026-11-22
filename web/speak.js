@@ -10,14 +10,11 @@
    - 🗣 话题：40 张话题卡（日常、工作、生活在马来西亚、旅行、兴趣、观点），计时开口说、录音回放、看样例回答
    跟读打分：录音 → 后台 /api/stt（Workers AI 转文字）→ 没开时用浏览器自带的语音识别（Chrome / Edge / Safari；Brave 不行）→ 逐词对比
    本机存：speak:done（练过的标记，按家人分开）、speak:opt（语速、显示中文）、speak:sec（上次看的栏）
-   依赖 index.html 的全局：toast、chosenVoice（「⚙ 设置」里选的朗读声音）、vocabAddWord（加进生词本） */
+   依赖 index.html 的全局：toast、chosenVoice（「⚙ 设置」里选的朗读声音）、加词用 word.js 的 WORD.add */
 (function () {
   "use strict";
+  const { esc, LG, LS, tip } = U; // 全站共用的小工具（util.js）
   const V = "2";
-  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const LG = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
-  const LS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
-  const tip = m => (typeof toast === "function" ? toast(m) : alert(m));
   const SECS = [["start", "🌱 入门"], ["daily", "📅 每日一练"], ["chat", "🤖 AI 陪练"], ["tools", "🧰 AI 工具"], ["dialog", "🎭 情景对话"], ["func", "💬 表达和俚语"], ["drill", "🔁 句型操练"], ["pron", "🔊 发音"], ["shadow", "🎯 跟读"], ["clip", "🎬 原声跟读"], ["quick", "⚡ 快问快答"], ["topic", "🗣 话题"], ["mine", "📼 我的录音"]];
 
   const CSS = `
@@ -444,10 +441,9 @@
     if (!CH || CH.busy) return; CH.busy = true; CH.err = ""; draw(); chatScroll();
     const my = CH;
     try {
-      const r = await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "chat", scene: CH.scene, history: CH.msgs.map(m => ({ role: m.role, content: m.content })) }) });
-      const j = await r.json().catch(() => ({}));
+      const j = await AI.ask("chat", { scene: CH.scene, history: CH.msgs.map(m => ({ role: m.role, content: m.content })) });
       if (CH !== my) return;
-      if (!j.ok) throw new Error(j.error === "noai" ? "AI 没开（Cloudflare 里绑定 Workers AI）" : "AI 没回上来，点重试");
+      if (!j.ok) throw new Error(AI.msg(j, "AI 没回上来，点重试"));
       const last = [...CH.msgs].reverse().find(m => m.role === "user"); if (last && j.fix) last.fix = j.fix;
       CH.msgs.push({ role: "assistant", content: j.reply }); CH.busy = false; chatSave(); draw(); chatScroll();
       if (chatAuto) say(j.reply, { who: "A" });
@@ -463,21 +459,19 @@
   async function chatSum() {
     if (!CH || CH.sumBusy) return; CH.sumBusy = true; draw(); const my = CH;
     try {
-      const j = await (await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "chatsum", scene: CH.scene, history: CH.msgs.map(m => ({ role: m.role, content: m.content })) }) })).json();
-      if (CH !== my) return; CH.sumBusy = false; if (j.ok) { CH.sum = j; chatSave(); fixesToErr(j.fixes); } else tip("总结没出来，再点一次"); draw();
+      const j = await AI.ask("chatsum", { scene: CH.scene, history: CH.msgs.map(m => ({ role: m.role, content: m.content })) });
+      if (CH !== my) return; CH.sumBusy = false; if (j.ok) { CH.sum = j; chatSave(); fixesToErr(j.fixes); } else tip(AI.msg(j, "总结没出来，再点一次")); draw();
       const b = root.querySelector(".sk-box:last-child"); if (b) b.scrollIntoView({ block: "start", behavior: "smooth" });
     } catch (e) { if (CH === my) { CH.sumBusy = false; tip("总结没出来，再点一次"); draw(); } }
   }
-  async function zhOf(en) { // 谷歌翻译（同阅读页）
-    try { const j = await (await NET.g("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q=" + encodeURIComponent(en))).json(); return (j[0] || []).map(x => x[0] || "").join(""); } catch (e) { return ""; }
-  }
+  const zhOf = en => TR.text(en).catch(() => ""); // 全站共用的翻译（tr.js）
 
   // ===== 🎬 原声跟读 =====
   let CLIPS = null, clipN = 40; const CLIPREC = {};
   function loadClips() {
     if (CLIPS) return Promise.resolve();
-    return fetch("/api/ext", { cache: "no-store" }).then(r => r.json()).then(j => {
-      const it = (j && j.items) || {}, L = [];
+    return CLOUD.chan("ext").get().then(it => { // 全站共用的同步（cloud.js）
+      const L = [];
       for (const k in it) {
         if (!k.startsWith("med|med:")) continue; const mk = k.slice(4), at = it[k].at || 0;
         if (mk.startsWith("med:w:")) { const w = mk.slice(6), c = it["savedCtx|" + w]; L.push({ mk, word: w, t: c && c.v && c.v.t ? String(c.v.t) : "", at }); }
@@ -488,7 +482,7 @@
   }
   function clipGet(mk) { return CLIPREC[mk] ? Promise.resolve(CLIPREC[mk]) : fetch("/api/media?k=" + encodeURIComponent(mk)).then(r => r.ok ? r.json() : null).then(j => (CLIPREC[mk] = (j && j.rec) || {})).catch(() => ({})); }
   let clipAudio = null;
-  function clipPlay(mk, slow) { clipGet(mk).then(r => { if (!r || !r.aud) { tip("这条没有原声"); return; } hush(); try { if (clipAudio) clipAudio.pause(); clipAudio = new Audio(r.aud); clipAudio.playbackRate = slow ? 0.75 : 1; clipAudio.play(); } catch (e) { tip("播放不了"); } }); }
+  function clipPlay(mk, slow) { clipGet(mk).then(r => { if (!r || !r.aud) { tip("这条没有原声"); return; } hush(); clipAudio = MEDIA.play(r.aud, { rate: slow ? 0.75 : 1 }); }); } // 全站共用的放音（media.js）
   function clipList() {
     if (!CLIPS) { loadClips().then(draw); return '<div class="sk-empty">正在取你保存的原声……</div>'; }
     if (!CLIPS.length) return '<div class="sk-intro">还没有原声：在电脑上用插件看 YouTube 时保存单词或句子（设置里开着「保存时存下原声和画面」），这里就会出现那一句的真人原声。</div>';
@@ -520,24 +514,23 @@
     const x = RES[key] || {}; if (!x.said) return;
     AIR[key] = { busy: true }; draw();
     try {
-      const j = await (await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "speak", prompt: q, text: x.said }) })).json();
+      const j = await AI.ask("speak", { prompt: q, text: x.said });
       if (j.ok) fixesToErr(j.fixes, q);
-      AIR[key] = j.ok ? { r: j } : { err: j.error === "noai" ? "AI 没开（Cloudflare 里绑定 Workers AI）" : j.error === "too short" ? "说得太短了，至少说几句再点评" : "AI 没回上来" };
+      AIR[key] = j.ok ? { r: j } : { err: j.error === "too short" ? "说得太短了，至少说几句再点评" : AI.msg(j, "AI 没回上来") };
     } catch (e) { AIR[key] = { err: "网络问题，没连上 AI" }; }
     draw();
   }
 
   /* ---------- 同步：练习记录、打卡、聊天记录、录音存档、教练计划 → 后台 /api/mine?k=speak（按家人分开，换设备也在） ---------- */
-  let SY = {}, syQ = {}, syT = 0;
-  function syPut(id, v) { const at = Date.now(); SY[id] = { v, at }; syQ[id] = { v, at }; clearTimeout(syT); syT = setTimeout(syFlush, 1500); }
-  function syDel(id) { const at = Date.now(); delete SY[id]; syQ[id] = { del: 1, at }; clearTimeout(syT); syT = setTimeout(syFlush, 1500); }
-  function syFlush() { const ch = syQ; syQ = {}; if (!Object.keys(ch).length) return; fetch("/api/mine", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ k: "speak", changes: ch }) }).then(r => { if (!r.ok && (r.status >= 500 || r.status === 429)) throw 0; }).catch(() => { for (const k in ch) if (!(k in syQ)) syQ[k] = ch[k]; }); } // 断网、服务器出错（5xx / 429）：放回去下次再传（同一项后来又改过的以新的为准）
-  window.addEventListener("pagehide", () => { if (Object.keys(syQ).length) try { navigator.sendBeacon("/api/mine", new Blob([JSON.stringify({ k: "speak", changes: syQ })], { type: "application/json" })); syQ = {}; } catch (e) {} });
+  let SY = {}; const CL = CLOUD.chan("speak"); // 全站共用的同步（cloud.js）：排队、1.5 秒合并发、失败重发、关页面发完
+  function syPut(id, v) { const at = Date.now(); SY[id] = { v, at }; CL.put(id, v, at); }
+  function syDel(id) { const at = Date.now(); delete SY[id]; CL.del(id, at); }
   let syPulled = null;
   function syPull() {
     if (syPulled) return syPulled;
-    syPulled = fetch("/api/mine?k=speak", { cache: "no-store" }).then(r => r.json()).then(j => {
-      const R = (j && j.ok && j.items) || {}; let ch = false; const L = LG("speak:log", {}), DD = LG("speak:days", {}), up = {};
+    syPulled = CL.pull({ force: true }).then(items => {
+      if (!items) { syPulled = null; return false; } // 拉不下来（断网）：下次再拉，别把本机的全部重传一遍
+      const R = items; let ch = false; const L = LG("speak:log", {}), DD = LG("speak:days", {}), up = {};
       for (const id in R) { const x = R[id]; if (x.del) continue; SY[id] = x;
         if (id.startsWith("done:")) { const k = id.slice(5); if (!(done[k] >= x.v)) { done[k] = x.v; ch = true; } }
         else if (id.startsWith("log:")) { const k = id.slice(4); if (!(L[k] >= x.v)) { L[k] = x.v; ch = true; } }
@@ -547,7 +540,7 @@
       for (const k in L) if (!R["log:" + k] || R["log:" + k].v < L[k]) up["log:" + k] = { v: L[k], at: Date.now() };
       for (const k in DD) if (!R["days:" + k]) up["days:" + k] = { v: 1, at: Date.now() };
       if (ch) { LS("speak:done", done); LS("speak:log", L); LS("speak:days", DD); }
-      Object.assign(syQ, up); if (Object.keys(up).length) syFlush();
+      for (const k in up) CL.put(k, up[k].v, up[k].at); if (Object.keys(up).length) CL.flush();
       return ch;
     }).catch(() => false);
     return syPulled;
@@ -569,7 +562,7 @@
   }
   const topicOf = key => key.indexOf("t:") === 0 ? (D.topics || []).find(x => "t:" + x.id === key) : null;
   const MREC = {};
-  function playArchived(id) { (MREC[id] ? Promise.resolve(MREC[id]) : fetch("/api/media?k=" + encodeURIComponent("med:sp:" + id)).then(r => r.ok ? r.json() : null).then(j => (MREC[id] = j && j.rec))).then(r => { if (!r || !r.aud) return tip("这条录音没取到"); hush(); try { if (clipAudio) clipAudio.pause(); clipAudio = new Audio(r.aud); clipAudio.play(); } catch (e) {} }); }
+  function playArchived(id) { (MREC[id] ? Promise.resolve(MREC[id]) : fetch("/api/media?k=" + encodeURIComponent("med:sp:" + id)).then(r => r.ok ? r.json() : null).then(j => (MREC[id] = j && j.rec))).then(r => { if (!r || !r.aud) return tip("这条录音没取到"); hush(); clipAudio = MEDIA.play(r.aud); }); }
   function curveSvg(pts) { // 每天跟读的平均分
     if (pts.length < 2) return '<div class="sk-note">练满两天就能看到分数曲线。</div>';
     const W = 640, H = 160, L = 34, B = 22, T = 10, xs = i => L + (W - L - 10) * (i / (pts.length - 1)), ys = v => T + (H - T - B) * (1 - v / 100);
@@ -624,7 +617,7 @@
     if (COACH && COACH.busy) return; COACH = { busy: true }; draw();
     const recent = items("rec:").slice(0, 50), avg = recent.filter(r => r.score != null), hist = { 练过的情景对话: doneCount("d:"), 跟读句子: doneCount("s:"), 说过的话题: doneCount("t:"), 原声跟读: doneCount("v:"), 最近跟读平均分: avg.length ? Math.round(avg.reduce((a, r) => a + r.score, 0) / avg.length) : "还没有", 连续打卡天数: streak() };
     const text = "自我评估：" + COACH_Q.map(([k, q]) => q + "：" + (coachAns[k] || "没选")).join("；") + "\n练习记录：" + JSON.stringify(hist);
-    try { const j = await (await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "coach", text }) })).json(); if (j.ok) { syPut("plan", { level_zh: j.level_zh, advice_zh: j.advice_zh, days: j.days, encourage_zh: j.encourage_zh, at: Date.now() }); COACH = null; } else COACH = { err: j.error === "noai" ? "AI 没开" : "AI 没排出来，再点一次" }; }
+    try { const j = await AI.ask("coach", { text }); if (j.ok) { syPut("plan", { level_zh: j.level_zh, advice_zh: j.advice_zh, days: j.days, encourage_zh: j.encourage_zh, at: Date.now() }); COACH = null; } else COACH = { err: AI.msg(j, "AI 没排出来，再点一次") }; }
     catch (e) { COACH = { err: "网络问题，没连上 AI" }; }
     draw();
   }
@@ -652,7 +645,7 @@
   async function howGo(q) {
     q = String(q || "").trim(); if (!q || HOW.busy) return; HOW = { q, busy: true, r: null, err: "" }; draw();
     HOWHIST = [q].concat(HOWHIST.filter(x => x !== q)).slice(0, 30); LS("speak:howto", HOWHIST);
-    try { const j = await (await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "howto", text: q }) })).json(); HOW = j.ok ? { q, r: j } : { q, err: j.error === "noai" ? "AI 没开" : "AI 没回上来，再点一次" }; }
+    try { const j = await AI.ask("howto", { text: q }); HOW = j.ok ? { q, r: j } : { q, err: AI.msg(j, "AI 没回上来，再点一次") }; }
     catch (e) { HOW = { q, err: "网络问题，没连上 AI" }; }
     draw();
   }
@@ -674,7 +667,7 @@
   async function uwCheck(id, text) {
     const w = UW && UW.list.find(x => x.id === id); text = String(text || "").trim(); if (!w || !text) return;
     UW.res[id] = { busy: true, text }; draw();
-    try { const j = await (await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "useword", word: w.word, zh: w.zh || "", text }) })).json(); UW.res[id] = j.ok ? { r: j, text } : { err: "AI 没回上来，再试一次", text }; if (j.ok && j.correct) markDone("uw:" + id); }
+    try { const j = await AI.ask("useword", { word: w.word, zh: w.zh || "", text }); UW.res[id] = j.ok ? { r: j, text } : { err: AI.msg(j, "AI 没回上来，再试一次"), text }; if (j.ok && j.correct) markDone("uw:" + id); }
     catch (e) { UW.res[id] = { err: "网络问题", text }; }
     draw();
   }
@@ -700,7 +693,7 @@
   async function mockRate() {
     MK.busy = true; MK.err = ""; draw();
     const text = MK.qs.map((q, i) => "[Part " + q.part + "] Q: " + q.q + "\nA: " + (MK.ans[i] || "(no answer)")).join("\n\n");
-    try { const j = await (await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "speak", prompt: "IELTS Speaking mock test, Parts 1-3 (judge all answers together)", text }) })).json(); MK.busy = false; if (j.ok) { MK.r = j; markDone("mk:" + today()); fixesToErr(j.fixes, "雅思口语模拟考"); } else MK.err = j.error === "too short" ? "说得太少了，没法打分" : "AI 没打出分，点重试"; }
+    try { const j = await AI.ask("speak", { prompt: "IELTS Speaking mock test, Parts 1-3 (judge all answers together)", text }); MK.busy = false; if (j.ok) { MK.r = j; markDone("mk:" + today()); fixesToErr(j.fixes, "雅思口语模拟考"); } else MK.err = j.error === "too short" ? "说得太少了，没法打分" : AI.msg(j, "AI 没打出分，点重试"); }
     catch (e) { MK.busy = false; MK.err = "网络问题"; }
     draw();
   }
@@ -795,7 +788,7 @@
     if (QK !== my) return; QK.phase = "judge"; draw();
     const q = QK.list[i0];
     if (!x.said) { QK.j[i0] = { err: "没识别到声音，下次大声一点" }; QK.phase = "done"; draw(); return; }
-    try { const j = await (await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "judge", prompt: q.q, text: x.said }) })).json(); if (QK !== my) return; QK.j[i0] = j.ok ? j : { err: "AI 没回上来" }; if (j.ok && j.correct) QK.ok++; }
+    try { const j = await AI.ask("judge", { prompt: q.q, text: x.said }); if (QK !== my) return; QK.j[i0] = j.ok ? j : { err: AI.msg(j, "AI 没回上来") }; if (j.ok && j.correct) QK.ok++; }
     catch (e) { if (QK === my) QK.j[i0] = { err: "网络问题" }; }
     if (QK === my) { QK.phase = "done"; draw(); }
   }
@@ -815,7 +808,7 @@
     const L = F.filter(f => f && f.good && !seen.has(f.good) && seen.add(f.good));
     if (!L.length) return tip("这次没有要改的句子");
     if (!confirm("把这次聊天里改过的 " + L.length + " 句正确说法加进生词本？之后在「🔊 练习」里复习。")) return;
-    (async () => { for (const f of L) { if (window.vocabAddWord) await window.vocabAddWord(f.good, f.bad ? "✗ " + f.bad : ""); } })();
+    (async () => { let n = 0; for (const f of L) if (await WORD.add(f.good, { sent: f.bad ? "✗ " + f.bad : "", silent: true, learn: false, from: "口语·更好的说法" })) n++; tip("已加入生词本 " + n + " 条"); })(); // 全站共用的加词（word.js）
   }
 
   /* ---------- 事件 ---------- */
@@ -850,7 +843,7 @@
         });
         return;
       }
-      const ad = t.closest("[data-add]"); if (ad) { if (window.vocabAddWord) window.vocabAddWord(ad.dataset.add, ad.dataset.sent || ""); else tip("生词本还没加载好"); return; }
+      const ad = t.closest("[data-add]"); if (ad) { WORD.add(ad.dataset.add, { sent: ad.dataset.sent || "", from: "口语" }); return; }
       const bz = t.closest("[data-basic]"); if (bz) { stopAll(); if (window.enShow) window.enShow("basic", bz.dataset.basic); return; }
       const sc = t.closest("[data-sec]"); if (sc) { stopAll(); sec = sc.dataset.sec; view = null; LS("speak:sec", sec); draw(); return; }
       const vc = t.closest("[data-voice]"); if (vc) { hush(); if (window.TTS) TTS.setMode(vc.dataset.voice); draw(); if (vc.dataset.voice !== "sys" && window.TTS) TTS.load().then(() => say("Hi! This is the voice you will hear.")); return; }

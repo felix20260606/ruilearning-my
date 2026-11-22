@@ -21,13 +21,10 @@
    - 📈 我的听力：每天听了几分钟、精听几句、听写平均正确率、跟读几次（sme:stat {日期: {设备: {s, dk, dks, sh}}}，同步到 /api/mine k=sme 的 "st:日期:设备"）
    - 记住听到哪（sme:pos {期号: {t 秒, at}}，同步到 /api/mine k=sme 的 "pos:期号"）：再打开从断点接着听；听完就清掉
    - 手机锁屏 / 耳机：Media Session（标题、封面、播放暂停、快进快退 10 秒；精听时「上一首 / 下一首」= 上一句 / 下一句）
-   依赖 index.html：window.enShow、window.vocabAddWord、toast；read.js 的 window.readingOpen；watch.js 的 window.videoCore.pause（两边不同时放） */
+   依赖 index.html：window.enShow、toast；加词用 word.js 的 WORD.add；read.js 的 window.readingOpen；watch.js 的 window.videoCore.pause（两边不同时放） */
 (function () {
   "use strict";
-  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const LG = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
-  const LS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
-  const tip = m => { try { (window.toast || (() => {}))(m); } catch (e) {} };
+  const { esc, LG, LS, tip } = U; // 全站共用的小工具（util.js）
   // 新加的排前面。[栏目, 按钮, 英文名, 一句介绍, 来源, 故事类（按集连着听）]
   const SER = [
     ["new", "🆕 本周更新", "This week", "所有来源最近 7 天出的新节目合在一起，按天排、新的在前（VOA 已停更、广播剧和大学英语是固定的旧节目，不在这里）", "NEW"],
@@ -151,7 +148,8 @@
     if (t < 15 || t > AU.duration - 20 || AU.ended) { if (!P[id]) return; delete P[id]; LS("sme:pos", P); if (sync) putPos(id, null, at); return; }
     P[id] = { t: Math.round(t), at }; LS("sme:pos", P); if (sync) putPos(id, P[id].t, at);
   }
-  function putPos(id, t, at) { const ch = { ["pos:" + id]: t == null ? { del: 1, at } : { v: t, at } }; fetch("/api/mine", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ k: "sme", changes: ch }) }).catch(() => {}); }
+  const CL = CLOUD.chan("sme"); // 全站共用的同步（cloud.js）：听过哪几期、听到哪、听力统计
+  function putPos(id, t, at) { if (t == null) CL.del("pos:" + id, at); else CL.put("pos:" + id, t, at); }
   window.addEventListener("pagehide", () => { if (AU.dataset.id && !AU.paused) savePos(false); });
   AU.addEventListener("loadedmetadata", () => {
     AU.playbackRate = rate;
@@ -172,30 +170,31 @@
     for (const k in H) try { M.setActionHandler(k, H[k]); } catch (e) {}
   }
   AU.addEventListener("play", msSet);
-  AU.addEventListener("play", () => { flClosed = false; try { if (window.TTS && TTS.hush) TTS.hush(); else speechSynthesis.cancel(); } catch (e) {} try { if (window.videoCore && videoCore.pause) videoCore.pause(); } catch (e) {} sync(); });
+  AU.addEventListener("play", () => { flClosed = false; MEDIA.solo(AU); sync(); }); // 全站共用的放音（media.js）：朗读、视频、练习课的原声都停掉
   AU.addEventListener("pause", () => sync());
   AU.addEventListener("timeupdate", () => { if (AU.duration && AU.currentTime / AU.duration > 0.9 && AU.dataset.id) markDone(AU.dataset.id); });
-  window.smePause = () => { try { AU.pause(); } catch (e) {} };
+  window.smePause = () => { try { AU.pause(); } catch (e) {} }; // 旧接口；新代码用 MEDIA.solo（media.js）
+  MEDIA.reg(AU);
 
   // ---------- 听过哪几期：本机 sme:done + 后台 /api/mine k=sme ----------
   const done = () => LG("sme:done", {}) || {};
   function markDone(id) {
     const D = done(); if (D[id] && new Date(D[id]).toDateString() === new Date().toDateString()) return;
     D[id] = Date.now(); LS("sme:done", D);
-    fetch("/api/mine", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ k: "sme", changes: { [id]: { v: D[id], at: D[id] } } }) }).catch(() => {});
+    CL.put(id, D[id], D[id]);
     tip("✓ 这期听完了"); if (view === "ep") draw();
   }
   let pulled = false;
   function pull() {
     if (pulled) return; pulled = true;
-    fetch("/api/mine?k=sme").then(r => r.json()).then(j => { if (!j || !j.ok) return; const D = done(); let ch = false; const P = POS(); let pc = false;
+    CL.pull({ force: true }).then(items => { if (!items) return; const j = { items }, D = done(); let ch = false; const P = POS(); let pc = false;
       for (const id in j.items || {}) {
         const x = j.items[id];
         if (id.startsWith("st:")) { const mm = id.match(/^st:(\d{4}-\d\d-\d\d):(\w+)$/); if (mm && x.v && typeof x.v === "object") { const A = STAT(), Dd = A[mm[1]] = A[mm[1]] || {}, mine = mm[2] === DEV; if (!Dd[mm[2]] || (!mine && +x.at > (+Dd[mm[2]].at || 0)) || (mine && +x.v.s > (+Dd[mm[2]].s || 0))) { Dd[mm[2]] = x.v; LS("sme:stat", A); pc = true; } } continue; } // 听力统计：每台设备一条
         if (id.startsWith("pos:")) { const e = id.slice(4); if (+x.at > (+(P[e] || {}).at || 0)) { if (x.del) { if (P[e]) { delete P[e]; pc = true; } } else { P[e] = { t: +x.v, at: +x.at }; pc = true; } } continue; } // 听到哪：新的为准
         if (!x.del && +x.v > (+D[id] || 0)) { D[id] = +x.v; ch = true; }
       }
-      if (pc) LS("sme:pos", P); if (ch || pc) { if (ch) LS("sme:done", D); draw(); } }).catch(() => {});
+      if (pc) LS("sme:pos", P); if (ch || pc) { if (ch) LS("sme:done", D); draw(); } });
   }
 
   function loadList(s) {
@@ -213,19 +212,7 @@
     const fromOff = async () => { const o = await offJson(id); if (!o || !o.ep) return null; if (o.zh) ZH[id] = o.zh; if (o.sents) TIM[id] = o.sents; return o.ep; };
     fetch("/api/sme?ep=" + encodeURIComponent(id)).then(r => r.json()).catch(() => null).then(async j => { if (!(j && j.ok)) j = (await fromOff()) || j; epBusy = false; if (j && j.ok) EPS[id] = j; if (view === "ep" && !EP) { EP = j && j.ok ? j : { err: 1, id, msg: (j && j.error) || "" }; draw(); if (zhOn && EP.ok) loadZh(id); } });
   }
-  // 🀄 中文：先找后台（翻过的存 KV，全家共用）；后台翻不了（谷歌拦了 Cloudflare 机房的 IP）就在浏览器里直接问谷歌，和阅读、视频字幕一样
-  async function gtx(arr) {
-    const out = arr.map(() => ""), go = async idx => {
-      const r = await NET.g("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q=" + encodeURIComponent(idx.map(i => arr[i].replace(/\s+/g, " ")).join("\n")));
-      const zh = ((await r.json())[0] || []).map(x => x[0] || "").join("").split("\n").map(x => x.trim());
-      if (zh.length === idx.length) idx.forEach((i, k) => { out[i] = zh[k]; }); else if (idx.length === 1) out[idx[0]] = zh.join(" ").trim(); else for (const i of idx) await go([i]); // 行数对不上就一行一行翻
-    };
-    const chunks = []; let cur = [], len = 0;
-    arr.forEach((t, i) => { if (!t) return; if (cur.length && len + t.length > 1500) { chunks.push(cur); cur = []; len = 0; } cur.push(i); len += t.length + 1; });
-    if (cur.length) chunks.push(cur);
-    for (let i = 0; i < chunks.length; i += 3) await Promise.all(chunks.slice(i, i + 3).map(c => go(c).catch(() => {})));
-    return out;
-  }
+  // 🀄 中文：先找后台（翻过的存 KV，全家共用）；后台翻不了（谷歌拦了 Cloudflare 机房的 IP）就在浏览器里翻（tr.js，和阅读、视频字幕一样）
   // 一期要翻的所有文字（顺序和后台 /api/sme?zh=1 一样）↔ 翻好的结构
   const zhAll = ep => [ep.intro || "", ...(ep.q || []), ...(ep.vocab || []).map(v => v[1] || ""), ...(ep.vocab || []).map(v => v[2] || ""), ...(ep.heads || []).map(h => h[0]), ...(ep.lines || []).map(l => l.t)];
   const zhFlat = (j, ep) => { const pad = (a, n) => Array.from({ length: n }, (_, i) => (a || [])[i] || ""); const V = (ep.vocab || []).length; return [j.intro || "", ...pad(j.q, (ep.q || []).length), ...pad(j.vocab, V), ...pad(j.vex, V), ...pad(j.heads, (ep.heads || []).length), ...pad(j.lines, (ep.lines || []).length)]; };
@@ -233,7 +220,7 @@
   const zhMiss = id => { const ep = EPS[id], j = ZH[id]; if (!ep) return 0; if (!j) return zhAll(ep).filter(Boolean).length; const f = zhFlat(j, ep); return zhAll(ep).filter((t, i) => t && !f[i]).length; };
   const ZHC = () => LG("sme:zhc", {}) || {}; // 这台设备翻好的（最近 15 期）：再打开马上有，没网也有
   function zhKeep(id, j) { const C = ZHC(); C[id] = { j, at: Date.now() }; const ks = Object.keys(C).sort((a, b) => C[b].at - C[a].at); ks.slice(15).forEach(k => delete C[k]); try { localStorage.setItem("sme:zhc", JSON.stringify(C)); } catch (e) { LS("sme:zhc", { [id]: C[id] }); } } // 存满了就只留这一期
-  // 🀄 一层层来，哪层成了就停：① 本机存的 ② 后台（存过的 / 谷歌 / Workers AI）③ 浏览器直接问谷歌 ④ 剩下的请后台 AI 翻；还缺的页面上写「还有 N 句没翻出来 · 重试」
+  // 🀄 一层层来，哪层成了就停：① 本机存的 ② 后台（存过的 / 谷歌 / Workers AI）③ 浏览器直接问谷歌 ④ 剩下的请后台 AI 翻（③④ 都在 tr.js 的 TR.lines）；还缺的页面上写「还有 N 句没翻出来 · 重试」
   const zhSt = {};
   async function loadZh(id, retry) {
     if (zhBusy[id] || (ZH[id] && !retry && !zhMiss(id))) return; zhBusy[id] = true; zhSt[id] = ""; if (EP && EP.id === id) draw();
@@ -243,8 +230,7 @@
     if (ep) {
       const all = zhAll(ep), zh = j ? zhFlat(j, ep) : all.map(() => ""), miss = () => all.map((t, i) => (t && !zh[i] ? i : -1)).filter(i => i >= 0);
       let m = miss();
-      if (m.length) { try { const g = await gtx(m.map(i => all[i])); m.forEach((i, k) => { if (g[k]) zh[i] = g[k]; }); } catch (e) {} m = miss(); }
-      for (let k = 0; k < m.length; k += 120) { try { const r = await (await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "tr", texts: m.slice(k, k + 120).map(i => all[i]) }) })).json(); if (r && Array.isArray(r.zh)) m.slice(k, k + 120).forEach((i, n) => { if (r.zh[n]) zh[i] = r.zh[n]; }); } catch (e) {} }
+      if (m.length) { const g = await TR.lines(m.map(i => all[i])); m.forEach((i, k) => { if (g[k]) zh[i] = g[k]; }); } // 全站共用的翻译（tr.js）：谷歌，剩下的请后台 AI 翻
       if (zh.some(Boolean)) j = zhBuild(ep, zh);
     }
     zhBusy[id] = false;
@@ -261,7 +247,7 @@
   // ---------- 🎯 逐句精听：每句单独播、重复、放慢、听写对答案 ----------
   // 每句的时间：后台 /api/sme?al=期号&part=N 用 Whisper 把原声分段转成「每个词在第几秒」（存 KV，只花一次），这里和文稿逐词对齐（最长公共子序列），
   // 每句从第一个对上的词开始、到下一句开头结束；对不上的句子按前后两句插值。听写对得少于 80% 的句子收进「❌ 错题本」
-  const DK = {}; let segEnd = 0, segT = 0;
+  const DK = {};
   const ntok = t => String(t || "").toLowerCase().replace(/[’‘]/g, "'").replace(/[^\p{L}\p{N}'\s-]+/gu, " ").split(/[\s-]+/).map(x => x.replace(/^'+|'+$/g, "")).filter(Boolean);
   function splitSents(lines) {
     const out = [];
@@ -297,7 +283,7 @@
       const W = []; let parts = 1, total = 0, id3 = 0;
       for (let p = 0; p < parts && p < 40; p++) {
         const j = await (await fetch("/api/sme?al=" + encodeURIComponent(id) + "&part=" + p)).json();
-        if (!j || !j.ok) throw new Error(j && j.error === "noai" ? "AI 没开" : "对时间失败（" + ((j && j.error) || "网络") + "）");
+        if (!j || !j.ok) throw new Error(j && j.error === "noai" ? AI.MSG.noai : "对时间失败（" + ((j && j.error) || "网络") + "）");
         parts = j.parts || 1; total = j.total || 1; if (p === 0) id3 = +j.id3 || 0;
         const off = Math.max(0, (p * 1e6 - (p ? id3 : 0)) / Math.max(1, total - id3) * dur);
         (j.words || []).forEach(w => W.push([w[0], w[1] + off, w[2] + off]));
@@ -364,7 +350,7 @@
   }
   function statFlush(push) {
     if (statAcc >= 1) { const a = Math.round(statAcc); statAcc -= a; statAdd(o => { o.s += a; }); }
-    if (push && Date.now() - statSent > 20000) { const d = dayOf(Date.now()), o = (STAT()[d] || {})[DEV]; if (o) { statSent = Date.now(); fetch("/api/mine", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ k: "sme", changes: { ["st:" + d + ":" + DEV]: { v: o, at: o.at } } }) }).catch(() => {}); } }
+    if (push && Date.now() - statSent > 20000) { const d = dayOf(Date.now()), o = (STAT()[d] || {})[DEV]; if (o) { statSent = Date.now(); CL.put("st:" + d + ":" + DEV, o, o.at); CL.flush(); } }
   }
   AU.addEventListener("timeupdate", () => { const now = Date.now(); if (!AU.paused && statT && now - statT < 3000) statAcc += (now - statT) / 1000 * Math.min(1, AU.playbackRate || 1); statT = AU.paused ? 0 : now; if (statAcc >= 30) statFlush(false); });
   AU.addEventListener("pause", () => { statT = 0; statFlush(true); }); window.addEventListener("pagehide", () => statFlush(true));
@@ -405,8 +391,8 @@
   async function lqLoad(id) {
     const ep = EPS[id]; if (!ep) return; LQ[id] = { busy: true, pick: {} }; draw();
     try {
-      const r = await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "lquiz", title: ep.title, text: ep.lines.map(l => (l.who ? l.who + ": " : "") + l.t).join("\n") }) });
-      const j = await r.json(); if (!j || !j.ok || !(j.quiz || []).length) throw new Error(j && j.error === "noai" ? "AI 没开" : "AI 没出好题，再点一次（也可能今天的免费额度用完了）");
+      const j = await AI.ask("lquiz", { title: ep.title, text: ep.lines.map(l => (l.who ? l.who + ": " : "") + l.t).join("\n") });
+      if (!j.ok || !(j.quiz || []).length) throw new Error(AI.msg(j, "AI 没出好题，再点一次"));
       LQ[id] = { quiz: j.quiz, pick: {} };
     } catch (e) { LQ[id] = { err: e.message || String(e) }; }
     if (EP && EP.id === id) draw();
@@ -437,8 +423,8 @@
     toks.forEach(w => { const n = ntok(w).length; if (!n) return; if (!R.hit.slice(k, k + n).every(Boolean)) miss.push(w.replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g, "")); k += n; });
     if (!miss.length) return; d.why = { i, busy: true }; draw();
     try {
-      const j = await (await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "whymiss", sent: x.t, typed: d.typed, missed: [...new Set(miss)] }) })).json();
-      if (!j || !j.ok || !(j.items || []).length) throw new Error(j && j.error === "noai" ? "AI 没开" : "这次没讲好，再点一次");
+      const j = await AI.ask("whymiss", { sent: x.t, typed: d.typed, missed: [...new Set(miss)] });
+      if (!j.ok || !(j.items || []).length) throw new Error(AI.msg(j, "这次没讲好，再点一次"));
       if (d.why && d.why.i === i) d.why = { i, items: j.items, tip: j.tip_zh || "" };
     } catch (e) { if (d.why && d.why.i === i) d.why = { i, err: e.message || String(e) }; }
     if (EP && DK[EP.id] === d) draw();
@@ -511,25 +497,19 @@
   AU.addEventListener("timeupdate", () => { hl(); hlWord(); }); AU.addEventListener("seeked", () => { hl(); hlWord(); }); // 逐词主要靠 tick（每帧），后台标签页里帧停了就靠这个
   function seekSent(k) { // 点文稿里的一句 → 从那句开始播
     const S = TIM[EP.id], x = S && S[k]; if (!x) return;
-    autoStop(); recStop(true); clearInterval(segT); const prev = segDone; segDone = null; if (prev) prev(false); AU.playbackRate = rate;
+    autoStop(); recStop(true); MEDIA.stop(AU); AU.playbackRate = rate;
     if (AU.dataset.id !== EP.id) { AU.src = srcOf(EP.id); AU.dataset.id = EP.id; auTitle = SM[serOf(EP.id)][1] + " · " + EP.title; }
     AU.currentTime = x.s; AU.play().catch(() => {});
     const d = DK[EP.id]; if (d && d.sents) { d.i = k; d.typed = ""; d.res = null; d.why = null; d.rec = null; d.show = false; draw(); } else hl(true);
   }
   // 播这一句；放完调 done(true)，被手动暂停 / 换句调 done(false)
-  let segDone = null;
   function dkPlay(slow, done) {
     const d = EP && DK[EP.id], x = d && d.sents && d.sents[d.i]; if (!x) return;
     if (AU.dataset.id !== EP.id) { AU.src = srcOf(EP.id); AU.dataset.id = EP.id; auTitle = SM[serOf(EP.id)][1] + " · " + EP.title; }
-    const prev = segDone; segDone = null; if (prev) prev(false);
-    recStop(true); clearInterval(segT); AU.playbackRate = slow ? 0.75 : rate; AU.currentTime = x.s; segEnd = x.e; segDone = done || null;
-    AU.play().catch(() => {});
-    segT = setInterval(() => {
-      const end = AU.currentTime >= segEnd; if (!AU.paused && !end) return;
-      clearInterval(segT); if (!AU.paused) AU.pause(); AU.playbackRate = rate;
-      const f = segDone; segDone = null; if (f) f(end);
-    }, 60);
+    recStop(true); AU.playbackRate = rate; // 放完 / 被打断后回到这个速度
+    MEDIA.seg(AU, x.s, x.e, { rate: slow ? 0.75 : rate, end: () => { if (done) done(true); }, cut: () => { if (done) done(false); }, fail: () => { if (done) done(false); } }); // 全站共用的放一段原声（media.js）
   }
+
   // 🔁 自动连播：每句放 reps 遍，每遍之间停 gap 秒，放完自动下一句；手动点任何精听按钮或暂停就停
   let autoTok = 0;
   function autoStop() { autoTok++; const d = EP && DK[EP.id]; if (d && d.auto) { d.auto = false; draw(); } }
@@ -716,7 +696,7 @@
       const sv = t.closest("[data-ser]"); if (sv) { ser = sv.dataset.ser; LS("sme:s", ser); view = "home"; loadList(ser); draw(); return; }
       const epEl = t.closest("[data-ep]"); if (epEl) { openEp(epEl.dataset.ep); return; }
       const r = t.closest("[data-rate]"); if (r) { rate = +r.dataset.rate; LS("sme:rate", rate); AU.playbackRate = rate; root.querySelectorAll("[data-rate]").forEach(x => x.classList.toggle("on", x === r)); return; }
-      const ad = t.closest("[data-add]"); if (ad && EP) { const v = EP.vocab[+ad.dataset.add], w = String(v[0]).replace(/\s*\(.*?\)\s*/g, " ").trim(), re = new RegExp("\\b" + w.split(/\s+/)[0].replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"), line = (EP.lines || []).find(l => re.test(l.t)); if (window.vocabAddWord) { ad.disabled = true; window.vocabAddWord(w, v[2] || (line ? line.t : "")).then(ok => { ad.textContent = ok ? "✓ 已加" : "已在本里"; }); } return; }
+      const ad = t.closest("[data-add]"); if (ad && EP) { const v = EP.vocab[+ad.dataset.add], w = String(v[0]).replace(/\s*\(.*?\)\s*/g, " ").trim(), re = new RegExp("\\b" + w.split(/\s+/)[0].replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"), line = (EP.lines || []).find(l => re.test(l.t)); ad.disabled = true; WORD.add(w, { sent: v[2] || (line ? line.t : ""), from: "听力·词汇" }).then(ok => { if (ok == null) ad.disabled = false; else ad.textContent = ok ? "✓ 已加" : "已在本里"; }); return; } /* 全站共用的加词（word.js） */
       const b = t.closest("[data-a]"); if (!b) return; const a = b.dataset.a;
       if (a === "more") { MORE[ser] = (MORE[ser] || 40) + 80; draw(); return; }
       if (a === "home") { const home = () => { view = "home"; if (EP && !EP.err && ser !== "new") ser = serOf(EP.id); loadList(ser); draw(); }; if (window.NAV) NAV.back(home); else home(); return; } // 回到上一个页面
@@ -727,7 +707,7 @@
         if (a === "dk-why") return whyLoad();
         if (a === "dk-auto") { if (d.auto) autoStop(); else autoRun(); return; }
         if (a === "dk-rec") return recStart();
-        if (a === "dk-me") { if (d.rec && d.rec.url) { AU.pause(); new Audio(d.rec.url).play().catch(() => {}); } return; }
+        if (a === "dk-me") { if (d.rec && d.rec.url) { MEDIA.play(d.rec.url); } return; }
         if (a === "dk-play") { draw(); return dkPlay(false); }
         if (a === "dk-slow") { draw(); return dkPlay(true); }
         if (a === "dk-prev") return dkGo(-1);

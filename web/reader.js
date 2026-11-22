@@ -4,7 +4,7 @@
    - 每条有自己的网址 #read/编号（生词本词条用词条 id，插件句型用 p:id），可以收藏、分享，打开网站直接进这一条
    依赖 index.html 的全局：words / speak；插件句型数据 web/vs/pattern.js（VS_PAT_LIST） */
 (function () {
-  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const { esc } = U; // 全站共用的小工具（util.js）
   const hl = s => esc(String(s)).replace(/\{([^}]+)\}/g, "<em>$1</em>");
   const enOf = s => String(s).replace(/[{}]/g, "").split(/[一-鿿（(]/)[0].trim();
   const CSS = `
