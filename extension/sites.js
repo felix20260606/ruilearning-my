@@ -21,6 +21,8 @@
     const path = String(loc && loc.pathname || ""), sp = new URLSearchParams(String(loc && loc.search || "")); let m;
     if ((m = /^\/(?:[a-z]{2}(?:-[A-Za-z]{2,4})?\/)?video\/(BV[0-9A-Za-z]{10})(?:\/|$)/.exec(path))) { const p = parseInt(sp.get("p"), 10) || 1; return m[1] + (p > 1 ? "?p=" + p : ""); }
     if ((m = /^\/(?:[a-z]{2}(?:-[A-Za-z]{2,4})?\/)?bangumi\/play\/(ep|ss)(\d+)/.exec(path))) return m[1] + m[2];
+    // 稍后再看、收藏夹、合集这类播放列表页：/list/watchlater?bvid=BV…、/list/ml123?bvid=BV…（以前不认，没有字幕）
+    if (/^\/(?:list|medialist\/play)\//.test(path) && /^BV[0-9A-Za-z]{10}$/.test(sp.get("bvid") || "")) { const p = parseInt(sp.get("p"), 10) || 1; return sp.get("bvid") + (p > 1 ? "?p=" + p : ""); }
     return "";
   }
   // 页面脚本报来的播放器信息（getManifest：bvid、p、episodeId）是不是当前这个视频的：B 站切换视频时地址先变，播放器后换，对不上就等一会儿再问

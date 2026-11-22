@@ -1145,7 +1145,11 @@ async function load(){
 async function save(s){
   vStamp(s);
   if(hasStore){try{await Promise.race([window.storage.set(KEY,JSON.stringify(s)),new Promise((_,r)=>setTimeout(r,1500))]);}catch(e){}}
-  else{mem=s;try{localStorage.setItem(KEY,JSON.stringify(s));}catch(e){}}
+  else{mem=s;try{localStorage.setItem(KEY,JSON.stringify(s));}catch(e){
+    // 本机存储满了：先去掉配图缓存（能重新找）再存；还存不下就提醒一次（生词本内容已经传到后台的不会丢，只是这台设备的缓存没更新）
+    try{const t=Object.assign({},s);delete t.imgcache;delete t.rowimgcache;localStorage.setItem(KEY,JSON.stringify(t));}
+    catch(e2){if(!save.warned){save.warned=1;try{toast("⚠️ 这台设备的浏览器存储满了，生词本的改动只能先传到后台。可以在浏览器设置里清一下这个网站以外的数据。");}catch(e3){}}}
+  }}
   schedulePush();
 }
 function def(){return{progress:{},custom:[],deleted:[],pending:[],srs:{}};}
@@ -1290,29 +1294,33 @@ function applyImg(id){
     }
   });
 }
+/* 维基百科一次最多问 3 个：生词本页一打开要几百张配图，同时发会被维基限流（429）；
+   没连上 / 被限流的不记成「没有图」（以前记了就再也不找），过 10 分钟再试；真的查到没有图才记 null */
+let wikiN=0;const wikiQ=[],imgRetry={};
+function wikiSlot(){return new Promise(res=>{const go=()=>{wikiN++;res(()=>{wikiN--;const n=wikiQ.shift();if(n)n();});};if(wikiN<3)go();else wikiQ.push(go);});}
+async function wikiJson(u){const r=await NET.fetch(u);if(!r.ok)throw new Error("wiki "+r.status);return r.json();}
 async function fetchWiki(id){
   const w=words.find(x=>x.id===id);
   if(!w){imgCache[id]=null;return;}
+  if(imgRetry[id]>Date.now())return;
   imgCache[id]="pending";
+  const done=await wikiSlot();let failed=false;
   const BAD=/(Commons-logo|Wiktionary|Edit-|OOjs|Ambox|Question_book|Wikidata|Red_pog|Location|_map|\bmap\b|Increase|Decrease|icon|logo|flag|disambig|placeholder|no[_-]?image|nuvola|symbol|\.svg)/i;
   let urls=[];
   try{
     if(w.wiki){ // curated page → accurate representative image (en.wikipedia)
       const title=encodeURIComponent(w.wiki);
-      const r=await NET.fetch("https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=original%7Cthumbnail&pithumbsize=700&titles="+title);
-      const j=await r.json();
+      const j=await wikiJson("https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=original%7Cthumbnail&pithumbsize=700&titles="+title);
       const pg=j&&j.query&&j.query.pages;
       if(pg){const p=Object.values(pg)[0]||{};const src=(p.original&&p.original.source)||(p.thumbnail&&p.thumbnail.source);if(src&&!BAD.test(src))urls.push(src);}
       if(urls.length<4){
-        const r2=await NET.fetch("https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&generator=images&gimlimit=25&prop=imageinfo&iiprop=url%7Cmime&iiurlwidth=700&titles="+title);
-        const j2=await r2.json();const pg2=j2&&j2.query&&j2.query.pages;
+        const j2=await wikiJson("https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&generator=images&gimlimit=25&prop=imageinfo&iiprop=url%7Cmime&iiurlwidth=700&titles="+title);const pg2=j2&&j2.query&&j2.query.pages;
         if(pg2)Object.values(pg2).forEach(p=>{if(urls.length>=4)return;const ii=p.imageinfo&&p.imageinfo[0];if(!ii)return;if(!/^image\//.test(ii.mime||"")||/svg/i.test(ii.mime||""))return;const src=ii.thumburl||ii.url;if(!src||BAD.test(src))return;if(urls.indexOf(src)<0)urls.push(src);});
       }
     }
     if(urls.length<2){ // no curated page, or too few → search Wikimedia Commons by the word
       const q=encodeURIComponent((w.wiki||w.word||"").replace(/[{}]/g,"").trim());
-      const r3=await NET.fetch("https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch="+q+"&gsrnamespace=6&gsrlimit=10&prop=imageinfo&iiprop=url%7Cmime&iiurlwidth=700");
-      const j3=await r3.json();const pg3=j3&&j3.query&&j3.query.pages;
+      const j3=await wikiJson("https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch="+q+"&gsrnamespace=6&gsrlimit=10&prop=imageinfo&iiprop=url%7Cmime&iiurlwidth=700");const pg3=j3&&j3.query&&j3.query.pages;
       if(pg3)Object.values(pg3).sort((a,b)=>(a.index||0)-(b.index||0)).forEach(p=>{
         if(urls.length>=4)return;
         const ii=p.imageinfo&&p.imageinfo[0];if(!ii)return;
@@ -1321,7 +1329,9 @@ async function fetchWiki(id){
         if(urls.indexOf(src)<0)urls.push(src);
       });
     }
-  }catch(e){}
+  }catch(e){failed=true;}
+  done();
+  if(failed&&!urls.length){imgCache[id]=null;applyImg(id);delete imgCache[id];imgRetry[id]=Date.now()+10*60e3;return;} // 没连上：先不显示，下次再找
   imgCache[id]=urls.length?urls:null;
   applyImg(id);
   state.imgcache=imgCache;save(state);
@@ -1347,15 +1357,17 @@ function applyRowImg(title){
 }
 async function fetchRowImg(title){
   if(!title)return;
+  if(imgRetry["r:"+title]>Date.now())return;
   rowImgCache[title]="pending";
+  const done=await wikiSlot();
   try{
-    const r=await NET.fetch("https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=220&titles="+encodeURIComponent(title));
-    const j=await r.json();
+    const j=await wikiJson("https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=220&titles="+encodeURIComponent(title));
     const pg=j&&j.query&&j.query.pages;
     let src=null;
     if(pg){const p=Object.values(pg)[0]||{};src=(p.thumbnail&&p.thumbnail.source)||null;}
     rowImgCache[title]=src;
-  }catch(e){rowImgCache[title]=null;}
+  }catch(e){delete rowImgCache[title];imgRetry["r:"+title]=Date.now()+10*60e3;done();return;} // 没连上不记成「没有图」
+  done();
   applyRowImg(title);
   state.rowimgcache=rowImgCache;save(state);
 }
@@ -1754,7 +1766,7 @@ refresh(); // show seed words immediately, no waiting on storage
   const loaded=await load();
   if(loaded){state=loaded;if(!state.progress)state.progress={};if(!state.custom)state.custom=[];if(!state.deleted)state.deleted=[];if(!state.pending)state.pending=[];
     imgCache=state.imgcache||{};Object.keys(imgCache).forEach(k=>{if(!Array.isArray(imgCache[k]))delete imgCache[k];});
-    rowImgCache=state.rowimgcache||{};Object.keys(rowImgCache).forEach(k=>{if(rowImgCache[k]==="pending")delete rowImgCache[k];});
+    rowImgCache=state.rowimgcache||{};Object.keys(rowImgCache).forEach(k=>{if(rowImgCache[k]==="pending"||rowImgCache[k]===null)delete rowImgCache[k];}); // null 以前也可能是没连上：重新找一次
     refresh();
     if(state.sort){sortBy=state.sort;const ss=document.getElementById("sort-sel");if(ss)ss.value=sortBy;renderList();}
     loadVoices();

@@ -104,12 +104,21 @@ const path = require("path");
   KEY = "secret-123"; r = await call("/api/dict?w=apple&fresh=1"); ok(fetched > 0, "fresh works with key"); KEY = "";
 
   // ---- 8. 缓存写不进去 ----
-  globalThis.fetch = async u => { u = String(u); if (u.includes("translate") || u.includes("mymemory")) return new Response(JSON.stringify({ responseData: { translatedText: "香蕉" }, sentences: [{ trans: "香蕉" }] }), { status: 200 }); if (u.includes("NEVER")) return new Response(JSON.stringify({ sentences: [{ trans: "香蕉" }] }), { status: 200 }); if (u.includes("dictionaryapi")) return new Response("[]", { status: 429 }); return new Response(JSON.stringify({ results: [] }), { status: 200 }); };
-  putFail = true; r = await call("/api/dict?w=banana"); putFail = false;
+  globalThis.fetch = async u => { u = String(u); if (u.includes("translate") || u.includes("mymemory")) return new Response(JSON.stringify({ responseData: { translatedText: "香蕉" }, sentences: [{ trans: "香蕉" }] }), { status: 200 }); if (u.includes("NEVER")) return new Response(JSON.stringify({ sentences: [{ trans: "香蕉" }] }), { status: 200 }); if (u.includes("dictionaryapi")) return !u.includes("banana") ? new Response("", { status: 404 }) : dictUp ? new Response(JSON.stringify([{ phonetic: "/bəˈnɑːnə/", meanings: [{ partOfSpeech: "noun", definitions: [{ definition: "a long curved fruit" }] }] }]), { status: 200 }) : new Response("[]", { status: 429 }); return new Response(JSON.stringify({ results: [] }), { status: 200 }); };
+  let dictUp = false; putFail = true; r = await call("/api/dict?w=banana"); putFail = false; dictUp = true;
   ok(r.j.ok && r.j.zh === "香蕉", "dict still answers when cache put fails " + JSON.stringify(r.j).slice(0, 120));
   ok(!kv.has("d/banana"), "not cached while quota out");
+  r = await call("/api/dict?w=zzqxv"); ok(!kv.has("d/zzqxv"), "made-up word (no definitions / examples) not cached");
   r = await call("/api/dict?w=banana"); ok(kv.has("d/banana") && meta.get("d/banana") === undefined, "dict cached after quota back");
   globalThis.fetch = of;
 
+  // ---- 9. AI 语音：别的网站来的不给；短时间现做太多字母 → 429 ----
+  let aiRuns = 0; env.AI = { run: async () => { aiRuns++; return new Uint8Array(500); } };
+  const tts = async (t, og) => { const r = await W.fetch(new Request("https://x.test/api/tts?t=" + encodeURIComponent(t), og ? { headers: { origin: og } } : {}), env); return r.status; };
+  ok(await tts("hello there", "https://evil.example") === 403 && aiRuns === 0, "foreign origin refused");
+  ok(await tts("hello there", "https://ruilearning-my.pages.dev") === 200 && await tts("hello again") === 200, "own site / curl ok");
+  const big = "a".repeat(1400); let st = 200, n = 0; while (st === 200 && n < 40) { st = await tts(big + " " + n); n++; }
+  ok(st === 429 && n > 15, "too many letters in 10 min → 429 after " + n);
+  delete env.AI;
   console.log(fail ? fail + " FAILED" : "t64 sync fixes: all ok"); process.exit(fail ? 1 : 0);
 })();

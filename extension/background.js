@@ -16,18 +16,21 @@ self.fetch = async (u, o) => {
 };
 
 // ---------- 外部服务通不通（中国大陆打不开谷歌翻译 / 谷歌发音、维基词典） ----------
-// 每个请求都有超时；连不上（网络错误或超时）的网站记下来，6 小时内直接用备用的，不再每次白等（同网站 index.html 开头的 window.NET）。
+// 每个请求都有超时；连不上（网络错误或超时）的网站记下来，一段时间内（第一次 15 分钟、反复不通 6 小时）直接用备用的，不再每次白等（同网站 index.html 开头的 window.NET）。
 // 备用：翻译 → 微软翻译（大陆能用）→ 网站后台 /api/ai {task:"tr"}；查词 → 有道词典（国内）→ 网站后台 /api/dict；
 // 维基词典 → 网站后台中转 /api/px → 有道；发音 → 有道真人发音 → 浏览器自带语音（content.js 的 speakLocal）
-const NET_KEY = "netBad", NET_TTL = 6 * 3600e3, G_HOST = "translate.googleapis.com";
+// 第一次不通只先绕开 15 分钟（可能只是一次慢）；2 小时内又不通（多半真被墙了）才 6 小时不问。netLong 记着哪些是「又不通」的
+const NET_KEY = "netBad", NET_TTL = 6 * 3600e3, NET_SHORT = 15 * 60e3, G_HOST = "translate.googleapis.com";
+let netLong = {}; chrome.storage.local.get({ netLong: {} }).then(v => (netLong = v.netLong || {})).catch(() => {});
 let netBad = null;
 const netP = chrome.storage.local.get({ [NET_KEY]: {} }).then(v => (netBad = v[NET_KEY] || {})).catch(() => (netBad = {}));
 const hostOf = u => { try { return new URL(u).hostname; } catch (e) { return ""; } };
-async function isDown(h) { if (!netBad) await netP; const t = netBad[h]; return !!t && Date.now() - t < NET_TTL; }
+async function isDown(h) { if (!netBad) await netP; const t = netBad[h]; return !!t && Date.now() - t < (netLong[h] ? NET_TTL : NET_SHORT); }
 function netMark(h, ok) {
   if (!netBad || !h) return;
-  if (ok) { if (!(h in netBad)) return; delete netBad[h]; } else netBad[h] = Date.now();
-  chrome.storage.local.set({ [NET_KEY]: netBad }).catch(() => {});
+  if (ok) { if (!(h in netBad) && !(h in netLong)) return; delete netBad[h]; delete netLong[h]; }
+  else { const prev = netBad[h]; if (prev && Date.now() - prev < 2 * 3600e3) netLong[h] = 1; netBad[h] = Date.now(); }
+  chrome.storage.local.set({ [NET_KEY]: netBad, netLong }).catch(() => {});
 }
 // 带超时的请求：已知不通直接报错；连不上 / 超时记为不通；HTTP 出错（404、429…）说明网站是通的
 async function nfetch(u, o, ms) {

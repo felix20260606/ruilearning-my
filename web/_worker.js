@@ -406,7 +406,7 @@ async function sent(req, env, u) {
     const re = new RegExp("\\b" + stem.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/ /g, "\\s+"), "i");
     const items = (j.results || []).map(x => { const ts = (x.translations || []).flat().filter(t => t && t.lang === "cmn"), t = ts.find(t => t.script === "Hans") || ts[0]; return { en: String(x.text || ""), zh: t ? String(t.text || "") : "" }; })
       .filter(x => x.en && x.zh && x.en.length <= 100 && re.test(x.en)).slice(0, 12);
-    if (kv) await cput(kv, key, JSON.stringify(items), { expirationTtl: 30 * 86400 });
+    if (kv && items.length) await cput(kv, key, JSON.stringify(items), { expirationTtl: 30 * 86400 }); // 没有例句的不存（随便编的词也会写一条，白占当天写入额度）
     return json({ ok: true, w, items });
   } catch (e) { return json({ ok: false, error: String(e && e.message || e) }, 500); }
 }
@@ -488,7 +488,7 @@ async function dict(req, env, u) {
     if (ex && ex.ok) out.examples = (ex.items || []).slice(0, 5).map(x => [x.en, x.zh]);
     if (!out.zh && !out.en.length) return json({ ok: false, error: "not found", word: w }, 404);
     const full = (!one || d !== null) && (!exOn || (ex && ex.ok)); // 词典、例句有一个没连上：只存 1 天，过后再补全
-    if (kv && out.zh) await cput(kv, key, JSON.stringify(out), { expirationTtl: (full ? 30 : 1) * 86400 }); // 中文没取到的不缓存，下次再试
+    if (kv && out.zh && (out.en.length || out.zhs.length || out.examples.length)) await cput(kv, key, JSON.stringify(out), { expirationTtl: (full ? 30 : 1) * 86400 }); // 中文没取到的不缓存，下次再试
     return json(Object.assign({ ok: true }, out));
   } catch (e) { return json({ ok: false, error: String(e && e.message || e) }, 500); }
 }
@@ -1242,6 +1242,7 @@ async function stt(req, env) {
 //   v 只能是 TTS_VOICES 里的；t 最长 1500 个字母。生成过的放进 Cloudflare 缓存（同一句不重复花额度）。
 //   固定句子由 GitHub Actions（.github/workflows/tts.yml）每天用剩下的额度预先生成成 web/tts/*.mp3，网页优先播那些静态文件；这里只给 AI 回复、随机数字这类每次不同的句子用。
 const TTS_VOICES = ["asteria", "luna", "stella", "athena", "hera", "orion", "arcas", "perseus", "angus", "orpheus", "helios", "zeus"];
+const TTS_WIN = { at: 0, n: 0 };
 async function tts(req, env, u, ctx) {
   if (req.method === "OPTIONS") return json({ ok: true });
   if (req.method !== "GET") return json({ ok: false, error: "method" }, 405);
@@ -1251,6 +1252,12 @@ async function tts(req, env, u, ctx) {
   if (!TTS_VOICES.includes(v)) return json({ ok: false, error: "voice" }, 400);
   const key = new Request("https://tts.cache/" + v + "?t=" + encodeURIComponent(t)), cache = typeof caches !== "undefined" ? caches.default : null;
   try { const hit = cache && await cache.match(key); if (hit) return hit; } catch (e) {}
+  // 防别人拿来白用 AI 额度：别的网站的网页来请求的不给；同一台机房 10 分钟内现做的最多 3 万个字母（正常朗读、每天预生成都远远用不到）
+  const og = req.headers.get("origin") || "";
+  if (og && !/^(https:\/\/ruilearning-my\.pages\.dev|http:\/\/(localhost|127\.0\.0\.1)(:\d+)?|chrome-extension:\/\/[a-z]+)$/.test(og)) return json({ ok: false, error: "origin" }, 403);
+  if (Date.now() - TTS_WIN.at > 600e3) { TTS_WIN.at = Date.now(); TTS_WIN.n = 0; }
+  if (TTS_WIN.n + t.length > 30000) return json({ ok: false, error: "busy" }, 429);
+  TTS_WIN.n += t.length;
   try {
     let r = await env.AI.run("@cf/deepgram/aura-1", { text: t, speaker: v, encoding: "mp3" });
     let body = r;

@@ -16,6 +16,9 @@ const eq = (a, b, m) => ok(JSON.stringify(a) === JSON.stringify(b), m + " → " 
   eq(G.vsBiliVid(L("/video/BV1Gf4y1y7wc", "?p=1")), "BV1Gf4y1y7wc", "第 1 P 不带 p");
   eq(G.vsBiliVid(L("/bangumi/play/ep123456")), "ep123456", "番剧 ep");
   eq(G.vsBiliVid(L("/bangumi/play/ss789")), "ss789", "番剧 ss");
+  eq(G.vsBiliVid(L("/list/watchlater", "?bvid=BV1Gf4y1y7wc&oid=123")), "BV1Gf4y1y7wc", "稍后再看列表");
+  eq(G.vsBiliVid(L("/list/ml1234567", "?oid=1&bvid=BV1Gf4y1y7wc&p=2")), "BV1Gf4y1y7wc?p=2", "收藏夹列表 + 分 P");
+  eq(G.vsBiliVid(L("/list/watchlater", "")), "", "列表页还没选视频");
   eq(G.vsBiliVid(L("/")), "", "首页不是视频");
   eq(G.vsBiliVid(L("/video/BV1Gf4y1y7wcX/")), "", "BV 号位数不对");
   eq(G.vsVidUrl("BV1Gf4y1y7wc", 83.6), "https://www.bilibili.com/video/BV1Gf4y1y7wc/?t=83", "B 站链接带时间");
