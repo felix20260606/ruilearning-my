@@ -106,7 +106,24 @@
       (Q.notes || []).map((x, i) => ({ k: "n" + i, type: "gap", grp: "笔记填空：每空不超过三个词和 / 或一个数字", s: x.s, a: x.a, why: x.why_zh })),
       (Q.mcq || []).map((x, i) => ({ k: "c" + i, type: "mcq", grp: "选择题：选一个正确答案", s: x.q, opts: x.opts, a: x.ans, why: x.why_zh })));
   }
-  const right = (q, v) => q.type === "gap" ? !!v && (noArt(v) === noArt(q.a) || norm(v) === norm(q.a)) : q.type === "mcq" ? v === q.a : !!v && String(v).toUpperCase() === String(q.a).toUpperCase();
+  // 数字写成词也算对：twenty seventeen = 2017、nine am = 9am、fifteenth = 15th、thirty dollars = $30、twenty five percent = 25%
+  const NW = { zero: 0, oh: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19, twenty: 20, thirty: 30, forty: 40, fifty: 50, sixty: 60, seventy: 70, eighty: 80, ninety: 90,
+    first: 1, second: 2, third: 3, fifth: 5, eighth: 8, ninth: 9, twelfth: 12, twentieth: 20, thirtieth: 30 };
+  const nw = w => w in NW ? NW[w] : /^(\w+?)(th)$/.test(w) && (w.slice(0, -2) in NW) ? NW[w.slice(0, -2)] : null;
+  function numNorm(s) {
+    const T = norm(String(s || "").replace(/(\d),(?=\d{3})/g, "$1")).replace(/(\d)(st|nd|rd|th)\b/g, "$1").replace(/(\d)([a-z])/g, "$1 $2").split(" ").filter(w => w && !/^(the|a|an|dollars?|pounds?|euros?|percent|per|cent|o'clock|of)$/.test(w));
+    const out = []; let run = [];
+    const flush = () => {
+      if (!run.length) return;
+      if (run.some(w => w === "hundred" || w === "thousand" || w === "million")) { let tot = 0, cur = 0; run.forEach(w => { if (w === "hundred") cur = (cur || 1) * 100; else if (w === "thousand" || w === "million") { tot += (cur || 1) * (w === "thousand" ? 1e3 : 1e6); cur = 0; } else if (w !== "and") cur += nw(w); }); out.push(String(tot + cur)); }
+      else { const ch = []; run.filter(w => w !== "and").forEach(w => { const n = nw(w), p = ch.length - 1; if (p >= 0 && ch[p] >= 20 && ch[p] % 10 === 0 && n < 10) ch[p] += n; else ch.push(n); }); out.push(ch.length === 2 && ch[0] >= 10 && ch[1] >= 10 ? String(ch[0] * 100 + ch[1]) : ch.join(" ")); }
+      run = [];
+    };
+    T.forEach(w => { if (nw(w) != null || ((w === "hundred" || w === "thousand" || w === "million" || w === "and") && run.length)) run.push(w); else { flush(); out.push(w); } });
+    flush(); return out.join(" ");
+  }
+  window.examNum = numNorm; // 测试用
+  const right = (q, v) => q.type === "gap" ? !!v && (noArt(v) === noArt(q.a) || norm(v) === norm(q.a) || numNorm(v) === numNorm(q.a)) : q.type === "mcq" ? v === q.a : !!v && String(v).toUpperCase() === String(q.a).toUpperCase();
   window.examRight = right; // 测试用
   const shown = (q, v) => q.type === "mcq" ? (v == null ? "（没选）" : String.fromCharCode(65 + v) + ". " + q.opts[v]) : v ? String(v) : "（没答）";
   const answer = q => q.type === "mcq" ? String.fromCharCode(65 + q.a) + ". " + q.opts[q.a] : q.a;

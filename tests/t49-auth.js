@@ -99,7 +99,7 @@ const path = require("path");
   aiOut = { title: "x", lines: [{ who: "A", t: "too short" }] }; r = await call("/api/ai", "POST", { task: "ieltsscript", sec: 1, fresh: true }); ok(r.status === 502, "short script rejected");
 
   // ---- 答案就写在题目里的填空不要 ----
-  aiOut = { notes: [{ s: "Oslo scientists were based in ____.", a: "Oslo" }, { s: "Topic: ____", a: "sleep" }, { s: "Number ____", a: "12" }, { s: "They found something ____.", a: "interesting" }, { s: "Speakers talk about ____.", a: "sleep" }], mcq: [{ q: "Who?", opts: ["Neil", "Beth", "Both"], ans: 2 }, { q: "Where?", opts: ["Oslo", "Paris", "Rome"], ans: 0 }, { q: "What?", opts: ["sleep", "food", "work"], ans: 0 }, { q: "How many?", opts: ["7", "8", "9"], ans: 0 }] };
+  aiOut = { notes: [{ s: "Oslo scientists were based in ____.", a: "Oslo" }, { s: "Topic: ____", a: "sleep" }, { s: "Number ____", a: "12" }, { s: "They found something ____.", a: "interesting" }, { s: "Speakers talk about ____.", a: "sleep" }, { s: "From ____ to ____", a: "sleep" }], mcq: [{ q: "Who?", opts: ["Neil", "Beth", "Both"], ans: 2 }, { q: "Where?", opts: ["Oslo", "Paris", "Rome"], ans: 0 }, { q: "What?", opts: ["sleep", "food", "work"], ans: 0 }, { q: "How many?", opts: ["7", "8", "9"], ans: 0 }] };
   r = await call("/api/ai", "POST", { task: "exam", mode: "listening", text: tr, kind: "s2" });
   ok(r.j.ok && r.j.notes.length === 4 && !r.j.notes.some(x => x.a === "Oslo"), "self-answer gap dropped " + JSON.stringify(r.j.notes || r.j));
 

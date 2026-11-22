@@ -49,6 +49,7 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
   ok(ctx.examSections("short.").length < 4, "too short");
   const R = ctx.examRight;
   ok(R({ type: "gap", a: "canopy cover" }, "Canopy  cover") && R({ type: "gap", a: "the council" }, "council") && !R({ type: "gap", a: "Oslo" }, "Osl"), "gap check");
+  ok(R({ type: "gap", a: "twenty seventeen" }, "2017") && R({ type: "gap", a: "nine am" }, "9am") && R({ type: "gap", a: "fifteenth of March" }, "15th March") && R({ type: "gap", a: "ten thousand" }, "10,000") && R({ type: "gap", a: "$30" }, "thirty dollars") && !R({ type: "gap", a: "nineteen" }, "9") && !R({ type: "gap", a: "2017" }, "2018"), "numbers as words");
   ok(R({ type: "tfng", a: "NOT GIVEN" }, "NOT GIVEN") && !R({ type: "tfng", a: "TRUE" }, "FALSE") && R({ type: "mcq", a: 2 }, 2) && !R({ type: "mcq", a: 2 }, 0), "tfng / mcq");
 }
 // ---- 逐句精听对时间 ----

@@ -738,7 +738,7 @@ function examClean(o, mode, text) {
   if (!isObj(o)) return null;
   const T = " " + exNorm(text) + " ", c = (x, n) => clip(x, n).trim(), out = { mode };
   const self = x => (" " + exNorm(String(x.s).replace(/_{2,}/g, " ")) + " ").includes(" " + exNorm(x.a) + " "); // 答案就写在题目里（「Dr. Lee 的姓是 ____ → Lee」）的不要
-  const gap = x => isObj(x) && /_{2,}/.test(x.s || "") && x.a && exNorm(x.a).split(" ").length <= 3 && T.includes(" " + exNorm(x.a) + " ") && !self(x) ? { s: c(x.s, 300).replace(/_{2,}/, "____"), a: c(x.a, 60), why_zh: c(x.why_zh, 300) } : null;
+  const gap = x => isObj(x) && (String(x.s || "").match(/_{2,}/g) || []).length === 1 && x.a && exNorm(x.a).split(" ").length <= 3 && T.includes(" " + exNorm(x.a) + " ") && !self(x) ? { s: c(x.s, 300).replace(/_{2,}/, "____"), a: c(x.a, 60), why_zh: c(x.why_zh, 300) } : null;
   const mcq = n => x => isObj(x) && x.q && Array.isArray(x.opts) && x.opts.length === n && x.opts.every(y => typeof y === "string" && y.trim()) && Number.isInteger(+x.ans) && +x.ans >= 0 && +x.ans < n ? { q: c(x.q, 300), opts: x.opts.map(y => c(y, 200).replace(/^[A-D][.)]\s+/, "")), ans: +x.ans, why_zh: c(x.why_zh, 300) } : null;
   if (mode === "reading") {
     const L = [...new Set((String(text).match(/^[A-H](?= )/gm) || []))];
