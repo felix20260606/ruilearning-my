@@ -18,7 +18,7 @@
     return of.call(this,u,o);
   };
   if(navigator.sendBeacon){var ob=navigator.sendBeacon.bind(navigator);navigator.sendBeacon=function(u,d){try{var x=new URL(String(u),location.href);if(x.origin===location.origin&&API.test(x.pathname)){x.searchParams.set("u",id);u=x.pathname+x.search;}}catch(e){}return ob(u,d);};}
-  var MINE=/^(vocab_state_v1|pump:opt|pump:heard|pump:day|pump:log|wt:meta|reading:docs|reading:tr|speak:done|speak:log|speak:days|reading:lv|writing:draft|writing:history|writing:lang|vocab:test|remind:time|daily:opt|daily:check|daily:days|daily:sat|daily:sent|daily:wkseen|sme:done|sme:pos|sme:stat|sme:lq|sme:diff|err:items|exam:hist|mine:seen:reading|mine:seen:writing|mine:seen:vtest)$/,S=Storage.prototype,g=S.getItem,st=S.setItem,rm=S.removeItem;
+  var MINE=/^(vocab_state_v1|pump:opt|pump:heard|pump:day|pump:log|wt:meta|reading:docs|reading:tr|speak:done|speak:log|speak:days|reading:lv|writing:draft|writing:history|writing:lang|vocab:test|remind:time|daily:opt|daily:check|daily:days|daily:sat|daily:sent|daily:wkseen|sme:done|sme:pos|sme:stat|sme:lq|sme:diff|err:items|exam:hist|lang|drill:prog|drill:last|mine:seen:reading|mine:seen:writing|mine:seen:vtest)$/,S=Storage.prototype,g=S.getItem,st=S.setItem,rm=S.removeItem;
   var k=function(t,key){var ls=null;try{ls=window.localStorage;}catch(e){}return t===ls&&MINE.test(String(key))?key+"@"+id:key;};
   S.getItem=function(key){return g.call(this,k(this,key));};
   S.setItem=function(key,v){return st.call(this,k(this,key),v);};
@@ -202,7 +202,12 @@
   #apptabs button.who{flex:0 0 auto;margin:0 0 0 8px;max-width:110px;min-height:36px;padding:4px 10px;border-radius:999px;font-size:13px;font-weight:700;color:var(--ui-ink-2);background:var(--ui-surface-2);border:1px solid var(--ui-line-2)}
   #apptabs button.who:hover{color:var(--ui-ink)}
   #apptabs button.who b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
-  @media (min-width:1024px){#apptabs button.who{position:absolute;right:32px;top:50%;transform:translateY(-50%);margin:0;max-width:180px}}
+  #apptabs .top-r{flex:0 0 auto;display:flex;align-items:center;gap:6px;margin-left:8px}#apptabs .top-r button.who{margin:0}
+  @media (min-width:1024px){#apptabs .top-r{position:absolute;right:32px;top:50%;transform:translateY(-50%);margin:0;gap:8px}#apptabs button.who{max-width:180px}}
+  /* 🌐 学习语言（lang.js 加的按钮，样式同「👤」）：手机只显示国旗 */
+  #apptabs button.who.lang{max-width:none}#apptabs button.who.lang .ln{display:none}
+  @media (min-width:600px) and (max-width:1023px),(min-width:1400px){#apptabs button.who.lang .ln{display:inline}} /* 电脑窄屏和二级标签挤在一行：只留国旗 */
+  @media (min-width:1024px) and (max-width:1279px){.subgrp{gap:14px!important}} /* 电脑窄屏：二级标签挤一点，别压到右上角的 🌐 / 👤 */
   .who{display:inline-flex;align-items:center;gap:5px;margin:8px 0 0;border:1px solid var(--ui-line-2);background:var(--ui-surface-2);color:var(--ui-ink-2);border-radius:999px;padding:4px 11px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;max-width:100%}
   .who:hover{border-color:var(--ui-pur);color:var(--ui-ink)}.who b{color:var(--ui-ink);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:12em}
   .who-menu{position:fixed;z-index:9600;min-width:200px;max-width:min(320px,calc(100vw - 32px));background:var(--ui-surface);border:1px solid var(--ui-line-2);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.45);padding:6px;display:none}
@@ -549,7 +554,7 @@
     <button id="l1-en" class="on" type="button">📚 英语</button>
     <button id="l1-life" type="button">🏡 生活</button>
   </div>
-  <button class="who" id="who" type="button" title="家人各用各的生词本：点这里切换">👤 <b id="who-name">…</b> ▾</button>
+  <div class="top-r"><button class="who" id="who" type="button" title="家人各用各的生词本：点这里切换">👤 <b id="who-name">…</b> ▾</button></div><!-- 🌐 学习语言按钮由 lang.js 插在 👤 前面 -->
 </div>
 <div id="subtabs">
   <div class="subgrp on" data-l1="en">
@@ -595,6 +600,7 @@
       <button data-mode="list" class="on">📖 列表</button>
       <button data-mode="grammar" class="mx">📐 语法</button>
       <button data-mode="writing" class="mx">📝 写作批改</button>
+      <button data-mode="drill" class="mx">🧩 练习课</button>
       <button data-mode="sme" class="mx">📻 BBC 听力</button>
     </div>
   </div>
@@ -650,6 +656,7 @@
   <div id="grammar"></div>
   <div id="reading"></div>
   <div id="sme"></div>
+  <div id="drill"></div><!-- 🧩 练习课（drill.js，跟着顶栏的学习语言换素材） -->
   <div id="errwrap" style="display:none"></div>
   <div id="stats"></div>
 
@@ -1497,6 +1504,7 @@ document.querySelectorAll(".modes button").forEach(b=>b.onclick=()=>{
   document.getElementById("grammar").classList.toggle("on",m==="grammar"); if(m==="grammar"&&window.grammarShow)grammarShow();
   document.getElementById("reading").classList.toggle("on",m==="reading"); if(m==="reading"&&window.readingShow)readingShow();
   {const sm=document.getElementById("sme"); if(sm){sm.classList.toggle("on",m==="sme"); if(m==="sme"&&window.smeShow)smeShow();}}
+  {const dr=document.getElementById("drill"); if(dr){dr.classList.toggle("on",m==="drill"); if(m==="drill"&&window.drillShow)drillShow(); else if(window.drillHide)drillHide();}}
   document.getElementById("stats").classList.toggle("on",m==="stats"); if(m==="stats"&&window.statsShow)statsShow();
   {const ew=document.getElementById("errwrap"); if(ew){ew.style.display=m==="err"?"block":"none"; if(m==="err"&&window.errShow)errShow(ew);}}
   const wv=document.getElementById("ielts-write-view"); if(wv){wv.style.display=m==="writing"?"block":"none"; if(m==="writing"&&window.writingShow&&!wv.dataset.on){wv.dataset.on="1";writingShow(wv);}}
@@ -1819,8 +1827,9 @@ refresh(); // show seed words immediately, no waiting on storage
   var tListen=document.getElementById('tab-listen'),tRead=document.getElementById('tab-read'),tWrite=document.getElementById('tab-write');
   var L2_OWNER={daily:'en',notebook:'en',listen:'en',speak:'en',read:'en',write:'en',ielts:'en',fat:'life',trip:'life'};
   var EN_PAGE={notebook:'vocab',listen:'listen',read:'read',write:'write'};
-  var SECS={listen:[['sme','📻 BBC 听力'],['video','🎬 视频'],['practice','🎧 听力练习']],write:[['writing','📝 写作批改'],['grammar','📐 语法']]};
+  var SECS={listen:[['drill','🧩 练习课'],['sme','📻 BBC 听力'],['video','🎬 视频'],['practice','🎧 听力练习']],write:[['writing','📝 写作批改'],['grammar','📐 语法']]};
   var VOCAB_MODES=/^(err|stats|pump|saved|list)$/, CUR='', busy=false;
+  try{if(!localStorage.getItem('drill:seen')){localStorage.setItem('drill:seen','1');if(localStorage.getItem('en_sub_listen'))localStorage.setItem('en_sub_listen','drill');}}catch(e){} // 新加的「🧩 练习课」第一次默认选它（新标签排最前、默认选最新）
   function getSub(w){var d=SECS[w][0][0];try{var v=localStorage.getItem('en_sub_'+w);if(SECS[w].some(function(x){return x[0]===v;}))return v;}catch(e){}return d;}
   function clickMode(m){var b=document.querySelector('.modes button[data-mode="'+m+'"]');if(b&&!b.classList.contains('on'))b.click();}
   function setSec(which,sub){
@@ -1881,7 +1890,7 @@ refresh(); // show seed words immediately, no waiting on storage
       if(which==='notebook'){if(!VOCAB_MODES.test(root.getAttribute('data-mode')||'')){var lm='list';try{lm=localStorage.getItem('vocab_mode_v')||'list';}catch(e){}clickMode(VOCAB_MODES.test(lm)?lm:'list');}}
       else if(which==='read')clickMode('reading');
       else if(which==='write')clickMode(sub==='grammar'?'grammar':'writing');
-      else if(which==='listen'){if(wantVideo){if(window.videoCore)videoCore.enter();else window.__wantVideo=1;}else clickMode(sub==='sme'?'sme':'pump');}
+      else if(which==='listen'){if(wantVideo){if(window.videoCore)videoCore.enter();else window.__wantVideo=1;}else clickMode(sub==='sme'||sub==='drill'?sub:'pump');}
     }finally{busy=false;}
     try{localStorage.setItem('vocab_tab',which);}catch(e){}
   }
@@ -1891,7 +1900,7 @@ refresh(); // show seed words immediately, no waiting on storage
     if(busy||!EN_PAGE[CUR]||root.classList.contains('show-video')){if(CUR==='notebook'&&VOCAB_MODES.test(m)){try{localStorage.setItem('vocab_mode_v',m);}catch(e){}}return;}
     if(VOCAB_MODES.test(m)&&!(m==='pump'&&CUR==='listen')){try{localStorage.setItem('vocab_mode_v',m);}catch(e){}} // 「📖 词汇」记住上次的模式（听力练习不算）
     if(m==='reading'){if(CUR!=='read')show('read');return;}
-    if(m==='sme'){if(CUR!=='listen'||getSub('listen')!=='sme')show('listen','sme');return;}
+    if(m==='sme'||m==='drill'){if(CUR!=='listen'||getSub('listen')!==m)show('listen',m);return;}
     if(m==='grammar'||m==='writing'){var sb=m==='grammar'?'grammar':'writing';if(CUR!=='write'||getSub('write')!==sb)show('write',sb);return;}
     if(m==='pump'&&CUR==='listen')return;
     if(CUR!=='notebook')show('notebook');
@@ -1965,6 +1974,7 @@ refresh(); // show seed words immediately, no waiting on storage
   sw(/^(basics|notes|lexam|rexam)$/.test(s)?s:'lexam'); // 新加的「听力模考」排最前、第一次打开默认它
 })();
 </script>
+<script src="lang.js?v=1"></script>
 <script src="tts.js?v=1"></script>
 <script src="watch.js?v=16"></script>
 <script src="channels.js?v=3"></script>
@@ -1973,6 +1983,7 @@ refresh(); // show seed words immediately, no waiting on storage
 <script src="daily.js?v=6"></script>
 <script src="read.js?v=11"></script>
 <script src="listen.js?v=12"></script>
+<script src="drill.js?v=1"></script>
 <script src="errbook.js?v=1"></script>
 <script src="exam.js?v=5"></script>
 <script src="import.js?v=1"></script>
