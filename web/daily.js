@@ -9,6 +9,7 @@
    - 📊 本周小结：最近 7 天每样练了几天、卡片数和正确率（比上周多还是少）、写作分数、最难的词、下周建议；周日、周一自动展开一次
    - 本机存 daily:opt（开哪几项、单词目标、考试日期和目标分）、daily:check（手动打勾）、daily:days（每天完成几项 / 共几项）、daily:sent（造句）；
      opt、check、days 同步到后台 /api/mine k=daily（换设备也在，记在 daily:sat 每项的修改时间；days 两边取完成得多的）
+   - 最上面是 🔋 AI 额度面板（quota.js：今天还剩多少 neurons、每个模型用了多少、最近 7 天、剩下的还能做几次）
    - 去练了某项之后，页面左下角有「📅 每日一练 2/5」小按钮，点一下回来 */
 (function () {
   "use strict";
@@ -219,6 +220,7 @@
       (sug && sug !== o.word ? '<div class="row" style="color:var(--ui-muted);font-size:13px">离考试还有 ' + exL + " 天，建议单词每天 " + sug + ' 张 <button class="ui-btn" data-word="' + sug + '">用建议值</button></div>' : "") + "</div>";
     const exTxt = o.exam ? (exL > 0 ? '<span class="ex">🎓 离雅思还有 ' + exL + " 天" + (o.band ? "（目标 " + o.band + "）" : "") + "</span> · " : exL === 0 ? '<span class="ex">🎓 今天考试，加油！</span> · ' : "") : "";
     root.innerHTML = '<div class="dy">' +
+      '<div id="dy-quota">' + (window.quotaHtml ? window.quotaHtml() : "") + "</div>" + // 🔋 AI 额度（quota.js）
       '<div class="dy-hd"><h1>📅 每日一练</h1><p>每天按顺序做完这几项：词 → 听 → 说 → 读 → 写。点「去练」直接跳过去，做完回来会自动打勾。</p><button class="ui-btn" data-act="wk">📊 本周小结</button><button class="ui-btn" data-act="set">⚙ 设置</button></div>' + set +
       (showWk ? weekHtml() : "") +
       '<div class="dy-top"><div class="dy-ring" style="--p:' + (L.length ? Math.round(n / L.length * 100) : 0) + '"><div><div><b>' + n + "/" + L.length + '</b><span>今天</span></div></div></div>' +

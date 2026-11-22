@@ -1084,6 +1084,7 @@ async function ai(req, env) {
   if (req.method !== "POST") return json({ ok: false, error: "method" }, 405);
   try {
     const b = await req.json(), text = String(b.text || "").split(/\s+/).slice(0, 1500).join(" ").slice(0, 10000), prompt = String(b.prompt || "").slice(0, 3000);
+    if (env.__use) env.__use.f = "ai:" + String(b.task || "write").replace(/[^a-z0-9]/gi, "").slice(0, 16); // 额度记账：记在哪个功能下
     if (b.task === "newsimp") {
       const t = String(b.text || "").split(/\s+/).slice(0, 1000).join(" "), title = clip(b.title, 300); if (t.split(" ").length < 80) return json({ ok: false, error: "bad body" }, 400);
       let hh = 2166136261; const hs = String(b.url || title || t.slice(0, 200)); for (let i = 0; i < hs.length; i++) { hh ^= hs.charCodeAt(i); hh = Math.imul(hh, 16777619); }
@@ -1242,9 +1243,88 @@ async function px(req, u) {
   return new Response(r.body, { status: r.status, headers: out });
 }
 
+// ---------- 🔋 AI 额度记账：GET /api/usage → 最近 7 天每天每个模型 / 每个功能用了多少 neurons（「📅 每日」最上面的额度面板用） ----------
+// Workers AI 免费额度每天 1 万 neurons，00:00 UTC（北京 / 吉隆坡早上 8 点）重置。Cloudflare 没有给 Pages 直接查额度的绑定，这里自己记：
+// 每次 env.AI.run 后按官方价格表（developers.cloudflare.com/workers-ai/platform/pricing）把用量折成 neurons——大模型按 AI 返回的 token 数
+// （没有就按字数估），Whisper 按音频分钟，Aura 按字母数——是估算，精确数字以 Cloudflare 后台为准。
+// 存法：同一个 isolate 里先攒着，第一次调用后约 15 秒写一次 KV「use/日期/随机号」（数字放在 metadata 里，读的时候 list 一次就全拿到，不用一个个 get），
+// 这样一个 isolate 每分钟最多写 4 次（KV 免费每天 1000 次写）；保留 9 天。
+const NRATE = { // neurons：大模型 [每百万输入 token, 每百万输出 token]；whisper 每分钟音频；aura 每千个字母
+  "@cf/meta/llama-3.3-70b-instruct-fp8-fast": [26668, 204805], "@cf/meta/llama-4-scout-17b-16e-instruct": [24545, 77273], "@cf/meta/m2m100-1.2b": [31050, 31050],
+  "@cf/openai/whisper-large-v3-turbo": 46.63, "@cf/openai/whisper": 41.14, "@cf/deepgram/aura-1": 1363.64,
+};
+const tokEst = s => Math.ceil(String(s || "").replace(/[　-鿿]/g, "xxxx").length / 4); // 英文约 4 个字母一个 token，汉字约一个字一个 token
+function neuronsOf(m, inp, r) {
+  const R = NRATE[m]; inp = inp || {};
+  if (m === "@cf/deepgram/aura-1") return String(inp.text || "").length / 1000 * R;
+  if (/whisper/.test(m)) {
+    let sec = r && r.transcription_info && +r.transcription_info.duration;
+    if (!sec && r && Array.isArray(r.segments) && r.segments.length) sec = +r.segments[r.segments.length - 1].end;
+    if (!sec && r && Array.isArray(r.words) && r.words.length) sec = +r.words[r.words.length - 1].end;
+    if (!sec) { const a = inp.audio; sec = (typeof a === "string" ? a.length * 0.75 : a ? a.length : 0) / 16000; } // 按 128kbps 估
+    return (sec || 0) / 60 * (R || 46.63);
+  }
+  if (Array.isArray(R)) {
+    const us = r && r.usage, i = us && +us.prompt_tokens || tokEst(inp.text || "") + (Array.isArray(inp.messages) ? inp.messages.reduce((a, x) => a + tokEst(x && x.content) + 4, 0) : 0);
+    const o = us && +us.completion_tokens || tokEst(r && (r.translated_text || (typeof r.response === "string" ? r.response : JSON.stringify(r.response || ""))));
+    return (i * R[0] + o * R[1]) / 1e6;
+  }
+  return 0;
+}
+const useDay = () => new Date().toISOString().slice(0, 10); // UTC 日期 = 额度的一天
+let USE = null, useT = 0;
+function useAdd(m, f, nu, err) {
+  const d = useDay(); if (!USE || USE.d !== d) USE = { d, m: {}, f: {}, e: 0 };
+  const k = m.replace(/^@cf\/[^/]+\//, ""), a = USE.m[k] || (USE.m[k] = [0, 0]), b = USE.f[f] || (USE.f[f] = [0, 0]);
+  if (err) { USE.e++; return; }
+  a[0]++; a[1] += nu; b[0]++; b[1] += nu;
+}
+async function useFlush(env) {
+  const x = USE; USE = null; useT = 0; if (!x || !env.CAPTIONS || (!Object.keys(x.m).length && !x.e)) return;
+  const r2 = v => Math.round(v * 10) / 10, md = { m: {}, f: {}, e: x.e };
+  for (const k in x.m) md.m[k] = [x.m[k][0], r2(x.m[k][1])];
+  for (const k in x.f) md.f[k] = [x.f[k][0], r2(x.f[k][1])];
+  let s = JSON.stringify(md); if (s.length > 1000) { md.f = {}; s = JSON.stringify(md); } // metadata 最多 1024 字节：放不下就只记模型
+  try { await env.CAPTIONS.put("use/" + x.d + "/" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), s, { metadata: md, expirationTtl: 9 * 86400 }); } catch (e) {}
+}
+function meter(env, ctx, u) { // 包一层 env.AI：每次 run 记一笔；f = 哪个功能（/api/ai 的 task 进了函数再填）
+  if (!env.AI || env.AI.__m) return env;
+  const real = env.AI, tag = { f: u.pathname.replace(/^\/api\//, "") + (u.searchParams.has("al") ? ":al" : u.searchParams.get("zh") ? ":zh" : "") };
+  const AI = { __m: 1, run: async (m, inp, o) => {
+    let r; try { r = await real.run(m, inp, o); } catch (e) { useAdd(m, tag.f, 0, 1); kick(); throw e; }
+    try { useAdd(m, tag.f, neuronsOf(m, inp, r)); } catch (e) {} kick(); return r;
+  } };
+  function kick() { if (useT || !ctx || !ctx.waitUntil) return; useT = 1; ctx.waitUntil(new Promise(res => setTimeout(res, 15000)).then(() => useFlush(env))); }
+  return Object.assign({}, env, { AI, __use: tag });
+}
+async function usage(req, env) {
+  const cache = typeof caches !== "undefined" ? caches.default : null, ck = new Request("https://use.cache/v1");
+  if (cache) { const c = await cache.match(ck); if (c) return c; }
+  const days = {}, from = new Date(Date.now() - 6 * 864e5).toISOString().slice(0, 10);
+  if (env.CAPTIONS) {
+    let cursor; do {
+      const L = await env.CAPTIONS.list({ prefix: "use/", cursor }); cursor = L.list_complete ? null : L.cursor;
+      for (const k of L.keys) {
+        const d = k.name.slice(4, 14); if (d < from) continue; let md = k.metadata;
+        if (!md) try { md = await env.CAPTIONS.get(k.name, "json"); } catch (e) {}
+        if (!md) continue; const D = days[d] || (days[d] = { m: {}, f: {}, e: 0 });
+        for (const g of ["m", "f"]) for (const n in md[g] || {}) { const a = D[g][n] || (D[g][n] = [0, 0]); a[0] += +md[g][n][0] || 0; a[1] += +md[g][n][1] || 0; }
+        D.e += +md.e || 0;
+      }
+    } while (cursor);
+  }
+  for (const d in days) for (const g of ["m", "f"]) for (const n in days[d][g]) days[d][g][n][1] = Math.round(days[d][g][n][1]);
+  const now = new Date(), reset = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
+  const res = new Response(JSON.stringify({ ok: true, today: useDay(), limit: 10000, reset, days, at: Date.now() }), { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "max-age=30" } });
+  if (cache) await cache.put(ck, res.clone());
+  return res;
+}
+
 export default {
   async fetch(req, env, ctx) {
     const u = new URL(req.url);
+    if (u.pathname === "/api/usage") return usage(req, env);
+    env = meter(env, ctx, u);
     if (API_PATHS.includes(u.pathname)) return cap(req, env, u);
     if (u.pathname === VOCAB_PATH) return vocab(req, env);
     if (u.pathname === "/api/users") return users(req, env);
