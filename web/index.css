@@ -97,8 +97,8 @@ html.show-basic-home #view-en,html.show-basic-home #view-speak{display:none}html
 #reading,#sme,#drill,#grammar{display:none}#reading.on,#sme.on,#drill.on,#grammar.on{display:block}
 
 /* 🇩🇪 学德语时：说、读、写、听力节目都有德语版（speak-data-de.js、tagesschau、歌德写作、DW 慢速新闻）；
-   只藏没有德语内容的：雅思、插件存的英语词句（saved）、英语语法速查（德语语法在「🌱 入门 → 📐 语法入门」） */
-html[data-lang="de"] #tab-ielts,
+   只藏没有德语内容的：雅思的笔记和常识（考试页在德语里是歌德模考）、插件存的英语词句（saved）、英语语法速查（德语语法在「🌱 入门 → 📐 语法入门」） */
+html[data-lang="de"] #ielts-t-notes,html[data-lang="de"] #ielts-t-basics,
 html[data-lang="de"] .modes button[data-mode="saved"],html[data-lang="de"] .modes button[data-mode="grammar"]{display:none!important}
 /* 🌱 德语入门（de-basic.js 画进 #view-basic）：显示方式同英语入门（basic.js 里那几条），学德语时 basic.js 不加载，所以放这里 */
 html[data-lang="de"].show-basic-home #view-en,html[data-lang="de"].show-basic-home #view-speak{display:none}

@@ -1170,9 +1170,24 @@ Reply with ONLY one JSON object, no markdown:
 {"notes":[{"s":"a note line with ____ where the answer goes","a":"ONE to THREE words or a number, copied exactly from the transcript","why_zh":"简体中文解释，引用原话"}],
  "mcq":[{"q":"question","opts":["A text","B text","C text"],"ans":0,"why_zh":"..."}]}
 Exactly 6 notes and 4 mcq, all in the order the information is heard. Notes must paraphrase the context but the answer words must appear exactly in the transcript.`;
-const exNorm = s => String(s || "").toLowerCase().replace(/[’']/g, "'").replace(/[^a-z0-9' ]+/g, " ").replace(/\s+/g, " ").trim();
-function examClean(o, mode, text) {
+// 🇩🇪 歌德模考（lang:"de"）：同样的 JSON（判断题的答案也用 TRUE / FALSE / NOT GIVEN 存，网页显示成 Richtig / Falsch / Steht nicht im Text），题目全用德语
+const EXAM_READ_SYS_DE = `You are an experienced question writer for the Goethe-Zertifikat B1/B2 reading module (Lesen). The passage is a German news article split into paragraphs labelled A, B, C ... Write all questions and options in clear German (B1-B2 level); test real reading skills (paraphrase, not copying sentences). ${DE_RULE}
+Reply with ONLY one JSON object, no markdown:
+{"tfng":[{"s":"German statement","a":"TRUE|FALSE|NOT GIVEN","p":"paragraph letter","why_zh":"简体中文解释，指出原文依据"}],
+ "match":[{"s":"a short German description of information (paraphrased)","a":"paragraph letter","why_zh":"..."}],
+ "gaps":[{"s":"a German summary sentence with ____ where the answer goes","a":"ONE to THREE words copied exactly from the passage (same spelling, case and umlauts)","why_zh":"..."}],
+ "mcq":[{"q":"German question","opts":["A text","B text","C text","D text"],"ans":0,"why_zh":"..."}]}
+"a" in tfng is TRUE (richtig), FALSE (falsch) or NOT GIVEN (steht nicht im Text). Exactly 5 tfng (at least one of each answer), 3 match (different paragraphs), 3 gaps, 2 mcq. Statements must be paraphrased. Do not use information outside the passage.`;
+const EXAM_LISTEN_SYS_DE = `You are an experienced question writer for the Goethe-Zertifikat B1/B2 listening module (Hören). The text is the transcript of a German radio news programme for learners (Deutsche Welle "Langsam gesprochene Nachrichten"; lines are "Headline: text"). Write everything in clear German (B1-B2 level). ${DE_RULE}
+Reply with ONLY one JSON object, no markdown:
+{"notes":[{"s":"a German note line with ____ where the answer goes","a":"ONE to THREE words or a number, copied exactly from the transcript (same spelling, case and umlauts)","why_zh":"简体中文解释，引用原话"}],
+ "mcq":[{"q":"German question","opts":["A text","B text","C text"],"ans":0,"why_zh":"..."}]}
+Exactly 6 notes and 4 mcq, all in the order the information is heard. Notes must paraphrase the context but the answer words must appear exactly in the transcript.`;
+const exNormEn = s => String(s || "").toLowerCase().replace(/[’']/g, "'").replace(/[^a-z0-9' ]+/g, " ").replace(/\s+/g, " ").trim(), exNorm = exNormEn;
+const exNormDe = s => String(s || "").normalize("NFC").toLowerCase().replace(/[’']/g, "'").replace(/[^\p{L}0-9' ]+/gu, " ").replace(/\s+/g, " ").trim(); // 德语：保留 ä ö ü ß
+function examClean(o, mode, text, de) {
   if (!isObj(o)) return null;
+  const exNorm = de ? exNormDe : exNormEn;
   const T = " " + exNorm(text) + " ", c = (x, n) => clip(x, n).trim(), out = { mode };
   const self = x => (" " + exNorm(String(x.s).replace(/_{2,}/g, " ")) + " ").includes(" " + exNorm(x.a) + " "); // 答案就写在题目里（「Dr. Lee 的姓是 ____ → Lee」）的不要
   const gap = x => isObj(x) && (String(x.s || "").match(/_{2,}/g) || []).length === 1 && x.a && exNorm(x.a).split(" ").length <= 3 && T.includes(" " + exNorm(x.a) + " ") && !self(x) ? { s: c(x.s, 300).replace(/_{2,}/, "____"), a: c(x.a, 60), why_zh: c(x.why_zh, 300) } : null;
@@ -1244,18 +1259,18 @@ async function ieltsScript(env, b) {
   return json(Object.assign({ ok: true, left: 0 }, x));
 }
 async function examGen(env, b) {
-  const mode = b.mode === "listening" ? "listening" : "reading", text = clip(b.text, 9000).trim();
+  const mode = b.mode === "listening" ? "listening" : "reading", text = clip(b.text, 9000).trim(), de = isDe(b);
   if (text.split(/\s+/).length < 150) return json({ ok: false, error: "too short" }, 400);
-  const kv = env.CAPTIONS, ck = "x/" + (await sha(mode + "|" + (b.kind || "") + "|" + text)).slice(0, 32);
+  const kv = env.CAPTIONS, ck = "x/" + (await sha((de ? "de|" : "") + mode + "|" + (b.kind || "") + "|" + text)).slice(0, 32);
   if (kv && !b.again) { const hit = await kv.get(ck, "json"); if (hit) return json(Object.assign({ ok: true, cached: true }, hit)); }
   let got = null, last = null;
-  const hint = mode === "listening" && b.kind === "s1" ? "\nThis is an IELTS Section 1 conversation: make the notes a form to complete (names spelled in the script, numbers, dates, prices, addresses). Answers must be copied exactly from the transcript; for a spelled name use the name as normally written."
+  const hint = de ? "" : mode === "listening" && b.kind === "s1" ? "\nThis is an IELTS Section 1 conversation: make the notes a form to complete (names spelled in the script, numbers, dates, prices, addresses). Answers must be copied exactly from the transcript; for a spelled name use the name as normally written."
     : mode === "listening" && b.kind === "s2" ? "\nThis is an IELTS Section 2 monologue: make the notes a table or form of practical facts (places, days, times, prices, activities). Answers must be copied exactly from the transcript; never write a gap whose answer appears in the same note sentence."
     : mode === "listening" && b.kind === "s4" ? "\nThis is an IELTS Section 4 academic lecture: make the notes a lecture outline to complete (key terms, causes, effects, dates); the multiple-choice questions test the main points and the speaker's conclusions. Never write a gap whose answer appears in the same note sentence."
     : mode === "listening" && b.kind === "s3" ? "\nThis is an IELTS Section 3 academic discussion: focus the multiple-choice questions on opinions, reasons and decisions, and the notes on key facts." : "";
-  const r = await aiJson(env, [{ role: "system", content: (mode === "reading" ? EXAM_READ_SYS : EXAM_LISTEN_SYS) + hint }, { role: "user", content: (b.title ? "Title: " + clip(b.title, 200) + "\n\n" : "") + text }], o => { last = o; return !!(got = examClean(o, mode, text)); }, 2600);
+  const r = await aiJson(env, [{ role: "system", content: (mode === "reading" ? (de ? EXAM_READ_SYS_DE : EXAM_READ_SYS) : (de ? EXAM_LISTEN_SYS_DE : EXAM_LISTEN_SYS)) + hint }, { role: "user", content: (b.title ? "Title: " + clip(b.title, 200) + "\n\n" : "") + text }], o => { last = o; return !!(got = examClean(o, mode, text, de)); }, 2600);
   if (!r.ok || !got) { // 说清楚哪里不合格，方便查
-    const n = k => Array.isArray(last && last[k]) ? last[k].length : 0, T = " " + exNorm(text) + " ", miss = ((last && (last.notes || last.gaps)) || []).filter(x => x && x.a && !T.includes(" " + exNorm(x.a) + " ")).map(x => x.a).slice(0, 4);
+    const nz = de ? exNormDe : exNorm, n = k => Array.isArray(last && last[k]) ? last[k].length : 0, T = " " + nz(text) + " ", miss = ((last && (last.notes || last.gaps)) || []).filter(x => x && x.a && !T.includes(" " + nz(x.a) + " ")).map(x => x.a).slice(0, 4);
     return json({ ok: false, error: r.error || "bad output", detail: last ? Object.keys(last).map(k => k + ":" + n(k)).join(" ") + (miss.length ? " | 答案不在原文：" + miss.join(", ") : "") : "" }, 502);
   }
   got.model = r.model; if (kv) await cput(kv, ck, JSON.stringify(got), { expirationTtl: 60 * 86400 });

@@ -30,7 +30,9 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
   ok(/reading:news\|reading:newsq/.test(W("web/boot.js")), "read: today's news cached per language");
   const ls = W("web/listen.js"); ok(/const SER = \(DE \? SER_DE :/.test(ls) && /\["dw", "📰 慢速新闻"/.test(ls) && /AI\.ask\("lquiz", \{ lang: RL\(\)/.test(ls) && !/lang: "en"/.test(ls), "listen: DW series, German scoring");
   ok(/sl = o\.sl \|\| VLS\(\)/.test(W("web/tr.js")), "tr: source language follows VL");
-  ok(!/if\(DE\)SECS\.listen=/.test(W("web/tabs.js")) && /DE_OFF=\{ielts:1\}/.test(W("web/tabs.js")), "tabs: speak/read/write/sme/video in German");
+  ok(!/if\(DE\)SECS\.listen=/.test(W("web/tabs.js")) && /DE_OFF=\{\}/.test(W("web/tabs.js")), "tabs: speak/read/write/sme/video/exam in German");
+  { const X = W("web/exam.js"); ok(/AI\.ask\("exam", \{ lang: LGC/.test(X) && /TFL = DE \? \{ TRUE: "Richtig"/.test(X) && /\["dw"\] : \["sme", "ree"\]/.test(X) && /pc \+ "%"/.test(X), "exam: Goethe mock (German questions, DW, tagesschau, %)"); }
+  { const src = W("web/_worker.js"); ok(/de \? EXAM_READ_SYS_DE : EXAM_READ_SYS/.test(src) && /de \? EXAM_LISTEN_SYS_DE : EXAM_LISTEN_SYS/.test(src) && /examClean\(o, mode, text, de\)/.test(src), "exam prompts German"); }
   ok(/langOk = x => \(DE \? \/\^de\/i/.test(W("web/watch.js")) && /lang: String\(d\.lang \|\| "en"\)\.slice\(0, 8\)/.test(W("web/_worker.js")), "video: list split by language");
   ok(/DE \? "\/corpus-de\.json" : "\/corpus\.json"/.test(W("web/corpus.js")) && fs.existsSync(path.join(__dirname, "..", "web", "corpus-de.json")), "corpus: German file");
   // ---- 后台：提示词按 lang；DW 走 /api/sme；查词、例句（假网络）----
@@ -57,5 +59,10 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
   const src = W("web/_worker.js");
   for (const k of ["WRITE_SYS_DE", "CHAT_SYS_DE", "CHATSUM_SYS_DE", "SPEAKRATE_SYS_DE", "HOWTO_SYS_DE", "USEWORD_SYS_DE", "JUDGE_SYS_DE", "COACH_SYS_DE", "NEWSIMP_SYS_DE", "LQUIZ_SYS_DE", "WHYMISS_SYS_DE"]) ok(new RegExp("isDe\\(b\\) \\? " + k.replace("_DE", "_DE") + "\\b|de \\? " + k + "\\b|\\(isDe\\(b\\) \\? " + k).test(src), "AI " + k + " used when lang=de");
   ok(/NEWS_FEEDS_DE = \[\["tagesschau"/.test(src) && /key = "news\/" \+ \(de \? "de\/" : ""\)/.test(src), "news?lang=de: tagesschau, own cache key");
+  // 🧪 德语词汇量测试：vt-de.js 每段 ≥ 25 个原形词、排名在段内、假词 40 个；出题 9 段 × 5 + 8 假词
+  { const c = { window: {} }; vm.createContext(c); vm.runInContext(W("web/vt-de.js"), c); const V = c.window.VT_DE, St = require(path.join(__dirname, "..", "web", "stats.js"));
+    ok(V && V.pool.length === 9 && V.pool.every((b, i) => b.length >= 25 && b.every(([w, r]) => r >= St.VT_BANDS[i][0] && r <= St.VT_BANDS[i][1] && /^\p{L}+$/u.test(w))) && V.fake.length >= 40, "vt-de pool valid");
+    const qs = St.vtBuildPool(Math.random, V.pool, V.fake); ok(qs.length === 53 && qs.filter(q => q.b < 0).length === 8, "German test: 53 questions incl. 8 fakes");
+    ok(St.vtLevel(3000, true).cefr === "B1" && St.vtLevel(3000, true).ielts === "" && St.vtLevel(3000).ielts !== "", "German level without IELTS"); }
   console.log(fail ? fail + " FAILED" : "t86 de align: all ok"); process.exit(fail ? 1 : 0);
 })();

@@ -16,7 +16,7 @@
     read: { src: "read.js?v=47cda2c8", fns: ["readingShow", "readingNews", "readingOpen", "readTextDiff"], el: { readingShow: "#reading" }, quiet: ["readingRefresh"] },
     listen: { src: "listen.js?v=f4333fe7", fns: ["smeShow", "smeOpen"], el: { smeShow: "#sme" }, quiet: ["smePause"] },
     drill: { src: "drill.js?v=f24f138e", deps: ["listen"], fns: ["drillShow", "drillReview"], el: { drillShow: "#drill" }, quiet: ["drillHide"] },
-    exam: { src: "exam.js?v=c0953f36", fns: ["examShow"], el: { examShow: 0 } },
+    exam: { src: "exam.js?v=ce143ebf", fns: ["examShow"], el: { examShow: 0 } },
     write: { src: "write.js?v=a6b7c11f", fns: ["writingShow"], el: { writingShow: 0 } },
     pitch: { src: "pitch.js?v=79ce25d1" }, // 🎵 跟读语调对比（口语页跟读后点「和原声比语调」才加载）
     corpus: { src: "corpus.js?v=1693fdfa", fns: ["corpusShow"] }, // 🔎 真人例句（查词卡片上的按钮）
@@ -66,7 +66,7 @@
   // 首页显示好以后，后台把剩下的一个个加载完（空闲时；手机省电模式下 requestIdleCallback 可能很晚，最多等 6 秒）
   function preload() {
     // 学德语时不预加载英语专用的页面（反正藏起来了）；学英语时不预加载德语入门
-    const DE = window.VL === "de", EN_ONLY = { basic: 1, exam: 1, grammar: 1, pitch: 1 }; // 说、读、写有德语版了
+    const DE = window.VL === "de", EN_ONLY = { basic: 1, grammar: 1, pitch: 1 }; // 说、读、写、考试（歌德）有德语版了
     const left = Object.keys(MODS).filter(n => !P[n] && (DE ? !EN_ONLY[n] : n !== "debasic"));
     const next = () => { const n = left.shift(); if (!n) return; need(n, true).catch(() => {}).then(() => idle(next)); };
     next();

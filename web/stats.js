@@ -136,6 +136,13 @@
     shuffle(VT_FAKE, rnd).slice(0, VT_FAKE_N).forEach(w => qs.push({ w, b: -1 }));
     return shuffle(qs, rnd);
   }
+  // 🇩🇪 德语：题目来自 web/vt-de.js（德语字幕词频表 FrequencyWords de_50k 各段挑好的原形词 + 假词），每段同样抽 5 个、假词 8 个
+  function vtBuildPool(rnd, pool, fake) {
+    rnd = rnd || Math.random; const qs = [];
+    VT_BANDS.forEach((B, i) => shuffle((pool && pool[i]) || [], rnd).slice(0, VT_PER).forEach(x => qs.push({ w: x[0], b: i, r: x[1] })));
+    shuffle(fake || [], rnd).slice(0, VT_FAKE_N).forEach(w => qs.push({ w, b: -1 }));
+    return shuffle(qs, rnd);
+  }
   // 估算：answers = [{b: 段号（假词 −1）, y: 认识?}]
   function vtEstimate(answers) {
     const fk = answers.filter(a => a.b < 0), fa = fk.length ? fk.filter(a => a.y).length / fk.length : 0;
@@ -151,10 +158,12 @@
   }
   // 大致水平（粗估；按字幕词频表的词形计数，变形词也算一个）
   const VT_LEVELS = [[1000, "入门（Pre-A1）", "雅思 3 以下"], [2000, "A1", "雅思约 3"], [3000, "A2", "雅思约 3.5–4"], [4500, "B1", "雅思约 4.5–5"], [6500, "B2", "雅思约 5.5–6.5"], [9000, "C1", "雅思约 7–7.5"], [Infinity, "C2", "雅思约 8 以上"]];
-  const vtLevel = size => { const L = VT_LEVELS.find(x => size < x[0]); return { cefr: L[1], ielts: L[2] }; };
+  // 德语（按词形计数，粗估）：A1 约 1000 个词形以内、A2 约 2000、B1 约 3500、B2 约 6000、C1 约 9000（没有雅思）
+  const VT_LEVELS_DE = [[800, "入门（Pre-A1）"], [1600, "A1"], [2800, "A2"], [4500, "B1"], [7000, "B2"], [10000, "C1"], [Infinity, "C2"]];
+  const vtLevel = (size, de) => { if (de) { const L = VT_LEVELS_DE.find(x => size < x[0]); return { cefr: L[1], ielts: "" }; } const L = VT_LEVELS.find(x => size < x[0]); return { cefr: L[1], ielts: L[2] }; };
 
   // ======================= 下面是页面部分 =======================
-  const API = { dayKey, mergeDaily, streakOf, bestStreak, frzLeft, forecastOf, distOf, curveOf, bucketOf, masteryLocal, vtBuild, vtEstimate, vtLevel, VT_BANDS, VT_POOL, VT_FAKE };
+  const API = { dayKey, mergeDaily, streakOf, bestStreak, frzLeft, forecastOf, distOf, curveOf, bucketOf, masteryLocal, vtBuild, vtBuildPool, vtEstimate, vtLevel, VT_BANDS, VT_POOL, VT_FAKE };
   if (typeof module === "object" && module.exports) module.exports = API;
   if (typeof window !== "undefined") window.STATS = API; // 「📅 每日」的家庭排行也用同一个连续天数算法
   if (typeof document === "undefined") return;
@@ -382,7 +391,7 @@
     const M = LG("vocab:ms", {}) || {}, K = LG("vocab:kn", {}) || {}, next = MS.find(m => m > known), prev = [...MS].reverse().find(m => m <= known) || 0;
     const pct = next ? Math.round((known - prev) / (next - prev) * 100) : 100;
     const badges = MS.map(m => '<span class="st-ms' + (M[m] ? " on" : "") + '" title="' + (M[m] ? "到达：" + esc(M[m]) : "还没到") + '">' + (M[m] ? "🏅" : "🔒") + " " + m + "</span>").join("");
-    const vt = (LG("vocab:test", []) || [])[0], lv = vt && vt.size ? vtLevel(vt.size) : null, ago = vt ? Math.floor((Date.now() - (+vt.at || 0)) / 864e5) : 0;
+    const vt = (LG("vocab:test", []) || [])[0], lv = vt && vt.size ? vtLevel(vt.size, VTDE()) : null, ago = vt ? Math.floor((Date.now() - (+vt.at || 0)) / 864e5) : 0;
     const days = Object.keys(K).filter(k => DAY_RE.test(k) && Array.isArray(K[k])).sort().slice(-60), pts = days.map(k => +K[k][0] || 0);
     let spark = "";
     if (pts.length >= 2) { const mx = Math.max(...pts, 1), mn = Math.min(...pts), w = 300, h = 46, x = i => (i / (pts.length - 1)) * w, y = v => h - 4 - ((v - mn) / Math.max(1, mx - mn)) * (h - 8); spark = '<svg viewBox="0 0 ' + w + " " + h + '" class="st-spark" preserveAspectRatio="none"><polyline fill="none" stroke="var(--ui-green)" stroke-width="2" points="' + pts.map((v, i) => x(i).toFixed(1) + "," + y(v).toFixed(1)).join(" ") + '"/></svg><div class="st-note">' + days[0] + " → " + days[days.length - 1] + "：" + pts[0] + " → " + pts[pts.length - 1] + " 个</div>"; }
@@ -391,7 +400,7 @@
       (next ? '<div class="st-ms-bar"><u style="width:' + pct + '%"></u></div><div class="st-note">下一站 <b>' + next + "</b>，还差 <b>" + (next - known) + "</b> 个</div>" : '<div class="st-note">🎉 所有里程碑都到了</div>') +
       '<div class="st-ms-row">' + badges + "</div>" + '<div class="st-ms-row">' + [[7, "🔥 连续 7 天"], [30, "🔥 连续 30 天"], [100, "🔥 连续 100 天"], [365, "🔥 连续一年"]].map(([n, t]) => '<span class="st-ms' + (d.best >= n ? " on" : "") + '" title="最长连续 ' + d.best + ' 天">' + (d.best >= n ? "" : "🔒 ") + t + "</span>").join("") +
         [[1000, "🃏 1,000 张卡"], [5000, "🃏 5,000 张卡"], [10000, "🃏 1 万张卡"]].map(([n, t]) => '<span class="st-ms' + (d.cards >= n ? " on" : "") + '" title="一共练了 ' + d.cards + ' 张">' + (d.cards >= n ? "" : "🔒 ") + t + "</span>").join("") + "</div>" + spark +
-      (window.VL && window.VL !== "en" ? "" : '<div class="st-ms-lv">' + (lv ? "📊 估计水平：<b>" + lv.cefr + "</b>（" + lv.ielts + "，词汇量约 " + vt.size + "，" + (ago ? ago + " 天前测的" : "今天测的") + "）" + (ago >= 30 ? ' · <u id="st-ms-vt">一个月了，再测一次看进步</u>' : "") : '📊 还没测过词汇量：<u id="st-ms-vt">测一下</u>（5 分钟，估出大概的 CEFR 等级）') + "</div>") + "</div>";
+      (window.VL && window.VL !== "en" && !VTDE() ? "" : '<div class="st-ms-lv">' + (lv ? "📊 估计水平：<b>" + lv.cefr + "</b>（" + (lv.ielts ? lv.ielts + "，" : "") + "词汇量约 " + vt.size + "，" + (ago ? ago + " 天前测的" : "今天测的") + "）" + (ago >= 30 ? ' · <u id="st-ms-vt">一个月了，再测一次看进步</u>' : "") : '📊 还没测过词汇量：<u id="st-ms-vt">测一下</u>（5 分钟，估出大概的 CEFR 等级）') + "</div>") + "</div>";
   }
   function heatHtml(d) {
     return '<div class="st-card st-wide"><h3>🗓 最近 26 周</h3><p class="sub">每格一天，越亮练得越多；悬停或点一下看具体数字</p><div class="st-heat-wrap">' + heatSvg(d) + "</div>" +
@@ -399,9 +408,10 @@
   }
 
   // ---------- 词汇量测试 ----------
-  function loadFreq() { // 词频表（和视频页、插件同一份）：第一次测试时才加载
-    if (typeof VS_RANK !== "undefined") return Promise.resolve();
-    return new Promise(res => { const s = document.createElement("script"); s.src = "vs/freq.js"; s.onload = s.onerror = res; document.head.append(s); setTimeout(res, 6000); });
+  const VTDE = () => window.VL === "de"; // 🇩🇪 德语的词汇量测试（题目在 vt-de.js）
+  function loadFreq() { // 词频表（和视频页、插件同一份）：第一次测试时才加载；德语加载 vt-de.js
+    if (VTDE() ? window.VT_DE : typeof VS_RANK !== "undefined") return Promise.resolve();
+    return new Promise(res => { const s = document.createElement("script"); s.src = VTDE() ? "vt-de.js?v=628d187d" : "vs/freq.js"; s.onload = s.onerror = res; document.head.append(s); setTimeout(res, 6000); });
   }
   function vtHtml() {
     const hist = LG("vocab:test", []);
@@ -413,8 +423,8 @@
         '<div class="st-row" style="justify-content:center"><button class="ui-chip" id="st-vt-back"' + (vt.i ? "" : " disabled") + '>↩ 上一题</button><button class="ui-chip" id="st-vt-quit">放弃测试</button></div>' +
         '<p class="sub" style="margin-top:10px">能说出大概意思才算认识。里面混了不存在的假词，乱点「认识」会扣分。键盘：← 认识，→ 不认识</p></div>';
     } else if (vt && vt.done) {
-      const e = vt.res, lv = vtLevel(e.size);
-      body = '<div class="st-vt-res"><b>≈ ' + e.size.toLocaleString() + "</b><span>" + lv.cefr + " · " + lv.ielts + "</span></div>" +
+      const e = vt.res, lv = vtLevel(e.size, VTDE());
+      body = '<div class="st-vt-res"><b>≈ ' + e.size.toLocaleString() + "</b><span>" + lv.cefr + (lv.ielts ? " · " + lv.ielts : "") + "</span></div>" +
         '<p class="sub">假词选了「认识」：' + e.fakeY + " / " + e.fakeN + "（已按比例扣分；不扣分是 " + e.raw.toLocaleString() + "）</p>" +
         (e.shaky ? '<div class="st-note warn">假词有 ' + Math.round(e.fa * 100) + "% 选成了认识，这次结果不太可靠。下次只在确定知道意思时选「认识」。</div>" : "") +
         '<div class="st-bands">' + e.bands.map(b => "<span>" + b.from.toLocaleString() + "–" + b.to.toLocaleString() + '</span><span class="tr"><i style="width:' + Math.round(b.p * 100) + '%"></i></span><span>' + b.y + "/" + b.n + "</span>").join("") + "</div>" +
@@ -424,20 +434,21 @@
     }
     const histHtml = hist.length ? '<ul class="st-hist">' + hist.map(h => "<li><b>" + (h.size || 0).toLocaleString() + "</b><span>" + esc(h.cefr || "") + "</span><em>" + esc(h.d || "") + (h.fa ? " · 假词误认 " + Math.round(h.fa * 100) + "%" : "") + "</em></li>").join("") + "</ul>" : "";
     return '<div class="st-card" id="st-vt"><h3>🧪 词汇量测试</h3>' + body +
-      '<div class="st-note">这是<b>粗估</b>：词表按字幕词频排名、按词形算（went、going 各算一个），CEFR 和雅思对照只是大致参考，前后差一两千很正常。适合隔几周测一次看趋势。</div>' +
+      (VTDE() ? '<div class="st-note">这是<b>粗估</b>：德语题目来自德语字幕词频表（FrequencyWords，OpenSubtitles 2018，CC BY-SA 4.0），按词形排名（ging、gehst 各算一个），CEFR 对照只是大致参考，前后差一两千很正常。适合隔几周测一次看趋势。</div>' : '<div class="st-note">这是<b>粗估</b>：词表按字幕词频排名、按词形算（went、going 各算一个），CEFR 和雅思对照只是大致参考，前后差一两千很正常。适合隔几周测一次看趋势。</div>') +
       (histHtml ? '<h3 style="margin-top:14px">最近 ' + hist.length + " 次</h3>" + histHtml : "") + "</div>";
   }
   function vtStart() {
     const btn = root.querySelector("#st-vt-start"); if (btn) { btn.disabled = true; btn.textContent = "准备中…"; }
     loadFreq().then(() => {
       const rank = typeof VS_RANK !== "undefined" ? VS_RANK : null, all = typeof VS_WORDS !== "undefined" ? VS_WORDS.split(" ") : null;
+      if (VTDE()) { const V = window.VT_DE; if (!V) { const b = root.querySelector("#st-vt-start"); if (b) { b.disabled = false; b.textContent = "题目没加载上（网络？），再点一次"; } return; } vt = { qs: vtBuildPool(Math.random, V.pool, V.fake), i: 0, ans: [] }; drawVt(); return; }
       vt = { qs: vtBuild(Math.random, rank, all), i: 0, ans: [] }; drawVt();
     });
   }
   function vtAnswer(y) {
     if (!vt || vt.done) return; const q = vt.qs[vt.i]; vt.ans[vt.i] = { b: q.b, y, w: q.w }; vt.i++;
     if (vt.i >= vt.qs.length) {
-      vt.done = true; vt.res = vtEstimate(vt.ans); const lv = vtLevel(vt.res.size);
+      vt.done = true; vt.res = vtEstimate(vt.ans); const lv = vtLevel(vt.res.size, VTDE());
       const hist = LG("vocab:test", []); hist.unshift({ at: Date.now(), d: dayKey(Date.now()), size: vt.res.size, raw: vt.res.raw, fa: +vt.res.fa.toFixed(3), cefr: lv.cefr, ielts: lv.ielts, n: vt.qs.length });
       LS("vocab:test", hist.slice(0, 10));
     }
@@ -544,7 +555,7 @@
   function draw() {
     if (!root) return;
     const d = data(); // 词汇量测试进行中也照常画：vtHtml 按 vt 的状态画到第几题
-    root.innerHTML = tilesHtml(d) + '<div class="st-grid">' + msHtml(d) + heatHtml(d) + forecastHtml(d) + distHtml(d) + curveHtml(d) + (window.VL && window.VL !== "en" ? "" : vtHtml()) + remindHtml() + installHtml() + "</div>";
+    root.innerHTML = tilesHtml(d) + '<div class="st-grid">' + msHtml(d) + heatHtml(d) + forecastHtml(d) + distHtml(d) + curveHtml(d) + (window.VL && window.VL !== "en" && !VTDE() ? "" : vtHtml()) + remindHtml() + installHtml() + "</div>";
     const hw = root.querySelector(".st-heat-wrap"); if (hw) hw.scrollLeft = hw.scrollWidth; // 手机上热力图横向滚动：默认停在最近几周
   }
   function showTip(el, x, y) {

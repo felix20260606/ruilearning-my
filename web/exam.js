@@ -15,15 +15,19 @@
   "use strict";
   const { esc, LG, LS, tip } = U; // 全站共用的小工具（util.js）
   const nday = () => U.day(); // 📅 全站共用的「今天」（util.js），和后台的新闻日期一致
-  const norm = s => String(s || "").toLowerCase().replace(/[’']/g, "'").replace(/[^a-z0-9' ]+/g, " ").replace(/\s+/g, " ").trim();
-  const noArt = s => norm(s).replace(/^(the|a|an) /, "");
-  const words = s => (String(s).match(/[A-Za-z0-9'’-]+/g) || []).length;
+  // 🇩🇪 学德语（window.VL === "de"）：这一页是「🎓 歌德」模考——听力材料 DW 慢速新闻、阅读材料 tagesschau 今日新闻，AI 用德语按歌德题型出题
+  //   （判断题 Richtig / Falsch / Steht nicht im Text、段落信息、填空、选择）；按答对比例打分，60% 及格（同歌德证书）；雅思的 AI 对话 / 独白（英语 AI 声）不出现
+  const DE = window.VL === "de", LGC = DE ? "de" : "en";
+  const norm = DE ? s => String(s || "").normalize("NFC").toLowerCase().replace(/[’']/g, "'").replace(/[^\p{L}0-9' ]+/gu, " ").replace(/\s+/g, " ").trim() : s => String(s || "").toLowerCase().replace(/[’']/g, "'").replace(/[^a-z0-9' ]+/g, " ").replace(/\s+/g, " ").trim();
+  const noArt = s => norm(s).replace(DE ? /^(der|die|das|den|dem|des|ein|eine|einen|einem|einer|eines) / : /^(the|a|an) /, "");
+  const words = s => (String(s).match(DE ? /[\p{L}0-9'’-]+/gu : /[A-Za-z0-9'’-]+/g) || []).length;
+  const TFL = DE ? { TRUE: "Richtig", FALSE: "Falsch", "NOT GIVEN": "Steht nicht im Text" } : { TRUE: "TRUE", FALSE: "FALSE", "NOT GIVEN": "NOT GIVEN" }; // 判断题按钮上显示的字（存的还是 TRUE / FALSE / NOT GIVEN）
   const mmss = s => { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
 
   // 雅思官方：40 题原始分 → 分数
   const BAND_L = [[39, 9], [37, 8.5], [35, 8], [32, 7.5], [30, 7], [26, 6.5], [23, 6], [18, 5.5], [16, 5], [13, 4.5], [10, 4], [8, 3.5], [6, 3], [4, 2.5], [0, 0]];
   const BAND_R = [[39, 9], [37, 8.5], [35, 8], [33, 7.5], [30, 7], [27, 6.5], [23, 6], [19, 5.5], [15, 5], [13, 4.5], [10, 4], [8, 3.5], [6, 3], [4, 2.5], [0, 0]];
-  const bandOf = (mode, got, n) => { const raw = n ? Math.round(got / n * 40) : 0, T = mode === "listening" ? BAND_L : BAND_R; return { raw, band: (T.find(x => raw >= x[0]) || [0, 0])[1] }; };
+  const bandOf = (mode, got, n) => { if (DE) { const pc = n ? Math.round(got / n * 100) : 0; return { raw: pc, band: pc + "%", pass: pc >= 60 }; } const raw = n ? Math.round(got / n * 40) : 0, T = mode === "listening" ? BAND_L : BAND_R; return { raw, band: (T.find(x => raw >= x[0]) || [0, 0])[1] }; }; // 德语：百分比，60% 及格
   window.examBand = bandOf; // 测试用
 
   /* ---------- 成绩：本机 exam:hist + 后台 /api/mine k=exam ---------- */
@@ -56,7 +60,7 @@
   window.examSections = sections; // 测试用
 
   /* ---------- 状态 ---------- */
-  const LSRC = { bbc: "📻 BBC 节目", s1: "🎙 S1 生活对话", s2: "🎙 S2 生活独白", s3: "🎙 S3 学术讨论", s4: "🎙 S4 学术讲座" };
+  const LSRC = DE ? { bbc: "📰 DW 慢速新闻" } : { bbc: "📻 BBC 节目", s1: "🎙 S1 生活对话", s2: "🎙 S2 生活独白", s3: "🎙 S3 学术讨论", s4: "🎙 S4 学术讲座" };
   const secOf = () => +String(S.lsrc).slice(1) || 1;
   const VOICE = { A: "orion", B: "luna" };
   const ttsUrl = l => "/api/tts?v=" + (S.src && S.src.sec === 2 ? "luna" : VOICE[l.who] || "asteria") + "&t=" + encodeURIComponent(String(l.t).replace(/[{}]/g, "").replace(/\s+/g, " ").trim());
@@ -94,9 +98,9 @@
   function qlist(Q) {
     if (!Q) return [];
     if (Q.mode === "reading") return [].concat(
-      (Q.tfng || []).map((x, i) => ({ k: "t" + i, type: "tfng", grp: "TRUE / FALSE / NOT GIVEN：这句话和文章说的一致（TRUE）、相反（FALSE），还是文章没说（NOT GIVEN）？", s: x.s, a: x.a, why: x.why_zh, p: x.p })),
+      (Q.tfng || []).map((x, i) => ({ k: "t" + i, type: "tfng", grp: DE ? "Richtig / Falsch / Steht nicht im Text：这句话和文章说的一致、相反，还是文章没说？" : "TRUE / FALSE / NOT GIVEN：这句话和文章说的一致（TRUE）、相反（FALSE），还是文章没说（NOT GIVEN）？", s: x.s, a: x.a, why: x.why_zh, p: x.p })),
       (Q.match || []).map((x, i) => ({ k: "m" + i, type: "match", grp: "下面的信息在哪一段？（字母 " + (Q.letters || []).join(" ") + "）", s: x.s, a: x.a, why: x.why_zh, p: x.a })),
-      (Q.gaps || []).map((x, i) => ({ k: "g" + i, type: "gap", grp: "摘要填空：每空不超过三个词，词必须来自原文", s: x.s, a: x.a, why: x.why_zh })),
+      (Q.gaps || []).map((x, i) => ({ k: "g" + i, type: "gap", grp: DE ? "摘要填空：每空不超过三个词，照原文写（名词大写、带变音）" : "摘要填空：每空不超过三个词，词必须来自原文", s: x.s, a: x.a, why: x.why_zh })),
       (Q.mcq || []).map((x, i) => ({ k: "c" + i, type: "mcq", grp: "选择题：选一个正确答案", s: x.q, opts: x.opts, a: x.ans, why: x.why_zh })));
     return [].concat(
       (Q.notes || []).map((x, i) => ({ k: "n" + i, type: "gap", grp: "笔记填空：每空不超过三个词和 / 或一个数字", s: x.s, a: x.a, why: x.why_zh })),
@@ -121,8 +125,8 @@
   window.examNum = numNorm; // 测试用
   const right = (q, v) => q.type === "gap" ? !!v && (noArt(v) === noArt(q.a) || norm(v) === norm(q.a) || numNorm(v) === numNorm(q.a)) : q.type === "mcq" ? v === q.a : !!v && String(v).toUpperCase() === String(q.a).toUpperCase();
   window.examRight = right; // 测试用
-  const shown = (q, v) => q.type === "mcq" ? (v == null ? "（没选）" : String.fromCharCode(65 + v) + ". " + q.opts[v]) : v ? String(v) : "（没答）";
-  const answer = q => q.type === "mcq" ? String.fromCharCode(65 + q.a) + ". " + q.opts[q.a] : q.a;
+  const shown = (q, v) => q.type === "mcq" ? (v == null ? "（没选）" : String.fromCharCode(65 + v) + ". " + q.opts[v]) : v ? String(q.type === "tfng" ? TFL[v] || v : v) : "（没答）";
+  const answer = q => q.type === "mcq" ? String.fromCharCode(65 + q.a) + ". " + q.opts[q.a] : q.type === "tfng" ? TFL[q.a] || q.a : q.a;
 
   /* ---------- 准备材料、出题 ---------- */
   const getJson = (u, o) => U.json(u, o); // util.js：网络不通也不抛错，给 { ok:false }
@@ -131,7 +135,7 @@
     try {
       let j;
       if (url) { j = await getJson("/api/readurl?url=" + encodeURIComponent(url)); if (j && j.ok) j = Object.assign({}, S.src && S.src.list ? { list: S.src.list } : {}, j, { url }); }
-      else { const c = LG("reading:news", null); j = c && c.date === nday() && c.text ? c : await getJson("/api/news?d=" + nday()); }
+      else { const c = LG("reading:news", null); j = c && c.date === nday() && c.text ? c : await getJson("/api/news?d=" + nday() + (DE ? "&lang=de" : "")); } // reading:news 按语言分开存（boot.js）
       if (!j || !j.ok || !j.text) throw new Error((j && j.error) || "没取到");
       const secs = sections(j.text); if (secs.length < 4) throw new Error("这篇太短，换一篇试试");
       S.src = { kind: "news", id: "r:" + (j.url || j.title), title: j.title || "", url: j.url || "", from: j.src || "", list: j.list || (S.src && S.src.list) || [], secs, words: secs.reduce((n, s) => n + words(s.t), 0) };
@@ -142,7 +146,7 @@
   async function loadEpList() {
     if (EPL) return EPL;
     const out = [];
-    for (const s of ["sme", "ree"]) { try { const j = await getJson("/api/sme?s=" + s); if (j && j.ok) (j.list || []).slice(0, 12).forEach(x => out.push(Object.assign({ s }, x))); } catch (e) {} }
+    for (const s of DE ? ["dw"] : ["sme", "ree"]) { try { const j = await getJson("/api/sme?s=" + s); if (j && j.ok) (j.list || []).slice(0, 12).forEach(x => out.push(Object.assign({ s }, x))); } catch (e) {} }
     EPL = out; return out;
   }
   async function loadEp(id) {
@@ -170,7 +174,7 @@
     S.busy = "AI 在出题（第一次要半分钟左右）…"; S.err = ""; draw();
     const text = S.mode === "reading" ? S.src.secs.map(s => s.L + " " + s.t).join("\n\n") : S.src.lines.map(l => (l.name || l.who || "Speaker") + ": " + l.t).join("\n");
     try {
-      const j = await AI.ask("exam", { mode: S.mode, text, title: S.src.title, again: !!again, kind: S.src.kind === "ai" ? "s" + S.src.sec : "" });
+      const j = await AI.ask("exam", { lang: LGC, mode: S.mode, text, title: S.src.title, again: !!again, kind: S.src.kind === "ai" ? "s" + S.src.sec : "" });
       if (!j.ok) throw new Error(j.error === "too short" ? "材料太短" : AI.msg(j, "AI 没出好题，再点一次试试"));
       S.Q = j; S.ans = {}; S.res = null; S.view = "do"; S.t0 = Date.now();
       if (S.mode === "reading") { S.left = 20 * 60; tick(); }
@@ -242,7 +246,7 @@
       const ctxOf = q => S.mode === "reading" ? (q.p ? "原文 " + q.p + " 段：" + ((S.src.secs.find(s => s.L === q.p) || {}).t || "").slice(0, 300) : "出自：" + S.src.title) : lineOf(q) || "出自：" + S.src.title;
       window.ERR.add(L.filter(q => !right(q, S.ans[q.k])).map(q => q.type === "mcq" ? { src: "exam", kind: "mcq", q: q.s, opts: q.opts, ans: q.a, ctx: ctxOf(q), why: q.why }
         : q.type === "gap" ? { src: "exam", kind: "gap", q: q.s, right: q.a, wrong: S.ans[q.k] || "", ctx: ctxOf(q), why: q.why }
-        : { src: "exam", kind: "mcq", q: q.type === "tfng" ? "TRUE / FALSE / NOT GIVEN：" + q.s : "哪一段？" + q.s, opts: q.type === "tfng" ? ["TRUE", "FALSE", "NOT GIVEN"] : S.Q.letters || [], ans: (q.type === "tfng" ? ["TRUE", "FALSE", "NOT GIVEN"] : S.Q.letters || []).indexOf(q.a), ctx: ctxOf(q), why: q.why }).filter(x => x.kind !== "mcq" || x.ans >= 0));
+        : { src: "exam", kind: "mcq", q: q.type === "tfng" ? (DE ? "Richtig / Falsch / Steht nicht im Text：" : "TRUE / FALSE / NOT GIVEN：") + q.s : "哪一段？" + q.s, opts: q.type === "tfng" ? ["TRUE", "FALSE", "NOT GIVEN"].map(o => TFL[o]) : S.Q.letters || [], ans: (q.type === "tfng" ? ["TRUE", "FALSE", "NOT GIVEN"] : S.Q.letters || []).indexOf(q.a), ctx: ctxOf(q), why: q.why }).filter(x => x.kind !== "mcq" || x.ans >= 0));
     }
     draw(); window.scrollTo(0, 0);
   }
@@ -251,11 +255,14 @@
 
   /* ---------- 画界面 ---------- */
   function homeHtml() {
-    const H = hist().filter(x => x.mode === S.mode), isR = S.mode === "reading";
-    let s = "<h2>" + (isR ? "📄 雅思阅读模考" : "🎧 雅思听力模考") + "</h2><div class=\"ex-sub\">" + (isR
+    const H = hist().filter(x => x.mode === S.mode), isR = S.mode === "reading"; let s0 = "";
+    if (DE) s0 = "<h2>" + (isR ? "📄 歌德阅读模考" : "🎧 歌德听力模考") + '</h2><div class="ex-sub">' + (isR
+      ? "用今天的 tagesschau 新闻当文章，AI 按歌德考试的题型用德语出题（Richtig / Falsch / Steht nicht im Text、哪一段讲了…、摘要填空、选择），限时 20 分钟。按答对比例打分，60% 及格（同歌德证书），做错的自动进「❌ 错题本」。"
+      : "材料是 DW 慢速新闻（真人原声）。AI 用德语出 10 题（笔记填空 / 选择），先给 30 秒看题，只放一遍（「练习模式」可以暂停、重放）。按答对比例打分，60% 及格，做错的自动进「❌ 错题本」。") + "</div>";
+    let s = DE ? s0 : "<h2>" + (isR ? "📄 雅思阅读模考" : "🎧 雅思听力模考") + "</h2><div class=\"ex-sub\">" + (isR
       ? "用今天的真实新闻当文章，AI 按雅思 Academic Reading 出 13 题（判断对错 / 段落信息 / 摘要填空 / 选择），限时 20 分钟。交卷后按雅思原始分对照表估分，做错的自动进「❌ 错题本」。"
       : "材料五选一：BBC 节目原声，或者 AI 写的雅思四个 Section：S1 生活对话（拼名字、电话、日期、地址——最容易丢分）/ S2 生活独白（导游、活动介绍）/ S3 学术讨论 / S4 学术讲座，AI 真人声来读。出 10 题（填空 / 选择），先给 30 秒看题，只放一遍，和真考一样。做错的自动进「❌ 错题本」。") + "</div>";
-    if (!isR) s += '<div class="ex-ch" style="margin:0 0 12px">' + Object.keys(LSRC).map(k => '<button data-lsrc="' + k + '" class="' + (S.lsrc === k ? "on" : "") + '">' + LSRC[k] + "</button>").join("") + "</div>";
+    if (!isR && !DE) s += '<div class="ex-ch" style="margin:0 0 12px">' + Object.keys(LSRC).map(k => '<button data-lsrc="' + k + '" class="' + (S.lsrc === k ? "on" : "") + '">' + LSRC[k] + "</button>").join("") + "</div>";
     if (S.err) s += '<div class="ex-err">' + esc(S.err) + "</div>";
     if (S.busy) s += '<div class="ex-box">' + esc(S.busy) + "</div>";
     else if (S.src && S.src.kind === (isR ? "news" : S.lsrc === "bbc" ? "sme" : "ai") && (S.src.kind !== "ai" || S.src.sec === secOf())) {
@@ -271,7 +278,7 @@
     const v = S.ans[q.k]; let s = '<div class="ex-q"><div class="qt"><i>' + (i + 1) + ".</i>" + esc(q.s).replace(/_{2,}/, "<b>________</b>") + "</div>";
     if (!done) {
       if (q.type === "gap") s += '<input class="ex-in" data-k="' + q.k + '" value="' + esc(v || "") + '" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="答案">';
-      else if (q.type === "tfng") s += '<div class="ex-ch">' + ["TRUE", "FALSE", "NOT GIVEN"].map(o => '<button data-k="' + q.k + '" data-v="' + o + '" class="' + (v === o ? "on" : "") + '">' + o + "</button>").join("") + "</div>";
+      else if (q.type === "tfng") s += '<div class="ex-ch">' + ["TRUE", "FALSE", "NOT GIVEN"].map(o => '<button data-k="' + q.k + '" data-v="' + o + '" class="' + (v === o ? "on" : "") + '">' + TFL[o] + "</button>").join("") + "</div>";
       else if (q.type === "match") s += '<div class="ex-ch">' + (S.Q.letters || []).map(o => '<button data-k="' + q.k + '" data-v="' + o + '" class="' + (v === o ? "on" : "") + '">' + o + "</button>").join("") + "</div>";
       else s += '<div class="ex-ch col">' + q.opts.map((o, oi) => '<button data-k="' + q.k + '" data-n="' + oi + '" class="' + (v === oi ? "on" : "") + '">' + String.fromCharCode(65 + oi) + ". " + esc(o) + "</button>").join("") + "</div>";
     } else {
@@ -298,11 +305,11 @@
   }
   function resHtml() {
     const R = S.res, isR = S.mode === "reading";
-    let s = '<div class="ex-box"><div class="ex-band"><div><small>估分</small><span class="b">' + R.band + "</span></div><div>答对 <b>" + R.got + " / " + R.n + "</b>（换算成 40 题约 " + R.raw + " 题）<small>用时 " + mmss(R.secs) + "。只有" + (isR ? "一篇文章" : "一段录音") + "，分数仅供参考；做错的 " + (R.n - R.got) + " 题已收进「❌ 错题本」。</small></div></div>" +
+    let s = '<div class="ex-box"><div class="ex-band"><div><small>' + (DE ? "得分" : "估分") + '</small><span class="b">' + R.band + "</span></div><div>答对 <b>" + R.got + " / " + R.n + "</b>" + (DE ? "（" + (R.raw >= 60 ? "✅ 达到 60% 及格线" : "还差一点：60% 及格") + "）" : "（换算成 40 题约 " + R.raw + " 题）") + "<small>用时 " + mmss(R.secs) + "。只有" + (isR ? "一篇文章" : "一段录音") + "，分数仅供参考；做错的 " + (R.n - R.got) + " 题已收进「❌ 错题本」。</small></div></div>" +
       '<div class="ex-row"><button class="ui-btn pri" data-a="home">再做一套</button>' + (R.n - R.got ? '<button class="ui-btn" data-a="errbook">去错题本复习</button>' : "") + '<button class="ui-btn" data-a="redo">同一篇重做</button></div></div>';
     s += qsHtml(true);
     if (isR) s += passHtml();
-    else s += '<div class="ex-box"><h3>📜 文稿（绿色是答案）</h3><div class="ex-tr">' + S.src.lines.map(l => { let t = esc(l.t); qlist(S.Q).filter(q => q.type === "gap").forEach(q => { const re = new RegExp("\\b(" + esc(q.a).replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")\\b", "i"); t = t.replace(re, "<mark>$1</mark>"); }); return "<div>" + (l.name || l.who ? "<b>" + esc(l.name || l.who) + "</b>：" : "") + t + "</div>"; }).join("") + "</div></div>";
+    else s += '<div class="ex-box"><h3>📜 文稿（绿色是答案）</h3><div class="ex-tr">' + S.src.lines.map(l => { let t = esc(l.t); qlist(S.Q).filter(q => q.type === "gap").forEach(q => { const qa = esc(q.a).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); t = DE ? t.replace(new RegExp("(^|[^\\p{L}])(" + qa + ")(?![\\p{L}])", "iu"), "$1<mark>$2</mark>") : t.replace(new RegExp("\\b(" + qa + ")\\b", "i"), "<mark>$1</mark>"); /* 德语：\\b 认不出 ä ö ü ß */ }); return "<div>" + (l.name || l.who ? "<b>" + esc(l.name || l.who) + "</b>：" : "") + t + "</div>"; }).join("") + "</div></div>";
     return s;
   }
   function draw() {
@@ -318,7 +325,7 @@
     } else {
       S.pick = '<div class="ex-box">取节目列表…</div>'; draw();
       const L = await loadEpList(), done = new Set(hist().map(x => x.src));
-      S.pick = '<div class="ex-box"><h3>选一期（6 分钟英语 / 慢速对话）</h3><div class="ex-pick">' + L.map((x, i) => '<button data-ep="' + i + '">' + (x.img ? '<img src="' + esc(x.img) + '" alt="">' : "") + "<span>" + esc(x.t) + "<small>" + (x.s === "ree" ? "🐢 慢速对话" : "📻 6 分钟英语") + " · " + esc(x.d || "") + (done.has("l:" + x.id) ? " · ✓ 做过" : "") + "</small></span></button>").join("") + "</div></div>";
+      S.pick = '<div class="ex-box"><h3>选一期（' + (DE ? "DW 慢速新闻" : "6 分钟英语 / 慢速对话") + '）</h3><div class="ex-pick">' + L.map((x, i) => '<button data-ep="' + i + '">' + (x.img ? '<img src="' + esc(x.img) + '" alt="">' : "") + "<span>" + esc(x.t) + "<small>" + (x.s === "dw" ? "📰 DW 慢速新闻" : x.s === "ree" ? "🐢 慢速对话" : "📻 6 分钟英语") + " · " + esc(x.d || "") + (done.has("l:" + x.id) ? " · ✓ 做过" : "") + "</small></span></button>").join("") + "</div></div>";
     }
     draw();
   }
@@ -327,7 +334,7 @@
     if (S.lsrc !== "bbc") { if (!(S.src && S.src.kind === "ai" && S.src.sec === secOf())) await loadScript(false); return; }
     if (S.src && S.src.kind === "sme") return;
     S.busy = "取节目…"; draw();
-    const L = await loadEpList(), done = new Set(hist().map(x => x.src)), x = L.find(e => e.s === "sme" && !done.has("l:" + e.id)) || L[0];
+    const L = await loadEpList(), done = new Set(hist().map(x => x.src)), x = L.find(e => e.s === (DE ? "dw" : "sme") && !done.has("l:" + e.id)) || L[0];
     S.busy = ""; if (!x) { S.err = "节目列表没取到，过一会儿再试"; draw(); return; }
     await loadEp(x.id);
   }
