@@ -117,10 +117,11 @@
   }
 
   // 每天完成情况：{日期: [完成几项, 共几项]}；连续天数 = 从今天（今天没做完就从昨天）往前数，全部做完的天
+  let drillTry = 0;
   function record(L) {
     const D = LG("daily:days", {}), k = lday(), v = [L.filter(x => x.ok).length, L.length];
     // 🧩 练习课还没加载（按需加载）：今天的练习课进度还算不出来，不能把已经记下的完成数往低改（以前一打开就记成少一项、传到后台，加载完又改回来再弹一次「全部完成」）
-    if (typeof window.drillToday !== "function" && window.LAZY) { window.LAZY.need("drill").catch(() => {}); if (D[k] && v[0] < D[k][0]) return D; }
+    if (typeof window.drillToday !== "function" && window.LAZY) { if (Date.now() - drillTry > 60e3) { drillTry = Date.now(); window.LAZY.need("drill", true).catch(() => {}); } /* 后台加载：失败不弹提示，一分钟内不重试 */ if (D[k] && v[0] < D[k][0]) return D; }
     if (!D[k] || D[k][0] !== v[0] || D[k][1] !== v[1]) { const was = full(D[k]); D[k] = v; LS("daily:days", D); put("day:" + k, v); if (!was && full(v)) tip("🎉 今天的每日一练全部完成！"); }
     return D;
   }
@@ -185,7 +186,7 @@
   }
   function boardHtml() {
     loadBoard(); if (!BD || BD.length < 2) return "";
-    const today = U.day(), wd = (new Date(Date.parse(today + "T00:00:00+08:00")).getUTCDay() + 6) % 7, wk = Array.from({ length: wd + 1 }, (_, i) => U.dayAgo(today, wd - i)), d7 = Array.from({ length: 7 }, (_, i) => U.dayAgo(today, i));
+    const today = U.day(), wd = (new Date(today + "T12:00:00Z").getUTCDay() + 6) % 7, wk = Array.from({ length: wd + 1 }, (_, i) => U.dayAgo(today, wd - i)), d7 = Array.from({ length: 7 }, (_, i) => U.dayAgo(today, i));
     const S = window.STATS, rows = BD.map(u => {
       const daily = {}; for (const k in u.days) daily[k] = { n: u.days[k] };
       const st = S && S.streakOf ? S.streakOf(daily, Date.parse(today + "T12:00:00+08:00"), { set: new Set(u.frz || []) }) : 0;

@@ -144,7 +144,7 @@
       cancel: () => { if (!mine()) return; x().on = false; x().busy = false; paintRec(key); },
       fail: m => { if (!mine()) return; x().on = false; x().busy = false; x().err = m; paintRec(key); },
       busy: () => { if (!mine()) return; x().on = false; x().busy = true; paintRec(key); },
-      done: y => { if (mine()) recDone({ key, target, after }, y); } });
+      done: y => { if (mine()) recDone({ key, target, after }, y); else if (y && y.url) try { URL.revokeObjectURL(y.url); } catch (e) {} } }); // 放弃 / 重录后晚到的：录音地址也放掉
   }
   // 放弃这一次（正在录 / 正在识别都行）：不打分、不存；again = 马上再录一次
   function recAbort(key, again) {

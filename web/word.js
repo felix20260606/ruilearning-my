@@ -157,7 +157,7 @@
       const extra = vsOk() && V().sheetExtra ? V().sheetExtra(word, pEl) : ""; // 语法、单词注释、📌 将要学习 / ✅ 已掌握 / 不学习（同插件）
       if (extra) h += extra; else if (g.length) h += '<div class="gm">这里的语法：' + esc(g.join(" · ")) + "</div>";
     }
-    return h + '<div class="act">' + (loading ? "" : addBtn(word)) + (window.VL && window.VL !== "en" ? "" : '<button class="ui-btn" data-a="pcorp" title="看这个词在真人视频、BBC 节目里怎么说">🔎 真人例句</button>') + '<a href="' + cam + '" target="_blank" rel="noopener">Cambridge 词典 ↗</a></div>';
+    return h + '<div class="act">' + (loading ? "" : addBtn(word)) + (window.VL && window.VL !== "en" ? "" : '<button class="ui-btn" data-a="pcorp" title="看这个词在真人视频、BBC 节目里怎么说">🔎 真人例句</button>') + (window.VL === "de" ? '<a href="https://www.dict.cc/?s=' + encodeURIComponent(word) + '" target="_blank" rel="noopener">dict.cc 德英词典 ↗</a>' : '<a href="' + cam + '" target="_blank" rel="noopener">Cambridge 词典 ↗</a>') + "</div>";
   }
   async function open(w, el, opt) { // opt：{ sent 例句, zh 例句的中文, quiet 不自动读, onAdd(词), showCtx 卡片里显示这句 }
     build(); w = String(w || "").replace(/’/g, "'").trim(); if (!w) return;

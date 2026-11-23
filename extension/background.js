@@ -352,7 +352,7 @@ async function syncAll(tl) {
     const med = (await chrome.storage.local.get("med:w:" + k))["med:w:" + k], c = st.savedCtx[k];
     const ctx = it.ctx || (med && med.t ? { t: med.t, tr: med.tr } : c && c.t ? { t: c.t } : null);
     if (ctx && ctx.t && !ctx.tr) { try { ctx.tr = (await translateMany([ctx.t], tl || "zh-CN", "google", "en"))[0] || ""; } catch (e) {} }
-    out.push(await makeEntry(it.word, { tl, zh: it.zh, ctx }));
+    out.push(await makeEntry(it.word, { tl, zh: it.zh, ctx, tag: c && c.tag })); // 网页上收的词（page.js）带 tag「网页」
   }
   const r = await cloudAdd(out); r.found = items.size; return r;
 }

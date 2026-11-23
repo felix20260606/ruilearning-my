@@ -27,12 +27,21 @@ export function fromCaptions(dir) {
   }
   return { docs, s };
 }
-async function getJson(u) { try { const r = await fetch(u, { headers: { "User-Agent": "ruilearning-corpus" } }); return r.ok ? await r.json() : null; } catch (e) { return null; } }
-async function fromBBC(docs, s) {
+async function getJson(u) { try { const r = await fetch(u, { headers: { "User-Agent": "ruilearning-corpus" }, signal: AbortSignal.timeout(20000) }); return r.ok ? await r.json() : null; } catch (e) { return null; } }
+// 某个栏目这次没取到（网络抖了一下）：沿用旧文件里这个栏目的句子，不让例句库忽大忽小、白白多部署一次
+function oldSeries(old, ser) {
+  const out = []; if (!old || !Array.isArray(old.docs)) return out;
+  old.docs.forEach((d, i) => { if (d[0] === "b" && String(d[1]).split("/")[0].replace(/_\d{4}$/, "").startsWith(SLUG[ser] || ser)) out.push({ d, s: old.s.filter(r => r[0] === i) }); });
+  return out;
+}
+const SLUG = { sme: "6-minute-english", ree: "real-easy-english", tews: "the-english-we-speak", news: "learning-english-from-the-news" };
+async function fromBBC(docs, s, old) {
   for (const ser of BBC) {
-    const L = await getJson(SITE + "/api/sme?s=" + ser); if (!L || !L.ok) continue;
+    const L = await getJson(SITE + "/api/sme?s=" + ser);
+    if (!L || !L.ok) { oldSeries(old, ser).forEach(o => { const di = docs.push(o.d) - 1; o.s.forEach(r => s.push([di].concat(r.slice(1)))); }); console.log("栏目 " + ser + " 没取到，沿用旧的"); continue; }
     for (const it of (L.list || []).slice(0, PER)) {
-      const ep = await getJson(SITE + "/api/sme?ep=" + encodeURIComponent(it.id)); if (!ep || !ep.ok || !Array.isArray(ep.lines)) continue;
+      const ep = await getJson(SITE + "/api/sme?ep=" + encodeURIComponent(it.id));
+      if (!ep || !ep.ok || !Array.isArray(ep.lines)) { const o = oldSeries(old, ser).find(x => x.d[1] === it.id); if (o) { const di = docs.push(o.d) - 1; o.s.forEach(r => s.push([di].concat(r.slice(1)))); } continue; }
       const di = docs.push(["b", it.id, clean(ep.title || it.t || it.id)]) - 1;
       ep.lines.forEach((l, i) => { const t = clean(l.t); if (ok(t)) s.push([di, i, 0, t, ""]); });
     }
@@ -40,10 +49,13 @@ async function fromBBC(docs, s) {
 }
 async function main() {
   const { docs, s } = fromCaptions(path.join(ROOT, "data/captions"));
-  if (!process.argv.includes("--no-bbc")) await fromBBC(docs, s);
+  let old = null; try { old = JSON.parse(fs.readFileSync(OUT, "utf8")); } catch (e) {}
+  if (!process.argv.includes("--no-bbc")) await fromBBC(docs, s, old);
+  const nb = d => (d && d.docs ? d.docs.filter(x => x[0] === "b").length : 0);
+  if (old && nb({ docs }) < nb(old) * 0.5) { console.log("BBC 来源比上次少了一半以上（" + nb({ docs }) + " < " + nb(old) + "），这次不更新"); return; }
   const out = JSON.stringify({ docs, s });
-  const old = fs.existsSync(OUT) ? fs.readFileSync(OUT, "utf8") : "";
-  if (old.replace(/^\{"at":\d+,/, "{") === out) { console.log("例句库没变化"); return; }
+  const prev = fs.existsSync(OUT) ? fs.readFileSync(OUT, "utf8") : "";
+  if (prev.replace(/^\{"at":\d+,/, "{") === out) { console.log("例句库没变化"); return; }
   fs.writeFileSync(OUT, '{"at":' + Date.now() + "," + out.slice(1));
   console.log("例句库：" + docs.length + " 个来源，" + s.length + " 句，" + Math.round(fs.statSync(OUT).size / 1024) + " KB");
 }

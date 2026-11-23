@@ -937,13 +937,14 @@ async function sme(req, env, u, ctx) {
   const ttl = S.story || S.voa ? 7 * 86400 : 2 * 86400, stale = S.story || S.voa ? 7 * 86400e3 : S.npr || S.bne != null ? 2 * 3600e3 : 3 * 3600e3;
   if (!fresh) {
     const c = await env.CAPTIONS.get(lk, "json");
-    if (c && !(Date.now() - (+c.at || 0) > stale && ctx && ctx.waitUntil && !SME_BUSY[lk])) return json(c);
-    if (c) { SME_BUSY[lk] = 1; ctx.waitUntil(smeList(env, s, S, lk, ttl).catch(() => {}).finally(() => { delete SME_BUSY[lk]; })); return json(c); }
+    const busy = Date.now() - (SME_BUSY[lk] || 0) < 60e3 || Date.now() < (SME_FAIL[lk] || 0); // 正在后台抓（最多算 1 分钟，卡住也会放开）/ 刚抓失败，10 分钟内不再打上游
+    if (c && !(Date.now() - (+c.at || 0) > stale && ctx && ctx.waitUntil && !busy)) return json(c);
+    if (c) { SME_BUSY[lk] = Date.now(); ctx.waitUntil(smeList(env, s, S, lk, ttl).then(r => { if (!r) SME_FAIL[lk] = Date.now() + 600e3; }, () => { SME_FAIL[lk] = Date.now() + 600e3; }).finally(() => { delete SME_BUSY[lk]; })); return json(c); }
   }
   const out = await smeList(env, s, S, lk, ttl);
   return out ? json(out) : json({ ok: false, error: "no list" }, 502);
 }
-const SME_BUSY = {};
+const SME_BUSY = {}, SME_FAIL = {};
 // 抓一个栏目的期数列表、排好序、存进 KV（带抓的时间 at）
 async function smeList(env, s, S, lk, ttl) {
   const BASE = "https://www.bbc.co.uk/learningenglish/english/features/", UA = { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36" };
@@ -1256,7 +1257,7 @@ async function stt(req, env) {
 //   v 只能是 TTS_VOICES 里的；t 最长 1500 个字母。生成过的放进 Cloudflare 缓存（同一句不重复花额度）。
 //   固定句子由 GitHub Actions（.github/workflows/tts.yml）每天用剩下的额度预先生成成 web/tts/*.mp3，网页优先播那些静态文件；这里只给 AI 回复、随机数字这类每次不同的句子用。
 const TTS_VOICES = ["asteria", "luna", "stella", "athena", "hera", "orion", "arcas", "perseus", "angus", "orpheus", "helios", "zeus"];
-const TTS_WIN = { at: 0, n: 0 };
+const TTS_WIN = { at: 0, n: 0, day: "", dn: 0 };
 async function tts(req, env, u, ctx) {
   if (req.method === "OPTIONS") return json({ ok: true });
   if (req.method !== "GET") return json({ ok: false, error: "method" }, 405);
@@ -1266,12 +1267,16 @@ async function tts(req, env, u, ctx) {
   if (!TTS_VOICES.includes(v)) return json({ ok: false, error: "voice" }, 400);
   const key = new Request("https://tts.cache/" + v + "?t=" + encodeURIComponent(t)), cache = typeof caches !== "undefined" ? caches.default : null;
   try { const hit = cache && await cache.match(key); if (hit) return hit; } catch (e) {}
-  // 防别人拿来白用 AI 额度：别的网站的网页来请求的不给；同一台机房 10 分钟内现做的最多 3 万个字母（正常朗读、每天预生成都远远用不到）
-  const og = req.headers.get("origin") || "";
+  // 防别人拿来白用 AI 额度（每天只有 1 万 neurons，约 7,000 个字母）：
+  //   别的网站的网页来请求的不给（看 Origin，和浏览器自己带的 Sec-Fetch-Site：<audio> 跨站引用也会被认出来）；
+  //   同一台机房 10 分钟内现做的最多 4,000 个字母、一天最多 12,000 个（每天预生成一次最多 3,600；网页上现做的都是一句一句的短句）
+  const og = req.headers.get("origin") || "", sfs = req.headers.get("sec-fetch-site") || "";
   if (og && !/^(https:\/\/ruilearning-my\.pages\.dev|http:\/\/(localhost|127\.0\.0\.1)(:\d+)?|chrome-extension:\/\/[a-z]+)$/.test(og)) return json({ ok: false, error: "origin" }, 403);
+  if (sfs === "cross-site") return json({ ok: false, error: "origin" }, 403);
+  const tday = useDay(); if (TTS_WIN.day !== tday) { TTS_WIN.day = tday; TTS_WIN.dn = 0; }
   if (Date.now() - TTS_WIN.at > 600e3) { TTS_WIN.at = Date.now(); TTS_WIN.n = 0; }
-  if (TTS_WIN.n + t.length > 30000) return json({ ok: false, error: "busy" }, 429);
-  TTS_WIN.n += t.length;
+  if (TTS_WIN.n + t.length > 4000 || TTS_WIN.dn + t.length > 12000) return json({ ok: false, error: "busy" }, 429);
+  TTS_WIN.n += t.length; TTS_WIN.dn += t.length;
   try {
     let r = await env.AI.run("@cf/deepgram/aura-1", { text: t, speaker: v, encoding: "mp3" });
     let body = r;
@@ -1414,18 +1419,25 @@ async function board(req, env, u) {
   } catch (er) { return json({ ok: false, error: String(er && er.message || er) }, 500); }
 }
 // 🔔 手机推送提醒（Web Push，不开网站也会弹）：
-//   GET  ?key=1            → { key: VAPID 公钥 }（第一次用时生成一对，存在 KV「push:vapid」）
-//   POST {sub, u, lang, time:"HH:MM"}  订阅 / 改时间（存 KV「push/<编号>」，编号 = endpoint 的 SHA-256 前 16 位）；POST {endpoint, off:1} 取消
-//   GET  ?peek=<编号>        → { title, body, url }：手机收到推送时 sw.js 来取这条要显示的话（今天练了没有、连续几天）
-//   POST {send:1}          → GitHub 定时任务（push.yml）每 30 分钟叫一次：到了各自的提醒时间（北京时间）、今天还没提醒过、今天还没练够的，推一条（不带内容，手机再来 peek）
-//   推送服务说这个订阅没了（404 / 410）就删掉；每个订阅一天最多一条
+//   GET  ?key=1             → { key: VAPID 公钥 }（第一次用时生成一对，存在 KV「push:vapid」；写完再读一次，以存进去的为准）
+//   POST {sub, u, lang, time:"HH:MM"}  订阅 / 改时间。一台设备（endpoint）可以挂好几组「人 + 语言」，每组一条（id = endpoint|人|语言 的哈希）
+//   POST {sub, u, lang, off:1}          取消这一组（不影响同一台设备上别的家人 / 语言）
+//   POST {renew:{old, sub}}              手机换了订阅（sw.js 的 pushsubscriptionchange）：把旧 endpoint 下的几组搬到新的
+//   GET  ?peek=<endpoint 编号>          → { title, body, url }：手机收到推送后 sw.js 来取要显示的话（这台设备最近推的那一组）
+//   POST {send:1}            → GitHub 定时任务（push.yml）每 30 分钟叫一次：到了各自的提醒时间（北京时间，之后 3 小时内，跨零点也算）、
+//                              这一组今天还没推过、今天还没练够 20 张的，推一条（不带内容）
+// 防滥用：endpoint 只认浏览器的推送服务（谷歌 / Mozilla / 苹果 / 微软）；最多 60 组；所有组记在一个索引键「push:subs」里（send 只读这一个键，不用 list）；
+//   一组 90 天没续订就过期；推送服务说订阅没了（404 / 410）就删，连续 3 次 401 / 403 也删；send 本身只读，到点要推的才写
 const b64u = b => btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 const b64uText = t => b64u(new TextEncoder().encode(t));
 const hash16 = async t => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)))].slice(0, 8).map(x => x.toString(16).padStart(2, "0")).join("");
+const PUSH_HOST = /^https:\/\/(fcm\.googleapis\.com|android\.googleapis\.com|[a-z0-9.-]*\.push\.services\.mozilla\.com|web\.push\.apple\.com|[a-z0-9.-]*\.notify\.windows\.com)\//;
+const PUSH_MAX = 60, PUSH_TTL = 90 * 86400e3;
 async function vapid(kv) {
   let v = await kv.get("push:vapid", "json"); if (v && v.pub && v.jwk) return v;
   const k = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign", "verify"]);
-  v = { pub: b64u(await crypto.subtle.exportKey("raw", k.publicKey)), jwk: await crypto.subtle.exportKey("jwk", k.privateKey) }; await kv.put("push:vapid", JSON.stringify(v)); return v;
+  v = { pub: b64u(await crypto.subtle.exportKey("raw", k.publicKey)), jwk: await crypto.subtle.exportKey("jwk", k.privateKey) }; await kv.put("push:vapid", JSON.stringify(v));
+  const again = await kv.get("push:vapid", "json"); return again && again.pub ? again : v; // 两处同时第一次生成：以 KV 里最后存下的为准
 }
 async function vapidAuth(v, endpoint) {
   const aud = new URL(endpoint).origin, now = Math.floor(Date.now() / 1000);
@@ -1442,10 +1454,19 @@ async function pushInfo(kv, x) {
   let k = act(day) ? day : prev(day), st = 0, g = 0; while (g++ < 4000 && (act(k) || frz(k))) { if (act(k)) st++; k = prev(k); }
   const r = it["stat|" + day]; return { today: r && r.v ? +r.v.n || 0 : 0, streak: st };
 }
-function pushText(i) {
-  if (!i.today) return { title: "📚 今天还没练英语", body: i.streak ? "已经连续 " + i.streak + " 天了，练几张卡别断 🔥" : "打开练 10 张卡，几分钟就好", url: "/?go=pump" };
-  return { title: "👍 今天练了 " + i.today + " 张", body: "再来一组？" + (i.streak ? "连续 " + i.streak + " 天 🔥" : ""), url: "/?go=pump" };
+function pushText(i, x, many) {
+  const who = many && x && x.name ? x.name + "：" : "", lg = x && x.lang === "de" ? "德语" : "英语";
+  if (!i.today) return { title: "📚 " + who + "今天还没练" + lg, body: i.streak ? "已经连续 " + i.streak + " 天了，练几张卡别断 🔥" : "打开练 10 张卡，几分钟就好", url: "/?go=pump" };
+  return { title: "👍 " + who + "今天练了 " + i.today + " 张", body: "再来一组？" + (i.streak ? "连续 " + i.streak + " 天 🔥" : ""), url: "/?go=pump" };
 }
+const okTime = t => /^([01]\d|2[0-3]):[0-5]\d$/.test(t || "");
+// 现在是不是这组的提醒时间（之后 3 小时内），以及这次算哪一天的提醒（23:30 的提醒过了零点补推时，算前一天）
+function pushDue(time, nowMs) {
+  const bj = new Date(nowMs + 8 * 3600e3), nowMin = bj.getUTCHours() * 60 + bj.getUTCMinutes(), [h, m] = time.split(":").map(Number);
+  const late = ((nowMin - (h * 60 + m)) % 1440 + 1440) % 1440;
+  return { due: late <= 180, day: new Date(nowMs + 8 * 3600e3 - late * 60e3).toISOString().slice(0, 10) };
+}
+async function pushIdx(kv) { const L = (await kv.get("push:subs", "json")) || {}, now = Date.now(); for (const id in L) if (!(L[id].exp > now)) delete L[id]; return L; }
 async function push(req, env, u) {
   if (req.method === "OPTIONS") return json({ ok: true });
   const kv = env.CAPTIONS; if (!kv) return json({ ok: false, error: "KV binding CAPTIONS is missing" }, 500);
@@ -1453,32 +1474,43 @@ async function push(req, env, u) {
     if (req.method === "GET") {
       if (u.searchParams.get("key")) return json({ ok: true, key: (await vapid(kv)).pub });
       const h = u.searchParams.get("peek") || ""; if (!/^[0-9a-f]{16}$/.test(h)) return json({ ok: false, error: "bad id" }, 400);
-      const x = await kv.get("push/" + h, "json"); if (!x) return json(Object.assign({ ok: true }, pushText({ today: 0, streak: 0 })));
-      return json(Object.assign({ ok: true }, pushText(await pushInfo(kv, x))));
+      const L = await pushIdx(kv), mine = Object.values(L).filter(x => x.e === h);
+      if (!mine.length) return json(Object.assign({ ok: true }, pushText({ today: 0, streak: 0 })));
+      const x = mine.sort((a, b) => (b.sent || 0) - (a.sent || 0))[0];
+      return json(Object.assign({ ok: true }, pushText(await pushInfo(kv, x), x, mine.length > 1)));
     }
     if (req.method !== "POST") return json({ ok: false, error: "method" }, 405);
-    const b = JSON.parse((await req.text()) || "{}");
-    if (b.send) { // 定时任务：到点的推一条
-      const v = await vapid(kv), day = bjDay(), nowHM = new Date(Date.now() + 8 * 3600e3).toISOString().slice(11, 16), out = { sent: 0, skip: 0, gone: 0 };
-      const L = await kv.list({ prefix: "push/" });
-      for (const k of L.keys) {
-        const x = await kv.get(k.name, "json"); if (!x || !x.sub || !x.sub.endpoint) continue;
-        const t = /^\d\d:\d\d$/.test(x.time || "") ? x.time : "20:00", late = (Date.parse("2000-01-01T" + nowHM + ":00Z") - Date.parse("2000-01-01T" + t + ":00Z")) / 60e3;
-        if (x.last === day || late < 0 || late > 180) continue; // 还没到点 / 过了 3 小时 / 今天推过
-        const i = await pushInfo(kv, x);
-        if (i.today >= 20) { x.last = day; await kv.put(k.name, JSON.stringify(x)); out.skip++; continue; } // 今天已经练够了：不打扰
-        const r = await fetch(x.sub.endpoint, { method: "POST", headers: { TTL: "43200", Urgency: "normal", Authorization: await vapidAuth(v, x.sub.endpoint), "Content-Length": "0" } }).catch(() => null);
-        if (r && (r.status === 404 || r.status === 410)) { await kv.delete(k.name); out.gone++; continue; }
-        if (r && r.ok) { x.last = day; await kv.put(k.name, JSON.stringify(x)); out.sent++; }
+    let b = null; try { b = JSON.parse((await req.text()) || "{}"); } catch (e) {} if (!isObj(b)) return json({ ok: false, error: "bad body" }, 400);
+    if (b.send) { // 定时任务：只读索引；到点、今天没推过的才去读这个人的练习记录、推送、写一次
+      const L = await pushIdx(kv), now = Date.now(), due = Object.entries(L).filter(([, x]) => { const d = pushDue(x.time, now); return d.due && x.last !== d.day; }), out = { sent: 0, skip: 0, gone: 0, fail: 0, due: due.length };
+      if (!due.length) return json(Object.assign({ ok: true }, out));
+      const v = await vapid(kv); let ch = false;
+      for (const [id, x] of due.slice(0, 40)) { // 一次最多 40 组（免费版每个请求最多 50 个子请求）
+        const d = pushDue(x.time, now), i = await pushInfo(kv, x);
+        if (i.today >= 20) { x.last = d.day; ch = true; out.skip++; continue; } // 今天已经练够了：不打扰
+        const r = await fetch(x.ep, { method: "POST", headers: { TTL: "43200", Urgency: "normal", Authorization: await vapidAuth(v, x.ep), "Content-Length": "0" } }).catch(() => null);
+        if (r && (r.status === 404 || r.status === 410)) { delete L[id]; ch = true; out.gone++; continue; }
+        if (r && r.ok) { x.last = d.day; x.sent = now; x.fail = 0; x.exp = now + PUSH_TTL; ch = true; out.sent++; }
+        else { x.fail = (x.fail || 0) + 1; out.fail++; ch = true; if (r && (r.status === 401 || r.status === 403) && x.fail >= 3) { delete L[id]; out.gone++; } }
       }
+      if (ch) await kv.put("push:subs", JSON.stringify(L));
       return json(Object.assign({ ok: true }, out));
     }
-    if (b.off && typeof b.endpoint === "string") { await kv.delete("push/" + (await hash16(b.endpoint))); return json({ ok: true }); }
-    const sub = b.sub; if (!isObj(sub) || typeof sub.endpoint !== "string" || !/^https:\/\//.test(sub.endpoint) || sub.endpoint.length > 1000) return json({ ok: false, error: "bad sub" }, 400);
-    const uid = /^[a-z0-9]{0,12}$/.test(b.u || "") ? b.u || "" : "", lg = LANG_OK.test(b.lang || "") ? b.lang : "en", time = /^\d\d:\d\d$/.test(b.time || "") ? b.time : "20:00";
-    const id = await hash16(sub.endpoint), key = "push/" + id, old = await kv.get(key, "json");
-    const x = { sub: { endpoint: sub.endpoint, keys: isObj(sub.keys) ? { p256dh: String(sub.keys.p256dh || "").slice(0, 200), auth: String(sub.keys.auth || "").slice(0, 100) } : {} }, u: uid, lang: lg, time, last: old && old.time === time ? old.last || "" : "", at: Date.now() };
-    if (!old || JSON.stringify(old.sub) !== JSON.stringify(x.sub) || old.u !== uid || old.lang !== lg || old.time !== time) await kv.put(key, JSON.stringify(x));
+    if (isObj(b.renew) && isObj(b.renew.sub) && typeof b.renew.old === "string" && PUSH_HOST.test(b.renew.sub.endpoint || "")) { // 手机换了订阅：搬过去
+      const L = await pushIdx(kv), oe = await hash16(b.renew.old), ne = await hash16(b.renew.sub.endpoint); let n = 0;
+      for (const id of Object.keys(L)) if (L[id].e === oe) { const x = L[id]; delete L[id]; const nid = await hash16(b.renew.sub.endpoint + "|" + x.u + "|" + x.lang); L[nid] = Object.assign(x, { e: ne, ep: b.renew.sub.endpoint, fail: 0, exp: Date.now() + PUSH_TTL }); n++; }
+      if (n) await kv.put("push:subs", JSON.stringify(L)); return json({ ok: true, moved: n });
+    }
+    const sub = b.sub; if (!isObj(sub) || typeof sub.endpoint !== "string" || !PUSH_HOST.test(sub.endpoint) || sub.endpoint.length > 1000) return json({ ok: false, error: "bad sub" }, 400);
+    const uid = /^[a-z0-9]{0,12}$/.test(b.u || "") ? b.u || "" : "", lg = LANG_OK.test(b.lang || "") ? b.lang : "en";
+    const users = await usersList(kv); if (!users.some(x => x.id === uid)) return json({ ok: false, error: "unknown user" }, 404);
+    const L = await pushIdx(kv), id = await hash16(sub.endpoint + "|" + uid + "|" + lg);
+    if (b.off) { if (L[id]) { delete L[id]; await kv.put("push:subs", JSON.stringify(L)); } return json({ ok: true }); }
+    const time = okTime(b.time) ? b.time : "20:00", old = L[id], now = Date.now();
+    if (!old && Object.keys(L).length >= PUSH_MAX) return json({ ok: false, error: "too many" }, 429);
+    const x = { e: await hash16(sub.endpoint), ep: sub.endpoint, u: uid, name: (users.find(y => y.id === uid) || {}).name || "", lang: lg, time, last: old && old.time === time ? old.last || "" : "", sent: old ? old.sent || 0 : 0, fail: 0, exp: now + PUSH_TTL };
+    // 内容没变、离过期还早：不写（每次打开页面都会来续一次）
+    if (!old || old.time !== time || old.ep !== x.ep || old.name !== x.name || old.exp - now < PUSH_TTL - 7 * 86400e3) { L[id] = x; await kv.put("push:subs", JSON.stringify(L)); }
     return json({ ok: true, id });
   } catch (e) { return json({ ok: false, error: String(e && e.message || e) }, 500); }
 }
@@ -1486,7 +1518,7 @@ async function usage(req, env) {
   const cache = typeof caches !== "undefined" ? caches.default : null, ck = new Request("https://use.cache/v3");
   if (cache) { const c = await cache.match(ck); if (c) return c; }
   const days = {}, from = new Date(Date.now() - 6 * 864e5).toISOString().slice(0, 10);
-  if (env.CAPTIONS) {
+  if (env.CAPTIONS) try { // 网站自己按功能记的账（每个功能花了多少）；读不到不影响 Cloudflare 的数字
     let cursor; do {
       const L = await env.CAPTIONS.list({ prefix: "use/", cursor }); cursor = L.list_complete ? null : L.cursor;
       for (const k of L.keys) {
@@ -1497,7 +1529,7 @@ async function usage(req, env) {
         D.e += +md.e || 0;
       }
     } while (cursor);
-  }
+  } catch (e) {}
   let src = "est", why = env.CF_API_TOKEN && env.CF_ACCOUNT_ID ? "" : "notset";
   if (!why) try { // 模型用量换成 Cloudflare 的精确数字；自己记的估算留在 est 里对照
     const C = await cfUsage(env, from, useDay());
@@ -1508,12 +1540,13 @@ async function usage(req, env) {
   if (env.CF_API_TOKEN && env.CF_ACCOUNT_ID) try { kv = await cfKV(env, from, useDay()); } catch (e) { kv = { why: String(e && e.message || e).slice(0, 200) }; } // 读不到存储用量不影响 AI 那部分
   for (const d in days) for (const g of ["m", "f", "est"]) for (const n in days[d][g] || {}) days[d][g][n][1] = Math.round(days[d][g][n][1]);
   const now = new Date(), reset = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
-  const res = new Response(JSON.stringify({ ok: true, src, why, today: useDay(), limit: 10000, reset, days, kv, kvLimit: { read: 100000, write: 1000, delete: 1000, list: 1000, bytes: 1e9 }, at: Date.now() }), { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "max-age=30" } });
-  if (cache) await cache.put(ck, res.clone()); // Cloudflare 的数字有几分钟延迟，缓存 30 秒够了
+  const res = new Response(JSON.stringify({ ok: true, src, why, today: useDay(), limit: 10000, reset, days, kv, kvLimit: { read: 100000, write: 1000, delete: 1000, list: 1000, bytes: 1e9 }, at: Date.now() }), { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "max-age=120" } });
+  if (cache) await cache.put(ck, res.clone()); // Cloudflare 的数字有几分钟延迟，缓存 2 分钟（每次都要 list 一次 KV，list 一天只有 1000 次）
   return res;
 }
 
 export default {
+  _pushDue: pushDue, // 测试用
   async fetch(req, env, ctx) {
     const u = new URL(req.url);
     if (u.pathname === "/api/usage") return usage(req, env);

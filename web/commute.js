@@ -47,11 +47,18 @@
   // 放一段：srcs 一个个试（前一个放不了就换下一个）；结束 / 全失败都往下走
   // fb = [文字, 语言]：音频都放不了（谷歌朗读被拦）时，页面开着就用浏览器自己的朗读顶上（锁屏时浏览器朗读会停，只好跳过）
   function sysSay(t, l, rate) { return new Promise(res => { try { if (document.hidden || !window.speechSynthesis) return res(); const u = new SpeechSynthesisUtterance(t); u.lang = l === "zh" ? "zh-CN" : l === "de" ? "de-DE" : "en-US"; u.rate = rate || 1; u.onend = u.onerror = () => res(); speechSynthesis.speak(u); setTimeout(res, 15000); } catch (e) { res(); } }); }
+  let att = 0; // 每试一个地址加 1：同一次失败只换一个地址（以前 play() 的报错和 onerror 各换一次，会连跳两个）
   function playSrc(srcs, rate, my, fb) {
     return new Promise(res => {
       let i = 0;
-      const next = () => { if (my !== tok) return res(false); if (i >= srcs.length) return fb ? sysSay(fb[0], fb[1], rate).then(() => res(my === tok)) : res(true); au.src = srcs[i++]; au.playbackRate = rate || 1; try { au.preservesPitch = true; } catch (e) {} const p = au.play(); if (p && p.catch) p.catch(e => { if (e && e.name === "NotAllowedError") { pause(); res(false); } else next(); }); };
-      au.onended = () => res(true); au.onerror = () => next();
+      const next = () => {
+        if (my !== tok) return res(false); if (i >= srcs.length) return fb ? sysSay(fb[0], fb[1], rate).then(() => res(my === tok)) : res(true);
+        const a = ++att; au.onended = () => { if (a === att) res(true); }; au.onerror = () => { if (a === att) next(); };
+        au.src = srcs[i++]; au.playbackRate = rate || 1; try { au.preservesPitch = true; } catch (e) {}
+        if (window.MEDIA) MEDIA.solo(au); // 一次只响一个（停掉视频、别的播放器、朗读）
+        // 放不了时浏览器会同时给 play() 报错和 error 事件：只让 error 事件换下一个（play 的报错只在 1.5 秒内没等到 error 事件时才换），AbortError（换了地址 / 暂停）不管
+        const p = au.play(); if (p && p.catch) p.catch(e => { if (a !== att) return; const n = e && e.name; if (n === "NotAllowedError") { pause(); res(false); } else if (n !== "AbortError") setTimeout(() => { if (a === att) next(); }, 1500); });
+      };
       next();
     });
   }
@@ -83,18 +90,29 @@
     }
     if (my === tok && qi >= Q.length) { playing = false; meta(null); paint("🎉 这一轮听完了：" + Q.length + " 条"); }
   }
-  function count() { // 听完一条 = 一张听力卡（「📅 每日」的「听」、统计页）
-    try { const d = U.day(), L = LG("pump:log", {}) || {}, r = L[d] = L[d] || {}; r.ls = (+r.ls || 0) + 1; LS("pump:log", L); } catch (e) {}
+  // 听完一条 = 一张听力卡：和「🔊 练习」一样记进 pump:log 今天的 n（卡片数）和 ls（听力卡），4 秒后同步到 /api/ext 的「stat|日期」
+  //   （「📅 每日」的「听」、统计页、连续天数、家庭排行、手机推送「今天练了几张」都认）
+  let logT = 0;
+  function count() {
+    try {
+      const d = U.day(), L = LG("pump:log", {}) || {}, x = L[d] || (L[d] = { n: 0, ok: 0, fail: 0, nw: 0, sec: 0 }); x.n = (+x.n || 0) + 1; x.ls = (+x.ls || 0) + 1; LS("pump:log", L);
+      clearTimeout(logT); logT = setTimeout(() => { try { const v = (LG("pump:log", {}) || {})[d]; if (v && window.CLOUD) CLOUD.chan("ext").send({ ["stat|" + d]: { v, at: Date.now() } }); } catch (e) {} }, 4000);
+    } catch (e) {}
   }
-  function pause() { playing = false; tok++; try { au.pause(); } catch (e) {} paint(); setState("paused"); }
-  function play() { if (!Q.length) return; if (qi >= Q.length) { qi = 0; step = 0; } setState("playing"); run(); }
-  function jump(d) { const was = playing; tok++; try { au.pause(); } catch (e) {} qi = Math.max(0, Math.min(Q.length - 1, qi + d)); step = 0; if (Q[qi]) show(Q[qi], false); if (was) run(); else paint(); }
+  let mine = false; // 是不是我们自己在暂停（别的播放器 / 视频开始放时 MEDIA.solo 会把我们暂停：这时也要停下流程）
+  function hold() { mine = true; try { au.pause(); } catch (e) {} mine = false; }
+  function pause() { playing = false; tok++; hold(); paint(); setState("paused"); }
+  function play() { if (!Q.length) return; if (qi >= Q.length) { qi = 0; step = 0; } bindMS(); setState("playing"); run(); }
+  function jump(d) { const was = playing; tok++; hold(); qi = Math.max(0, Math.min(Q.length - 1, qi + d)); step = 0; if (Q[qi]) show(Q[qi], false); if (was) run(); else paint(); }
 
   // ---------- 锁屏 / 耳机控制 ----------
   const MS = () => "mediaSession" in navigator ? navigator.mediaSession : null;
   function meta(it) { const m = MS(); if (!m) return; try { m.metadata = it ? new MediaMetadata({ title: it.en, artist: it.zh || "", album: "🎧 通勤模式 · " + (qi + 1) + " / " + Q.length }) : null; } catch (e) {} }
   function setState(s) { const m = MS(); if (m) try { m.playbackState = s; } catch (e) {} }
-  function bindMS() { const m = MS(); if (!m) return; const h = (a, f) => { try { m.setActionHandler(a, f); } catch (e) {} }; h("play", play); h("pause", pause); h("nexttrack", () => jump(1)); h("previoustrack", () => jump(-1)); }
+  // 锁屏 / 耳机按钮：开始放时才接管，关掉通勤模式就交还（不然以后放视频、听力节目时按耳机还会跑到这里）
+  function msHandlers(on) { const m = MS(); if (!m) return; const h = (a, f) => { try { m.setActionHandler(a, on ? f : null); } catch (e) {} }; h("play", play); h("pause", pause); h("nexttrack", () => jump(1)); h("previoustrack", () => jump(-1)); }
+  const bindMS = () => msHandlers(true);
+  function unbindMS() { msHandlers(false); meta(null); setState("none"); }
 
   // ---------- 界面 ----------
   function show(it, rev) {
@@ -120,10 +138,10 @@
       '<div class="ctl"><button data-a="prev" title="上一条">⏮</button><button class="pp" data-a="pp">▶</button><button data-a="next" title="下一条">⏭</button></div>' +
       '<div class="opts">' + sel("n", [[20, "20 条"], [30, "30 条"], [50, "50 条"], [100, "100 条"]], "每轮") + sel("gap", [[2, "2 秒"], [3, "3 秒"], [5, "5 秒"]], "想一想") +
       sel("rate", [[0.8, "0.8×"], [1, "1×"], [1.2, "1.2×"]], "语速") + sel("zh", [["true", "读"], ["false", "不读"]], "中文") + sel("ex", [["true", "读"], ["false", "不读"]], "例句") + sel("only", [["true", "只听没掌握的"], ["false", "全部"]], "范围") + "</div>" +
-      '<div class="tip">读英文 → 停几秒你在心里想意思 → 读中文 → 读例句。可以锁屏、切到别的 App，用耳机 / 锁屏上的按钮控制。<br>听完一条算一张听力卡（「📅 每日」的「听」会自动打勾）。</div>';
+      '<div class="tip">读' + (lang() === "de" ? "德语" : "英文") + ' → 停几秒你在心里想意思 → 读中文 → 读例句。可以锁屏、切到别的 App，用耳机 / 锁屏上的按钮控制。<br>听完一条算一张听力卡（「📅 每日」的「听」会自动打勾）。</div>';
     root.addEventListener("click", e => {
       const b = e.target.closest("[data-a]"); if (!b) return; const a = b.dataset.a;
-      if (a === "close") { pause(); root.classList.remove("on"); document.documentElement.style.overflow = ""; }
+      if (a === "close") { pause(); unbindMS(); root.classList.remove("on"); document.documentElement.style.overflow = ""; }
       else if (a === "pp") { if (playing) pause(); else play(); }
       else if (a === "next") jump(1); else if (a === "prev") jump(-1);
     });
@@ -132,12 +150,13 @@
       opt[k] = v === "true" ? true : v === "false" ? false : +v; LS("commute:opt", opt);
       if (k === "n" || k === "only") { const was = playing; pause(); Q = build(); qi = 0; step = 0; if (Q[0]) show(Q[0], false); else paint(); if (was) play(); }
     });
-    bindMS();
+    if (window.MEDIA) MEDIA.reg(au);
+    au.addEventListener("pause", () => { if (!mine && playing && !au.ended) pause(); }); // 被别的声音（视频、听力节目）停掉了
   }
   window.commuteShow = () => {
     init(); if (window.TTS && TTS.load) try { TTS.load(); } catch (e) {}
     root.classList.add("on"); document.documentElement.style.overflow = "hidden";
     if (!playing) { Q = build(); qi = 0; step = 0; if (Q[0]) show(Q[0], false); else paint(); }
   };
-  window.COMMUTE = { build, silence }; // 测试用
+  window.COMMUTE = { build, silence, playSrc, _au: a => { au = a; } }; // 测试用
 })();

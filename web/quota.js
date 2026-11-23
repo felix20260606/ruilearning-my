@@ -114,10 +114,12 @@
 
   let J = null, at = 0, busy = false, err = "";
   let opened = false; const isOpen = () => opened; // 默认收起，不记住
+  let forcedFor = 0;
   function load(force) {
-    if (J && Date.now() > J.reset) force = true; // 过了重置时间（北京时间 8 点）：马上重新读，不再显示昨天的「用完了」
+    // 过了重置时间（北京时间 8 点）：马上重新读一次，不再显示昨天的「用完了」；同一个重置时间只强制一次（后台缓存 2 分钟，读回来可能还是旧的，别每画一次就读一次）
+    if (J && Date.now() > J.reset && forcedFor !== J.reset) { force = true; forcedFor = J.reset; }
     if (busy || (!force && Date.now() - at < 60e3)) return; busy = true;
-    U.json("/api/usage").then(j => { if (j.ok) { J = j; err = ""; } else err = j.error === "net" ? "读不到用量（网络不通）" : "读不到用量"; })
+    U.json("/api/usage", force ? { cache: "no-store" } : undefined).then(j => { if (j.ok) { J = j; err = ""; } else err = j.error === "net" ? "读不到用量（网络不通）" : "读不到用量"; })
       .then(() => { busy = false; at = Date.now(); paint(); });
   }
   // 别的页面用了 AI（ai.js 发 "ai-used"）：后台大约 15 秒后记账，20 秒后面板在的话刷新一次

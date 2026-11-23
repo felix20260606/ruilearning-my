@@ -28,7 +28,9 @@ var VS_NUM = new Set("zero one two three four five six seven eight nine ten elev
 var VS_PREP_UNUSED = new Set("about above across after against along among around at before behind below beneath beside besides between beyond by despite down during except for from in inside into near of off on onto out outside over past per since through throughout to toward towards under underneath until unto up upon via with within without".split(" "));
 // 分类：learn 将要学习(已收藏) / known 已掌握 / ignore 不学习 / special 名称地点数字 / suggest 建议 / rare 更生僻
 // 你自己的标记按“原形”生效：保存了 write，wrote / written / writes 也算在学；保存了 reinvented，reinvent 也算
-var _vsIdx = { set: null, n: -1, mo: null, m: -1, S: null, M: null };
+var _vsIdx = { set: null, n: -1, mo: null, m: -1, S: null, M: null }, _vsLock = 0;
+// 一大批词一起判断（这期间标记表不会变）：开始时把索引对一次，之后每个词不再数标记表
+function vsBatch(fn) { if (!_vsLock) { _vsLock = 0; vsMarkOf(""); } _vsLock++; try { return fn(); } finally { _vsLock--; } }
 // 一个词可能对应的原形：词频表里查得到的原形；查不到时（生僻词）按词尾规则猜
 function vsKeys(x) {
   x = String(x).toLowerCase().replace(/’/g, "'"); var l = vsLemma(x), out = [l];
@@ -40,8 +42,10 @@ function vsKeys(x) {
 function vsSame(a, b) { a = String(a).toLowerCase(); b = String(b).toLowerCase(); if (a === b) return true; var A = vsKeys(a), B = vsKeys(b); A.push(a); B.push(b); for (var i = 0; i < A.length; i++) if (B.indexOf(A[i]) >= 0) return true; return false; }
 function vsMarkOf(k) {
   k = String(k).toLowerCase();
-  var keys = Object.keys(VS_MARKS);
-  if (_vsIdx.set !== VS_SAVED || _vsIdx.n !== VS_SAVED.size || _vsIdx.mo !== VS_MARKS || _vsIdx.m !== keys.length) {
+  // 标记表可能有几千个词：vsBatch 里（一段字幕 / 一整页一起上色）只在开始时数一次有几个，不是每个词都 Object.keys 一遍
+  var cnt = _vsLock && _vsIdx.mo === VS_MARKS ? _vsIdx.m : Object.keys(VS_MARKS).length;
+  if (_vsIdx.set !== VS_SAVED || _vsIdx.n !== VS_SAVED.size || _vsIdx.mo !== VS_MARKS || _vsIdx.m !== cnt) {
+    var keys = Object.keys(VS_MARKS);
     var S = new Set(), M = {};
     VS_SAVED.forEach(function (x) { vsKeys(x).forEach(function (q) { S.add(q); }); });
     keys.forEach(function (x) { vsKeys(x).forEach(function (l) { if (!M[l] || VS_MARKS[x] === "known") M[l] = VS_MARKS[x]; }); });
@@ -79,7 +83,8 @@ function vsClass(w, S, first, capAdj) {
 }
 // 给一段已转义文本里的单词加标记
 var VS_WORD_RE = /[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu;
-function vsMark(escaped, S, cls) {
+function vsMark(escaped, S, cls) { return vsBatch(function () { return vsMark1(escaped, S, cls); }); }
+function vsMark1(escaped, S, cls) {
   return escaped.replace(VS_WORD_RE, function (w, off, str) {
     if (off > 0 && str.charAt(off - 1) === "&" && str.charAt(off + w.length) === ";") return w; // 已经转义过的 &amp; &lt; &quot; 里的字母不是词（以前会显示成 R&amp;D、amp 还能点）
     var prev = str.slice(0, off).replace(/\s+$/, ""), first = !prev || /[.?!…“‘"'(\[:;—–\-]$/.test(prev), capAdj = false;

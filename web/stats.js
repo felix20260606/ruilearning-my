@@ -161,7 +161,7 @@
   const { esc } = U; // 全站共用的小工具（util.js）
   window.statsDayKey = (ts) => dayKey(ts == null ? Date.now() : ts);
 
-  let root = null, tip = null, SRV = null, srvAt = 0, CURVE = null, installEv = null;
+  let root = null, tip = null, SRV = null, srvOK = false, srvAt = 0, dailyOK = false, dailyP = null, CURVE = null, installEv = null;
   let vt = null; // 进行中的测试：{qs, i, ans}
   const W = () => (typeof words !== "undefined" && Array.isArray(words) ? words : []);
   const ST = () => (typeof state !== "undefined" && state ? state : {});
@@ -218,8 +218,26 @@
     return CLOUD.chan("ext").get().then(it => { // 全站共用的同步（cloud.js）
       const m = {};
       for (const k in it) if (k.indexOf("stat|") === 0 && it[k] && !it[k].del && it[k].v) m[k.slice(5)] = it[k].v;
-      SRV = m;
+      SRV = m; srvOK = true;
     }).catch(() => { SRV = SRV || {}; });
+  }
+  // 云端 daily（/api/mine）里别的设备记的：kn:日期（已掌握曲线）、ms:数字（到站日期）、frz:日期（用过的断签保护卡）→ 并进本机
+  //   拉完之前不用保护卡、不判断到没到新的一站（免得换了设备重复用卡、重复弹提示）
+  const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
+  function pullDaily() {
+    if (dailyOK) return Promise.resolve(); if (dailyP) return dailyP;
+    const C = window.CLOUD && CLOUD.chan("daily"); if (!C) return Promise.resolve();
+    return (dailyP = C.get(60e3).then(it => {
+      const K = LG("vocab:kn", {}) || {}, M = LG("vocab:ms", {}) || {}, FZ = LG("vocab:frz", {}) || {}; let ch = false;
+      for (const k in it || {}) {
+        const x = it[k]; if (!x || x.del) continue; const a = k.slice(k.indexOf(":") + 1);
+        if (k.indexOf("kn:") === 0 && DAY_RE.test(a) && !K[a] && Array.isArray(x.v) && x.v.length === 2 && x.v.every(n => Number.isFinite(+n))) { K[a] = [+x.v[0], +x.v[1]]; ch = true; }
+        else if (k.indexOf("ms:") === 0 && MS.includes(+a) && !M[a] && DAY_RE.test(String(x.v))) { M[a] = String(x.v); ch = true; }
+        else if (k.indexOf("frz:") === 0 && DAY_RE.test(a) && !FZ[a]) { FZ[a] = 1; ch = true; }
+      }
+      if (ch) { LS("vocab:kn", K); LS("vocab:ms", M); LS("vocab:frz", FZ); }
+      dailyOK = true; dailyP = null;
+    }).catch(() => { dailyP = null; }));
   }
   function data() {
     const now = Date.now(), S = ST().srs || {}, L = W().filter(w => (w.type || "word") !== "pattern"); // 规律是参考资料，不算（和顶部、练习页同一个口径）
@@ -231,7 +249,7 @@
     L.forEach(w => { const m = mfn(w); if (m >= 1) mastered++; else if (S[w.id]) learning++; else untouched++; });
     // 🛡 断签保护：用过的日期存本机 vocab:frz + 同步到 daily「frz:日期」（换设备、家庭排行都认）
     const F = LG("vocab:frz", {}) || {}, fset = new Set(Object.keys(F));
-    const fz = { set: fset, add: d => { F[d] = 1; LS("vocab:frz", F); if (window.CLOUD) CLOUD.chan("daily").put("frz:" + d, 1); if (window.U) U.tip("🛡 " + d.slice(5) + " 没练，用了一张断签保护卡，连续天数没断（这个月还剩 " + frzLeft(fset, d.slice(0, 7)) + " 张）"); } };
+    const fz = { set: fset, add: !(srvOK && dailyOK) ? null : d => { /* 服务器的练习记录和别的设备用过的卡都拿到了，才判断要不要用卡 */ F[d] = 1; LS("vocab:frz", F); if (window.CLOUD) CLOUD.chan("daily").put("frz:" + d, 1); if (window.U) U.tip("🛡 " + d.slice(5) + " 没练，用了一张断签保护卡，连续天数没断（这个月还剩 " + frzLeft(fset, d.slice(0, 7)) + " 张）"); } };
     const streak = streakOf(daily, now, fz);
     return { now, S, L, daily, tk, today: td && !td.est ? td.n : 0, todayEst: td && td.est ? td.n : 0, streak, frzLeft: frzLeft(fset, tk.slice(0, 7)), best: Math.max(bestStreak(daily), streak), cards: Object.keys(daily).reduce((a, k) => a + (+daily[k].n || 0), 0), days: Object.keys(daily).filter(k => daily[k].n > 0).length, mastered, learning, untouched };
   }
@@ -352,22 +370,20 @@
   //   每天记一笔「已掌握 / 收集」（本机 vocab:kn + 同步到 /api/mine 的 daily「kn:日期」），这条曲线从开始记的那天起是准的；
   //   上面「收集和掌握曲线」里以前的部分是按练习时间推算的。到了新的一站（vocab:ms + daily「ms:数字」）弹一次提示
   const MS = [50, 100, 250, 500, 1000, 1500, 2000, 3000, 5000, 8000];
-  let msPulled = false;
   function msRecord(known, total) {
     const day = U.day(), K = LG("vocab:kn", {}) || {}, M = LG("vocab:ms", {}) || {}, C = window.CLOUD && CLOUD.chan("daily");
-    if (!total) return; // 生词本还没读到（刚打开、换了设备）：不记，免得记成 0
+    if (!total || !dailyOK) return; // 生词本还没读到 / 别的设备记的还没拉过来：先不记（免得记成 0、重复弹提示）
     if (!K[day] || K[day][0] !== known || K[day][1] !== total) { K[day] = [known, total]; LS("vocab:kn", K); if (C) C.put("kn:" + day, [known, total]); }
     const hit = MS.filter(m => known >= m && !M[m]);
     if (hit.length) { hit.forEach(m => { M[m] = day; if (C) C.put("ms:" + m, day); }); LS("vocab:ms", M); U.tip("🏅 已掌握 " + hit[hit.length - 1] + " 个词！"); }
-    if (!msPulled && C) { msPulled = true; C.get(60e3).then(it => { let ch = false; const FZ = LG("vocab:frz", {}) || {}; for (const k in it || {}) { const x = it[k]; if (!x || x.del) continue; if (k.indexOf("kn:") === 0 && !K[k.slice(3)] && Array.isArray(x.v)) { K[k.slice(3)] = x.v; ch = true; } if (k.indexOf("ms:") === 0 && !M[k.slice(3)] && x.v) { M[k.slice(3)] = x.v; ch = true; } if (k.indexOf("frz:") === 0 && !FZ[k.slice(4)]) { FZ[k.slice(4)] = 1; ch = true; } } if (ch) { LS("vocab:kn", K); LS("vocab:ms", M); LS("vocab:frz", FZ); if (root && root.classList.contains("on")) draw(); } }).catch(() => {}); } // 换设备：把别的设备记的拉过来
   }
   function msHtml(d) {
     const total = d.L.length, known = d.mastered; msRecord(known, total);
     const M = LG("vocab:ms", {}) || {}, K = LG("vocab:kn", {}) || {}, next = MS.find(m => m > known), prev = [...MS].reverse().find(m => m <= known) || 0;
     const pct = next ? Math.round((known - prev) / (next - prev) * 100) : 100;
-    const badges = MS.map(m => '<span class="st-ms' + (M[m] ? " on" : "") + '" title="' + (M[m] ? "到达：" + M[m] : "还没到") + '">' + (M[m] ? "🏅" : "🔒") + " " + m + "</span>").join("");
+    const badges = MS.map(m => '<span class="st-ms' + (M[m] ? " on" : "") + '" title="' + (M[m] ? "到达：" + esc(M[m]) : "还没到") + '">' + (M[m] ? "🏅" : "🔒") + " " + m + "</span>").join("");
     const vt = (LG("vocab:test", []) || [])[0], lv = vt && vt.size ? vtLevel(vt.size) : null, ago = vt ? Math.floor((Date.now() - (+vt.at || 0)) / 864e5) : 0;
-    const days = Object.keys(K).sort().slice(-60), pts = days.map(k => K[k][0]);
+    const days = Object.keys(K).filter(k => DAY_RE.test(k) && Array.isArray(K[k])).sort().slice(-60), pts = days.map(k => +K[k][0] || 0);
     let spark = "";
     if (pts.length >= 2) { const mx = Math.max(...pts, 1), mn = Math.min(...pts), w = 300, h = 46, x = i => (i / (pts.length - 1)) * w, y = v => h - 4 - ((v - mn) / Math.max(1, mx - mn)) * (h - 8); spark = '<svg viewBox="0 0 ' + w + " " + h + '" class="st-spark" preserveAspectRatio="none"><polyline fill="none" stroke="var(--ui-green)" stroke-width="2" points="' + pts.map((v, i) => x(i).toFixed(1) + "," + y(v).toFixed(1)).join(" ") + '"/></svg><div class="st-note">' + days[0] + " → " + days[days.length - 1] + "：" + pts[0] + " → " + pts[pts.length - 1] + " 个</div>"; }
     return '<div class="st-card"><h3>🏅 里程碑和徽章</h3><p class="sub">已掌握 = 掌握度到 42 天的词（和顶上「🏆 已掌握」同一个数）</p>' +
@@ -430,6 +446,7 @@
   function drawVt() { const el = root && root.querySelector("#st-vt"); if (el) el.outerHTML = vtHtml(); }
 
   // ---------- 每日提醒 ----------
+  const LGN = () => (window.VL === "de" ? "德语" : "英语");
   const rmTime = () => { try { return localStorage.getItem("remind:time") || ""; } catch (e) { return ""; } };
   const notifOK = () => typeof Notification !== "undefined" && Notification.permission === "granted";
   const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
@@ -446,7 +463,7 @@
   }
   function dueToday() { const f = forecastOf(W(), ST().srs || {}, Date.now(), pumpTypes()); return f.today; }
   function notify(n, test) {
-    const title = test ? "提醒试一下 ✓" : "该练英语了 🔊", body = n ? "今天有 " + n + " 个要复习" : "今天没有到期的词，来学几个新词吧";
+    const title = test ? "提醒试一下 ✓" : "该练" + LGN() + "了 🔊", body = n ? "今天有 " + n + " 个要复习" : "今天没有到期的词，来学几个新词吧";
     const opt = { body, icon: "/icon-192.png", badge: "/icon-192.png", tag: "remind-pump", data: { url: "/?go=pump" } };
     const plain = () => { try { const x = new Notification(title, opt); x.onclick = () => { window.focus(); location.href = "/?go=pump"; x.close(); }; } catch (e) { say("这个浏览器只能从桌面 App 发通知"); } };
     if (navigator.serviceWorker && navigator.serviceWorker.getRegistration) navigator.serviceWorker.getRegistration().then(r => (r ? r.showNotification(title, opt) : plain())).catch(plain);
@@ -464,21 +481,30 @@
   // 🔔 手机推送（Web Push）：开通知时顺便订阅，到点由后台推（不开网页也会弹）；iPhone 要先「添加到主屏幕」
   const pushOK = () => "serviceWorker" in navigator && "PushManager" in window && typeof Notification !== "undefined";
   const b64 = s => { const p = "=".repeat((4 - (s.length % 4)) % 4), r = atob((s + p).replace(/-/g, "+").replace(/_/g, "/")); return Uint8Array.from([...r].map(c => c.charCodeAt(0))); };
+  const sameKey = (sub, key) => { try { const a = new Uint8Array(sub.options.applicationServerKey), b = b64(key); return a.length === b.length && a.every((x, i) => x === b[i]); } catch (e) { return true; } }; // 读不到就当一样（老浏览器）
+  const pushPost = b => U.json("/api/push", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(Object.assign({ u: window.VU || "", lang: window.VL || "en" }, b)) });
   async function pushOn(t) {
     if (!pushOK() || Notification.permission !== "granted") return false;
     try {
       const reg = await navigator.serviceWorker.ready, k = await U.json("/api/push?key=1"); if (!k || !k.key) return false;
-      let sub = await reg.pushManager.getSubscription(); if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64(k.key) });
-      const r = await U.json("/api/push", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sub: sub.toJSON(), u: window.VU || "", lang: window.VL || "en", time: t }) });
+      let sub = await reg.pushManager.getSubscription();
+      if (sub && !sameKey(sub, k.key)) { const old = sub.endpoint; await sub.unsubscribe().catch(() => {}); sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64(k.key) }); pushPost({ renew: { old, sub: sub.toJSON() } }); } // 后台换过钥匙：旧订阅收不到了，重订一个并把这台设备的几组搬过去
+      if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64(k.key) });
+      const r = await pushPost({ sub: sub.toJSON(), time: t });
       if (r && r.ok) { try { localStorage.setItem("remind:push", "1"); } catch (e) {} return true; }
     } catch (e) { if (window.U) U.log("push", "订阅失败", String(e && e.message || e)); }
     return false;
   }
-  async function pushOff() {
+  async function pushOff() { // 只关这个人、这种语言的这一组（同一台设备上别人 / 另一种语言的提醒还在，所以不退订设备）
     try { localStorage.removeItem("remind:push"); } catch (e) {}
-    try { const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription(); if (sub) { await U.json("/api/push", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ endpoint: sub.endpoint, off: 1 }) }); await sub.unsubscribe(); } } catch (e) {}
+    try { if (!pushOK()) return; const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription(); if (sub) await pushPost({ sub: sub.toJSON(), off: 1 }); } catch (e) {}
   }
-  const pushed = () => { try { return localStorage.getItem("remind:push") === "1"; } catch (e) { return false; } };
+  const pushed = () => { try { return localStorage.getItem("remind:push") === "1"; } catch (e) { return false; } }; // remind:push 按人、按语言分开存（boot.js 的 MINE）
+  // 打开网页时（每次打开一次）：开过推送的，确认订阅还在、钥匙没换、后台还记得（续期；后台内容没变就不写 KV）；订阅被浏览器清掉了就重订
+  function pushSync() {
+    const t = rmTime(); if (!t || !pushed() || !pushOK() || Notification.permission !== "granted") return;
+    pushOn(t).then(ok => { if (!ok && window.U) U.log("push", "打开网页时续订没成功（下次再试）"); });
+  }
   function remindOn() {
     const t = (root.querySelector("#st-rm-time") || {}).value || "20:00";
     if (typeof Notification === "undefined") { try { localStorage.setItem("remind:time", t); } catch (e) {} say(isIOS() ? "iPhone 要先「添加到主屏幕」，从桌面打开才能开通知；先用「添加到日历」吧" : "这个浏览器不支持网页通知，用「添加到日历」吧"); draw(); return; }
@@ -493,13 +519,13 @@
     const [hh, mm] = (t || "20:00").split(":"), d = new Date(now), ymd = d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate());
     const stamp = new Date(now).toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
     return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Ray's Life//English practice//ZH", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
-      "BEGIN:VEVENT", "UID:pump-daily-" + ymd + "@ruilearning-my.pages.dev", "DTSTAMP:" + stamp, "DTSTART:" + ymd + "T" + pad(+hh) + pad(+mm) + "00", "DURATION:PT15M", "RRULE:FREQ=DAILY",
-      "SUMMARY:🔊 英语练习", "DESCRIPTION:打开练习：" + PUMP_URL, "URL:" + PUMP_URL,
-      "BEGIN:VALARM", "ACTION:DISPLAY", "DESCRIPTION:该练英语了", "TRIGGER:-PT0M", "END:VALARM", "END:VEVENT", "END:VCALENDAR", ""].join("\r\n");
+      "BEGIN:VEVENT", "UID:pump-daily-" + (window.VL === "de" ? "de-" : "") + ymd + "@ruilearning-my.pages.dev", "DTSTAMP:" + stamp, "DTSTART:" + ymd + "T" + pad(+hh) + pad(+mm) + "00", "DURATION:PT15M", "RRULE:FREQ=DAILY",
+      "SUMMARY:🔊 " + LGN() + "练习", "DESCRIPTION:打开练习：" + PUMP_URL, "URL:" + PUMP_URL,
+      "BEGIN:VALARM", "ACTION:DISPLAY", "DESCRIPTION:该练" + LGN() + "了", "TRIGGER:-PT0M", "END:VALARM", "END:VEVENT", "END:VCALENDAR", ""].join("\r\n");
   }
   function icsDownload() {
     const t = (root.querySelector("#st-rm-time") || {}).value || rmTime() || "20:00";
-    U.download("英语练习提醒.ics", icsText(t, Date.now())); // ⬇️ 全站共用（util.js）
+    U.download(LGN() + "练习提醒.ics", icsText(t, Date.now())); // ⬇️ 全站共用（util.js）
     say("已生成日历文件：打开后选「添加」，每天 " + t + " 提醒");
   }
 
@@ -576,10 +602,10 @@
   // 提醒和安装：页面一打开就开始（不用先进统计页）
   window.addEventListener("beforeinstallprompt", onBIP);
   window.addEventListener("appinstalled", () => { installEv = null; if (root && root.classList.contains("on")) draw(); });
-  setInterval(remindTick, 30e3); setTimeout(remindTick, 5e3);
+  setInterval(remindTick, 30e3); setTimeout(remindTick, 5e3); setTimeout(pushSync, 9e3);
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") remindTick(); });
 
-  window.statsShow = () => { init(); if (!root) return; draw(); loadServer().then(() => { if (root.classList.contains("on") && !(vt && !vt.done)) draw(); }); };
+  window.statsShow = () => { init(); if (!root) return; draw(); Promise.all([loadServer(), pullDaily()]).then(() => { if (root.classList.contains("on") && !(vt && !vt.done)) draw(); }); };
   window.statsRefresh = () => { if (root && root.classList.contains("on") && !(vt && !vt.done)) draw(); };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();

@@ -155,7 +155,7 @@
       cancel: () => { r.on = false; r.busy = false; paintRow(id); },
       fail: m => { r.on = false; r.err = m; paintRow(id); },
       busy: () => { if (RES[id].tok !== tok) return; r.on = false; r.busy = true; paintRow(id); },
-      done: x => { if (RES[id].tok !== tok) return; r.on = false; r.busy = false; r.t = t; r.said = x.text || ""; r.sc = x.text ? REC.score(t, x.text, { lang: "de" }) : null;
+      done: x => { if (x && x.url) try { URL.revokeObjectURL(x.url); } catch (e) {} /* 这里不回放录音：录音地址用不上，马上放掉 */ if (RES[id].tok !== tok) return; r.on = false; r.busy = false; r.t = t; r.said = x.text || ""; r.sc = x.text ? REC.score(t, x.text, { lang: "de" }) : null;
         r.err = x.text ? "" : x.err === "empty" ? "没录到声音，靠近一点、大声一点再试" : /neuron|4006|quota/i.test(x.err || "") ? "今天的 AI 识别额度用完了，北京时间早上 8 点恢复" : "没识别出来，再读一次试试"; paintRow(id); } });
   }
 

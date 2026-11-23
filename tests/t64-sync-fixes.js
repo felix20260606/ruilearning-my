@@ -118,7 +118,7 @@ const path = require("path");
   ok(await tts("hello there", "https://evil.example") === 403 && aiRuns === 0, "foreign origin refused");
   ok(await tts("hello there", "https://ruilearning-my.pages.dev") === 200 && await tts("hello again") === 200, "own site / curl ok");
   const big = "a".repeat(1400); let st = 200, n = 0; while (st === 200 && n < 40) { st = await tts(big + " " + n); n++; }
-  ok(st === 429 && n > 15, "too many letters in 10 min → 429 after " + n);
+  ok(st === 429 && n >= 2 && n <= 4, "too many letters in 10 min (4000) → 429 after " + n);
   delete env.AI;
   console.log(fail ? fail + " FAILED" : "t64 sync fixes: all ok"); process.exit(fail ? 1 : 0);
 })();

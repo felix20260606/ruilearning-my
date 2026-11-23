@@ -11,7 +11,7 @@
   "use strict";
   if (window.LAZY) return;
   const MODS = {
-    speak: { src: "speak.js?v=d780a383", fns: ["speakShow"], el: { speakShow: "#view-speak" }, quiet: ["speakHide"] },
+    speak: { src: "speak.js?v=f1564f44", fns: ["speakShow"], el: { speakShow: "#view-speak" }, quiet: ["speakHide"] },
     basic: { src: "basic.js?v=6f44a263", deps: ["speak"], fns: ["basicShow"], el: { basicShow: "#view-basic" } },
     read: { src: "read.js?v=53955424", fns: ["readingShow", "readingNews", "readingOpen", "readTextDiff"], el: { readingShow: "#reading" }, quiet: ["readingRefresh"] },
     listen: { src: "listen.js?v=cbffd9c5", fns: ["smeShow", "smeOpen"], el: { smeShow: "#sme" }, quiet: ["smePause"] },
@@ -20,8 +20,8 @@
     write: { src: "write.js?v=0b8cb009", fns: ["writingShow"], el: { writingShow: 0 } },
     pitch: { src: "pitch.js?v=79ce25d1" }, // 🎵 跟读语调对比（口语页跟读后点「和原声比语调」才加载）
     corpus: { src: "corpus.js?v=1a7151f1", fns: ["corpusShow"] }, // 🔎 真人例句（查词卡片上的按钮）
-    commute: { src: "commute.js?v=eeeda1a7", fns: ["commuteShow"] }, // 🎧 通勤模式（「🔊 练习」首页的按钮）
-    debasic: { src: "de-basic.js?v=a1a62562", fns: ["deBasicShow"], el: { deBasicShow: "#view-basic" } }, // 🌱 德语入门（学德语时）
+    commute: { src: "commute.js?v=e400f35a", fns: ["commuteShow"] }, // 🎧 通勤模式（「🔊 练习」首页的按钮）
+    debasic: { src: "de-basic.js?v=24fdcf66", fns: ["deBasicShow"], el: { deBasicShow: "#view-basic" } }, // 🌱 德语入门（学德语时）
     grammar: { src: "grammar.js?v=19e2e8e7", fns: ["grammarShow"], el: { grammarShow: "#grammar" }, quiet: ["grammarRefresh"] },
   };
   const log = (m, d) => { if (window.U) U.log("lazy", m, d); };

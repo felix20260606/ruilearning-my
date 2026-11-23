@@ -100,6 +100,7 @@ async function main() {
   }
   if (!DRY) for (const x of todo) {
     if (used + x.t.length > LIM) { stop = "到了这次能用的额度"; break; }
+    if (!process.argv.includes("--force") && new Date().getUTCHours() < 20) { stop = "过了 00:00 UTC（新的一天），剩下的明天再做"; break; } // 跑到一半跨过了零点：别吃新一天的额度
     let r;
     try { r = await fetch(API + "?v=" + x.v + "&t=" + encodeURIComponent(x.t)); } catch (e) { stop = "连不上：" + e.message; break; }
     const ct = r.headers.get("content-type") || "";

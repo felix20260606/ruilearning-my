@@ -39,7 +39,7 @@ self.addEventListener('fetch', e => {
 });
 // 🔔 手机推送（_worker.js 的 /api/push）：推送不带内容，收到后用自己订阅的编号去后台取这条要显示的话（今天练了没有、连续几天）
 self.addEventListener('push', e => {
-  const fallback = { title: '📚 该练英语了', body: '打开练几张卡吧', url: '/?go=pump' };
+  const fallback = { title: '📚 今天该练习了', body: '打开练几张卡吧', url: '/?go=pump' };
   e.waitUntil(self.registration.pushManager.getSubscription().then(async sub => {
     let m = fallback;
     try {
@@ -48,6 +48,18 @@ self.addEventListener('push', e => {
     } catch (er) {}
     return self.registration.showNotification(m.title, { body: m.body, icon: '/icon-192.png', badge: '/icon-192.png', tag: 'daily-push', data: { url: m.url || '/?go=pump' } });
   }));
+});
+// 浏览器换了推送订阅（过期、重置）：订一个新的，告诉后台把旧订阅下的几组提醒搬过去（钥匙用旧订阅的；没有就去后台拿）
+self.addEventListener('pushsubscriptionchange', e => {
+  const old = e.oldSubscription;
+  e.waitUntil((async () => {
+    try {
+      let sub = e.newSubscription;
+      if (!sub) { let key = old && old.options && old.options.applicationServerKey; if (!key) { const j = await (await fetch('/api/push?key=1')).json(); const s = j.key, p = '='.repeat((4 - s.length % 4) % 4); key = Uint8Array.from(atob((s + p).replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0)); }
+        sub = await self.registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key }); }
+      if (old && old.endpoint && sub) await fetch('/api/push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ renew: { old: old.endpoint, sub: sub.toJSON() } }) });
+    } catch (er) {}
+  })());
 });
 // 每日提醒的通知（stats.js 用 registration.showNotification 发出）：点一下打开练习页；已经开着就切过去
 self.addEventListener('notificationclick', e => {

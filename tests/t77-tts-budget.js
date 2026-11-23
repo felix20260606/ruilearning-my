@@ -12,6 +12,6 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
   const yml = fs.readFileSync(path.join(__dirname, "..", ".github", "workflows", "tts.yml"), "utf8");
   ok(/cron: "0 22 \* \* \*"/.test(yml) && /--force/.test(yml), "workflow: 22:00 UTC, manual = --force");
   const q = fs.readFileSync(path.join(__dirname, "..", "web", "quota.js"), "utf8");
-  ok(/Date\.now\(\) > J\.reset\) force = true/.test(q) && /visibilitychange/.test(q), "quota panel reloads after reset / when page comes back");
+  ok(/Date\.now\(\) > J\.reset && forcedFor !== J\.reset\) \{ force = true; forcedFor = J\.reset; \}/.test(q) && !/if \(J && Date\.now\(\) > J\.reset\) force = true/.test(q) && /visibilitychange/.test(q), "quota panel reloads after reset / when page comes back");
   console.log(fail ? fail + " FAILED" : "t77 tts budget: all ok"); process.exit(fail ? 1 : 0);
 })();
