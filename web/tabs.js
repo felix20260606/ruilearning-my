@@ -92,8 +92,9 @@
   var SECS={listen:[['drill','🧩 练习课'],['sme','📻 听力节目'],['video','🎬 视频'],['practice','🎧 听力练习']],basic:[['start','🧭 从这开始'],['speak','🗣 口语入门'],['pron','🔊 发音'],['grammar','📐 语法']]}; // 「📐 语法」从「✍️ 写」挪到了「🌱 入门」
   // 🇩🇪 学德语时：只有英语内容的页面整个藏起来（说、读、写、雅思、入门、BBC 听力节目、视频、语法、写作批改、已保存），各语言完全分开；
   //   留下的是按语言分开存的：生词本（列表、练习、统计、错题）、🧩 练习课（德语素材）、🎧 听力练习（练自己生词本里的词）。样式在 index.css 的 html[data-lang="de"]
-  var DE=window.VL==='de', DE_OFF={speak:1,read:1,write:1,ielts:1,basic:1};
+  var DE=window.VL==='de', DE_OFF={speak:1,read:1,write:1,ielts:1};
   if(DE)SECS.listen=SECS.listen.filter(function(x){return x[0]==='drill'||x[0]==='practice';});
+  if(DE)SECS.basic=[['start','🧭 从这开始'],['laut','🔤 字母和发音'],['satz','👋 常用句'],['gram','📐 语法入门'],['zahl','🔢 数字和时间']]; // 🌱 德语入门（de-basic.js）
   var VOCAB_MODES=DE?/^(err|stats|pump|list)$/:/^(err|stats|pump|saved|list)$/, CUR='', busy=false;
   try{if(!localStorage.getItem('drill:seen')){localStorage.setItem('drill:seen','1');if(localStorage.getItem('en_sub_listen'))localStorage.setItem('en_sub_listen','drill');}}catch(e){} // 新加的「🧩 练习课」第一次默认选它（新标签排最前、默认选最新）
   function getSub(w){var d=SECS[w][0][0];try{var v=localStorage.getItem('en_sub_'+w);if(SECS[w].some(function(x){return x[0]===v;}))return v;}catch(e){}return d;}
@@ -155,7 +156,8 @@
       if(window.dailyShow)dailyShow();
     }else if(which==='basic'){
       root.classList.add('show-basic');
-      if(bSpeak){root.classList.add('show-speak');if(window.speakShow)speakShow(sub==='speak'?'start':'pron');}
+      if(DE){root.classList.add('show-basic-home');if(window.deBasicShow)deBasicShow(sub);}
+      else if(bSpeak){root.classList.add('show-speak');if(window.speakShow)speakShow(sub==='speak'?'start':'pron');}
       else if(sub==='start'){root.classList.add('show-basic-home');if(window.basicShow)basicShow();}
     }
     busy=true;

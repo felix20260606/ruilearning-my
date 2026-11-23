@@ -92,7 +92,7 @@
     const st = document.createElement("style"); st.textContent = CSS; document.head.append(st);
     root.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (b && GO[b.dataset.go]) GO[b.dataset.go](); });
   }
-  window.basicShow = () => { init(); if (root) root.innerHTML = html(); };
+  window.basicShow = () => { if (window.VL && window.VL !== "en") return; init(); if (root) root.innerHTML = html(); }; // 学德语时「🌱 入门」是 de-basic.js 画的
   window.BASIC = { GO }; // 测试用
   const boot = () => { init(); if (document.documentElement.classList.contains("show-basic-home")) window.basicShow(); };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();

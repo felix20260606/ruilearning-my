@@ -11,7 +11,7 @@
 <script src="cloud.js?v=6ddf45e3"></script>
 <script src="media.js?v=90149a34"></script>
 <script src="keys.js?v=3c74bc86"></script>
-<script src="lazy.js?v=57bd002d"></script><!-- ⚡ 按需加载：口语、入门、阅读、听力、练习课、考试、写作、语法点进去才加载，首页好了以后后台再加载完 -->
+<script src="lazy.js?v=ddc6b231"></script><!-- ⚡ 按需加载：口语、入门、阅读、听力、练习课、考试、写作、语法点进去才加载，首页好了以后后台再加载完 -->
 <script>/* 🐞 问题记录：生词本「⚙ 设置」里的入口，网址带 ?debug 直接打开（util.js 的 U.showLogs） */
 document.addEventListener("click",function(e){var t=e.target;if(!t||!t.closest)return;if(t.closest("#dbg-open"))U.showLogs();else if(t.closest("#dbg-clear"))U.ask("清空这台设备上的问题记录？",{ok:"清空",danger:true}).then(function(ok){if(ok){U.clearLogs();U.tip("已清空");}});});
 if(/[?&]debug\b/.test(location.search))setTimeout(function(){U.showLogs();},800);
@@ -39,7 +39,7 @@ if(/[?&]debug\b/.test(location.search))setTimeout(function(){U.showLogs();},800)
 </head>
 <body>
 
-<link rel="stylesheet" href="index.css?v=ab8bf466">
+<link rel="stylesheet" href="index.css?v=7822b8a1">
 <script>try{if(window.name==='vocab'&&/[#&]add=/.test(location.hash))document.documentElement.className+=' collect-mode';}catch(e){}</script>
 <div id="collect-overlay" style="display:none;position:fixed;inset:0;z-index:99999;background:#1d1e21;color:#E6E8EB;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;font-family:'PingFang SC','Noto Sans SC','Microsoft YaHei',system-ui,sans-serif">
   <div style="font-size:42px;margin-bottom:10px">📒</div>
@@ -390,7 +390,7 @@ if(/[?&]debug\b/.test(location.search))setTimeout(function(){U.showLogs();},800)
 <script src="de-forms.js?v=5bf6555d"></script>
 <script src="vocab.js?v=ae936d37"></script>
 
-<script src="tabs.js?v=875cf77a"></script>
+<script src="tabs.js?v=9717c305"></script>
 <script src="lang.js?v=0f6b8436"></script>
 <script src="tts.js?v=0f37f87f"></script>
 <script src="rec.js?v=0f113726"></script>
