@@ -90,7 +90,11 @@
   var L2_OWNER={daily:'en',notebook:'en',listen:'en',speak:'en',read:'en',write:'en',ielts:'en',basic:'en',fat:'life',trip:'life'};
   var EN_PAGE={notebook:'vocab',listen:'listen',read:'read',write:'write',basic:'write'}; // 入门只有「📐 语法」用生词本页
   var SECS={listen:[['drill','🧩 练习课'],['sme','📻 听力节目'],['video','🎬 视频'],['practice','🎧 听力练习']],basic:[['start','🧭 从这开始'],['speak','🗣 口语入门'],['pron','🔊 发音'],['grammar','📐 语法']]}; // 「📐 语法」从「✍️ 写」挪到了「🌱 入门」
-  var VOCAB_MODES=/^(err|stats|pump|saved|list)$/, CUR='', busy=false;
+  // 🇩🇪 学德语时：只有英语内容的页面整个藏起来（说、读、写、雅思、入门、BBC 听力节目、视频、语法、写作批改、已保存），各语言完全分开；
+  //   留下的是按语言分开存的：生词本（列表、练习、统计、错题）、🧩 练习课（德语素材）、🎧 听力练习（练自己生词本里的词）。样式在 index.css 的 html[data-lang="de"]
+  var DE=window.VL==='de', DE_OFF={speak:1,read:1,write:1,ielts:1,basic:1};
+  if(DE)SECS.listen=SECS.listen.filter(function(x){return x[0]==='drill'||x[0]==='practice';});
+  var VOCAB_MODES=DE?/^(err|stats|pump|list)$/:/^(err|stats|pump|saved|list)$/, CUR='', busy=false;
   try{if(!localStorage.getItem('drill:seen')){localStorage.setItem('drill:seen','1');if(localStorage.getItem('en_sub_listen'))localStorage.setItem('en_sub_listen','drill');}}catch(e){} // 新加的「🧩 练习课」第一次默认选它（新标签排最前、默认选最新）
   function getSub(w){var d=SECS[w][0][0];try{var v=localStorage.getItem('en_sub_'+w);if(SECS[w].some(function(x){return x[0]===v;}))return v;}catch(e){}return d;}
   function clickMode(m){var b=document.querySelector('.modes button[data-mode="'+m+'"]');if(b&&!b.classList.contains('on'))b.click();}
@@ -100,7 +104,7 @@
     wrap.innerHTML=SECS[which]?SECS[which].map(function(x){return '<button type="button" data-sub="'+x[0]+'" class="'+(x[0]===sub?'on':'')+'">'+x[1]+'</button>';}).join(''):'';
   }
   function show(which,sub){
-    if(!L2_OWNER[which])which='notebook';
+    if(!L2_OWNER[which]||(DE&&DE_OFF[which]))which='notebook';
     var l1=L2_OWNER[which];
     L2_OF[l1]=which; CUR=which;
     // L1 按钮 + 子导航条 显隐

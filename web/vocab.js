@@ -412,6 +412,7 @@ window.openVocabSettings=function(){const p=document.getElementById("export-pane
 function closeVocabSettings(){document.getElementById("export-panel").classList.remove("pop");document.getElementById("sp-mask").classList.remove("on");}
 document.getElementById("sp-close").onclick=closeVocabSettings;document.getElementById("sp-mask").onclick=closeVocabSettings;
 document.querySelectorAll(".modes button").forEach(b=>b.onclick=()=>{
+  if(window.VL==="de"&&/^(reading|saved|grammar|writing|sme)$/.test(b.dataset.mode)){const l=document.querySelector('.modes button[data-mode="list"]');if(l&&l!==b)return l.click();} // 🇩🇪 英语专用的模式：学德语时不进（按钮也藏起来了）
   document.querySelectorAll(".modes button").forEach(x=>x.classList.remove("on"));b.classList.add("on");
   const m=b.dataset.mode;
   document.documentElement.setAttribute("data-mode",m);
@@ -482,7 +483,9 @@ try{ptag=localStorage.getItem("list:ptag")||"all";}catch(x){}
 /* ===== quick collect (from videos / web pages) ===== */
 // 查词：后台 /api/dict；后台拿不到中文时（谷歌会拦机房 IP），在浏览器里直接查谷歌翻译补上（插件、练习页也是这样查的）
 window.dictGet=async function(word){
-  let j=null;try{const r=await fetch("/api/dict?w="+encodeURIComponent(word));j=await r.json();}catch(e){}
+  let j=null;
+  // 🇩🇪 后台的词典（音标、英文释义、Tatoeba 英语例句）只有英语：学德语时只查翻译（按德语查，tr.js 跟着 VL）
+  if(window.VL==="en"||!window.VL)try{const r=await fetch("/api/dict?w="+encodeURIComponent(word));j=await r.json();}catch(e){}
   if(j&&j.ok&&j.zh)return j;
   try{const g=await TR.word(word); // 全站共用的翻译（tr.js）
     const zh=g.zh[0]||"",zhs=g.pos.map(x=>({pos:x.p||"",terms:x.w}));
@@ -505,7 +508,8 @@ async function enrich(entry){ // 后台 /api/dict 一次拿齐：中文（谷歌
       return;
     }
   }catch(e){}
-  try{
+  const sl=window.VL&&window.VL!=="en"?window.VL:"en"; // 学德语：英语词典不查，翻译按德语
+  if(sl==="en")try{
     const r=await NET.fetch("https://api.dictionaryapi.dev/api/v2/entries/en/"+encodeURIComponent(entry.word));
     const j=await r.json();
     if(Array.isArray(j)&&j[0]){
@@ -520,7 +524,7 @@ async function enrich(entry){ // 后台 /api/dict 一次拿齐：中文（谷歌
     }
   }catch(e){}
   try{
-    const r2=await fetch("https://api.mymemory.translated.net/get?q="+encodeURIComponent(entry.word)+"&langpair=en|zh-CN");
+    const r2=await fetch("https://api.mymemory.translated.net/get?q="+encodeURIComponent(entry.word)+"&langpair="+sl+"|zh-CN");
     const j2=await r2.json();
     if(j2&&j2.responseData&&j2.responseData.translatedText)entry.zh=j2.responseData.translatedText;
   }catch(e){}

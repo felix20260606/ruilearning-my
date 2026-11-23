@@ -95,3 +95,8 @@
 html.show-speak #view-en{display:none}html.show-speak #view-speak{display:block}
 html.show-basic-home #view-en,html.show-basic-home #view-speak{display:none}html.show-basic-home #view-basic{display:block}
 #reading,#sme,#drill,#grammar{display:none}#reading.on,#sme.on,#drill.on,#grammar.on{display:block}
+
+/* 🇩🇪 学德语时只留按语言分开的页面（tabs.js 的 DE_OFF）：英语专用的标签、模式按钮都藏起来 */
+html[data-lang="de"] #tab-speak,html[data-lang="de"] #tab-read,html[data-lang="de"] #tab-write,html[data-lang="de"] #tab-ielts,html[data-lang="de"] #tab-basic,
+html[data-lang="de"] .modes button[data-mode="reading"],html[data-lang="de"] .modes button[data-mode="saved"],html[data-lang="de"] .modes button[data-mode="grammar"],
+html[data-lang="de"] .modes button[data-mode="writing"],html[data-lang="de"] .modes button[data-mode="sme"]{display:none!important}

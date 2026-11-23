@@ -450,7 +450,7 @@
   function draw() {
     if (!root) return;
     const d = data(); // 词汇量测试进行中也照常画：vtHtml 按 vt 的状态画到第几题
-    root.innerHTML = tilesHtml(d) + '<div class="st-grid">' + heatHtml(d) + forecastHtml(d) + distHtml(d) + curveHtml(d) + vtHtml() + remindHtml() + installHtml() + "</div>";
+    root.innerHTML = tilesHtml(d) + '<div class="st-grid">' + heatHtml(d) + forecastHtml(d) + distHtml(d) + curveHtml(d) + (window.VL && window.VL !== "en" ? "" : vtHtml()) + remindHtml() + installHtml() + "</div>";
     const hw = root.querySelector(".st-heat-wrap"); if (hw) hw.scrollLeft = hw.scrollWidth; // 手机上热力图横向滚动：默认停在最近几周
   }
   function showTip(el, x, y) {

@@ -110,7 +110,8 @@
       { id: "speak", ic: "🗣", t: "说", sub: "「🗣 说 → 📅 每日一练」：1 段情景对话 + 跟读 5 句 + 说 1 个话题", prog: sday ? "今天已打卡" : slog ? "今天练了 " + slog + " 次，还没打卡" : "", pct: sday ? 1 : Math.min(.9, slog / 7), auto: sday, min: 15 },
       { id: "read", ic: "📖", t: "读", sub: "读「📰 今日新闻」（觉得难就点「✨ 简单版 + 小测」），或者阅读里任意一篇；点不认识的词查意思、收进生词本", prog: rd.length ? "今天读了：" + rd.map(d => d.title).slice(0, 2).join("、") : "", pct: rd.length ? 1 : 0, auto: rd.length > 0, min: 10 },
       { id: "write", ic: "✍️", t: "写", sub: "在「✍️ 写 → 📝 写作批改」写一段交给它批改；时间不够就用下面 3 个词各造一句（AI 帮你看对不对）", prog: [wr.length ? "今天批改了 " + wr.length + " 篇" : "", sn ? "造句 " + Math.min(sn, 3) + " / 3" : ""].filter(Boolean).join(" · "), pct: wr.length ? 1 : sn / 3, auto: wr.length > 0 || sn >= 3, min: 10, extra: '<button class="dy-chk' + (sentOpen ? " on" : "") + '" data-sent="1">✏️ 用新词造 3 句</button>', more: sentOpen ? sentHtml() : "" },
-    ].filter(x => o.on[x.id]);
+    ].filter(x => o.on[x.id] && (!DE || DE_ON[x.id]));
+    if (DE) L.forEach(x => { if (x.id === "listen") x.sub = "「🎧 听 → 🧩 练习课」做一节德语课（或者把做错的复习 5 句）；或者「🎧 听力练习」做 10 张听力 / 听写卡（练你德语生词本里的词）"; });
     L.forEach(x => { x.man = !!man[x.id]; x.ok = x.auto || x.man; });
     return L;
   }
@@ -214,6 +215,8 @@
   @media(max-width:640px){.dy-hd h1{font-size:22px}.dy-top{grid-template-columns:auto 1fr}.dy-wk{grid-column:1/-1;justify-content:space-between}.dy-it{grid-template-columns:40px 1fr}.dy-ic{width:40px;height:40px}.dy-btns{grid-column:1/-1;flex-direction:row}.dy-btns .ui-btn{flex:1}.dy-wkbox .nums{grid-template-columns:repeat(3,1fr)}}`;
 
   let root = null, back = null, showSet = false, went = false;
+  // 🇩🇪 学德语时只排有德语内容的两项（词、听）；说、读、写、雅思都是英语专用的（tabs.js 也把它们藏起来了）
+  const DE = !!(window.VL && window.VL !== "en"), DE_ON = { word: 1, listen: 1 };
   function draw() {
     if (!root) return;
     const L = tasks(), D = record(L), n = L.filter(x => x.ok).length, st = streak(D), next = L.find(x => !x.ok), o = opt();
@@ -222,14 +225,14 @@
     const exL = o.exam ? daysTo(o.exam) : null, sug = exL != null && exL >= 0 ? suggestWord(exL) : 0;
     if (showWk === null) { const dw = new Date().getDay(); showWk = (dw === 0 || dw === 1) && LG("daily:wkseen", "") !== wkKey(); }
     const set = '<div class="dy-set' + (showSet ? " on" : "") + '"><b>每天练哪几项</b><div class="row">' +
-      [["word", "🔤 背单词"], ["listen", "🎧 听"], ["speak", "🗣 说"], ["read", "📖 读"], ["write", "✍️ 写"]].map(([k, t]) => '<label><input type="checkbox" data-on="' + k + '"' + (o.on[k] ? " checked" : "") + ">" + t + "</label>").join("") +
+      [["word", "🔤 背单词"], ["listen", "🎧 听"], ["speak", "🗣 说"], ["read", "📖 读"], ["write", "✍️ 写"]].filter(([k]) => !DE || DE_ON[k]).map(([k, t]) => '<label><input type="checkbox" data-on="' + k + '"' + (o.on[k] ? " checked" : "") + ">" + t + "</label>").join("") +
       '</div><div class="row">单词每天 ' + [10, 20, 30, 50].map(v => '<button class="ui-btn' + (o.word === v ? " pri" : "") + '" data-word="' + v + '">' + v + " 张</button>").join("") + "</div>" +
-      '<div class="row" style="margin-top:14px"><b>🎓 雅思考试</b> 日期 <input type="date" data-exam value="' + esc(o.exam) + '"> 目标 ' + [5.5, 6, 6.5, 7, 7.5].map(v => '<button class="ui-btn' + (o.band === v ? " pri" : "") + '" data-band="' + v + '">' + v + "</button>").join("") + (o.exam ? ' <button class="dy-chk" data-exam-clear="1">不设了</button>' : "") + "</div>" +
-      (sug && sug !== o.word ? '<div class="row" style="color:var(--ui-muted);font-size:13px">离考试还有 ' + exL + " 天，建议单词每天 " + sug + ' 张 <button class="ui-btn" data-word="' + sug + '">用建议值</button></div>' : "") + "</div>";
-    const exTxt = o.exam ? (exL > 0 ? '<span class="ex">🎓 离雅思还有 ' + exL + " 天" + (o.band ? "（目标 " + o.band + "）" : "") + "</span> · " : exL === 0 ? '<span class="ex">🎓 今天考试，加油！</span> · ' : "") : "";
+      (DE ? "" : '<div class="row" style="margin-top:14px"><b>🎓 雅思考试</b> 日期 <input type="date" data-exam value="' + esc(o.exam) + '"> 目标 ' + [5.5, 6, 6.5, 7, 7.5].map(v => '<button class="ui-btn' + (o.band === v ? " pri" : "") + '" data-band="' + v + '">' + v + "</button>").join("") + (o.exam ? ' <button class="dy-chk" data-exam-clear="1">不设了</button>' : "") + "</div>") +
+      (!DE && sug && sug !== o.word ? '<div class="row" style="color:var(--ui-muted);font-size:13px">离考试还有 ' + exL + " 天，建议单词每天 " + sug + ' 张 <button class="ui-btn" data-word="' + sug + '">用建议值</button></div>' : "") + "</div>";
+    const exTxt = o.exam && !DE ? (exL > 0 ? '<span class="ex">🎓 离雅思还有 ' + exL + " 天" + (o.band ? "（目标 " + o.band + "）" : "") + "</span> · " : exL === 0 ? '<span class="ex">🎓 今天考试，加油！</span> · ' : "") : "";
     root.innerHTML = '<div class="dy">' +
       '<div id="dy-quota">' + (window.quotaHtml ? window.quotaHtml() : "") + "</div>" + // 🔋 AI 额度（quota.js）
-      '<div class="dy-hd"><h1>📅 每日一练</h1><p>每天按顺序做完这几项：词 → 听 → 说 → 读 → 写。点「去练」直接跳过去，做完回来会自动打勾。</p><button class="ui-btn" data-act="wk">📊 本周小结</button><button class="ui-btn" data-act="set">⚙ 设置</button></div>' + set +
+      '<div class="dy-hd"><h1>📅 每日一练</h1><p>每天按顺序做完这几项：' + (DE ? "词 → 听（德语）" : "词 → 听 → 说 → 读 → 写") + '。点「去练」直接跳过去，做完回来会自动打勾。</p><button class="ui-btn" data-act="wk">📊 本周小结</button><button class="ui-btn" data-act="set">⚙ 设置</button></div>' + set +
       (showWk ? weekHtml() : weekBrief()) +
       '<div class="dy-top"><div class="dy-ring" style="--p:' + (L.length ? Math.round(n / L.length * 100) : 0) + '"><div><div><b>' + n + "/" + L.length + '</b><span>今天</span></div></div></div>' +
       '<div class="dy-meta"><b>' + (!L.length ? "在 ⚙ 设置里选几项开始" : n >= L.length ? "🎉 今天全部完成" : "还剩 " + (L.length - n) + " 项，约 " + left + " 分钟") + "</b><div>" + exTxt + '<span data-to="notebook/stats" title="看热力日历和统计">🔥 连续全勤 ' + st + " 天" + (Object.keys(D).length ? " · 共练了 " + Object.keys(D).filter(k => D[k][0] > 0).length + " 天" : "") + "</span>" + (!o.exam ? ' · <a href="javascript:void 0" data-act="set" style="color:var(--ui-muted)">设考试日期</a>' : "") + "</div></div>" +

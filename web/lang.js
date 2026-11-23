@@ -61,10 +61,16 @@
   function paint() {
     if (btn) btn.innerHTML = cfg().flag + ' <b class="ln">' + cfg().name + "</b> ▾";
     const l1 = document.getElementById("l1-en"); if (l1) l1.textContent = "📚 " + cfg().name; // 一级标签跟着语言
+    // 生词本的标题、搜索框也跟着语言（不是英语时不再写「英语生词本」）
+    if (cur !== "en") {
+      const h = document.querySelector("#view-en header h1"); if (h) h.textContent = cfg().name + "生词本";
+      const q = document.getElementById("q"); if (q) q.placeholder = "搜索" + cfg().name + "或中文…";
+      const eb = document.querySelector("#view-en header .eyebrow"); if (eb && cur === "de") eb.textContent = "Wortschatz";
+    }
   }
   function open() {
     menu.innerHTML = Object.values(LANGS).map(x => '<button data-l="' + x.code + '" class="' + (x.code === cur ? "on" : "") + '">' + x.flag + " " + x.name + (x.ready ? "" : ' <small style="color:var(--ui-muted)">（准备中）</small>') + "</button>").join("") +
-      '<div class="who-tip">每种语言的生词本、错题本、练习进度、每日打卡都分开存，切换后页面会重新加载。<br>每个家人各自选，只记在这台设备上。<br>内容跟着换的：🎧 听 → 🧩 练习课；其它页面的内容（BBC、雅思、新闻…）还是英语的。</div>';
+      '<div class="who-tip">每种语言完全分开：生词本、错题本、练习进度、每日打卡都各存各的，切换后页面会重新加载。<br>每个家人各自选，只记在这台设备上。<br>学德语时只显示有德语内容的：📖 词汇（列表、练习、统计、错题）、🧩 练习课、🎧 听力练习；英语专用的（说、读、写、雅思、入门、BBC 节目、视频）先藏起来。</div>';
     const r = btn.getBoundingClientRect(); menu.classList.add("on");
     const w = menu.offsetWidth; menu.style.left = Math.max(16, Math.min(r.left, innerWidth - w - 16)) + "px"; menu.style.top = (r.bottom + 6) + "px";
   }
