@@ -1177,7 +1177,7 @@ Reply with ONLY one JSON object, no markdown:
  "match":[{"s":"a short German description of information (paraphrased)","a":"paragraph letter","why_zh":"..."}],
  "gaps":[{"s":"a German summary sentence with ____ where the answer goes","a":"ONE to THREE words copied exactly from the passage (same spelling, case and umlauts)","why_zh":"..."}],
  "mcq":[{"q":"German question","opts":["A text","B text","C text","D text"],"ans":0,"why_zh":"..."}]}
-"a" in tfng is TRUE (richtig), FALSE (falsch) or NOT GIVEN (steht nicht im Text). Exactly 5 tfng (at least one of each answer), 3 match (different paragraphs), 3 gaps, 2 mcq. Statements must be paraphrased. Do not use information outside the passage.`;
+"a" in tfng is TRUE (richtig), FALSE (falsch) or NOT GIVEN (steht nicht im Text). Exactly 5 tfng: 2 TRUE, 2 FALSE and 1 NOT GIVEN, in mixed order, 3 match (different paragraphs), 3 gaps, 2 mcq. Statements must be paraphrased. Do not use information outside the passage.`;
 const EXAM_LISTEN_SYS_DE = `You are an experienced question writer for the Goethe-Zertifikat B1/B2 listening module (Hören). The text is the transcript of a German radio news programme for learners (Deutsche Welle "Langsam gesprochene Nachrichten"; lines are "Headline: text"). Write everything in clear German (B1-B2 level). ${DE_RULE}
 Reply with ONLY one JSON object, no markdown:
 {"notes":[{"s":"a German note line with ____ where the answer goes","a":"ONE to THREE words or a number, copied exactly from the transcript (same spelling, case and umlauts)","why_zh":"简体中文解释，引用原话"}],
@@ -1197,6 +1197,7 @@ function examClean(o, mode, text, de) {
     const tf = x => { const a = String(x && x.a || "").toUpperCase().replace(/_/g, " ").trim(); return isObj(x) && x.s && ["TRUE", "FALSE", "NOT GIVEN"].includes(a) ? { s: c(x.s, 300), a, p: L.includes(String(x.p || "").toUpperCase()) ? String(x.p).toUpperCase() : "", why_zh: c(x.why_zh, 300) } : null; };
     const mt = x => isObj(x) && x.s && L.includes(String(x.a || "").toUpperCase().trim()) ? { s: c(x.s, 300), a: String(x.a).toUpperCase().trim(), why_zh: c(x.why_zh, 300) } : null;
     out.tfng = (o.tfng || []).map(tf).filter(Boolean).slice(0, 5); out.match = (o.match || []).map(mt).filter(Boolean).slice(0, 3); out.gaps = (o.gaps || []).map(gap).filter(Boolean).slice(0, 3); out.mcq = (o.mcq || []).map(mcq(4)).filter(Boolean).slice(0, 2); out.letters = L;
+    if (de && !(out.tfng.some(x => x.a === "TRUE") && out.tfng.some(x => x.a === "FALSE"))) return null; // 德语：判断题全是 Falsch（或全是 Richtig）的不要，换个模型再出
     return out.tfng.length >= 3 && out.tfng.length + out.match.length + out.gaps.length + out.mcq.length >= 9 ? out : null;
   }
   out.notes = (o.notes || []).map(gap).filter(Boolean).slice(0, 6); out.mcq = (o.mcq || []).map(x => mcq(3)(x) || mcq(4)(x)).filter(Boolean).slice(0, 4);
