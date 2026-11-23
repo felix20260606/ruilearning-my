@@ -34,7 +34,12 @@
   .pl{background:var(--paper);border:1px solid var(--line);border-radius:var(--ui-radius,16px);margin:18px 0;overflow:hidden;scroll-margin-top:12px}
   .ph{display:flex;align-items:center;gap:14px;color:#fff;padding:16px 20px;background:linear-gradient(120deg,#4d2570,#7d38ab)}
   .pl.sea .ph{background:linear-gradient(120deg,#183f55,#24678a)}.pl.old .ph{background:linear-gradient(120deg,#5c3913,#94601f)}.pl.next .ph{background:linear-gradient(120deg,#22472f,#2f7a4a)}
-  .ph .em{font-size:32px}.ph h2{font-family:var(--display);font-size:22px;font-weight:900}.ph p{font-size:13px;opacity:.95}
+  .ph .em{font-size:32px}.ph>div{flex:1}
+  /* 去过 / 还没去：一眼看得出来 */
+  .been{flex:0 0 auto;font-size:13px;font-weight:900;border-radius:999px;padding:5px 12px;background:#2fbf71;color:#08140d;box-shadow:0 2px 10px rgba(47,191,113,.35);white-space:nowrap}
+  .been.no{background:rgba(255,255,255,.16);color:#fff;box-shadow:none;border:1px dashed rgba(255,255,255,.5)}
+  .toc a{position:relative}.toc a .ck{margin-left:auto;font-size:12px;font-weight:900;color:#2fbf71;white-space:nowrap}.toc a .ck.no{color:var(--soft)}
+  .toc a.done{border-color:rgba(47,191,113,.55);background:color-mix(in srgb,#2fbf71 10%,var(--paper-2))}.ph h2{font-family:var(--display);font-size:22px;font-weight:900}.ph p{font-size:13px;opacity:.95}
   .pb{padding:14px 20px 16px;font-size:14.5px}
   .pb h3{font-size:14px;color:var(--soft);font-weight:700;margin:10px 0 4px}
   .pb ul{padding-left:20px}.pb li{margin:2px 0}
@@ -62,18 +67,18 @@
   <nav class="toc" id="toc">
     <h2>📍 目录 · 点哪里跳到哪一段</h2>
     <ol>
-      <li><a href="#batu"><span class="em">🛕</span><span><b>黑风洞</b><small>到吉隆坡第一站</small></span></a></li>
-      <li><a href="#putra"><span class="em">🕌</span><span><b>布城</b><small>粉红清真寺</small></span></a></li>
-      <li><a href="#melaka"><span class="em">🏛</span><span><b>马六甲</b><small>世界遗产古城</small></span></a></li>
-      <li><a href="#penang"><span class="em">🏝</span><span><b>槟城</b><small>乔治市 + 国家公园</small></span></a></li>
-      <li><a href="#langkawi"><span class="em">🦅</span><span><b>兰卡威</b><small>天空之桥 + 浮潜</small></span></a></li>
-      <li><a href="#sg"><span class="em">🇸🇬</span><span><b>新加坡</b><small>8/19–21</small></span></a></li>
-      <li><a href="#next"><span class="em">⏳</span><span><b>走之前还能去</b><small>11/24–29</small></span></a></li>
+      <li><a class="done" href="#batu"><span class="em">🛕</span><span><b>黑风洞</b><small>到吉隆坡第一站</small></span><span class="ck">✅ 去过</span></a></li>
+      <li><a class="done" href="#putra"><span class="em">🕌</span><span><b>布城</b><small>粉红清真寺</small></span><span class="ck">✅ 去过</span></a></li>
+      <li><a class="done" href="#melaka"><span class="em">🏛</span><span><b>马六甲</b><small>世界遗产古城</small></span><span class="ck">✅ 去过</span></a></li>
+      <li><a class="done" href="#penang"><span class="em">🏝</span><span><b>槟城</b><small>乔治市 + 国家公园</small></span><span class="ck">✅ 去过</span></a></li>
+      <li><a class="done" href="#langkawi"><span class="em">🦅</span><span><b>兰卡威</b><small>天空之桥 + 浮潜</small></span><span class="ck">✅ 去过</span></a></li>
+      <li><a class="done" href="#sg"><span class="em">🇸🇬</span><span><b>新加坡</b><small>8/19–21</small></span><span class="ck">✅ 去过</span></a></li>
+      <li><a href="#next"><span class="em">⏳</span><span><b>走之前还能去</b><small>11/24–29</small></span><span class="ck no">还没去</span></a></li>
     </ol>
   </nav>
 
   <section class="pl" id="batu">
-    <div class="ph"><span class="em">🛕</span><div><h2>黑风洞 Batu Caves</h2><p>吉隆坡北边 · 半天 · 到吉隆坡最先去的地方</p></div></div>
+    <div class="ph"><span class="em">🛕</span><div><h2>黑风洞 Batu Caves</h2><p>吉隆坡北边 · 半天 · 到吉隆坡最先去的地方</p></div><span class="been">✅ 去过</span></div>
     <div class="pb">
       <h3>去过的</h3>
       <ul><li>272 级彩虹阶梯，上面是石灰岩大溶洞里的印度教神庙</li><li>门口 42.7 米高的金色战神像</li><li>洞口一路都是猴子，手里别拿吃的</li></ul>
@@ -83,7 +88,7 @@
   </section>
 
   <section class="pl" id="putra">
-    <div class="ph"><span class="em">🕌</span><div><h2>布城 Putrajaya</h2><p>行政首都 · 半天 · Grab 来回</p></div></div>
+    <div class="ph"><span class="em">🕌</span><div><h2>布城 Putrajaya</h2><p>行政首都 · 半天 · Grab 来回</p></div><span class="been">✅ 去过</span></div>
     <div class="pb">
       <h3>去过的</h3>
       <ul><li>布特拉清真寺（粉红清真寺），湖边倒影</li><li>首相署、太子桥、布城湖一圈的政府建筑群</li></ul>
@@ -93,7 +98,7 @@
   </section>
 
   <section class="pl old" id="melaka">
-    <div class="ph"><span class="em">🏛</span><div><h2>马六甲 Melaka</h2><p>世界遗产古城 · TBS 大巴 2 小时</p></div></div>
+    <div class="ph"><span class="em">🏛</span><div><h2>马六甲 Melaka</h2><p>世界遗产古城 · TBS 大巴 2 小时</p></div><span class="been">✅ 去过</span></div>
     <div class="pb">
       <h3>去过的</h3>
       <ul><li>荷兰红屋、基督堂、圣保罗山、圣地亚哥城门</li><li>鸡场街：鸡饭粒、珍多冰；周末夜市</li><li>和谐街（一条街三种宗教）、娘惹博物馆、河畔壁画</li><li>海峡水上清真寺看日落、马六甲河游船</li></ul>
@@ -102,7 +107,7 @@
   </section>
 
   <section class="pl old" id="penang">
-    <div class="ph"><span class="em">🏝</span><div><h2>槟城 Penang</h2><p>3 天 2 晚 · TBS 大巴来回 · 住 Cititel</p></div></div>
+    <div class="ph"><span class="em">🏝</span><div><h2>槟城 Penang</h2><p>3 天 2 晚 · TBS 大巴来回 · 住 Cititel</p></div><span class="been">✅ 去过</span></div>
     <div class="pb">
       <h3>去过的</h3>
       <ul><li>乔治市老城：壁画街、姓氏桥、邱公司、汕头街</li><li>国家公园徒步到 Monkey Beach</li><li>猫猫沙滩撸猫、晚上逛夜市</li></ul>
@@ -111,7 +116,7 @@
   </section>
 
   <section class="pl sea" id="langkawi">
-    <div class="ph"><span class="em">🦅</span><div><h2>兰卡威 Langkawi</h2><p>3 天 2 晚 · KL 直飞 1 小时 · 免税岛</p></div></div>
+    <div class="ph"><span class="em">🦅</span><div><h2>兰卡威 Langkawi</h2><p>3 天 2 晚 · KL 直飞 1 小时 · 免税岛</p></div><span class="been">✅ 去过</span></div>
     <div class="pb">
       <h3>去过的</h3>
       <ul><li>天空缆车 + 天空之桥</li><li>芭雅岛海洋公园浮潜</li><li>Cenang 海滩日落、夜市，免税店扫货</li></ul>
@@ -120,7 +125,7 @@
   </section>
 
   <section class="pl sea" id="sg">
-    <div class="ph"><span class="em">🇸🇬</span><div><h2>新加坡 Singapore</h2><p>8/19–21 · 大巴过关去 · 凌晨飞机回国</p></div></div>
+    <div class="ph"><span class="em">🇸🇬</span><div><h2>新加坡 Singapore</h2><p>8/19–21 · 大巴过关去 · 凌晨飞机回国</p></div><span class="been">✅ 去过</span></div>
     <div class="pb">
       <h3>去过的</h3>
       <ul><li>TBS 大巴过新柔长堤，两道关</li><li>牛车水、滨海湾两场灯光秀</li><li>圣淘沙 / 文化区，最后在星耀樟宜看瀑布</li></ul>
@@ -129,7 +134,7 @@
   </section>
 
   <section class="pl next" id="next">
-    <div class="ph"><span class="em">⏳</span><div><h2>走之前还能去 · 11/24–29</h2><p>上面没去过的，从吉隆坡出发；11/30 的飞机</p></div></div>
+    <div class="ph"><span class="em">⏳</span><div><h2>走之前还能去 · 11/24–29</h2><p>上面没去过的，从吉隆坡出发；11/30 的飞机</p></div><span class="been no">⏳ 还没去</span></div>
     <div class="pb">
       <h3>🪞 瓜拉雪兰莪 天空之镜 + 适耕庄（最推荐，一天）</h3>
       <ul><li>退潮时浅滩像镜子，拍照最出片；只在大退潮的日子有（满月 / 新月前后，这周正好），跟团最方便，出发时间前一天通知</li><li>回程顺路适耕庄稻田、海鲜，马六甲山顶看猴子</li></ul>
