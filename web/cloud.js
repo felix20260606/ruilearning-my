@@ -20,7 +20,7 @@
   function chan(k, opt) {
     if (CH[k]) return CH[k];
     opt = opt || {}; const delay = opt.delay || 1500, ext = k === "ext", url = ext ? "/api/ext" : "/api/mine", body = ch => JSON.stringify(ext ? { changes: ch } : { k, changes: ch });
-    let Q = {}, T = 0, pulledAt = 0, pulling = null, fails = 0, inflight = null;
+    let Q = {}, T = 0, pulledAt = 0, pulling = null, fails = 0, inflight = null; const okAt = {}; // okAt：每个 id 最近一次发成功的改动时间
     // 发失败（断网、后台出错、被限流）：等的时间一次比一次长（1.5 秒 → 3 → 6 … 最多 5 分钟），不再每 1.5 秒一直打后台；有新改动、连上网、切回页面时马上再试
     const wait = () => (fails ? Math.min(delay * Math.pow(2, fails), 300e3) : delay);
     const later = () => { clearTimeout(T); T = setTimeout(flush, wait()); };
@@ -32,9 +32,9 @@
       inflight = ch; // 正在发的这一批：关页面时 beacon 也一起补发
       let r = null; try { r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: body(ch) }); } catch (e) {}
       inflight = null;
-      if (r && r.ok) { fails = 0; return true; }
+      if (r && r.ok) { fails = 0; for (const id in ch) okAt[id] = Math.max(okAt[id] || 0, +ch[id].at || 0); return true; }
       const st = r ? r.status : 0;
-      if (!r || st >= 500 || st === 429) { for (const id in ch) if (!(id in Q)) Q[id] = ch[id]; fails++; log(k + " 没发出去，等下次再发", { 条数: n, status: st, 秒后再试: Math.round(wait() / 1000) }); later(); }
+      if (!r || st >= 500 || st === 429) { for (const id in ch) if (!(id in Q) && !((okAt[id] || 0) >= (+ch[id].at || 0))) Q[id] = ch[id]; fails++; /* 同一项更新的改动已经发成功了：旧的不再补发 */ log(k + " 没发出去，等下次再发", { 条数: n, status: st, 秒后再试: Math.round(wait() / 1000) }); later(); }
       else log(k + " 后台不收（丢掉）", { 条数: n, status: st });
       return false;
     }

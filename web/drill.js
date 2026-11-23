@@ -249,7 +249,7 @@
   function hush() { MEDIA.stop(AU); try { AU.pause(); } catch (e) {} if (window.TTS) TTS.hush(); }
   const others = () => MEDIA.solo(AU); // 全站共用的放音（media.js）：别的声音（听力节目、视频、朗读）都停掉
   // 没有原声时间的句子：全站共用的朗读（tts.js：英语先 AI 真人声，其它语言 / 播不了用系统语音）
-  function sayTTS(t, rate, onEnd) { if (window.TTS) TTS.say(t, { lang: LANG().cur(), rate: rate || 1, base: 0.95, end: onEnd ? () => onEnd() : null }); else tip("这个浏览器不能朗读"); }
+  function sayTTS(t, rate, onEnd) { if (window.TTS) TTS.say(t, { sys: true, lang: LANG().cur(), rate: rate || 1, base: 0.95, end: onEnd ? () => onEnd() : null }); /* 没有原声的整句：用系统语音（同重构前），不花 AI 额度 */ else tip("这个浏览器不能朗读"); }
   function play(si, slow, onEnd) {
     const x = M && M.sents[si]; if (!x) return; others(); hush();
     const rate = slow ? 0.75 : opt().rate;

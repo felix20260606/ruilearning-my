@@ -5,13 +5,13 @@
 <script src="boot.js?v=0828eb64"></script>
 <script src="util.js?v=501b9c33"></script>
 <script src="nav.js?v=7859fae8"></script>
-<script src="word.js?v=57e7b566"></script>
+<script src="word.js?v=1ee1b290"></script>
 <script src="ai.js?v=53f96086"></script>
 <script src="tr.js?v=bd7ef6b1"></script>
-<script src="cloud.js?v=1ddd4499"></script>
+<script src="cloud.js?v=6ddf45e3"></script>
 <script src="media.js?v=90149a34"></script>
 <script src="keys.js?v=3c74bc86"></script>
-<script src="lazy.js?v=9d29d980"></script><!-- ⚡ 按需加载：口语、入门、阅读、听力、练习课、考试、写作、语法点进去才加载，首页好了以后后台再加载完 -->
+<script src="lazy.js?v=e80f42cc"></script><!-- ⚡ 按需加载：口语、入门、阅读、听力、练习课、考试、写作、语法点进去才加载，首页好了以后后台再加载完 -->
 <script>/* 🐞 问题记录：生词本「⚙ 设置」里的入口，网址带 ?debug 直接打开（util.js 的 U.showLogs） */
 document.addEventListener("click",function(e){var t=e.target;if(!t||!t.closest)return;if(t.closest("#dbg-open"))U.showLogs();else if(t.closest("#dbg-clear"))U.ask("清空这台设备上的问题记录？",{ok:"清空",danger:true}).then(function(ok){if(ok){U.clearLogs();U.tip("已清空");}});});
 if(/[?&]debug\b/.test(location.search))setTimeout(function(){U.showLogs();},800);
@@ -387,6 +387,7 @@ if(/[?&]debug\b/.test(location.search))setTimeout(function(){U.showLogs();},800)
 <link rel="stylesheet" href="mobile.css?v=ff2903c5">
 <div class="toast" id="toast"></div>
 
+<script src="de-forms.js?v=5bf6555d"></script>
 <script src="vocab.js?v=81bf9911"></script>
 
 <script src="tabs.js?v=96662cdc"></script>

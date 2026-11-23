@@ -80,18 +80,22 @@
 
   /* ---------- 生词本状态（按原形匹配；规则同插件 web/vs/vlevel.js 的 vsKeys） ---------- */
   function stems(w) { const o = [w]; if (/ies$/.test(w)) o.push(w.slice(0, -3) + "y"); if (/(es|ed)$/.test(w)) o.push(w.slice(0, -2), w.slice(0, -1)); if (/s$/.test(w)) o.push(w.slice(0, -1)); if (/ing$/.test(w)) o.push(w.slice(0, -3), w.slice(0, -3) + "e"); if (/(.)\1(ed|ing)$/.test(w)) o.push(w.replace(/(.)\1(ed|ing)$/, "$1")); return o; }
+  const DE = () => window.VL === "de" && window.DE_FORMS;
   const keysOf = w => { try { if (typeof vsKeys === "function") return [w].concat(vsKeys(w)); } catch (e) {} return stems(w); };
+  // 德语（de-forms.js）：生词本里的词按原样（再去掉变音的写法），文章里的词推回可能的原形去比：Häuser / gemacht / ging 都能框到 Haus / machen / gehen
+  const bookKeys = w => (DE() ? [...new Set([w, w.replace(/ä/g, "a").replace(/ö/g, "o").replace(/ü/g, "u")])] : keysOf(w));
+  const textKeys = w => (DE() ? window.DE_FORMS.keys(w) : keysOf(w));
   const lemma = w => { try { return typeof vsLemma === "function" ? vsLemma(w) : w; } catch (e) { return w; } };
   let book = new Map(), bookK = null;
   function loadBook() {
     book = new Map(); bookK = null;
     try { (typeof words !== "undefined" ? words : []).forEach(w => { const k = String(w.word || "").toLowerCase().replace(/[{}]/g, "").replace(/’/g, "'").trim(); if (k && (!book.has(k) || w.status === "known")) book.set(k, w.status === "known" ? "kn" : "lr"); }); } catch (e) {}
   }
-  function bookIdx() { if (!bookK || bookK.fn !== typeof vsKeys) { bookK = new Map(); bookK.fn = typeof vsKeys; book.forEach((v, k) => keysOf(k).forEach(q => { if (!bookK.has(q) || v === "kn") bookK.set(q, v); })); } return bookK; }
+  function bookIdx() { if (!bookK || bookK.fn !== typeof vsKeys) { bookK = new Map(); bookK.fn = typeof vsKeys; book.forEach((v, k) => bookKeys(k).forEach(q => { if (!bookK.has(q) || v === "kn") bookK.set(q, v); })); } return bookK; }
   function status(w) {
     w = String(w || "").toLowerCase().replace(/’/g, "'"); if (!w) return "";
     if (!book.size) loadBook();
-    const B = bookIdx(); for (const s of keysOf(w)) if (B.has(s)) return B.get(s);
+    const B = bookIdx(); for (const s of textKeys(w)) if (B.has(s)) return B.get(s);
     return "";
   }
 
