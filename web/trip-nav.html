@@ -27,6 +27,12 @@ body{font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1
 .nc .tag.g{background:rgba(255,184,107,.14);color:var(--ui-orange)}
 .sec{font-family:var(--display);font-weight:900;font-size:14px;color:var(--soft);letter-spacing:.06em;margin:20px 2px 9px}
 footer{text-align:center;color:var(--soft);font-size:11px;margin-top:24px;line-height:1.7}
+.nc.static{cursor:default}.nc.static:hover{transform:none;box-shadow:0 1px 2px rgba(0,0,0,.36);border-color:var(--line)}
+.nc .tag.ok{background:rgba(124,227,184,.16);color:var(--ui-green,#7CE3B8)}
+.nc ul{font-size:11.8px;color:var(--soft);line-height:1.6;padding-left:16px;flex:1}
+.stats{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:2px 0 4px}
+.stats span{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:12px;color:var(--soft)}.stats b{color:var(--ink);font-size:14px;margin-right:3px}
+.note{font-size:12px;color:var(--soft);line-height:1.7;margin:8px 2px 0}
 /* ---- 电脑端（≥1024px）：铺满宽度，卡片 4 列 ---- */
 @media (min-width:1024px){
   .wrap{max-width:1480px;padding:36px 44px 72px}
@@ -48,6 +54,30 @@ footer{text-align:center;color:var(--soft);font-size:11px;margin-top:24px;line-h
     <h1>🧳 旅游中心</h1>
     <p>所有行程一览 · 点卡片直达</p>
   </div>
+
+  <!-- 🗺 去过的地方（2026 年在吉隆坡这一趟）：有行程文章的点卡片打开文章；黑风洞、布城是当天去的，没写文章 -->
+  <div class="sec">▍🗺 我去过的地方 · 吉隆坡这一趟</div>
+  <div class="stats"><span><b>6</b>个地方</span><span><b>2</b>个国家</span><span><b>4</b>篇马来西亚行程</span><span>✈️ 11/30 回国</span></div>
+  <div class="grid" style="margin-top:10px">
+    <div class="nc static"><span class="em">🛕</span><b>黑风洞 Batu Caves</b><ul><li>272 级彩虹阶梯 + 大金像</li><li>到吉隆坡最先去的地方</li></ul><span class="tag ok">✓ 去过</span></div>
+    <div class="nc static"><span class="em">🕌</span><b>布城 Putrajaya</b><ul><li>粉红清真寺、湖边政府建筑群</li><li>半天，Grab 来回</li></ul><span class="tag ok">✓ 去过</span></div>
+    <div class="nc" data-go="mel1"><span class="em">🏛</span><b>马六甲</b><ul><li>荷兰红屋、圣保罗山、鸡场街</li><li>和谐街、娘惹老宅、海峡水上清真寺日落</li></ul><span class="tag ok">✓ 去过 · 看文章 ›</span></div>
+    <div class="nc" data-go="pg"><span class="em">🏝</span><b>槟城</b><ul><li>乔治市壁画、姓氏桥、邱公司</li><li>国家公园徒步 Monkey Beach、猫猫沙滩</li></ul><span class="tag ok">✓ 去过 · 看文章 ›</span></div>
+    <div class="nc" data-go="lk"><span class="em">🦅</span><b>兰卡威</b><ul><li>天空缆车 + 天空之桥</li><li>芭雅岛浮潜、Cenang 海滩日落、免税店</li></ul><span class="tag ok">✓ 去过 · 看文章 ›</span></div>
+    <div class="nc" data-go="sg2"><span class="em">🇸🇬</span><b>新加坡（8/19–21）</b><ul><li>大巴过关、牛车水、滨海湾灯光秀</li><li>圣淘沙 / 文化区、星耀樟宜</li></ul><span class="tag ok">✓ 去过 · 看文章 ›</span></div>
+  </div>
+  <p class="note">吉隆坡市区（双子塔、茨厂街、武吉免登）住着就逛了，没单独算。哪里写错了、漏了，跟 Claude 说一声就改。</p>
+
+  <!-- 走之前还能去（11/24–29）：都是行程文章里没写过的，从吉隆坡出发 -->
+  <div class="sec">▍⏳ 走之前还能去 · 11/24–29</div>
+  <div class="grid">
+    <div class="nc static"><span class="em">🪞</span><b>瓜拉雪兰莪 天空之镜</b><p>退潮时海滩像镜子，拍照最出片；只在大退潮的日子有（满月 / 新月前后，这周正好），跟团一天，回程顺路适耕庄稻田 + 海鲜</p><span class="tag">最推荐</span></div>
+    <div class="nc static"><span class="em">☕</span><b>怡保 一日游</b><p>KL Sentral 坐 ETS 火车 2.5 小时：老街、二奶巷、山洞寺庙（三宝洞、极乐洞），白咖啡、芽菜鸡、豆腐花</p></div>
+    <div class="nc static"><span class="em">🍵</span><b>金马伦高原 2天1晚</b><p>18–25 度很凉快：BOH 茶园、草莓园、苔藓森林；巴士 3.5–4 小时，下午常下雨，早上去茶园</p></div>
+    <div class="nc static"><span class="em">🚡</span><b>云顶高原 半天</b><p>缆车上山、清水岩庙、奥特莱斯；轻松不累，适合收尾前一天</p></div>
+    <div class="nc static"><span class="em">🛍</span><b>最后一天：吉隆坡收尾</b><p>天后宫、鬼仔巷、Jalan Alor 夜市；手信：白咖啡、咖椰酱、Beryl's 巧克力</p></div>
+  </div>
+  <p class="note">11 月是雨季：上午安排户外，下午容易雷阵雨。东海岸海岛（热浪岛、停泊岛、刁曼岛）这时候停航。</p>
 
   <div class="sec">▍马来西亚周边</div>
   <div class="grid">
