@@ -173,7 +173,7 @@
     let ok; try { ok = await qa(w, o.sent || ""); } catch (e) { U.log("word", "加词失败：" + w, String(e && e.message || e)); if (!o.silent) tip("加入失败，请再试一次"); return null; }
     U.log("word", (ok ? "加入生词本 " : "已在生词本 ") + w, o.from || "");
     if (!o.silent) tip(ok ? "已加入生词本：" + w : "已在生词本里");
-    if (o.learn !== false && vsOk() && V().markOf(lw) !== "learn") { V().setMark(lw, "learn"); const lb = pop && pWord.toLowerCase() === lw && pop.querySelector("[data-m=learn]"); if (lb) lb.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === lb)); } // 加进生词本 = 将要学习
+    if (o.learn !== false && (ok === true || status(lw) !== "kn") && vsOk() && V().markOf(lw) !== "learn") { V().setMark(lw, "learn"); const lb = pop && pWord.toLowerCase() === lw && pop.querySelector("[data-m=learn]"); if (lb) lb.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === lb)); } // 加进生词本 = 将要学习
     setTimeout(() => { loadBook(); if (book.size && !status(lw)) book.set(lw, "lr"); bookK = null; changed(lw, "learn"); }, 300);
     return ok;
   }
@@ -242,7 +242,7 @@
       my.style.left = cx + "px"; const up = r.top - 8 - H >= 6; my.classList.toggle("dn", !up); my.style.top = (up ? r.top - 8 : r.bottom + 8) + "px";
     };
     fix();
-    my.addEventListener("mouseenter", () => clearTimeout(xT)); my.addEventListener("mouseleave", () => { xT = setTimeout(hideMini, 250); });
+    my.addEventListener("mouseenter", () => { clearTimeout(xT); clearTimeout(hT); }); my.addEventListener("mouseleave", () => { clearTimeout(xT); xT = setTimeout(hideMini, 250); });
     my.addEventListener("click", e => {
       const b = e.target.closest("button"); if (!b) return; e.stopPropagation();
       if (b.dataset.m === "dict") { hideMini(); open(w, el, { sent: el.closest("[data-sent]") ? el.closest("[data-sent]").dataset.sent : "" }); return; }
@@ -258,11 +258,14 @@
       clearTimeout(xT); if (mini && mini._el === el) return; clearTimeout(hT); hT = setTimeout(() => showMini(el, o.hover), 90);
     });
     box.addEventListener("mouseout", e => {
-      const el = e.target.closest && e.target.closest("[data-w]"); if (!el || (e.relatedTarget && el.contains(e.relatedTarget))) return;
-      clearTimeout(hT); xT = setTimeout(hideMini, 250);
+      const el = e.target.closest && e.target.closest("[data-w]"); if (!el || (e.relatedTarget && el.contains(e.relatedTarget)) || (o.skip && o.skip(el))) return;
+      clearTimeout(hT); clearTimeout(xT); xT = setTimeout(hideMini, 250); // 先清掉旧的：容器和全站兜底都会跑到这里，两个计时器只清得掉一个，小卡片 / 下一个词的气泡会被误关
     });
   }
-  window.addEventListener("scroll", () => { if (mini) hideMini(); }, { passive: true });
+  // 里面的列表、字幕滚动（不冒泡到 window）也关；小卡片自己滚动不关
+  window.addEventListener("scroll", e => { if (mini && !(e.target && e.target.nodeType === 1 && mini.contains(e.target))) hideMini(); }, { passive: true, capture: true });
+  // 词被重画掉了（字幕换句、改完标记重新上色）：它不会再触发 mouseout，鼠标一动就把挂着的气泡关掉
+  document.addEventListener("mouseover", e => { if (mini && mini._el && !mini._el.isConnected && !mini.contains(e.target)) { clearTimeout(xT); hideMini(); } }, { passive: true });
   function bind(box, o) {
     if (!box || box.__word) return; box.__word = 1; o = o || {};
     box.setAttribute("data-wd-bound", "1");
@@ -289,6 +292,18 @@
   });
   document.addEventListener("contextmenu", e => { const el = loose(e.target); if (!el) return; e.preventDefault(); close(); cycle(el.dataset.w); });
   hover(document, { global: true, skip: el => !loose(el) });
+  // 📱 iPhone / iPad：长按不会触发 contextmenu（安卓会，那边走上面的右键），自己数 0.55 秒：长按单词 = 右键循环标记
+  if (typeof navigator !== "undefined" && (/iP(hone|ad|od)/.test(navigator.userAgent || "") || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1))) {
+    let lpT = 0, lpEl = null, lpDone = 0;
+    const lpOff = () => { clearTimeout(lpT); lpT = 0; lpEl = null; };
+    document.addEventListener("touchstart", e => {
+      lpOff(); const el = e.target.closest && e.target.closest("[data-w]"); if (!el || e.touches.length !== 1 || el.closest("#wd-pop, #wd-mini")) return;
+      lpEl = el; lpT = setTimeout(() => { const w = lpEl && lpEl.dataset.w; lpOff(); if (!w) return; lpDone = Date.now(); close(); hideMini(); cycle(w); }, 550);
+    }, { passive: true });
+    document.addEventListener("touchmove", lpOff, { passive: true });
+    document.addEventListener("touchend", e => { lpOff(); if (Date.now() - lpDone < 800) e.preventDefault(); }, { passive: false }); // 长按完松手：不再当成点一下（不弹查词卡片）
+    document.addEventListener("touchcancel", lpOff, { passive: true });
+  }
   document.addEventListener("keydown", e => { if (e.key !== "Enter") return; const el = loose(e.target); if (el && el.tabIndex >= 0) { e.preventDefault(); open(el.dataset.w, el, {}); } });
 
   /* 🎨 英文 → 能点、按水平上色的 html（全站共用：阅读、视频字幕、听力文稿、背单词卡片）
@@ -302,7 +317,8 @@
   let colorLoading = null;
   function colorHtml(t, o) { // 别叫 html：上面画查词卡片的函数已经叫 html 了（同名会把它盖掉，卡片就只剩一个词）
     o = o || {}; const pt = protect(t), v = V(); let h = null;
-    try {
+    const foreign = window.VL && window.VL !== "en"; // 学德语等：词频、语法下划线都是按英语算的，不上色（以前德语词全被当成生僻词变淡）
+    if (!foreign) try {
       if (o.level == null && !o.settings && v && v.ready && v.ready()) h = v.html(pt); // 跟插件设置：直接用视频页那一份（还带你的标记、保存过的短语框）
       else if (typeof vsMark === "function") {
         const S = Object.assign({ fadeRare: true }, (v && v.settings && v.settings()) || {}, o.settings || {}, o.level != null ? { level: o.level } : {});
@@ -312,7 +328,7 @@
     } catch (e) { h = null; U.log("word", "上色出错", String(e && e.message || e)); }
     if (h == null) {
       h = pt.replace(WORD_RE, w => '<span class="vs-w" data-w="' + w + '">' + w + "</span>");
-      if (!colorLoading && v && v.load) colorLoading = Promise.resolve(v.load()).then(() => changed("", "ready"), () => {});
+      if (!foreign && !colorLoading && v && v.load) colorLoading = Promise.resolve(v.load()).then(() => changed("", "ready"), () => {});
     }
     h = h.replace(/<span class="([^"]*)" data-w="([^"]*)">/g, (a, cl, w) => {
       if (!/\bvs-w\b/.test(cl)) return a; const st = status(w); if (!st) return a;

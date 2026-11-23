@@ -9,8 +9,8 @@
   if (window.TR) return;
   const log = (m, d) => { if (window.U) U.log("tr", m, d); };
   const G = (q, tl, dict, sl) => "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + encodeURIComponent(sl || "en") + "&tl=" + encodeURIComponent(tl || "zh-CN") + "&dt=t" + (dict ? "&dt=bd" : "") + "&q=" + encodeURIComponent(q);
-  const get = u => (window.NET && NET.g ? NET.g(u) : fetch(u));
-  const MEM = new Map(), WM = new Map();
+  const get = (u, o) => (window.NET && NET.g ? NET.g(u, o) : fetch(u)); // o.noAI：谷歌不通时不请后台 AI 代翻（查词、ai:false 的时候）
+  const MEM = new Map(), WM = new Map(), WP = new Map(), WMISS = new Map();
   async function google(q, tl, sl) {
     const r = await get(G(q, tl, false, sl)); if (!r.ok) throw new Error("google " + r.status);
     const j = await r.json(); return ((j && j[0]) || []).map(x => (x && x[0]) || "").join("");
@@ -36,11 +36,11 @@
   async function lines(arr, o) {
     o = o || {}; const tl = o.tl || "zh-CN", sl = o.sl || "en", K = t => sl + ">" + tl + "|" + String(t || "").trim(), out = arr.map(t => MEM.get(K(t)) || "");
     const go = async idx => {
-      const r = await get(G(idx.map(i => String(arr[i]).replace(/\s+/g, " ")).join("\n"), tl, false, sl)); if (!r.ok) throw new Error("google " + r.status);
+      const r = await get(G(idx.map(i => String(arr[i]).replace(/\s+/g, " ")).join("\n"), tl, false, sl), { noAI: o.ai === false }); if (!r.ok) throw new Error("google " + r.status);
       const zh = (((await r.json()) || [])[0] || []).map(x => (x && x[0]) || "").join("").split("\n").map(x => x.trim());
       if (zh.length === idx.length) idx.forEach((i, k) => { out[i] = zh[k]; });
       else if (idx.length === 1) out[idx[0]] = zh.join(" ").trim();
-      else for (const i of idx) await go([i]); // 行数对不上就一行一行翻
+      else for (const i of idx) { try { await go([i]); } catch (e) { log("这一行没翻出来", String(e.message || e)); } } // 行数对不上就一行一行翻（一行出错不影响后面的）
     };
     const todo = arr.map((t, i) => (t && !out[i] ? i : -1)).filter(i => i >= 0), chunks = []; let cur = [], len = 0;
     todo.forEach(i => { const t = String(arr[i]); if (cur.length && len + t.length > 1500) { chunks.push(cur); cur = []; len = 0; } cur.push(i); len += t.length + 1; });
@@ -56,16 +56,24 @@
     if (miss.length || fails) log("一批句子翻完", { 句数: todo.length, 没翻出: miss.length, 失败批: fails });
     return out;
   }
-  async function word(w, o) {
-    o = o || {}; const k0 = String(w || "").trim().toLowerCase(), tl = o.tl || "zh-CN", key = tl + "|" + k0, res = { zh: [], pos: [] };
-    if (!k0) return res; if (WM.has(key)) return WM.get(key);
+  // 鼠标停在词上就会查：同一个词正在查的只发一次；查不到的 1 分钟内不再查；不请后台 AI 代翻（每个新词都会让后台写一次缓存）
+  //   原文语言默认跟着现在学的语言（德语时按德语查）
+  function word(w, o) {
+    o = o || {}; const k0 = String(w || "").trim().toLowerCase(), tl = o.tl || "zh-CN", sl = o.sl || (window.VL && window.VL !== "en" ? window.VL : "en"), key = sl + ">" + tl + "|" + k0;
+    if (!k0) return Promise.resolve({ zh: [], pos: [] }); if (WM.has(key)) return Promise.resolve(WM.get(key));
+    if (WP.has(key)) return WP.get(key);
+    if (Date.now() - (WMISS.get(key) || 0) < 60e3) return Promise.resolve({ zh: [], pos: [] });
+    const p = word1(k0, tl, sl, key).finally(() => WP.delete(key)); WP.set(key, p); return p;
+  }
+  async function word1(k0, tl, sl, key) {
+    const res = { zh: [], pos: [] };
     try {
-      const r = await get(G(k0, tl, true)); if (!r.ok) throw new Error("google " + r.status); const j = await r.json();
+      const r = await get(G(k0, tl, true, sl), { noAI: true }); if (!r.ok) throw new Error("google " + r.status); const j = await r.json();
       const add = x => { x = String(x || "").trim(); if (x && x.toLowerCase() !== k0 && !res.zh.includes(x)) res.zh.push(x); };
       add(((j && j[0]) || []).map(x => (x && x[0]) || "").join("")); ((j && j[1]) || []).forEach(e => (e[1] || []).slice(0, 4).forEach(add));
       res.pos = ((j && j[1]) || []).slice(0, 4).map(e => ({ p: e[0], w: (e[1] || []).slice(0, 6) })); // 最多 4 个词性、每个 6 个意思，用的地方自己再截
     } catch (e) { log("查词翻译失败：" + k0, String(e.message || e)); }
-    if (res.zh.length) WM.set(key, res);
+    if (res.zh.length) WM.set(key, res); else WMISS.set(key, Date.now());
     return res;
   }
   window.TR = { text, lines, word };

@@ -82,7 +82,7 @@
     el.addEventListener("touchstart", e => { const t = e.touches[0]; x0 = t.clientX; y0 = t.clientY; }, { passive: true });
     el.addEventListener("touchend", e => { if (x0 == null) return; const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0; x0 = null; if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) go(dx < 0 ? 1 : -1); }, { passive: true });
     // ⌨️ 快捷键：全站共用的 keys.js；单词阅读器盖在别的页面上面，优先级高
-    KEYS.on("reader", { when: () => opened, prio: 10 }, k => {
+    KEYS.on("reader", { when: () => opened, prio: 10, modal: true }, k => {
       if (k === "right") go(1); else if (k === "left") go(-1); else if (k === "esc") { const b = document.getElementById("rd-big"); if (b) b.remove(); else close(); } else return false;
       return true;
     });

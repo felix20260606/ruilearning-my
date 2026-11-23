@@ -118,6 +118,8 @@
   // 每天完成情况：{日期: [完成几项, 共几项]}；连续天数 = 从今天（今天没做完就从昨天）往前数，全部做完的天
   function record(L) {
     const D = LG("daily:days", {}), k = lday(), v = [L.filter(x => x.ok).length, L.length];
+    // 🧩 练习课还没加载（按需加载）：今天的练习课进度还算不出来，不能把已经记下的完成数往低改（以前一打开就记成少一项、传到后台，加载完又改回来再弹一次「全部完成」）
+    if (typeof window.drillToday !== "function" && window.LAZY) { window.LAZY.need("drill").catch(() => {}); if (D[k] && v[0] < D[k][0]) return D; }
     if (!D[k] || D[k][0] !== v[0] || D[k][1] !== v[1]) { const was = full(D[k]); D[k] = v; LS("daily:days", D); put("day:" + k, v); if (!was && full(v)) tip("🎉 今天的每日一练全部完成！"); }
     return D;
   }

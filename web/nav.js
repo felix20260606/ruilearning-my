@@ -35,7 +35,21 @@
     if (!same(snap(), n.s)) apply(n.s);
   });
   window.NAV = {
-    reg(k, get, set) { if (!mods.some(m => m.k === k)) mods.push({ k, get, set }); else { const m = mods.find(x => x.k === k); m.get = get; m.set = set; } mark(); },
+    reg(k, get, set) {
+      const isNew = !mods.some(m => m.k === k);
+      if (isNew) mods.push({ k, get, set }); else { const m = mods.find(x => x.k === k); m.get = get; m.set = set; }
+      // 按需加载的页面（lazy.js）晚登记：把它补进当前这条历史（replaceState），不多推一条（以前「后退」要按两次）；
+      //   这条历史里本来记着它在哪一页（后退回来时它还没加载）：加载好就切过去
+      const cur = booted && st();
+      if (isNew && cur) {
+        try {
+          if (cur.s[k] !== undefined) { if (!same(get(), cur.s[k])) { restoring++; try { set(cur.s[k]); } finally { setTimeout(() => { restoring--; }, DELAY + 50); } } return; }
+          const v = get(); if (v !== undefined) history.replaceState(Object.assign({}, history.state || {}, { nav: { id: cur.id, s: Object.assign({}, cur.s, { [k]: v }) } }), "", location.href);
+        } catch (e) {}
+        return;
+      }
+      mark();
+    },
     mark,
     back(fallback) { // 页面里的「← 返回」：有上一页就退回上一页，没有就做原来的事
       if (T) { clearTimeout(T); commit(); } // 还没记下的变化先记上

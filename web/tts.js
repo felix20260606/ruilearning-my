@@ -28,12 +28,14 @@
     var t = clean(text), v = M.voices[who === "A" ? "A" : ""] || "asteria", k = key(v, t);
     if (M.done.has(k)) return "/tts/" + k + ".mp3";
     if (M.todo.has(k) || !t || t.length > 1500 || !/[a-z]/i.test(t)) return "";
+    if (Date.now() - liveFail < 10 * 60e3) return ""; // 现场生成刚失败过（额度用完 / 太频繁 429）：10 分钟内直接用系统语音，不再每句先等后台报错
     return "/api/tts?v=" + v + "&t=" + encodeURIComponent(t);
   }
+  var liveFail = 0;
   function play(text, o) {
     o = o || {};
     if (mode() === "sys") return false;
-    if (window.VL && window.VL !== "en") return false; // AI 真人声只会英语：学德语等其它语言时用系统语音（index.html 按语言挑）
+    if (!o.en && window.VL && window.VL !== "en") return false; // o.en：调用的已经确定这句是英语（学德语的人在口语页练英语也能用 AI 声） // AI 真人声只会英语：学德语等其它语言时用系统语音（index.html 按语言挑）
     if (!M) { load(); return false; }
     var src = srcOf(text, o.who); if (!src) return false;
     stop(); try { speechSynthesis.cancel(); } catch (e) {}
@@ -41,7 +43,7 @@
     var back = function () { if (fell || my !== id) return; fell = true; player = null; if (o.fallback) o.fallback(); };
     try { a.preservesPitch = true; a.playbackRate = Math.max(0.5, Math.min(2, +o.rate || 1)); } catch (e) {}
     a.onended = function () { if (my === id) { player = null; if (o.end) o.end(); } };
-    a.onerror = back;
+    a.onerror = function () { if (/^\/api\/tts/.test(src)) liveFail = Date.now(); back(); }; // 后台没给出声音（额度用完、429）才冷却；play() 被浏览器拦（还没点过页面）不算
     try { var pr = a.play(); if (pr && pr.catch) pr.catch(back); } catch (e) { back(); }
     return true;
   }
@@ -95,7 +97,7 @@
     o = o || {}; hush(); var my = sayId, t = clean(text);
     if (!t) { if (o.end) o.end(true); return; }
     var en = bcpOf(o).slice(0, 2).toLowerCase() === "en";
-    if (!o.sys && en && play(t, { who: o.who, rate: o.rate || 1, end: function () { if (my === sayId && o.end) o.end(); }, fallback: function () { if (my === sayId) sysSay(t, o, my); } })) return;
+    if (!o.sys && en && play(t, { en: true, who: o.who, rate: o.rate || 1, end: function () { if (my === sayId && o.end) o.end(); }, fallback: function () { if (my === sayId) sysSay(t, o, my); } })) return;
     sysSay(t, o, my);
   }
   function realLoad() { if (!realLoading) realLoading = fetch("pron-real.json?v=b6ceb67b").then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }).then(function (j) { REAL = j || {}; return REAL; }); return realLoading; }

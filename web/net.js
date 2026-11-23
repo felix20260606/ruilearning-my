@@ -31,12 +31,15 @@
     });
   }
   function src(u){var h=host(u);return u&&PXH.test(h)&&isBad(h)?pxu(u):u;}
-  function g(u){ // 谷歌翻译：translate.googleapis.com/translate_a/single?…&q=
+  function g(u,o){ // 谷歌翻译：translate.googleapis.com/translate_a/single?…&q=；o.noAI：谷歌不通时不请后台代翻
     var H="translate.googleapis.com";
     var direct=isBad(H)?Promise.reject(0):tfetch(u,{},5000).then(function(r){if(r.ok){mark(H,1);return r;}throw 0;});
     return direct.catch(function(){
       mark(H,0);
-      var UR=new URL(u),q=UR.searchParams.get("q")||"",dj=UR.searchParams.get("dj")==="1",lines=q.split("\n"),parts=[];
+      var UR=new URL(u),q=UR.searchParams.get("q")||"",sl=UR.searchParams.get("sl")||"en",tl=UR.searchParams.get("tl")||"zh-CN";
+      // 后台代翻只会英译中：别的语言（学德语、字幕译成别的语言）、或者调用的说了不用，就直接算失败（以前会把德语当英语翻、返回中文）
+      if((o&&o.noAI)||!/^(en|auto)$/.test(sl)||tl!=="zh-CN")return new Response("{}",{status:502,headers:{"content-type":"application/json"}});
+      var dj=UR.searchParams.get("dj")==="1",lines=q.split("\n"),parts=[];
       for(var i=0;i<lines.length;i+=120)parts.push(lines.slice(i,i+120));
       return Promise.all(parts.map(function(p){return fetch("/api/ai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({task:"tr",texts:p})}).then(function(r){return r.json();}).then(function(j){return j&&Array.isArray(j.zh)?j.zh:p.map(function(){return "";});},function(){return p.map(function(){return "";});});})).then(function(rs){
         var zh=[].concat.apply([],rs),t=zh.join("\n"),body=dj?{sentences:[{trans:t,orig:q}],src:"en"}:[[[t,q]],null,"en"];

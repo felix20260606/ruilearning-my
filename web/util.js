@@ -39,13 +39,14 @@
   const LOG = [], KEEP = 200, LKEY = "debug:log";
   const stamp = () => { const d = new Date(), p = n => String(n).padStart(2, "0"); return p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + d.toTimeString().slice(0, 8); };
   try { const old = JSON.parse(localStorage.getItem(LKEY) || "[]"); if (Array.isArray(old)) old.slice(-KEEP).forEach(x => { if (x && x.msg) LOG.push(Object.assign({}, x, { old: 1 })); }); } catch (e) {}
-  let saveT = 0;
-  const persist = () => { clearTimeout(saveT); saveT = 0; try { localStorage.setItem(LKEY, JSON.stringify(LOG.slice(-KEEP).map(x => { const y = Object.assign({}, x); delete y.old; return y; }))); } catch (e) {} };
+  let saveT = 0, persistOff = 0;
+  // 存不进去（本机存储满了）：10 分钟内不再试（以前每 1.5 秒重试一次、每次都记一条「存不进去」，把真正的报错挤掉）
+  const persist = () => { clearTimeout(saveT); saveT = 0; try { localStorage.setItem(LKEY, JSON.stringify(LOG.slice(-KEEP).map(x => { const y = Object.assign({}, x); delete y.old; return y; }))); persistOff = 0; } catch (e) { persistOff = Date.now(); } };
   function log(mod, msg, data) {
     const x = { t: stamp(), mod: String(mod), msg: String(msg).slice(0, 300) };
     if (data !== undefined) x.data = typeof data === "string" ? data.slice(0, 500) : data;
     LOG.push(x); if (LOG.length > 300) LOG.splice(0, LOG.length - 300);
-    if (!saveT) saveT = setTimeout(persist, 1500);
+    if (!saveT && Date.now() - persistOff > 600e3) saveT = setTimeout(persist, 1500);
     try { if (window.localStorage && localStorage.getItem("debug") === "1") console.debug("[" + x.mod + "]", x.msg, data === undefined ? "" : data); } catch (e) {}
   }
   function logs(mod) { const L = mod ? LOG.filter(x => x.mod === mod) : LOG.slice(); try { console.table(L.map(x => ({ 时间: x.t, 模块: x.mod, 事情: x.msg, 详情: x.data === undefined ? "" : typeof x.data === "string" ? x.data : JSON.stringify(x.data) }))); } catch (e) {} return L; }
@@ -176,9 +177,13 @@
   [["debug:log", "问题记录"], ["wt:doc:", "视频字幕"], ["wt:tr:", "视频字幕译文"], ["wt:recent", "最近看的视频"], ["wt:w:", "视频查过的词"], ["wt:wl", "视频查词列表"], ["wt:list", "视频列表"], ["reader:img", "配图地址"],
     ["sme:zhc", "听力节目的中文"], ["sme:diff", "听力节目难度"], ["reading:newsq", "新闻简单版"], ["reading:news", "今天的新闻"], ["reading:tr", "文章译文"]].forEach(c => cacheable(c[0], c[1]));
   const isQuota = e => !!e && (e.name === "QuotaExceededError" || e.name === "NS_ERROR_DOM_QUOTA_REACHED" || e.code === 22 || e.code === 1014);
+  // 键名算不算这个缓存：前缀以 ":" 结尾的（wt:doc:）按前缀；其它（reading:tr）只认它本身、带家人 / 语言后缀的（@u2、~de）和 ":" 往下的——
+  //   不然 reading:tr 会把用户设置 reading:trOn 也当成缓存清掉
+  const ofCache = (k, pre) => (/:$/.test(pre) ? k.startsWith(pre) : k === pre || k.startsWith(pre + "@") || k.startsWith(pre + "~") || k.startsWith(pre + ":"));
   function clearCache(c, except) {
     let n = 0;
-    try { for (let i = localStorage.length - 1; i >= 0; i--) { const k = localStorage.key(i); if (k && k !== except && k.startsWith(c.pre)) { localStorage.removeItem(k); n++; } } } catch (e) {} // 原始键名（带家人后缀的也是这个前缀开头）
+    const rm = window.__lsRawRemove || (k => localStorage.removeItem(k)); // 按真实键名删（boot.js），带后缀的缓存才真的删得掉
+    try { for (let i = localStorage.length - 1; i >= 0; i--) { const k = localStorage.key(i); if (k && k !== except && ofCache(k, c.pre)) { rm(k); n++; } } } catch (e) {}
     return n;
   }
   let fullTipped = false;
@@ -187,6 +192,7 @@
     SP.setItem = function (k, v) {
       try { return orig.call(this, k, v); } catch (e) {
         if (!isQuota(e) || this !== window.localStorage) throw e;
+        if (k === LKEY) throw e; // 问题记录自己就是缓存：存不下就不存，不为它清别的、也不再记一条
         for (const c of CACHES) {
           if (!clearCache(c, k)) continue;
           try { const r = orig.call(this, k, v); log("store", "本机存储满了：清掉「" + c.name + "」缓存后存进去了", k); if (!fullTipped) { fullTipped = true; tip("本机存储快满了，已经清掉一些缓存（字幕、翻译之类，用到时会重新下载）"); } return r; }

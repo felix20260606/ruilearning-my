@@ -11,28 +11,29 @@
   "use strict";
   if (window.LAZY) return;
   const MODS = {
-    speak: { src: "speak.js?v=0577af77", fns: ["speakShow"], el: { speakShow: "#view-speak" }, quiet: ["speakHide"] },
+    speak: { src: "speak.js?v=65775f95", fns: ["speakShow"], el: { speakShow: "#view-speak" }, quiet: ["speakHide"] },
     basic: { src: "basic.js?v=80195e90", deps: ["speak"], fns: ["basicShow"], el: { basicShow: "#view-basic" } },
     read: { src: "read.js?v=53955424", fns: ["readingShow", "readingNews", "readingOpen", "readTextDiff"], el: { readingShow: "#reading" }, quiet: ["readingRefresh"] },
     listen: { src: "listen.js?v=10611718", fns: ["smeShow"], el: { smeShow: "#sme" }, quiet: ["smePause"] },
     drill: { src: "drill.js?v=d33beba8", deps: ["listen"], fns: ["drillShow", "drillReview"], el: { drillShow: "#drill" }, quiet: ["drillHide"] },
     exam: { src: "exam.js?v=c0953f36", fns: ["examShow"], el: { examShow: 0 } },
-    write: { src: "write.js?v=d2e6b783", fns: ["writingShow"], el: { writingShow: 0 } },
+    write: { src: "write.js?v=0b8cb009", fns: ["writingShow"], el: { writingShow: 0 } },
     grammar: { src: "grammar.js?v=19e2e8e7", fns: ["grammarShow"], el: { grammarShow: "#grammar" }, quiet: ["grammarRefresh"] },
   };
   const log = (m, d) => { if (window.U) U.log("lazy", m, d); };
   const ready = document.readyState === "loading" ? new Promise(r => document.addEventListener("DOMContentLoaded", r, { once: true })) : Promise.resolve();
-  const P = {};
-  function need(name) {
+  const P = {}, OK = new Set();
+  // bg：后台预加载（用户没点什么），失败了不弹提示。失败（包括它依赖的页面失败）会把记录删掉，下次再点能重新加载
+  function need(name, bg) {
     const m = MODS[name]; if (!m) return Promise.reject(new Error("没有这个页面：" + name));
     if (P[name]) return P[name];
     const t0 = Date.now();
-    P[name] = ready.then(() => Promise.all((m.deps || []).map(need))).then(() => new Promise((res, rej) => {
+    P[name] = ready.then(() => Promise.all((m.deps || []).map(d => need(d, true)))).then(() => new Promise((res, rej) => {
       const s = document.createElement("script"); s.src = m.src; s.async = false;
-      s.onload = () => { log(name + " 加载好了", { ms: Date.now() - t0 }); try { document.dispatchEvent(new CustomEvent("lazy-loaded", { detail: { name } })); } catch (e) {} res(); };
-      s.onerror = () => { delete P[name]; log(name + " 加载失败", m.src); if (window.U) U.tip("这一页没加载出来（网络不通？），再点一次试试"); rej(new Error("load " + m.src)); };
+      s.onload = () => { OK.add(name); log(name + " 加载好了", { ms: Date.now() - t0 }); try { document.dispatchEvent(new CustomEvent("lazy-loaded", { detail: { name } })); } catch (e) {} res(); };
+      s.onerror = () => { s.remove(); log(name + " 加载失败", m.src); rej(new Error("load " + m.src)); };
       document.head.append(s);
-    }));
+    })).catch(e => { delete P[name]; if (!bg && window.U) U.tip("这一页没加载出来（网络不通？），再点一次试试"); throw e; });
     return P[name];
   }
   // 「显示」类入口（el：这一页的容器；数字 = 第几个参数是容器）：容器还看不见时先记下这次调用，等它真的显示出来再加载、再调用
@@ -40,8 +41,9 @@
   const WAIT = new Map(); let mo = null;
   const shown = el => !!(el && el.isConnected && el.getClientRects().length);
   function check() { if (!loadedPage) return; WAIT.forEach((w, fn) => { if (!shown(w.el)) return; WAIT.delete(fn); const f = window[fn]; Promise.resolve().then(() => f.apply(w.self, w.a)).catch(e => log(fn + " 出错", String(e && e.message || e))); }); if (!WAIT.size && mo) { mo.disconnect(); mo = null; } }
-  let loadedPage = document.readyState === "complete";
-  window.addEventListener("load", () => { loadedPage = true; setTimeout(check, 0); });
+  // 网页解析完（DOMContentLoaded）就能判断看不看得见：样式表在前面的同步脚本之前就加载好了。以前要等整页 load（字体、配图都到齐），大陆网慢时页面一直空着
+  let loadedPage = document.readyState !== "loading";
+  ready.then(() => { loadedPage = true; setTimeout(check, 0); });
   function later(fn, el, self, a) { WAIT.set(fn, { el, self, a }); if (loadedPage) setTimeout(check, 50); if (!mo && window.MutationObserver) { mo = new MutationObserver(() => { clearTimeout(mo.t); mo.t = setTimeout(check, 30); }); mo.observe(document.documentElement, { attributes: true, subtree: true, attributeFilter: ["class", "style"] }); } }
   for (const name in MODS) {
     const m = MODS[name];
@@ -60,10 +62,10 @@
   // 首页显示好以后，后台把剩下的一个个加载完（空闲时；手机省电模式下 requestIdleCallback 可能很晚，最多等 6 秒）
   function preload() {
     const left = Object.keys(MODS).filter(n => !P[n]);
-    const next = () => { const n = left.shift(); if (!n) return; need(n).catch(() => {}).then(() => idle(next)); };
+    const next = () => { const n = left.shift(); if (!n) return; need(n, true).catch(() => {}).then(() => idle(next)); };
     next();
   }
   const idle = f => (window.requestIdleCallback ? requestIdleCallback(f, { timeout: 6000 }) : setTimeout(f, 200));
   window.addEventListener("load", () => setTimeout(() => idle(preload), 2500));
-  window.LAZY = { need, loaded: n => !!P[n], MODS };
+  window.LAZY = { need, loaded: n => OK.has(n), MODS };
 })();

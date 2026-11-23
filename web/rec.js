@@ -19,15 +19,19 @@
   let rec = null;
 
   function stop(cancel) {
-    const r = rec; if (!r) return; rec = null; clearTimeout(r.t); r.cancel = !!cancel;
+    const r = rec; if (!r) return; rec = null; if (r.pending) return; // 还在等麦克风：start 拿到以后看到被取消，会自己关掉
+    clearTimeout(r.t); r.cancel = !!cancel;
     try { if (r.sr) r.sr.stop(); } catch (e) {}
     try { if (r.mr && r.mr.state !== "inactive") r.mr.stop(); else { r.stream.getTracks().forEach(t => t.stop()); finish(r); } } catch (e) { finish(r); }
   }
   async function start(key, o) {
     if (o.before) try { o.before(); } catch (e) {}
     if (window.TTS) TTS.hush();
+    // 等麦克风（第一次会弹权限框）期间先占个位：这时再点录音、翻卡、停止，都能取消这一次（以前会同时开两个，旧的那个麦克风一直不关）
+    const ph = rec = { key, o, pending: true };
     let stream;
-    try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { tip("没拿到麦克风：请在浏览器地址栏允许使用麦克风"); return false; }
+    try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { if (rec === ph) rec = null; tip("没拿到麦克风：请在浏览器地址栏允许使用麦克风"); return false; }
+    if (rec !== ph) { stream.getTracks().forEach(t => t.stop()); return false; }
     const lang = curLang(o), r = rec = { key, o, lang, stream, chunks: [], srText: "", fin: false };
     try { r.mr = new MediaRecorder(stream); r.mr.ondataavailable = e => { if (e.data && e.data.size) r.chunks.push(e.data); }; r.mr.onstop = () => { stream.getTracks().forEach(t => t.stop()); finish(r); }; r.mr.start(); } catch (e) { r.mr = null; }
     if (SR) try { const sr = r.sr = new SR(); sr.lang = bcp(lang); sr.interimResults = false; sr.continuous = true; sr.onresult = e => { r.srText = [...e.results].map(y => y[0].transcript).join(" "); }; sr.onerror = () => {}; sr.start(); } catch (e) { r.sr = null; }

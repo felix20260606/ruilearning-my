@@ -27,6 +27,7 @@
   S.getItem=function(key){return g.call(this,k(this,key));};
   S.setItem=function(key,v){return st.call(this,k(this,key),v);};
   S.removeItem=function(key){return rm.call(this,k(this,key));};
+  window.__lsRawRemove=function(key){try{rm.call(window.localStorage,String(key));}catch(e){}}; // 按真实键名删（util.js 清缓存用：localStorage.key(i) 拿到的已经是带后缀的真实键名，再走上面那层会被改成当前家人的）
 })();
 /* 🔒 写入口令（见 _worker.js「写入保护」）：发往本站 /api/ 的请求自动带请求头 x-key（本机 localStorage「auth:key」，各家人共用）。
    平时用不到口令；后台说「这次改动太大，要口令」（403 needkey）时弹窗问一次，对了就记在本机、把这次请求再发一遍。

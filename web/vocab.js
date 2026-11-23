@@ -424,7 +424,7 @@ document.querySelectorAll(".modes button").forEach(b=>b.onclick=()=>{
   {const dr=document.getElementById("drill"); if(dr){dr.classList.toggle("on",m==="drill"); if(m==="drill"&&window.drillShow)drillShow(); else if(window.drillHide)drillHide();}}
   document.getElementById("stats").classList.toggle("on",m==="stats"); if(m==="stats"&&window.statsShow)statsShow();
   {const ew=document.getElementById("errwrap"); if(ew){ew.style.display=m==="err"?"block":"none"; if(m==="err"&&window.errShow)errShow(ew);}}
-  const wv=document.getElementById("ielts-write-view"); if(wv){wv.style.display=m==="writing"?"block":"none"; if(m==="writing"&&window.writingShow&&!wv.dataset.on){wv.dataset.on="1";writingShow(wv);}}
+  const wv=document.getElementById("ielts-write-view"); if(wv){wv.style.display=m==="writing"?"block":"none"; if(m==="writing"&&window.writingShow&&!wv.dataset.on){wv.dataset.on="1";Promise.resolve(writingShow(wv)).catch(()=>{delete wv.dataset.on;});} /* 写作页没加载出来：下次点「✍️ 写」再试 */}
   try{localStorage.setItem("vocab_mode",m);}catch(e){}
   if(window.enSync)enSync(m); // 阅读 → 「📰 读」，语法 / 写作批改 → 「✍️ 写」，其它 → 「📖 词汇」（别的页面直接点模式按钮跳过来时，上面的标签跟着变）
   
@@ -528,10 +528,10 @@ async function enrich(entry){ // 后台 /api/dict 一次拿齐：中文（谷歌
   if(entry.zh==="(翻译中…)")entry.zh="(未查到，可手动补)";
 }
 async function quickAdd(word,sentence){
-  word=(word||"").trim().replace(/[^A-Za-z' -]/g,"").replace(/\s+/g," ");
+  word=(word||"").trim().normalize("NFC").replace(/[’‘]/g,"'").replace(/[^\p{L}' -]/gu,"").replace(/\s+/g," "); // 字母包括 ä ö ü ß é（以前只认 A–Z，德语 Mädchen 会存成 Mdchen）
   if(!word)return false;
   if(words.some(w=>w.word.toLowerCase()===word.toLowerCase())){return false;}
-  const re=new RegExp("\\b("+word.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\w*)","i"),own=sentence&&re.test(sentence)?[[String(sentence).trim().replace(re,"{$1}"),""]]:[];
+  const re=new RegExp("(?<![\\p{L}])("+word.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\p{L}*)","iu"),own=sentence&&re.test(sentence)?[[String(sentence).trim().replace(re,"{$1}"),""]]:[];
   const entry={id:"u_"+Date.now()+"_"+Math.random().toString(36).slice(2,6),type:/\s/.test(word)?"phrase":"word",word:word,
     phon:"",en:"(查询中…)",zh:"(翻译中…)",tag:"收集",date:ymdLocal(),forms:[],examples:own,tip:"",auto:1}; // auto：自动生成的词条（想要多义项、记忆法时再发给 Claude 补）
   state.custom.push(entry);refresh();save(state);

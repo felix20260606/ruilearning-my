@@ -246,7 +246,7 @@
     return mk === "learn" ? (plain ? "" : "known") : mk === "known" ? (plain ? "learn" : "") : "learn";
   }
   async function vsData() {
-    const it = await CLOUD.chan("ext").get(); // 全站共用的同步（cloud.js）
+    const it = await CLOUD.chan("ext").get().catch(() => ({})); // 全站共用的同步（cloud.js）；读不到先按默认设置
     const S = Object.assign({}, VS_DEF), marks = {}, saved = new Set(), sents = [];
     for (const k in it) { const i = k.indexOf("|"), n = k.slice(0, i), id = k.slice(i + 1), v = it[k].v;
       if (n === "set") S[id] = v; else if (n === "marks" && (v === "known" || v === "ignore")) marks[id] = v; else if (n === "saved") saved.add(id); else if (n === "savedSents" && v && v.ph && v.t) sents.push(String(v.t).toLowerCase().split(/\s+/)); }
@@ -295,18 +295,27 @@
       '<div class="mk"><button data-a="mk" data-m="learn" class="' + (m === "learn" ? "on" : "") + '">📌 将要学习</button><button data-a="mk" data-m="known" class="' + (m === "known" ? "on" : "") + '">✅ 已掌握</button><button data-a="mk" data-m="ignore" class="' + (m === "ignore" ? "on" : "") + '">🚫 不学习</button><button data-a="mk" data-m="">↺ 恢复默认</button></div>';
   }
   async function vsSetMark(w, m) { // 和插件右键 / 词典里的标记一样；写回 /api/ext，插件那边同步过去
-    const k = w.toLowerCase(), at = Date.now(), ch = {};
+    const k = w.toLowerCase(), at = Date.now(), ch = {}, same = x => (typeof vsSame === "function" ? vsSame(x, k) : x === k);
     const marks = Object.assign({}, VS_MARKS), saved = new Set(VS_SAVED);
-    if (m === "learn") { delete marks[k]; saved.add(k); ch["marks|" + k] = { del: 1, at }; ch["saved|" + k] = { v: k, at }; }
-    else { saved.delete(k); ch["saved|" + k] = { del: 1, at }; if (m) { marks[k] = m; ch["marks|" + k] = { v: m, at }; } else { delete marks[k]; ch["marks|" + k] = { del: 1, at }; } }
+    if (m === "learn") { Object.keys(marks).forEach(x => { if (same(x)) { delete marks[x]; ch["marks|" + x] = { del: 1, at }; } }); saved.add(k); ch["saved|" + k] = { v: k, at }; }
+    else {
+      // 按原形一起改（同插件 content.js）：标 went 为已掌握时，以前保存的 go / goes 也一起移出「将要学习」，不然 went 还是显示成在学
+      [...saved].filter(same).forEach(x => { saved.delete(x); ch["saved|" + x] = { del: 1, at }; }); ch["saved|" + k] = { del: 1, at };
+      Object.keys(marks).forEach(x => { if (x !== k && same(x)) { delete marks[x]; ch["marks|" + x] = { del: 1, at }; } });
+      if (m) { marks[k] = m; ch["marks|" + k] = { v: m, at }; } else { delete marks[k]; ch["marks|" + k] = { del: 1, at }; }
+    }
     VS_MARKS = marks; VS_SAVED = saved;
-    try { // 生词本里的掌握状态跟着变
-      const e = (state.custom || []).find(x => x && String(x.word || "").toLowerCase() === k);
-      if (e && (m === "known" || m === "learn")) { state.progress = state.progress || {}; state.progress[e.id] = m === "known" ? "known" : "learning"; /* 写 learning 不是删掉：带着修改时间才能盖过别处的「已掌握」 */ refresh(); save(state); loadBook(); }
+    try { // 生词本里的掌握状态跟着变（生词本里是原形 go、标的是 went 也算）
+      const L = state.custom || [], e = L.find(x => x && String(x.word || "").toLowerCase() === k) || L.find(x => x && x.word && same(String(x.word).toLowerCase()));
+      const cur = e && state.progress && state.progress[e.id];
+      /* 已掌握 → 写 known；将要学习、恢复默认、不学习（而原来是已掌握）→ 写 learning（不删键：带着修改时间才能盖过别处的「已掌握」） */
+      const nx = !e ? null : m === "known" ? "known" : m === "learn" || cur === "known" ? "learning" : null;
+      if (nx && cur !== nx) { state.progress = state.progress || {}; state.progress[e.id] = nx; refresh(); save(state); loadBook(); }
     } catch (er) {}
     vsRedraw();
     if (!(await CLOUD.chan("ext").send(ch))) tip("没连上网络，标记先记在这台设备，连上网会自动同步"); // 全站共用的同步（cloud.js）：没发出去会自动重发
   }
+
 
   /* ---------- 搭界面 ---------- */
   let root, listEl, subEl, enter = () => {};
@@ -613,7 +622,7 @@
   const note = (html) => { const n = $("#wt-note"); if (!n) return; n.innerHTML = html || ""; n.style.display = html ? "" : "none"; fit(); };
   async function gtLines(lines, tl) { // 全站共用的翻译（tr.js）：一批合并成一次请求，行数对不上它自己一行行翻；有翻不出的就算这批失败（下面会重试）
     const out = await TR.lines(lines, { tl, ai: false });
-    if (out.some((x, i) => lines[i] && !x)) throw new Error("some lines failed");
+    if (lines.some(Boolean) && !out.some(Boolean)) throw new Error("all lines failed"); // 一句都没翻出来才算这批失败（重试）；翻出一部分就先用上，没翻出的几句记成失败、可以点「重试」
     return out;
   }
   let fillBusy = false;

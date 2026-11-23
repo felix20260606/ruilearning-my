@@ -989,7 +989,7 @@
     if (document.getElementById("wr-css")) return;
     const s = document.createElement("style"); s.id = "wr-css"; s.textContent = CSS; document.head.append(s);
     document.addEventListener("click", e => { if (pop && !pop.contains(e.target) && !e.target.closest(".wr-mk mark,.wr-is")) closePop(); }, true);
-    KEYS.on("write-pop", { when: () => !!pop, prio: 5 }, k => { if (k === "esc") { closePop(); return true; } return false; }); // ⌨️ 全站共用的快捷键（keys.js）：Esc 关批改说明
+    KEYS.on("write-pop", { when: () => !!pop && KEYS.visible(pop), prio: 5 }, k => { if (k === "esc") { closePop(); return true; } return false; }); // ⌨️ 全站共用的快捷键（keys.js）：Esc 关批改说明
     window.addEventListener("scroll", () => { if (pop && !(mask && mask.classList.contains("on"))) closePop(); }, { passive: true });
     window.addEventListener("resize", () => closePop());
     window.addEventListener("pagehide", () => saveDraft(true));

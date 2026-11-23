@@ -5,7 +5,7 @@
    统一的规则（每页不用再写）：
      - 按着 Ctrl / ⌘ / Alt、正在用输入法打字（isComposing）、焦点在输入框 / 文本框 / 下拉框 / 可编辑区域里：都不触发
      - 查词卡片开着（#wd-pop.on）：不触发（Esc 由卡片自己关）
-     - 好几页都 when() 为真时，只交给 prio 最大的那页（一样大就后登记的）
+     - 好几页都 when() 为真时，从 prio 大的往下问（一样大就后登记的先问），谁返回 true 就停；{ modal: true } 的不管处没处理都不再往下传
      - 处理了就 preventDefault；空格处理了，松开时也拦住（焦点在按钮上时别再「点」一下那个按钮）
    KEYS.visible(元素) → 元素现在在页面上看得见（不在隐藏的标签里）
    出错记进 U.log("keys", …) */
@@ -19,7 +19,7 @@
   const visible = el => !!(el && el.isConnected && el.getClientRects().length);
   let spaceDown = false;
   function on(name, o, fn) {
-    const i = L.findIndex(x => x.name === name); const x = { name, when: o.when || (() => true), prio: o.prio || 0, fn, n: L.length };
+    const i = L.findIndex(x => x.name === name); const x = { name, when: o.when || (() => true), prio: o.prio || 0, modal: !!o.modal, fn, n: L.length };
     if (i >= 0) L[i] = x; else L.push(x);
   }
   document.addEventListener("keydown", e => {
@@ -28,8 +28,9 @@
     const k = norm(e.key);
     const live = L.filter(x => { try { return x.when(); } catch (er) { return false; } }).sort((a, b) => b.prio - a.prio || b.n - a.n);
     if (!live.length) return;
+    // 从优先级高的往下问，谁处理了（返回 true）就停：盖在上面的弹层不管的键（比如它只管 Esc），下面的页面照样能用
     let done = false;
-    try { done = live[0].fn(k, e) === true; } catch (er) { if (window.U) U.log("keys", live[0].name + " 快捷键出错：" + k, String(er && er.message || er)); }
+    for (const x of live) { try { done = x.fn(k, e) === true; } catch (er) { if (window.U) U.log("keys", x.name + " 快捷键出错：" + k, String(er && er.message || er)); } if (done || x.modal) break; } // modal：整屏盖住的（阅读器），它不管的键也不往下传
     if (done) { e.preventDefault(); e.stopPropagation(); if (k === "space") spaceDown = true; }
   });
   document.addEventListener("keyup", e => { if (spaceDown && norm(e.key) === "space") { spaceDown = false; e.preventDefault(); } });

@@ -68,7 +68,7 @@
       EXT = X;
       for (const k in it) if (k.startsWith("med|med:w:")) m[k.slice(10)] = k.slice(4);
       for (const k in it) if (k.startsWith("savedSents|")) { const x = it[k].v, mk = "med:s:" + (x && x.k); if (x && x.t && it["med|" + mk]) { const t = String(x.t).toLowerCase().trim(); if (!m[t]) m[t] = mk; } }
-      return (MED = m); }).catch(() => (MED = {}));
+      return (MED = m); }).catch(() => { medP = null; return (MED = {}); }); // 读不到：EXT 保持 null（☆ 不能点，免得重复收藏），下次再读
     return medP;
   }
   function medFor(w) {

@@ -130,11 +130,12 @@
   const toks = t => REC.toks(t, "en"), align = (target, said) => REC.score(target, said, { lang: "en" });
   const SR = REC.SR;
   const RES = {}; // key → {url, said, res, best, busy, noai, on}
-  const recOn = () => REC.cur() != null;
+  let myRec = null; // 口语页自己录的那条（离开口语页只停它，别的页面正在录的不管）
+  const recOn = () => REC.cur() != null && REC.cur() === myRec;
   function recStop(cancel) { if (recOn()) REC.stop(cancel); }
   // key：这条的编号；target：要读的句子（话题卡没有目标句，只录音、转文字）；max：最长秒数；after：录完以后要做的事
   function recStart(key, target, max, after) {
-    const x = () => (RES[key] = RES[key] || {});
+    const x = () => (RES[key] = RES[key] || {}); myRec = key;
     REC.toggle(key, { lang: "en", max: max || 20, before: hush,
       start: () => { x().on = true; paintRec(key); },
       cancel: () => { x().on = false; paintRec(key); },

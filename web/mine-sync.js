@@ -9,7 +9,8 @@
   function seen(k){try{return JSON.parse(localStorage.getItem("mine:seen:"+k)||"{}")||{};}catch(e){return {};}}
   function setSeen(k,o){quiet=true;try{localStorage.setItem("mine:seen:"+k,JSON.stringify(o));}catch(e){}quiet=false;}
   function post(k,ch){if(!Object.keys(ch).length)return;var sn=seen(k);for(var id in ch){ch[id].at=Math.max(ch[id].at,(+sn[id]||0)+1);sn[id]=ch[id].at;}setSeen(k,sn);
-    fetch("/api/mine",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({k:k,changes:ch})}).catch(function(){});}
+    // 走全站共用的同步（cloud.js）：没发出去（断网、后台出错）会放回队列、隔一会儿再发，关页面时用 sendBeacon 补发（以前发失败就丢了，别的设备永远收不到）
+    if(window.CLOUD)CLOUD.chan(k).send(ch);else fetch("/api/mine",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({k:k,changes:ch})}).catch(function(){});}
   // 阅读位置 pos 单独传（一项「pos:文章id」= 位置数字）：读的时候每滚一下、每朗读一句都会改它，以前每次都把整篇文章（最多 8 万字）传一遍、
   //   后台每次写一次 KV（一天只有 1000 次）。现在最多两分钟传一次，切走页面时马上传。存储满了本机少存几篇（__mineKeepDel）不当成删除
   function sig(key,x){if(key!=="reading:docs")return JSON.stringify(x);var y=Object.assign({},x);delete y.pos;return JSON.stringify(y);}
@@ -24,8 +25,9 @@
     post(c.k,ch);}
   S.setItem=function(key,v){var c=!quiet&&KS[key];var ls=null;try{ls=window.localStorage;}catch(e){}if(this!==ls)c=null;var before=c?rd(key):null;var r=set0.apply(this,arguments);if(c)push(key,before,rd(key));return r;};
   var busy={};
-  window.mineSyncPull=function(key){var c=KS[key];if(!c||busy[key])return Promise.resolve(false);busy[key]=1;
-    return fetch("/api/mine?k="+c.k,{cache:"no-store"}).then(function(r){return r.json();}).then(function(j){
+  // 正在拉的时候又被叫到（比如阅读页刚加载、拿着换设备的文章链接）：等同一次拉完，不是直接说「没有」
+  window.mineSyncPull=function(key){var c=KS[key];if(!c)return Promise.resolve(false);if(busy[key])return busy[key];
+    return busy[key]=fetch("/api/mine?k="+c.k,{cache:"no-store"}).then(function(r){return r.json();}).then(function(j){
       if(!j||!j.ok)return false;var R=j.items||{},sn=seen(c.k),L=rd(key),byId={},changed=false,up={};
       L.forEach(function(x){if(x&&c.id(x))byId[c.id(x)]=x;});
       for(var id in R){var r=R[id];var known=+sn[id]||0;
