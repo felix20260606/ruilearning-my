@@ -274,7 +274,7 @@ async function makeEntry(word, m) {
   const def = d && d.meanings && d.meanings[0] && d.meanings[0].defs[0] && d.meanings[0].defs[0].def || "";
   const ex = []; const c = m.ctx;
   if (c && c.t) { const re = new RegExp("\\b(" + word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+") + "\\w*)", "i"); ex.push([c.t.replace(/\s+/g, " ").replace(re, "{$1}"), c.tr || ""]); }
-  return { id: entryId(word), type: isPh ? "phrase" : "word", word, phon: d && d.phonetic ? (/^\//.test(d.phonetic) ? d.phonetic : "/" + d.phonetic + "/") : "", en: def, zh: zs.slice(0, 4).join("；") || "(未查到，可手动补)", tag: "视频", date: new Date().toISOString().slice(0, 10), forms: [], examples: ex, tip: "" };
+  return { id: entryId(word), type: isPh ? "phrase" : "word", word, phon: d && d.phonetic ? (/^\//.test(d.phonetic) ? d.phonetic : "/" + d.phonetic + "/") : "", en: def, zh: zs.slice(0, 4).join("；") || "(未查到，可手动补)", tag: m.tag || "视频", date: new Date().toISOString().slice(0, 10), forms: [], examples: ex, tip: "" };
 }
 let cloudChain = Promise.resolve();
 function cloudAdd(entries) { // 网站后台负责合并（同名词跳过、移出待整理队列）；这里串行发送，避免连续加词互相覆盖

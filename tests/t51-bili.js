@@ -120,7 +120,7 @@ const eq = (a, b, m) => ok(JSON.stringify(a) === JSON.stringify(b), m + " → " 
 
   // ---------- manifest：B 站的匹配和权限、版本 ----------
   const M = JSON.parse(fs.readFileSync(path.join(EXT, "manifest.json"), "utf8"));
-  ok(/^1\.25\.\d+$/.test(M.version), "版本 1.25.x " + M.version);
+  ok(/^1\.2[5-9]\.\d+$/.test(M.version), "版本 1.25 以后 " + M.version);
   const cs = M.content_scripts, main = cs.find(c => c.world === "MAIN" && c.js.includes("bili-inject.js")), iso = cs.find(c => c.js.includes("content.js"));
   ok(main && main.matches.includes("https://www.bilibili.com/*") && main.run_at === "document_start", "页面脚本在 B 站一开始就跑");
   ok(iso.matches.includes("https://www.bilibili.com/*") && iso.matches.includes("https://www.youtube.com/*"), "内容脚本两个网站都跑");
