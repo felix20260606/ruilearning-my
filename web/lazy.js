@@ -18,6 +18,7 @@
     drill: { src: "drill.js?v=f24f138e", deps: ["listen"], fns: ["drillShow", "drillReview"], el: { drillShow: "#drill" }, quiet: ["drillHide"] },
     exam: { src: "exam.js?v=c0953f36", fns: ["examShow"], el: { examShow: 0 } },
     write: { src: "write.js?v=0b8cb009", fns: ["writingShow"], el: { writingShow: 0 } },
+    commute: { src: "commute.js?v=eeeda1a7", fns: ["commuteShow"] }, // 🎧 通勤模式（「🔊 练习」首页的按钮）
     debasic: { src: "de-basic.js?v=a1a62562", fns: ["deBasicShow"], el: { deBasicShow: "#view-basic" } }, // 🌱 德语入门（学德语时）
     grammar: { src: "grammar.js?v=19e2e8e7", fns: ["grammarShow"], el: { grammarShow: "#grammar" }, quiet: ["grammarRefresh"] },
   };

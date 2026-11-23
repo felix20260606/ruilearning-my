@@ -90,7 +90,8 @@
   .pp-bar{height:6px;border-radius:3px;background:var(--paper-2);overflow:hidden}.pp-bar i{display:block;height:100%;background:var(--jade);width:0;transition:width .3s}
   .pp-st{display:flex;margin:18px 0 14px;padding-bottom:16px;border-bottom:1px solid var(--line)}.pp-st div{flex:1}
   .pp-st small{display:block;color:var(--muted);font-size:12px}.pp-st b{font-size:24px;font-weight:600}.pp-st em{display:block;font-style:normal;color:var(--muted);font-size:12px}
-  .pp-go{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:6px}
+  .pp-go{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:6px;flex-wrap:wrap}
+  .pp-go button.pp-cm{background:var(--ui-surface-2,#2d2f34);color:var(--ui-ink,#eee);border:1px solid var(--ui-line-2,#454950)}
   .pp-go button{background:var(--jade);color:#fff;border:0;font:inherit;font-weight:800;font-size:16px;border-radius:12px;padding:0 22px;min-height:46px;cursor:pointer}.pp-go button:disabled{opacity:.4;cursor:default}.pp-go span{color:var(--muted);font-size:13px}
   .pp-only{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}.pp-only small{color:var(--muted);font-size:12.5px}
   .pp-hard .hw{flex-basis:100%;text-align:center;color:var(--muted);font-size:12.5px}
@@ -289,7 +290,7 @@
       '<div data-to="notebook/list?f=known&amp;c=all" title="半衰期到了 42 天（至少 6 周都很可能记得），自动算已掌握 · 点一下看是哪些"><small>已掌握</small><b>' + done + "</b></div></div>" +
       (() => { const all = VS ? words.filter(w => (w.type || "word") !== "pattern") : p.P.filter(w => !w.sg), kn = VS ? VS.known : all.filter(w => w.status === "known").length, lr = all.filter(w => mastery(S[w.id], w) < 1 && S[w.id]), avg = lr.length ? lr.reduce((a, w) => a + mastery(S[w.id], w), 0) / lr.length : 0, tot = all.length ? kn / all.length : 0;
         return '<div class="pp-master" data-to="notebook/list?f=known&amp;c=all" title="半衰期到 42 天（至少 6 周都很可能记得）算已掌握 · 点一下看是哪些"><div class="h"><span>🏆 已掌握</span><b>' + pcent(tot) + "%</b><small>" + kn + " / " + all.length + " 个</small></div>" + mbar(tot, true) + (lr.length ? '<div class="h2">学习中的 ' + lr.length + " 个词平均掌握进度 <b>" + pcent(avg) + "%</b></div>" + mbar(avg) : "") + "</div>"; })() +
-      '<div class="pp-go"><button id="pp-start"' + (n ? "" : " disabled") + ">开始练习</button><span>" + (n ? n + " 张卡片" : p.mode === "none" ? (opt.sugg ? "测验、练习都关了：只练建议，现在没有建议" : "测验、练习、建议都关了，没有可练的") : "现在没有要练的") + "</span></div>" +
+      '<div class="pp-go"><button id="pp-start"' + (n ? "" : " disabled") + ">开始练习</button>" + '<button id="pp-commute" class="pp-cm" title="生词一条条读给你听：熄屏、走路、开车也能复习">🎧 通勤模式</button>' + "<span>" + (n ? n + " 张卡片" : p.mode === "none" ? (opt.sugg ? "测验、练习都关了：只练建议，现在没有建议" : "测验、练习、建议都关了，没有可练的") : "现在没有要练的") + "</span></div>" +
       (() => { const H = hardOf(p.P.filter(w => !w.sg), S); return H.length ? '<div class="pp-only pp-hard"><small>🔥 难词 ' + H.length + ' 个</small><button id="pp-hard" title="' + esc(H.slice(0, 30).map(w => w.word).join(" · ")) + '">只练难词</button><span class="hw">' + H.slice(0, 6).map(w => '<u data-w="' + esc(w.word) + '">' + esc(w.word) + "</u>").join(" · ") + (H.length > 6 ? " …" : "") + "</span></div>" : ""; })() +
       '<div class="pp-only"><small>只练一种：</small><button id="pp-only-shadow"' + (p.queue.length ? "" : " disabled") + ' title="听一句，自己读一遍，录音转文字，标出读对、读漏的词">🎙 跟读</button><button id="pp-only-dict"' + (p.queue.length ? "" : " disabled") + ' title="只放声音，把整句打出来，逐词对错">✍️ 听写</button></div>' +
       (p.queue.length ? '<div class="pp-next"><b>接下来</b> · 你的队列，然后是推荐' + '<div class="pp-q">' + p.queue.slice(0, 12).map(q => { const r = S[q.w.id]; const m = mastery(r, q.w); return "<span" + (q.kind === "sugg" ? ' class="sg" title="推荐：从看过的视频里来的新词"' : ' title="掌握进度 ' + pcent(m) + "%" + (r && r.at ? " · 现在记得 " + pcent(rNow(r)) + "%" : " · 新词") + '"') + " data-w=\"" + esc(q.w.word) + "\">" + esc(q.w.word) + (q.kind === "sugg" ? "" : " <i>" + pcent(m) + "%</i>" + mbar(m)) + "</span>"; }).join("") + "</div></div>" : "") + "</div>" +
@@ -309,6 +310,7 @@
       seg("types", { name: "类型", items: [["word", "单词"], ["phrase", "短语"], ["sentence", "句子"], ["pattern", "规律"]] }, v => opt.types.includes(v)) +
       '<p class="pp-note">插件里的「复习」也打开这里，进度是同一份：在哪台设备练都算。「练习数量」是这一组的卡片张数；「新项目」是其中新词最多占的比例。每个词这一轮要么听 3 句例句（每次换着听），要么做 1 道填空。按 Ebisu 排复习（同 Language Reactor）：记得的概率降到 50%（过了半衰期）时再练，越接近遗忘时答对，半衰期涨得越多；半衰期到 42 天（至少 6 周都很可能记得），自动算「已掌握」。电脑上可以用键盘（同 Language Reactor）：A 上一个、S 播放、E 显示 / 看答案、D 下一个；测验和认词卡 Z 忘了、C 记得；建议 Z 已知、X 学习、C 跳过。</p></div></div>';
     root.querySelector("#pp-start").onclick = () => { lastSum = ""; start(); };
+    const cm = root.querySelector("#pp-commute"); if (cm) cm.onclick = () => { if (window.commuteShow) window.commuteShow(); }; // 🎧 通勤模式（commute.js，按需加载）
     root.querySelector("#pp-only-shadow").onclick = () => { lastSum = ""; start("shadow"); };
     root.querySelector("#pp-only-dict").onclick = () => { lastSum = ""; start("dict"); };
     const hb = root.querySelector("#pp-hard"); if (hb) hb.onclick = () => { lastSum = ""; start(null, true); };

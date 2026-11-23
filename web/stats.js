@@ -165,6 +165,10 @@
   .st-tile span{display:block;margin-top:3px;font-size:12.5px;color:var(--ui-muted)}
   .st-tile.fire{background:var(--ui-hero);border-color:var(--ui-pur-line)}
   .st-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}@media(min-width:1024px){.st-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.st-wide{grid-column:1/-1}}
+  .st-ms-big{display:flex;align-items:baseline;gap:8px;margin:4px 0 8px}.st-ms-big b{font-size:34px;font-weight:900;color:var(--ui-green);font-variant-numeric:tabular-nums}.st-ms-big span{color:var(--ui-ink-2);font-size:14px}
+  .st-ms-bar{height:8px;border-radius:4px;background:var(--ui-surface-2);overflow:hidden}.st-ms-bar u{display:block;height:100%;background:var(--ui-green);border-radius:4px}
+  .st-ms-row{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 6px}.st-ms{font-size:12.5px;font-weight:700;border-radius:999px;padding:3px 9px;background:var(--ui-surface-2);color:var(--ui-muted);border:1px solid var(--ui-line)}.st-ms.on{color:var(--ui-ink);border-color:var(--ui-green)}
+  .st-spark{width:100%;height:46px;display:block;margin-top:6px}.st-ms-lv{margin-top:8px;font-size:13.5px;color:var(--ui-ink-2)}.st-ms-lv u{cursor:pointer;color:var(--ui-pur-text,var(--ui-pur))}
   .st-card{background:var(--ui-surface);border:1px solid var(--ui-line);border-radius:14px;padding:14px 16px;min-width:0}
   .st-card h3{margin:0 0 4px;font-size:15.5px;font-weight:800;color:var(--ui-ink)}.st-card .sub{margin:0 0 10px;font-size:12.5px;color:var(--ui-muted)}
   .st-card svg{display:block;width:100%;height:auto;overflow:visible}
@@ -328,6 +332,34 @@
     return '<div class="st-card"><h3>📚 收集和掌握曲线</h3><p class="sub">累计收集按收词日期；已掌握按每个词最后一次练习的时间近似' + (showMas ? "" : "（已掌握的词还太少，先只画收集）") + "</p>" + curveSvg(pts) +
       '<div class="st-legend"><span><i class="ln" style="background:var(--ui-pur-text)"></i>累计收集</span>' + (showMas ? '<span><i class="ln" style="background:var(--ui-green)"></i>已掌握</span>' : "") + '</div><div class="st-detail" id="st-cd"></div></div>';
   }
+  // 🏅 词量里程碑（对标 LingQ 的已知词数）：已掌握多少个、下一站还差多少、到过哪几站（哪天）、按词汇量测试估的水平
+  //   每天记一笔「已掌握 / 收集」（本机 vocab:kn + 同步到 /api/mine 的 daily「kn:日期」），这条曲线从开始记的那天起是准的；
+  //   上面「收集和掌握曲线」里以前的部分是按练习时间推算的。到了新的一站（vocab:ms + daily「ms:数字」）弹一次提示
+  const MS = [50, 100, 250, 500, 1000, 1500, 2000, 3000, 5000, 8000];
+  let msPulled = false;
+  function msRecord(known, total) {
+    const day = U.day(), K = LG("vocab:kn", {}) || {}, M = LG("vocab:ms", {}) || {}, C = window.CLOUD && CLOUD.chan("daily");
+    if (!total) return; // 生词本还没读到（刚打开、换了设备）：不记，免得记成 0
+    if (!K[day] || K[day][0] !== known || K[day][1] !== total) { K[day] = [known, total]; LS("vocab:kn", K); if (C) C.put("kn:" + day, [known, total]); }
+    const hit = MS.filter(m => known >= m && !M[m]);
+    if (hit.length) { hit.forEach(m => { M[m] = day; if (C) C.put("ms:" + m, day); }); LS("vocab:ms", M); U.tip("🏅 已掌握 " + hit[hit.length - 1] + " 个词！"); }
+    if (!msPulled && C) { msPulled = true; C.get(60e3).then(it => { let ch = false; for (const k in it || {}) { const x = it[k]; if (!x || x.del) continue; if (k.indexOf("kn:") === 0 && !K[k.slice(3)] && Array.isArray(x.v)) { K[k.slice(3)] = x.v; ch = true; } if (k.indexOf("ms:") === 0 && !M[k.slice(3)] && x.v) { M[k.slice(3)] = x.v; ch = true; } } if (ch) { LS("vocab:kn", K); LS("vocab:ms", M); if (root && root.classList.contains("on")) draw(); } }).catch(() => {}); } // 换设备：把别的设备记的拉过来
+  }
+  function msHtml(d) {
+    const total = d.L.length, known = d.mastered; msRecord(known, total);
+    const M = LG("vocab:ms", {}) || {}, K = LG("vocab:kn", {}) || {}, next = MS.find(m => m > known), prev = [...MS].reverse().find(m => m <= known) || 0;
+    const pct = next ? Math.round((known - prev) / (next - prev) * 100) : 100;
+    const badges = MS.map(m => '<span class="st-ms' + (M[m] ? " on" : "") + '" title="' + (M[m] ? "到达：" + M[m] : "还没到") + '">' + (M[m] ? "🏅" : "🔒") + " " + m + "</span>").join("");
+    const vt = (LG("vocab:test", []) || [])[0], lv = vt && vt.size ? vtLevel(vt.size) : null, ago = vt ? Math.floor((Date.now() - (+vt.at || 0)) / 864e5) : 0;
+    const days = Object.keys(K).sort().slice(-60), pts = days.map(k => K[k][0]);
+    let spark = "";
+    if (pts.length >= 2) { const mx = Math.max(...pts, 1), mn = Math.min(...pts), w = 300, h = 46, x = i => (i / (pts.length - 1)) * w, y = v => h - 4 - ((v - mn) / Math.max(1, mx - mn)) * (h - 8); spark = '<svg viewBox="0 0 ' + w + " " + h + '" class="st-spark" preserveAspectRatio="none"><polyline fill="none" stroke="var(--ui-green)" stroke-width="2" points="' + pts.map((v, i) => x(i).toFixed(1) + "," + y(v).toFixed(1)).join(" ") + '"/></svg><div class="st-note">' + days[0] + " → " + days[days.length - 1] + "：" + pts[0] + " → " + pts[pts.length - 1] + " 个</div>"; }
+    return '<div class="st-card"><h3>🏅 词量里程碑</h3><p class="sub">已掌握 = 掌握度到 42 天的词（和顶上「🏆 已掌握」同一个数）</p>' +
+      '<div class="st-ms-big"><b>' + known + '</b><span>个已掌握 · 收集了 ' + total + " 个</span></div>" +
+      (next ? '<div class="st-ms-bar"><u style="width:' + pct + '%"></u></div><div class="st-note">下一站 <b>' + next + "</b>，还差 <b>" + (next - known) + "</b> 个</div>" : '<div class="st-note">🎉 所有里程碑都到了</div>') +
+      '<div class="st-ms-row">' + badges + "</div>" + spark +
+      (window.VL && window.VL !== "en" ? "" : '<div class="st-ms-lv">' + (lv ? "📊 估计水平：<b>" + lv.cefr + "</b>（" + lv.ielts + "，词汇量约 " + vt.size + "，" + (ago ? ago + " 天前测的" : "今天测的") + "）" + (ago >= 30 ? ' · <u id="st-ms-vt">一个月了，再测一次看进步</u>' : "") : '📊 还没测过词汇量：<u id="st-ms-vt">测一下</u>（5 分钟，估出大概的 CEFR 等级）') + "</div>") + "</div>";
+  }
   function heatHtml(d) {
     return '<div class="st-card st-wide"><h3>🗓 最近 26 周</h3><p class="sub">每格一天，越亮练得越多；悬停或点一下看具体数字</p><div class="st-heat-wrap">' + heatSvg(d) + "</div>" +
       '<div class="st-legend"><span>少</span>' + HEAT.map(c => '<i style="background:' + c + ';margin:0"></i>').join("") + '<span>多</span></div><div class="st-detail" id="st-hd"></div></div>';
@@ -450,7 +482,7 @@
   function draw() {
     if (!root) return;
     const d = data(); // 词汇量测试进行中也照常画：vtHtml 按 vt 的状态画到第几题
-    root.innerHTML = tilesHtml(d) + '<div class="st-grid">' + heatHtml(d) + forecastHtml(d) + distHtml(d) + curveHtml(d) + (window.VL && window.VL !== "en" ? "" : vtHtml()) + remindHtml() + installHtml() + "</div>";
+    root.innerHTML = tilesHtml(d) + '<div class="st-grid">' + msHtml(d) + heatHtml(d) + forecastHtml(d) + distHtml(d) + curveHtml(d) + (window.VL && window.VL !== "en" ? "" : vtHtml()) + remindHtml() + installHtml() + "</div>";
     const hw = root.querySelector(".st-heat-wrap"); if (hw) hw.scrollLeft = hw.scrollWidth; // 手机上热力图横向滚动：默认停在最近几周
   }
   function showTip(el, x, y) {
@@ -493,6 +525,7 @@
       else if (id === "st-vt-back") { if (vt && vt.i > 0) { vt.i--; drawVt(); } }
       else if (id === "st-vt-close") { vt = null; drawVt(); }
       else if (id === "st-rm-on") remindOn();
+      else if (id === "st-ms-vt") { const v = document.getElementById("st-vt"); if (v) v.scrollIntoView({ behavior: "smooth", block: "start" }); }
       else if (id === "st-rm-off") { try { localStorage.removeItem("remind:time"); } catch (x) {} say("提醒已关闭"); draw(); }
       else if (id === "st-rm-test") { e.preventDefault(); notify(dueToday(), true); }
       else if (id === "st-rm-ics") icsDownload();
