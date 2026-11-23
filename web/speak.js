@@ -94,7 +94,10 @@
 
   let root = null, D = null, loading = null;
   // 「🌱 入门」「🔊 发音」挪到了英语「🌱 入门」标签（index.html 的 SECS.basic，basic.js）：那边用 speakShow("start" / "pron") 只显示这一栏；「🗣 说」里不再列
-  const MOVED = ["start", "pron"];
+  // 🇩🇪 学德语（window.VL === "de"）：内容换 speak-data-de.js（同样的结构，"en" 字段里放德语）；朗读、录音打分、AI 都按德语；
+  //   德语的「🌱 入门」是 de-basic.js（没有口语入门、发音两栏），所以这两栏留在「🗣 说」里；雅思模拟考、数字（英语读法）、真人录音（英语）不显示
+  const DE = window.VL === "de", LC = DE ? "de" : "en", LGN = DE ? "德语" : "英语";
+  const MOVED = DE ? [] : ["start", "pron"];
   let only = null; // 嵌在「🌱 入门」里时 = "start" / "pron"
   let sec = LG("speak:sec", ""); if (!SECS.some(s => s[0] === sec)) sec = "";
   let opt = Object.assign({ rate: 1, zh: true }, LG("speak:opt", {}));
@@ -112,22 +115,22 @@
 
   function loadData() {
     if (window.SPEAK_DATA) { D = window.SPEAK_DATA; return Promise.resolve(); }
-    if (!loading) loading = new Promise(res => { const s = document.createElement("script"); s.src = "speak-data.js?v=f592f75f"; /* ?v= 由 tools/bump-versions.js 按文件内容自动改 */ s.onload = s.onerror = res; document.head.append(s); }).then(() => { D = window.SPEAK_DATA || null; });
+    if (!loading) loading = new Promise(res => { const s = document.createElement("script"); s.src = DE ? "speak-data-de.js?v=c289acae" : "speak-data.js?v=f592f75f"; /* ?v= 由 tools/bump-versions.js 按文件内容自动改 */ s.onload = s.onerror = res; document.head.append(s); }).then(() => { D = window.SPEAK_DATA || null; });
     return loading;
   }
 
   /* ---------- 朗读：全站共用的 tts.js（TTS.say 先 AI 真人声、不行系统语音；TTS.word 单词先放真人录音；A 用另一个声音） ---------- */
   const rateOf = o => (o.rate || opt.rate) * (o.slow ? 0.75 : 1);
-  function say(text, o) { o = o || {}; if (window.TTS) TTS.say(text, { who: o.who, rate: rateOf(o), base: 1, lang: "en", end: o.end }); else if (o.end) o.end(true); }
+  function say(text, o) { o = o || {}; if (window.TTS) TTS.say(text, { who: o.who, rate: rateOf(o), base: 1, lang: LC, end: o.end }); else if (o.end) o.end(true); }
   function hush() { if (window.TTS) TTS.hush(); }
   /* 「🔊 发音」最小对立词的真人录音：web/pron-real.json（tools/gen-pron.mjs 从维基词典找的 Wikimedia Commons 录音，CC BY-SA 等授权），播放在 tts.js 的 TTS.word */
   let REAL = null;
   function realLoad() { return TTS.realLoad().then(j => { if (!REAL) { REAL = j; if (view && view.t === "pair") draw(); } }); }
   const realOf = w => (window.TTS && TTS.realOf(w)) || null;
-  function sayWord(w, o) { o = o || {}; TTS.word(w, { rate: rateOf(o), base: 1, lang: "en" }); }
+  function sayWord(w, o) { o = o || {}; if (DE) return say(w, o); TTS.word(w, { rate: rateOf(o), base: 1, lang: "en" }); } // 真人单词录音只有英语
 
   /* ---------- 录音和打分：全站共用的 rec.js（REC），同「🔊 练习」的跟读卡 ---------- */
-  const toks = t => REC.toks(t, "en"), align = (target, said) => REC.score(target, said, { lang: "en" });
+  const toks = t => REC.toks(t, LC), align = (target, said) => REC.score(target, said, { lang: LC });
   const SR = REC.SR;
   const RES = {}; // key → {url, said, res, best, busy, noai, on}
   let myRec = null; // 口语页自己录的那条（离开口语页只停它，别的页面正在录的不管）
@@ -139,7 +142,7 @@
     // 每次录都换一个号：放弃 / 重录以后，上一次晚到的识别结果不会再盖上来
     const cur = x(), tok = REC.cur() === key ? cur.tok : (cur.tok = (cur.tok || 0) + 1), mine = () => x().tok === tok;
     if (REC.cur() !== key) { cur.err = ""; cur.busy = false; }
-    REC.toggle(key, { lang: "en", max: max || 20, before: hush,
+    REC.toggle(key, { lang: LC, max: max || 20, before: hush,
       start: () => { if (!mine()) return; x().on = true; x().err = ""; paintRec(key); },
       cancel: () => { if (!mine()) return; x().on = false; x().busy = false; paintRec(key); },
       fail: m => { if (!mine()) return; x().on = false; x().busy = false; x().err = m; paintRec(key); },
@@ -177,7 +180,7 @@
   const pct = v => Math.round((v || 0) * 100);
   function recBtn(key, target, max, label) { const x = RES[key] || {}; return '<button class="sk-ib rec' + (x.on ? " on" : "") + '" data-rec="' + esc(key) + '" data-t="' + esc(target || "") + '" data-max="' + (max || 20) + '">' + (x.on ? "⏹ 停止" : "🎙 " + (label || (x.url ? "再读" : "跟读"))) + "</button>"; }
   // 原声：预先生成好的 AI 语音文件（不花额度）；还没生成的，点了「比语调」才现做一句（约 80 neurons，做过的有缓存）
-  const refSrc = t => { try { if (!window.TTS || !TTS.srcOf) return ""; const s = TTS.srcOf(t, ""); if (s && s.indexOf("/tts/") === 0) return s; const c = TTS.clean ? TTS.clean(t) : String(t || "").trim(); return c && c.length <= 600 && /[a-z]/i.test(c) ? "/api/tts?v=asteria&t=" + encodeURIComponent(c) : ""; } catch (e) { return ""; } };
+  const refSrc = t => { try { if (DE || !window.TTS || !TTS.srcOf) return ""; const s = TTS.srcOf(t, ""); if (s && s.indexOf("/tts/") === 0) return s; const c = TTS.clean ? TTS.clean(t) : String(t || "").trim(); return c && c.length <= 600 && /[a-z]/i.test(c) ? "/api/tts?v=asteria&t=" + encodeURIComponent(c) : ""; } catch (e) { return ""; } };
   function pitchOf(key) {
     const x = RES[key]; if (!x || !x.blob) return; x.pt = '<span class="said">🎵 正在分析……</span>'; paintRec(key);
     const go = () => window.PITCH.compare(refSrc(x.tgt), x.blob).then(r => { x.pt = window.PITCH.html(r); }, e => { x.pt = '<span class="said">没分析出来（' + esc(String(e && e.message || e)).slice(0, 60) + "）</span>"; }).then(() => paintRec(key));
@@ -233,9 +236,9 @@
     const H = only === "start" ? ["🗣 口语入门", "第一次练口语从这里开始：先学救命句、把自我介绍说顺，再照新手 7 天计划每天练一点。"] : only === "pron" ? ["🔊 发音", "中国人最容易混的音（最小对立词）、连读弱读、重音、数字：先听、再跟读，会标出读对、读漏的词。"] : ["🗣 口语", "每天 15 分钟：听 → 跟读 → 角色扮演 → 自己说。点 🔊 听，点 🎙 录音跟读，会标出读对、读漏的词。"];
     return '<div class="sk-hd"><h1>' + H[0] + "</h1><p>" + H[1] + '</p><div class="sp">' +
       '<span class="sk-seg" title="朗读速度"><button data-rate="0.8" class="' + (opt.rate < .95 ? "on" : "") + '">慢</button><button data-rate="1" class="' + (opt.rate >= .95 && opt.rate < 1.1 ? "on" : "") + '">正常</button><button data-rate="1.15" class="' + (opt.rate >= 1.1 ? "on" : "") + '">快</button></span>' +
-      '<span class="sk-seg" title="朗读声音：AI 真人语音（Workers AI）或这台设备自带的语音"><button data-voice="ai" class="' + (!window.TTS || TTS.mode() !== "sys" ? "on" : "") + '">AI 真人声</button><button data-voice="sys" class="' + (window.TTS && TTS.mode() === "sys" ? "on" : "") + '">系统声</button></span>' +
+      (DE ? "" : '<span class="sk-seg" title="朗读声音：AI 真人语音（Workers AI）或这台设备自带的语音"><button data-voice="ai" class="' + (!window.TTS || TTS.mode() !== "sys" ? "on" : "") + '">AI 真人声</button><button data-voice="sys" class="' + (window.TTS && TTS.mode() === "sys" ? "on" : "") + '">系统声</button></span>') + /* 德语：AI 真人声只会英语，只用系统德语语音 */
       '<span class="sk-seg" title="显示中文"><button data-zh="1" class="' + (opt.zh ? "on" : "") + '">中文</button><button data-zh="0" class="' + (!opt.zh ? "on" : "") + '">隐藏</button></span></div></div>' +
-      (only ? "" : '<div class="sk-chips"><button data-basic="speak" title="救命句、自我介绍、发音在「🌱 入门」标签">🌱 新手入门 ›</button>' + SECS.filter(x => !MOVED.includes(x[0])).map(([k, t]) => '<button data-sec="' + k + '" class="' + (sec === k && !view ? "on" : sec === k ? "on" : "") + '">' + t + (n[k] === "" ? "" : "<b>" + (n[k] || 0) + "</b>") + "</button>").join("") + "</div>") + (view || only ? "" : statBar());
+      (only ? "" : '<div class="sk-chips">' + (DE ? "" : '<button data-basic="speak" title="救命句、自我介绍、发音在「🌱 入门」标签">🌱 新手入门 ›</button>') + SECS.filter(x => !MOVED.includes(x[0])).map(([k, t]) => '<button data-sec="' + k + '" class="' + (sec === k && !view ? "on" : sec === k ? "on" : "") + '">' + t + (n[k] === "" ? "" : "<b>" + (n[k] || 0) + "</b>") + "</button>").join("") + "</div>") + (view || only ? "" : statBar());
   }
   function draw() {
     if (!root) return;
@@ -255,7 +258,7 @@
   const LV = ["入门", "基础", "进阶"];
   function dialogList() {
     const L = D.dialogs || [];
-    return '<div class="sk-intro"><b>怎么练：</b>① 先点「▶ 听全文」听两遍；② 每句点 🎙 跟读，读到 85% 以上；③ 点「🎭 角色扮演」，你演 B：只看中文说英文，说完对答案。已练 ' + doneCount("d:") + " / " + L.length + " 个场景。</div>" +
+    return '<div class="sk-intro"><b>怎么练：</b>① 先点「▶ 听全文」听两遍；② 每句点 🎙 跟读，读到 85% 以上；③ 点「🎭 角色扮演」，你演 B：只看中文说' + (DE ? "德语" : "英文") + '，说完对答案。已练 ' + doneCount("d:") + " / " + L.length + " 个场景。</div>" +
       '<div class="sk-grid">' + L.slice().sort((a, b) => LV.indexOf(a.level) - LV.indexOf(b.level)).map(d => card("dialog", d.id, d.title, d.en_title + " · " + (d.lines || []).length + " 句", d.scene, isDone("d:" + d.id), '<span class="sk-tag">' + esc(d.level || "") + "</span>")).join("") + "</div>";
   }
   let RP = null; // 角色扮演 / 听全文的进度：{id, i, mode:"play"|"rp", wait}
@@ -265,7 +268,7 @@
     const lines = d.lines.map((l, i) => {
       const key = "d:" + d.id + ":" + i, cur = rp && rp.i === i, hideEn = rp && rp.mode === "rp" && l.who === "B" && i >= rp.i && !(rp.shown || {})[i];
       return '<div class="sk-ln ' + l.who + (cur ? " cur" : "") + '" data-li="' + i + '"><div class="sk-av">' + esc(l.who === "B" ? "我" : "A") + '</div><div class="sk-bub">' +
-        (hideEn ? '<div class="sk-mask">（' + esc(d.roles && d.roles.B || "你") + "：用英语说）</div>" + '<div class="sk-zh" style="display:block">' + esc(l.zh) + "</div>" : '<div class="sk-en">' + esc(l.en) + '</div><div class="sk-zh">' + esc(l.zh) + "</div>") +
+        (hideEn ? '<div class="sk-mask">（' + esc(d.roles && d.roles.B || "你") + "：用" + LGN + "说）</div>" + '<div class="sk-zh" style="display:block">' + esc(l.zh) + "</div>" : '<div class="sk-en">' + esc(l.en) + '</div><div class="sk-zh">' + esc(l.zh) + "</div>") +
         (hideEn ? (cur ? '<div class="sk-ops">' + recBtn(key, l.en, 25, "说出来") + '<button class="sk-ib" data-act="rp-show" data-i="' + i + '">看答案</button></div><div data-res="' + esc(key) + '">' + resHtml(key) + "</div>" : "") : ops(key, l.en, l.who === "A" ? "A" : "")) +
         (rp && rp.mode === "rp" && cur && (rp.shown || {})[i] ? '<div class="sk-ops"><button class="ui-btn pri" data-act="rp-next">继续 ▶</button></div>' : "") +
         "</div></div>";
@@ -310,20 +313,21 @@
   // ===== 🔊 发音 =====
   function pronList() {
     const P = D.pron || {}, L = P.pairs || [];
-    return '<div class="sk-intro"><b>怎么练：</b>中国人最容易混的音，一组一组练：先看嘴型说明，点两个词对比着听（单词都是<b>真人录音</b>，来自维基词典），再做「听音辨词」小测（听到哪个点哪个），最后跟读例句。已练 ' + doneCount("p:") + " / " + L.length + " 组。</div>" +
+    return '<div class="sk-intro"><b>怎么练：</b>中国人最容易混的音，一组一组练：先看嘴型说明，点两个词对比着听' + (DE ? "（系统德语语音）" : "（单词都是<b>真人录音</b>，来自维基词典）") + '，再做「听音辨词」小测（听到哪个点哪个），最后跟读例句。已练 ' + doneCount("p:") + " / " + L.length + " 组。</div>" +
       '<div class="sk-grid three">' + L.map(p => card("pair", p.id, p.title, p.a + " vs " + p.b, (p.words || []).slice(0, 4).map(w => w[0] + "/" + w[1]).join(" · "), isDone("p:" + p.id))).join("") + "</div>" +
-      '<div class="sk-sub">连读、弱读、吞音<small>母语者说快了为什么听不懂</small></div><div class="sk-grid">' + card("conn", "all", "连读和弱读 " + ((P.connected || []).length) + " 条", "gonna、wanna、didja、pick it up……", "听慢速和正常速度对比，跟读", isDone("p:conn")) +
-      card("stress", "all", "重音和语调 " + (D.stress || []).length + " 句", "重读不同的词，意思就变了", "I didn't say he stole it.", false) +
-      card("twist", "all", "绕口令 " + (D.twisters || []).length + " 条", "th、r/l、v/w、s/sh", "She sells seashells…", false) +
-      card("num", "all", "数字和价格", "电话、价格、时间、年份、大数、日期", "听写 + 说出来", false) + "</div>";
+      '<div class="sk-sub">连读、弱读、吞音<small>母语者说快了为什么听不懂</small></div><div class="sk-grid">' + card("conn", "all", (DE ? "发音规则和口语缩读 " : "连读和弱读 ") + ((P.connected || []).length) + " 条", DE ? "尾音清化、-er、-ig、st/sp、haste、gibt's……" : "gonna、wanna、didja、pick it up……", "听慢速和正常速度对比，跟读", isDone("p:conn")) +
+      card("stress", "all", "重音和语调 " + (D.stress || []).length + " 句", "重读不同的词，意思就变了", ((D.stress || [])[0] || {}).en || "", false) +
+      card("twist", "all", "绕口令 " + (D.twisters || []).length + " 条", DE ? "f/pf、z/zw、ch/sch、r/l" : "th、r/l、v/w、s/sh", (((D.twisters || [])[0] || {}).en || "").slice(0, 28) + "…", false) +
+      (DE ? "" : card("num", "all", "数字和价格", "电话、价格、时间、年份、大数、日期", "听写 + 说出来", false)) + "</div>";
   }
   function realNote(p) {
+    if (DE) return '<small class="sk-h3n">系统德语语音</small>';
     if (!REAL) { realLoad(); return '<small class="sk-h3n">载入真人录音…</small>'; }
     const W = (p.words || []).flat(), n = W.filter(realOf).length;
     return '<small class="sk-h3n">' + (n === W.length ? "🎙 全部是真人录音" : n ? "🎙 真人录音（标 AI 的 " + (W.length - n) + " 个词没找到真人录音）" : "AI 声音") + "</small>";
   }
   function realCredit(p) {
-    if (!REAL) return ""; const L = (p.words || []).flat().map(w => [w, realOf(w)]).filter(x => x[1]); if (!L.length) return "";
+    if (DE || !REAL) return ""; const L = (p.words || []).flat().map(w => [w, realOf(w)]).filter(x => x[1]); if (!L.length) return "";
     const acc = { us: "美音", uk: "英音", au: "澳音", ll: "Lingua Libre 志愿者" };
     return '<details class="sk-cred"><summary>录音来源：维基词典 / Wikimedia Commons（志愿者录制，CC BY-SA 等自由授权）</summary>' + L.map(x => '<a href="https://commons.wikimedia.org/wiki/' + esc(encodeURI(x[1].f.replace(/ /g, "_"))) + '" target="_blank" rel="noopener">' + esc(x[0]) + "</a>" + '<small>' + esc(acc[x[1].a] || "") + "</small>").join(" · ") + "</details>";
   }
@@ -333,8 +337,8 @@
     return '<div class="sk-bar">' + back + "</div>" + '<h2 class="sk-title">' + esc(p.title) + "<small>" + esc(p.a) + " vs " + esc(p.b) + "</small></h2>" +
       '<div class="sk-scene">👄 ' + esc(p.how) + "</div>" +
       '<div class="sk-box"><h3>🎧 听音辨词</h3><div class="sk-quiz" id="sk-quiz"></div></div>' +
-      '<div class="sk-box"><h3>对比着听（点词就读）' + realNote(p) + '</h3><div class="sk-pairs">' + (p.words || []).map(w => '<div class="sk-pair">' + w.map(x => '<button data-word="' + esc(x) + '">' + esc(x) + (REAL && !realOf(x) ? '<small class="sk-ai">AI</small>' : "") + "</button>").join("") + "</div>").join("") + "</div>" + realCredit(p) + "</div>" +
-      '<div class="sk-box"><h3>例句跟读<small class="sk-h3n">句子是 AI 声音（这些句子没有能用的真人录音）</small></h3>' + (p.sent || []).flat().map((s, i) => '<div class="sk-ph" style="display:block"><div class="e">' + esc(s) + "</div>" + ops("p:" + p.id + ":" + i, s) + "</div>").join("") + "</div>";
+      '<div class="sk-box"><h3>对比着听（点词就读）' + realNote(p) + '</h3><div class="sk-pairs">' + (p.words || []).map(w => '<div class="sk-pair">' + w.map(x => '<button data-word="' + esc(x) + '">' + esc(x) + (!DE && REAL && !realOf(x) ? '<small class="sk-ai">AI</small>' : "") + "</button>").join("") + "</div>").join("") + "</div>" + realCredit(p) + "</div>" +
+      '<div class="sk-box"><h3>例句跟读<small class="sk-h3n">' + (DE ? "系统德语语音" : "句子是 AI 声音（这些句子没有能用的真人录音）") + '</small></h3>' + (p.sent || []).flat().map((s, i) => '<div class="sk-ph" style="display:block"><div class="e">' + esc(s) + "</div>" + ops("p:" + p.id + ":" + i, s) + "</div>").join("") + "</div>";
   }
   function quizNew() {
     const p = ((D.pron || {}).pairs || []).find(x => view && x.id === view.id); if (!p) return;
@@ -440,7 +444,7 @@
   const FREE = { id: "free", title: "自由聊天", scene: "casual small talk between two friends: daily life, work, weekend plans, food, hobbies, living in Kuala Lumpur" };
   function chatScenes() { return [FREE].concat((D.dialogs || []).map(d => ({ id: d.id, title: d.title, scene: d.en_title + ". " + "You play: " + (d.roles && d.roles.A || "the other person") + ". The learner plays: " + (d.roles && d.roles.B || "themselves") + ". Context (Chinese): " + d.scene }))); }
   function chatView() {
-    if (!CH) return '<div class="sk-intro"><b>怎么聊：</b>选一个场景，AI 先开口；你点 🎙 用英语回答（说完自动发出去），也可以打字。AI 会接着聊、追问，还会顺手纠正你上一句的错。聊 6 句以上点「结束并总结」，看看哪些地方可以说得更好。</div>' +
+    if (!CH) return '<div class="sk-intro"><b>怎么聊：</b>选一个场景，AI 先开口；你点 🎙 用' + LGN + '回答（说完自动发出去），也可以打字。AI 会接着聊、追问，还会顺手纠正你上一句的错。聊 6 句以上点「结束并总结」，看看哪些地方可以说得更好。</div>' +
       '<div class="sk-grid three">' + chatScenes().map(c => '<button class="sk-card" data-act="chat-go" data-id="' + esc(c.id) + '"><div class="t"><b>' + (c.id === "free" ? "💬 " : "🎭 ") + esc(c.title) + "</b><span>" + (c.id === "free" ? "想到哪聊到哪" : "AI 演对方，你演自己") + "</span></div><i>›</i></button>").join("") + "</div>" + chatHistHtml();
     const msgs = CH.msgs.map((m, i) => m.role === "assistant"
       ? '<div class="sk-ln"><div class="sk-av">AI</div><div class="sk-bub"><div class="sk-en">' + esc(m.content) + '</div><div class="sk-ops"><button class="sk-ib" data-say="' + esc(m.content) + '" data-who="A">🔊</button><button class="sk-ib" data-say="' + esc(m.content) + '" data-who="A" data-slow="1">🐢</button><button class="sk-ib" data-act="chat-zh" data-i="' + i + '">译</button></div>' + (m.zh ? '<div class="sk-zh" style="display:block">' + esc(m.zh) + "</div>" : "") + "</div></div>"
@@ -455,17 +459,17 @@
     return '<div class="sk-bar"><button class="ui-btn" data-act="chat-end">← 换个场景</button><span class="gap"></span><label class="sk-note" style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" id="sk-auto"' + (chatAuto ? " checked" : "") + '>自动朗读 AI 的话</label>' +
       ((CH.msgs.some(m => m.fix) || (CH.sum && (CH.sum.fixes || []).length)) ? '<button class="ui-btn" data-act="chat-book" title="把改过的正确说法加进生词本">＋ 改过的句子进生词本</button>' : "") +
       '<button class="ui-btn" data-act="chat-sum"' + (users >= 2 && !CH.busy && !CH.sumBusy ? "" : " disabled") + ">结束并总结</button></div>" +
-      '<h2 class="sk-title">' + esc(CH.title) + "<small>AI 演对方，你用英语回答</small></h2>" +
+      '<h2 class="sk-title">' + esc(CH.title) + "<small>AI 演对方，你用" + LGN + "回答</small></h2>" +
       '<div class="sk-lines" id="sk-chat">' + msgs + (CH.busy ? '<div class="sk-ln"><div class="sk-av">AI</div><div class="sk-bub"><span class="sk-note">正在想……</span></div></div>' : "") + "</div>" +
       (CH.err ? '<div class="sk-tip">' + esc(CH.err) + ' <button class="sk-ib" data-act="chat-retry">重试</button></div>' : "") +
       '<div class="sk-box"><div class="sk-ops" style="margin-top:0">' + '<button class="ui-btn ' + (x.on ? "" : "pri") + '" data-rec="chat" data-t="" data-max="40" data-label="说一句" style="min-width:120px">' + (x.on ? "⏹ 说完了" : "🎙 说一句") + '</button><input id="sk-say" placeholder="或者打字，回车发送" style="flex:1 1 200px;min-width:0;height:38px;border-radius:10px;border:1px solid var(--ui-line-2);background:var(--ui-surface-2);color:var(--ui-ink);padding:0 12px;font:inherit;font-size:15px"><button class="ui-btn" data-act="chat-send">发送</button></div>' +
-      (x.busy ? '<div class="sk-note">正在识别……</div>' : "") + '<div class="sk-note">卡住了？说 "Sorry, could you say that again?" 或 "How do you say … in English?" 也算练习。</div></div>' + sum;
+      (x.busy ? '<div class="sk-note">正在识别……</div>' : "") + '<div class="sk-note">卡住了？说 ' + (DE ? '"Wie bitte? Können Sie das wiederholen?" 或 "Wie sagt man … auf Deutsch?"' : '"Sorry, could you say that again?" 或 "How do you say … in English?"') + ' 也算练习。</div></div>' + sum;
   }
   async function chatAsk() {
     if (!CH || CH.busy) return; CH.busy = true; CH.err = ""; draw(); chatScroll();
     const my = CH;
     try {
-      const j = await AI.ask("chat", { scene: CH.scene, history: CH.msgs.map(m => ({ role: m.role, content: m.content })) });
+      const j = await AI.ask("chat", { lang: LC, scene: CH.scene, history: CH.msgs.map(m => ({ role: m.role, content: m.content })) });
       if (CH !== my) return;
       if (!j.ok) throw new Error(AI.msg(j, "AI 没回上来，点重试"));
       const last = [...CH.msgs].reverse().find(m => m.role === "user"); if (last && j.fix) last.fix = j.fix;
@@ -483,7 +487,7 @@
   async function chatSum() {
     if (!CH || CH.sumBusy) return; CH.sumBusy = true; draw(); const my = CH;
     try {
-      const j = await AI.ask("chatsum", { scene: CH.scene, history: CH.msgs.map(m => ({ role: m.role, content: m.content })) });
+      const j = await AI.ask("chatsum", { lang: LC, scene: CH.scene, history: CH.msgs.map(m => ({ role: m.role, content: m.content })) });
       if (CH !== my) return; CH.sumBusy = false; if (j.ok) { CH.sum = j; chatSave(); fixesToErr(j.fixes); } else tip(AI.msg(j, "总结没出来，再点一次")); draw();
       const b = root.querySelector(".sk-box:last-child"); if (b) b.scrollIntoView({ block: "start", behavior: "smooth" });
     } catch (e) { if (CH === my) { CH.sumBusy = false; tip("总结没出来，再点一次"); draw(); } }
@@ -525,10 +529,10 @@
   function aiRateHtml(key) {
     const a = AIR[key], x = RES[key] || {}, words = x.said ? toks(x.said).length : 0;
     if (!a) return words >= 8 ? '<div class="sk-center"><button class="ui-btn pri" data-act="ai-rate">🤖 AI 点评这次回答</button></div>' : "";
-    if (a.busy) return '<div class="sk-note" style="text-align:center">AI 正在听你的回答（按雅思口语标准）……</div>';
+    if (a.busy) return '<div class="sk-note" style="text-align:center">AI 正在听你的回答（按' + (DE ? "歌德 / telc 口语标准" : "雅思口语标准") + '）……</div>';
     if (a.err) return '<div class="sk-tip">' + esc(a.err) + ' <button class="sk-ib" data-act="ai-rate">重试</button></div>';
     const r = a.r, B = r.band || {}, bk = "tb:" + key;
-    return '<div style="margin-top:12px"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:baseline"><span style="font-size:30px;font-weight:900;color:var(--ui-pur-text)">' + esc(B.overall) + '</span><span class="sk-note" style="margin:0">流利连贯 ' + esc(B.FC) + " · 词汇 " + esc(B.LR) + " · 语法 " + esc(B.GRA) + "（发音没算：AI 只看文字）</span></div>" +
+    return '<div style="margin-top:12px"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:baseline"><span style="font-size:30px;font-weight:900;color:var(--ui-pur-text)">' + esc(B.overall) + (r.scale === "de" ? '<small style="font-size:14px">/100</small>' : "") + '</span><span class="sk-note" style="margin:0">' + (r.scale === "de" ? (r.cefr ? "约 " + esc(r.cefr) + " · " : "") + "流利连贯 " + esc(B.FC) + "/25 · 词汇 " + esc(B.LR) + "/25 · 语法 " + esc(B.GRA) + "/25" : "流利连贯 " + esc(B.FC) + " · 词汇 " + esc(B.LR) + " · 语法 " + esc(B.GRA)) + "（发音没算：AI 只看文字）</span></div>" +
       '<div style="margin-top:6px;font-size:14.5px;line-height:1.7;color:var(--ui-ink-2)">' + esc(r.summary_zh || "") + "</div>" +
       ((r.strengths_zh || []).length ? '<div style="margin-top:6px;font-size:14px;color:var(--ui-green,#7CE3B8)">' + r.strengths_zh.map(g => "👍 " + esc(g)).join("<br>") + "</div>" : "") +
       ((r.fixes || []).length ? '<h3 style="margin-top:12px">✏️ 改一改</h3>' + r.fixes.map(f => '<div class="sk-ph"><div class="t"><div class="z"><span style="color:var(--ui-red,#ff8080)">' + esc(f.bad) + '</span></div><div class="e">' + esc(f.good) + '</div><div class="z">' + esc(f.why_zh || "") + '</div></div><button class="sk-ib" data-say="' + esc(f.good) + '">🔊</button></div>').join("") : "") +
@@ -538,7 +542,7 @@
     const x = RES[key] || {}; if (!x.said) return;
     AIR[key] = { busy: true }; draw();
     try {
-      const j = await AI.ask("speak", { prompt: q, text: x.said });
+      const j = await AI.ask("speak", { lang: LC, prompt: q, text: x.said });
       if (j.ok) fixesToErr(j.fixes, q);
       AIR[key] = j.ok ? { r: j } : { err: j.error === "too short" ? "说得太短了，至少说几句再点评" : AI.msg(j, "AI 没回上来") };
     } catch (e) { AIR[key] = { err: "网络问题，没连上 AI" }; }
@@ -611,7 +615,7 @@
   }
 
   /* ---------- 🌱 入门：新手从这里开始 ---------- */
-  const SECINFO = { rescue: ["🆘 救命句", "听不懂、想不起词时的 40 句"], intro: ["🙋 自我介绍", "12 句，先把自己介绍顺"], daily: ["📅 每日一练", "每天自动安排，15 分钟"], dialog: ["🎭 情景对话", "听全文 → 跟读 → 角色扮演"], func: ["💬 表达和俚语", "按功能分类的地道说法"], drill: ["🔁 句型操练", "一个句型换着说，练到脱口而出"], pron: ["🔊 发音", "易混音、连读、重音、绕口令、数字"], shadow: ["🎯 跟读", "120 句高频句"], clip: ["🎬 原声跟读", "你保存的 YouTube 真人原声"], quick: ["⚡ 快问快答", "听到问题 3 秒内开口，AI 判断"], chat: ["🤖 AI 陪练", "和 AI 用英语聊天，顺手纠错"], howto: ["🧰 这句话怎么说", "中文 → 地道英语三种说法"], topic: ["🗣 话题", "说 1–2 分钟，AI 按雅思点评"], mock: ["🎓 模拟考", "雅思口语三部分完整走一遍"], useword: ["📘 用生词说一句", "生词本里的词，开口用一次"] };
+  const SECINFO = { rescue: ["🆘 救命句", "听不懂、想不起词时的 40 句"], intro: ["🙋 自我介绍", "12 句，先把自己介绍顺"], daily: ["📅 每日一练", "每天自动安排，15 分钟"], dialog: ["🎭 情景对话", "听全文 → 跟读 → 角色扮演"], func: ["💬 表达和俚语", "按功能分类的地道说法"], drill: ["🔁 句型操练", "一个句型换着说，练到脱口而出"], pron: ["🔊 发音", DE ? "易混音、发音规则、重音、绕口令" : "易混音、连读、重音、绕口令、数字"], shadow: ["🎯 跟读", "120 句高频句"], clip: ["🎬 原声跟读", DE ? "插件里存的德语视频原声" : "你保存的 YouTube 真人原声"], quick: ["⚡ 快问快答", "听到问题 3 秒内开口，AI 判断"], chat: ["🤖 AI 陪练", "和 AI 用" + LGN + "聊天，顺手纠错"], howto: ["🧰 这句话怎么说", "中文 → 地道" + LGN + "三种说法"], topic: ["🗣 话题", DE ? "说 1–2 分钟，AI 按歌德 / telc 点评" : "说 1–2 分钟，AI 按雅思点评"], mock: ["🎓 模拟考", "雅思口语三部分完整走一遍"], useword: ["📘 用生词说一句", "生词本里的词，开口用一次"] };
   function goSec(k) { // 入门里的「去练」：有的是一栏，有的是 AI 工具或入门里的小页
     if (k === "rescue" || k === "intro") return open(k, k);
     if (only && k === "pron") { stopAll(); view = null; if (window.enShow) window.enShow("basic", "pron"); return; }
@@ -620,7 +624,7 @@
     if (SECS.some(s => s[0] === k)) { stopAll(); sec = k; view = null; LS("speak:sec", sec); draw(); window.scrollTo(0, 0); }
   }
   let COACH = null; // {busy, err, r}
-  const COACH_Q = [["feel", "现在开口说英语的感觉", ["完全不敢开口", "能说几个词", "能简单对话", "能聊但不流利"]], ["use", "主要想用在哪", ["日常生活", "工作开会", "雅思考试", "出国旅行"]], ["time", "每天能练多久", ["10 分钟", "20 分钟", "30 分钟以上"]], ["hard", "最难的是", ["听不懂对方", "想不起单词", "发音不准", "不敢说、怕错"]]];
+  const COACH_Q = [["feel", "现在开口说" + LGN + "的感觉", ["完全不敢开口", "能说几个词", "能简单对话", "能聊但不流利"]], ["use", "主要想用在哪", ["日常生活", "工作开会", DE ? "歌德考试" : "雅思考试", "出国旅行"]], ["time", "每天能练多久", ["10 分钟", "20 分钟", "30 分钟以上"]], ["hard", "最难的是", ["听不懂对方", "想不起单词", "发音不准", "不敢说、怕错"]]];
   let coachAns = LG("speak:coachAns", {});
   function startView() {
     const W = (D.starter && D.starter.week) || [], plan = (SY.plan && SY.plan.v) || null;
@@ -635,13 +639,13 @@
       '<button class="ui-btn pri" data-act="coach"' + (COACH && COACH.busy ? " disabled" : "") + ">" + (COACH && COACH.busy ? "AI 正在排计划……" : plan ? "重新定计划" : "🤖 生成我的计划") + "</button>" + (COACH && COACH.err ? '<div class="sk-tip">' + esc(COACH.err) + "</div>" : "") + "</div>" +
       (plan ? '<div class="sk-box"><h3>📋 AI 给你的计划</h3><div style="font-size:14.5px;line-height:1.7;color:var(--ui-ink-2)"><b>' + esc(plan.level_zh || "") + "</b><br>" + esc(plan.advice_zh || "") + "</div>" +
         (plan.days || []).map(d => '<div style="margin-top:10px"><b>第 ' + esc(d.day) + " 天 · " + esc(d.title || "") + "</b>" + (d.steps || []).map((s, i) => step("cp:" + d.day + ":" + i, s)).join("") + "</div>").join("") + (plan.encourage_zh ? '<div class="sk-tip">💪 ' + esc(plan.encourage_zh) + "</div>" : "") + "</div>" : "") +
-      '<div class="sk-sub">📚 每一栏是干嘛的</div><div class="sk-grid three">' + Object.keys(SECINFO).map(k => '<button class="sk-card" data-go="' + k + '"><div class="t"><b>' + SECINFO[k][0] + "</b><span>" + SECINFO[k][1] + "</span></div><i>›</i></button>").join("") + "</div>";
+      '<div class="sk-sub">📚 每一栏是干嘛的</div><div class="sk-grid three">' + Object.keys(SECINFO).filter(k => !(DE && k === "mock")).map(k => '<button class="sk-card" data-go="' + k + '"><div class="t"><b>' + SECINFO[k][0] + "</b><span>" + SECINFO[k][1] + "</span></div><i>›</i></button>").join("") + "</div>";
   }
   async function coachRun() {
     if (COACH && COACH.busy) return; COACH = { busy: true }; draw();
     const recent = items("rec:").slice(0, 50), avg = recent.filter(r => r.score != null), hist = { 练过的情景对话: doneCount("d:"), 跟读句子: doneCount("s:"), 说过的话题: doneCount("t:"), 原声跟读: doneCount("v:"), 最近跟读平均分: avg.length ? Math.round(avg.reduce((a, r) => a + r.score, 0) / avg.length) : "还没有", 连续打卡天数: streak() };
     const text = "自我评估：" + COACH_Q.map(([k, q]) => q + "：" + (coachAns[k] || "没选")).join("；") + "\n练习记录：" + JSON.stringify(hist);
-    try { const j = await AI.ask("coach", { text }); if (j.ok) { syPut("plan", { level_zh: j.level_zh, advice_zh: j.advice_zh, days: j.days, encourage_zh: j.encourage_zh, at: Date.now() }); COACH = null; } else COACH = { err: AI.msg(j, "AI 没排出来，再点一次") }; }
+    try { const j = await AI.ask("coach", { lang: LC, text }); if (j.ok) { syPut("plan", { level_zh: j.level_zh, advice_zh: j.advice_zh, days: j.days, encourage_zh: j.encourage_zh, at: Date.now() }); COACH = null; } else COACH = { err: AI.msg(j, "AI 没排出来，再点一次") }; }
     catch (e) { COACH = { err: "网络问题，没连上 AI" }; }
     draw();
   }
@@ -655,12 +659,12 @@
 
   /* ---------- 🧰 AI 工具 ---------- */
   function toolsView() {
-    return '<div class="sk-intro">用 AI 帮你开口：不知道怎么说的先查「这句话怎么说」；背过的生词用「用生词说一句」练会用；想知道自己什么水平就做一次「模拟考」。</div><div class="sk-grid three">' +
-      ["howto", "useword", "mock"].map(k => '<button class="sk-card" data-act="' + k + '" data-id="' + k + '"><div class="t"><b>' + SECINFO[k][0] + "</b><span>" + SECINFO[k][1] + "</span></div><i>›</i></button>").join("") + "</div>";
+    return '<div class="sk-intro">用 AI 帮你开口：不知道怎么说的先查「这句话怎么说」；背过的生词用「用生词说一句」练会用' + (DE ? "。" : "；想知道自己什么水平就做一次「模拟考」。") + '</div><div class="sk-grid three">' +
+      (DE ? ["howto", "useword"] : ["howto", "useword", "mock"]).map(k => '<button class="sk-card" data-act="' + k + '" data-id="' + k + '"><div class="t"><b>' + SECINFO[k][0] + "</b><span>" + SECINFO[k][1] + "</span></div><i>›</i></button>").join("") + "</div>";
   }
   let HOW = { q: "", busy: false, r: null, err: "" }, HOWHIST = LG("speak:howto", []);
   function howtoView() {
-    return '<div class="sk-bar">' + back + "</div>" + '<h2 class="sk-title">🧰 这句话英语怎么说<small>输入中文（或中英混着），AI 给随意 / 中性 / 正式三种说法</small></h2>' +
+    return '<div class="sk-bar">' + back + "</div>" + '<h2 class="sk-title">🧰 这句话' + LGN + '怎么说<small>输入中文（或中' + (DE ? "德" : "英") + '混着），AI 给随意 / 中性 / 正式三种说法</small></h2>' +
       '<div class="sk-box" style="margin-top:0"><textarea id="sk-how" rows="2" placeholder="比如：这个 bug 我明天再看一下 / 不好意思，能帮我打包吗" style="width:100%;border-radius:10px;border:1px solid var(--ui-line-2);background:var(--ui-surface-2);color:var(--ui-ink);padding:10px 12px;font:inherit;font-size:15.5px;resize:vertical">' + esc(HOW.q) + '</textarea><div class="sk-ops"><button class="ui-btn pri" data-act="how-go"' + (HOW.busy ? " disabled" : "") + ">" + (HOW.busy ? "AI 在想……" : "怎么说") + "</button></div>" + (HOW.err ? '<div class="sk-tip">' + esc(HOW.err) + "</div>" : "") + "</div>" +
       (HOW.r ? '<div class="sk-box">' + (HOW.r.items || []).map((x, i) => '<div class="sk-item" style="margin-top:8px"><div class="e">' + esc(x.en) + '<span class="sk-reg ' + regCls(x.reg) + '">' + esc(x.reg || "") + '</span></div><div class="z">' + esc(x.note_zh || "") + "</div>" + ops("h:" + hashOf(x.en), x.en, "", '<button class="sk-ib" data-add="' + esc(x.en) + '">＋ 生词本</button>') + "</div>").join("") +
         ((HOW.r.words || []).length ? '<div class="sk-note" style="margin-top:10px">' + HOW.r.words.map(w => esc(w.en) + "（" + esc(w.zh) + "）").join("　") + "</div>" : "") + "</div>" : "") +
@@ -669,7 +673,7 @@
   async function howGo(q) {
     q = String(q || "").trim(); if (!q || HOW.busy) return; HOW = { q, busy: true, r: null, err: "" }; draw();
     HOWHIST = [q].concat(HOWHIST.filter(x => x !== q)).slice(0, 30); LS("speak:howto", HOWHIST);
-    try { const j = await AI.ask("howto", { text: q }); HOW = j.ok ? { q, r: j } : { q, err: AI.msg(j, "AI 没回上来，再点一次") }; }
+    try { const j = await AI.ask("howto", { lang: LC, text: q }); HOW = j.ok ? { q, r: j } : { q, err: AI.msg(j, "AI 没回上来，再点一次") }; }
     catch (e) { HOW = { q, err: "网络问题，没连上 AI" }; }
     draw();
   }
@@ -691,7 +695,7 @@
   async function uwCheck(id, text) {
     const w = UW && UW.list.find(x => x.id === id); text = String(text || "").trim(); if (!w || !text) return;
     UW.res[id] = { busy: true, text }; draw();
-    try { const j = await AI.ask("useword", { word: w.word, zh: w.zh || "", text }); UW.res[id] = j.ok ? { r: j, text } : { err: AI.msg(j, "AI 没回上来，再试一次"), text }; if (j.ok && j.correct) markDone("uw:" + id); }
+    try { const j = await AI.ask("useword", { lang: LC, word: w.word, zh: w.zh || "", text }); UW.res[id] = j.ok ? { r: j, text } : { err: AI.msg(j, "AI 没回上来，再试一次"), text }; if (j.ok && j.correct) markDone("uw:" + id); }
     catch (e) { UW.res[id] = { err: "网络问题", text }; }
     draw();
   }
@@ -785,7 +789,7 @@
   let QK = null; // {lv, list, i, phase:"ask"|"count"|"rec"|"judge"|"done", left, r, err}
   function quickView() {
     const L = D.quick || [];
-    if (!QK) return '<div class="sk-intro"><b>怎么练：</b>系统读一个问题，倒数 3 秒后自动开始录音，你马上用英语回答（一两句就行，别在心里先翻译）。AI 看你答得通不通，再给一个地道的回答。一轮 10 题。</div>' +
+    if (!QK) return '<div class="sk-intro"><b>怎么练：</b>系统读一个问题，倒数 3 秒后自动开始录音，你马上用' + LGN + '回答（一两句就行，别在心里先翻译）。AI 看你答得通不通，再给一个地道的回答。一轮 10 题。</div>' +
       '<div class="sk-grid three">' + ["入门", "基础", "进阶"].map(lv => '<button class="sk-card" data-act="qk-go" data-lv="' + lv + '"><div class="t"><b>' + lv + "</b><span>" + L.filter(x => x.level === lv).length + " 题，随机 10 题</span></div><i>›</i></button>").join("") + "</div>";
     const q = QK.list[QK.i], key = "qk:" + QK.i, x = RES[key] || {};
     if (!q) return '<div class="sk-bar"><button class="ui-btn" data-act="qk-end">← 返回</button></div><div class="sk-box"><h3>这一轮做完了 👏</h3><div class="sk-note">答得通 ' + QK.ok + " / " + QK.list.length + '</div><div class="sk-center"><button class="ui-btn pri" data-act="qk-go" data-lv="' + QK.lv + '">再来一轮</button></div></div>';
@@ -812,7 +816,7 @@
     if (QK !== my) return; QK.phase = "judge"; draw();
     const q = QK.list[i0];
     if (!x.said) { QK.j[i0] = { err: "没识别到声音，下次大声一点" }; QK.phase = "done"; draw(); return; }
-    try { const j = await AI.ask("judge", { prompt: q.q, text: x.said }); if (QK !== my) return; QK.j[i0] = j.ok ? j : { err: AI.msg(j, "AI 没回上来") }; if (j.ok && j.correct) QK.ok++; }
+    try { const j = await AI.ask("judge", { lang: LC, prompt: q.q, text: x.said }); if (QK !== my) return; QK.j[i0] = j.ok ? j : { err: AI.msg(j, "AI 没回上来") }; if (j.ok && j.correct) QK.ok++; }
     catch (e) { if (QK === my) QK.j[i0] = { err: "网络问题" }; }
     if (QK === my) { QK.phase = "done"; draw(); }
   }

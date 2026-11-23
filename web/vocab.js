@@ -412,7 +412,7 @@ window.openVocabSettings=function(){const p=document.getElementById("export-pane
 function closeVocabSettings(){document.getElementById("export-panel").classList.remove("pop");document.getElementById("sp-mask").classList.remove("on");}
 document.getElementById("sp-close").onclick=closeVocabSettings;document.getElementById("sp-mask").onclick=closeVocabSettings;
 document.querySelectorAll(".modes button").forEach(b=>b.onclick=()=>{
-  if(window.VL==="de"&&/^(reading|saved|grammar|writing|sme)$/.test(b.dataset.mode)){const l=document.querySelector('.modes button[data-mode="list"]');if(l&&l!==b)return l.click();} // 🇩🇪 英语专用的模式：学德语时不进（按钮也藏起来了）
+  if(window.VL==="de"&&/^(saved|grammar)$/.test(b.dataset.mode)){const l=document.querySelector('.modes button[data-mode="list"]');if(l&&l!==b)return l.click();} // 🇩🇪 英语专用的模式：学德语时不进（按钮也藏起来了）
   document.querySelectorAll(".modes button").forEach(x=>x.classList.remove("on"));b.classList.add("on");
   const m=b.dataset.mode;
   document.documentElement.setAttribute("data-mode",m);
@@ -484,8 +484,8 @@ try{ptag=localStorage.getItem("list:ptag")||"all";}catch(x){}
 // 查词：后台 /api/dict；后台拿不到中文时（谷歌会拦机房 IP），在浏览器里直接查谷歌翻译补上（插件、练习页也是这样查的）
 window.dictGet=async function(word){
   let j=null;
-  // 🇩🇪 后台的词典（音标、英文释义、Tatoeba 英语例句）只有英语：学德语时只查翻译（按德语查，tr.js 跟着 VL）
-  if(window.VL==="en"||!window.VL)try{const r=await fetch("/api/dict?w="+encodeURIComponent(word));j=await r.json();}catch(e){}
+  // 🇩🇪 学德语：后台 /api/dict?lang=de（中文 + 维基词典的德语词条：词性、名词的性 der/die/das、音标、英文释义、变形的原形 + Tatoeba 德语例句）
+  try{const r=await fetch("/api/dict?"+(window.VL==="de"?"lang=de&":"")+"w="+encodeURIComponent(word));j=await r.json();}catch(e){}
   if(j&&j.ok&&j.zh)return j;
   try{const g=await TR.word(word); // 全站共用的翻译（tr.js）
     const zh=g.zh[0]||"",zhs=g.pos.map(x=>({pos:x.p||"",terms:x.w}));
@@ -497,12 +497,15 @@ async function enrich(entry){ // 后台 /api/dict 一次拿齐：中文（谷歌
     const j=await window.dictGet(entry.word);
     if(j&&j.ok){
       if(j.phon)entry.phon=j.phon;
+      const de=window.VL==="de";
+      if(de&&j.word&&j.word!==entry.word&&j.word.toLowerCase()===String(entry.word).toLowerCase())entry.word=j.word; // 德语名词大写：haus → Haus
       const zs=(j.zhs||[]).map(x=>(x.terms||[]).slice(0,3).join("、")).filter(Boolean);
       entry.zh=[j.zh].concat(zs).filter((x,i,a)=>x&&a.indexOf(x)===i).slice(0,3).join("；")||"(未查到，可手动补)";
-      const d=(j.en||[])[0];entry.en=d?(d.pos?"("+d.pos+") ":"")+d.def:"";
-      const re=new RegExp("\\b("+entry.word.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\w*)","i");
-      const ex=(j.examples||[]).map(x=>[String(x[0]).replace(re,"{$1}"),x[1]||""]);
-      (j.en||[]).forEach(x=>{if(x.ex&&ex.length<4)ex.push([String(x.ex).replace(re,"{$1}"),""]);});
+      const d=(j.en||[])[0];entry.en=d?(de&&j.gender?j.gender+" "+entry.word+" · ":"")+(d.pos?"("+d.pos+") ":"")+d.def:(de&&j.gender?j.gender+" "+entry.word:"");
+      if(de&&j.lemma&&!entry.tip)entry.tip="原形："+j.lemma;
+      const wre=entry.word.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),re=de?new RegExp("(^|[^\\p{L}])("+wre+"\\p{L}*)","iu"):new RegExp("\\b("+wre+"\\w*)","i"),mk=de?"$1{$2}":"{$1}"; // 德语：\b 认不出 ä ö ü ß
+      const ex=(j.examples||[]).map(x=>[String(x[0]).replace(re,mk),x[1]||""]);
+      (j.en||[]).forEach(x=>{if(x.ex&&ex.length<4)ex.push([String(x.ex).replace(re,mk),""]);});
       entry.examples=(entry.examples||[]).concat(ex).slice(0,4);
       if(j.audio)entry.audio=j.audio;
       return;

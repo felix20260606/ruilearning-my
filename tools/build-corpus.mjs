@@ -11,17 +11,19 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = process.env.SITE || "https://ruilearning-my.pages.dev";
-const OUT = path.join(ROOT, "web/corpus.json");
+// 🇩🇪 --lang de：德语例句库 web/corpus-de.json（存过字幕的德语视频 + DW 慢速新闻最近几期的文稿，期号 dw/<文章号>，在「📻 听力节目」里打开）
+const LANG = process.argv.includes("--lang") ? process.argv[process.argv.indexOf("--lang") + 1] : "en", DE = LANG === "de";
+const OUT = path.join(ROOT, DE ? "web/corpus-de.json" : "web/corpus.json");
 const BBC = (process.env.CORPUS_BBC || "sme,ree,tews,news").split(",").filter(Boolean), PER = +(process.env.CORPUS_PER || 8);
 const ok = t => { const n = String(t || "").split(/\s+/).length; return n >= 3 && n <= 40; };
 const clean = t => String(t || "").replace(/\s+/g, " ").trim();
 
-export function fromCaptions(dir) {
+export function fromCaptions(dir, lang = "en") {
   const docs = [], s = [];
   if (!fs.existsSync(dir)) return { docs, s };
   for (const f of fs.readdirSync(dir).filter(f => f.endsWith(".json") && f !== "index.json").sort()) {
     let d; try { d = JSON.parse(fs.readFileSync(path.join(dir, f), "utf8")); } catch (e) { continue; }
-    if (!d || !d.v || !Array.isArray(d.cues) || !/^en/i.test(d.lang || "en")) continue;
+    if (!d || !d.v || !Array.isArray(d.cues) || !new RegExp("^" + lang, "i").test(d.lang || "en")) continue;
     const di = docs.push(["y", d.v, clean(d.title || d.v)]) - 1;
     d.cues.forEach(c => { const t = clean(c.t); if (ok(t)) s.push([di, Math.round((+c.s || 0) * 10) / 10, Math.round((+c.e || 0) * 10) / 10, t, clean(c.r)]); });
   }
@@ -47,10 +49,23 @@ async function fromBBC(docs, s, old) {
     }
   }
 }
+// DW 慢速新闻：/api/dw 的最近 PER 期（每期几条新闻，每条一段：按句切开）；取不到的期沿用旧文件
+async function fromDW(docs, s, old) {
+  const L = await getJson(SITE + "/api/dw?list=1"), oldDw = id => { if (!old || !Array.isArray(old.docs)) return null; const i = old.docs.findIndex(d => d[0] === "b" && d[1] === id); return i < 0 ? null : { d: old.docs[i], s: old.s.filter(r => r[0] === i) }; };
+  const keep = o => { const di = docs.push(o.d) - 1; o.s.forEach(r => s.push([di].concat(r.slice(1)))); };
+  if (!L || !L.ok) { if (old) old.docs.forEach(d => { if (d[0] === "b") { const o = oldDw(d[1]); if (o) keep(o); } }); console.log("DW 没取到，沿用旧的"); return; }
+  for (const it of (L.list || []).slice(0, +(process.env.CORPUS_PER_DE || 30))) { // DW 列表有二十几期，全取（每期就几段，文件很小）
+    const id = "dw/" + it.id, ep = await getJson(SITE + "/api/dw?ep=" + encodeURIComponent(it.id));
+    if (!ep || !ep.ok || !Array.isArray(ep.lines)) { const o = oldDw(id); if (o) keep(o); continue; }
+    const di = docs.push(["b", id, clean(ep.title || it.t || it.id)]) - 1;
+    ep.lines.forEach((l, i) => String(l.t || "").split(/(?<=[.!?])\s+(?=[A-ZÄÖÜ„"])/).forEach(x => { const t = clean(x); if (ok(t)) s.push([di, i, 0, t, ""]); }));
+  }
+}
 async function main() {
-  const { docs, s } = fromCaptions(path.join(ROOT, "data/captions"));
+  const { docs, s } = fromCaptions(path.join(ROOT, "data/captions"), LANG);
   let old = null; try { old = JSON.parse(fs.readFileSync(OUT, "utf8")); } catch (e) {}
-  if (!process.argv.includes("--no-bbc")) await fromBBC(docs, s, old);
+  if (DE) { if (!process.argv.includes("--no-bbc")) await fromDW(docs, s, old); }
+  else if (!process.argv.includes("--no-bbc")) await fromBBC(docs, s, old);
   const nb = d => (d && d.docs ? d.docs.filter(x => x[0] === "b").length : 0);
   if (old && nb({ docs }) < nb(old) * 0.5) { console.log("BBC 来源比上次少了一半以上（" + nb({ docs }) + " < " + nb(old) + "），这次不更新"); return; }
   const out = JSON.stringify({ docs, s });

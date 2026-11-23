@@ -26,7 +26,10 @@
   "use strict";
   const { esc, LG, LS, tip } = U; // 全站共用的小工具（util.js）
   // 新加的排前面。[栏目, 按钮, 英文名, 一句介绍, 来源, 故事类（按集连着听）]
-  const SER = [
+  // 🇩🇪 学德语（window.VL === "de"）：只有德语的栏目（DW 慢速新闻，后台 /api/sme?s=dw 转 /api/dw）；英语的栏目都不显示
+  const DE = window.VL === "de", RL = () => (DE ? "de" : "en"); // 跟读 / 听写打分按哪种语言比
+  const SER_DE = [["dw", "📰 慢速新闻", "Langsam gesprochene Nachrichten", "德国之声（DW）每个工作日的德语新闻，用比平常慢的语速念，几分钟一期；带全文、中文翻译，点句子能跟读、听写", "DW"]];
+  const SER = (DE ? SER_DE : [
     ["new", "🆕 本周更新", "This week", "所有来源最近 7 天出的新节目合在一起，按天排、新的在前（VOA 已停更、广播剧和大学英语是固定的旧节目，不在这里）", "NEW"],
     ["bn1", "📶 L1 初级", "Level 1", "同一篇时事新闻按难度改写成好几级：L1 句子短、词简单；每篇一两分钟，带全文。每三四天出一篇新的", "BNE"],
     ["bn3", "📶 L3 中级", "Level 3", "同一篇新闻的 L3 版本：句子长一点、细节多一点；每篇两三分钟，带全文", "BNE"],
@@ -45,12 +48,12 @@
     ["tews", "💬 地道说法", "The English We Speak", "每周一期 · 3 分钟讲一个英国人常说的地道表达，有例句和文稿"],
     ["news", "📰 新闻英语", "Learning English from the News", "每周一期 · 用真实的新闻标题讲词：新闻背景、各家标题、关键词和例句（这个栏目没有全文文稿）"],
     ["sme", "📻 6 分钟英语", "6 Minute English", "每周一期 · 两位主持人 6 分钟聊一个话题，有本期问题、生词表和文稿"],
-  ].map(x => (x[4] ? x : x.concat("BBC")));
+  ]).map(x => (x[4] ? x : x.concat("BBC")));
   const SM = Object.fromEntries(SER.map(x => [x[0], x]));
   const serOf = id => { const m = /^([a-z0-9]{2,6})\//.exec(id); return m && SM[m[1]] ? m[1] : /^drama\//.test(id) ? "drama" : /^english-at-university\//.test(id) ? "eau" : /^real-easy-english\//.test(id) ? "ree" : /^the-english-we-speak/.test(id) ? "tews" : /^learning-english-from-the-news/.test(id) ? "news" : "sme"; };
-  const SRC = { NEW: ["最新", "各来源", ""], BNE: ["分级", "Breaking News English", "分级新闻：同一篇新闻有好几个难度，选适合自己的那一级"], NPR: ["NPR", "NPR", "美国公共广播电台的播客，正常语速（进阶）；新节目的文稿 NPR 一般晚一两天才放"], VOA: ["VOA", "VOA Learning English", "美音；2025 年 3 月起停更，旧节目都能听"], BBC: ["BBC", "BBC Learning English", ""] }; // [行首标签, 全名, 说明]
+  const SRC = { DW: ["DW", "Deutsche Welle", "德国之声的学德语节目：慢速德语新闻，带全文"], NEW: ["最新", "各来源", ""], BNE: ["分级", "Breaking News English", "分级新闻：同一篇新闻有好几个难度，选适合自己的那一级"], NPR: ["NPR", "NPR", "美国公共广播电台的播客，正常语速（进阶）；新节目的文稿 NPR 一般晚一两天才放"], VOA: ["VOA", "VOA Learning English", "美音；2025 年 3 月起停更，旧节目都能听"], BBC: ["BBC", "BBC Learning English", ""] }; // [行首标签, 全名, 说明]
   const srcName = id => SRC[SM[serOf(id)][4]][1];
-  const srcUrl = (id, ep) => { const s = serOf(id), sub = id.slice(s.length + 1), src = SM[s][4]; return (ep && ep.url) || (src === "VOA" ? "https://learningenglish.voanews.com/a/" + sub + ".html" : src === "NPR" ? "https://www.npr.org/transcripts/" + sub : src === "BNE" ? "https://breakingnewsenglish.com/" + sub + ".html" : "https://www.bbc.co.uk/learningenglish/english/features/" + id); };
+  const srcUrl = (id, ep) => { const s = serOf(id), sub = id.slice(s.length + 1), src = SM[s][4]; return (ep && ep.url) || (src === "DW" ? "https://learngerman.dw.com/de/x/a-" + sub : src === "VOA" ? "https://learningenglish.voanews.com/a/" + sub + ".html" : src === "NPR" ? "https://www.npr.org/transcripts/" + sub : src === "BNE" ? "https://breakingnewsenglish.com/" + sub + ".html" : "https://www.bbc.co.uk/learningenglish/english/features/" + id); };
   const MORE = {}; // 列表显示到第几期（「显示更多」）
   // 🆕 本周更新：一直在更新的栏目（分级、NPR、BBC 每周的）各自的列表里，挑最近 7 天的合起来
   const WKS = () => SER.filter(x => x[4] !== "NEW" && x[4] !== "VOA" && !x[5]).map(x => x[0]);
@@ -374,7 +377,7 @@
     try {
       const ep = EPS[id]; if (!ep || !(ep.lines || []).length || serOf(id) === "news") return;
       const text = ep.lines.map(l => l.t).join("\n"), n = ntok(text).length, dur = await durOf(id, srcOf(id, ep)); if (!dur) return;
-      const d = window.readTextDiff ? await window.readTextDiff(text) : null;
+      const d = window.readTextDiff && !DE ? await window.readTextDiff(text) : null; // 生词率按英语词频算：学德语时不算
       const D = DIFF(); D[id] = { wpm: Math.round(n / (dur / 60)), rate: d && d.ready ? Math.round(d.rate * 1000) / 10 : null, lv: d ? d.level : 0, at: Date.now() };
       const ks = Object.keys(D).sort((a, b) => D[b].at - D[a].at); ks.slice(200).forEach(k => delete D[k]); LS("sme:diff", D);
       const el = root && EP && EP.id === id && root.querySelector(".sm-diff"); if (el) el.outerHTML = diffHtml(id);
@@ -393,7 +396,7 @@
   async function lqLoad(id) {
     const ep = EPS[id]; if (!ep) return; LQ[id] = { busy: true, pick: {} }; draw();
     try {
-      const j = await AI.ask("lquiz", { title: ep.title, text: ep.lines.map(l => (l.who ? l.who + ": " : "") + l.t).join("\n") });
+      const j = await AI.ask("lquiz", { lang: RL(), title: ep.title, text: ep.lines.map(l => (l.who ? l.who + ": " : "") + l.t).join("\n") });
       if (!j.ok || !(j.quiz || []).length) throw new Error(AI.msg(j, "AI 没出好题，再点一次"));
       LQ[id] = { quiz: j.quiz, pick: {} };
     } catch (e) { LQ[id] = { err: e.message || String(e) }; }
@@ -425,7 +428,7 @@
     toks.forEach(w => { const n = ntok(w).length; if (!n) return; if (!R.hit.slice(k, k + n).every(Boolean)) miss.push(w.replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g, "")); k += n; });
     if (!miss.length) return; d.why = { i, busy: true }; draw();
     try {
-      const j = await AI.ask("whymiss", { sent: x.t, typed: d.typed, missed: [...new Set(miss)] });
+      const j = await AI.ask("whymiss", { lang: RL(), sent: x.t, typed: d.typed, missed: [...new Set(miss)] });
       if (!j.ok || !(j.items || []).length) throw new Error(AI.msg(j, "这次没讲好，再点一次"));
       if (d.why && d.why.i === i) d.why = { i, items: j.items, tip: j.tip_zh || "" };
     } catch (e) { if (d.why && d.why.i === i) d.why = { i, err: e.message || String(e) }; }
@@ -542,19 +545,19 @@
     const d = EP && DK[EP.id], x = d && d.sents && d.sents[d.i]; if (!x) return;
     if (REC.cur() === RK) { recStop(false); return; }
     const id = EP.id, i = d.i;
-    REC.toggle(RK, { lang: "en", max: Math.min(30, (x.e - x.s) * 2 + 3), before: () => { autoTok++; d.auto = false; AU.pause(); },
+    REC.toggle(RK, { lang: RL(), max: Math.min(30, (x.e - x.s) * 2 + 3), before: () => { autoTok++; d.auto = false; AU.pause(); },
       start: () => { d.rec = { on: true }; draw(); },
       cancel: () => { if (d.rec && d.rec.on) d.rec = null; },
       busy: () => { d.rec = { busy: true }; if (EP && EP.id === id) draw(); },
       done: y => {
-        const dd = DK[id]; if (!dd) return; const R = REC.score(dd.sents[i].t, y.text, { lang: "en" });
+        const dd = DK[id]; if (!dd) return; const R = REC.score(dd.sents[i].t, y.text, { lang: RL() });
         dd.rec = { said: y.text, hit: R.hit, score: R.score, url: y.url, i }; statAdd(o => { o.sh++; });
         if (EP && EP.id === id) draw();
       } });
   }
   function dkCheck() {
     const d = EP && DK[EP.id], x = d && d.sents && d.sents[d.i]; if (!x) return;
-    const SC = REC.score(x.t, d.typed, { lang: "en", near: false }), a = SC.a, hit = SC.hit, n = a.length; // 听写是打字：不放宽
+    const SC = REC.score(x.t, d.typed, { lang: RL(), near: false }), a = SC.a, hit = SC.hit, n = a.length; // 听写是打字：不放宽
     d.res = { hit, score: n ? hit.filter(Boolean).length / n : 0 }; d.show = true; d.why = null;
     statAdd(o => { o.dk++; o.dks += Math.round(d.res.score * 100); });
     if (d.res.score < 0.8 && window.ERR) { const miss = a.filter((w, k) => !hit[k]); window.ERR.add([{ src: "listen", kind: "say", q: "精听时没听出来：听一遍，再跟着读", ctx: x.t, right: x.t, why: "没听出来的词：" + miss.slice(0, 12).join(", ") + "（出自 " + EP.title + "）" }], true); }
@@ -568,13 +571,13 @@
     if (d.err) return s + '<div class="sm-intro">' + esc(d.err) + '</div><div class="dk-b"><button class="ui-btn" data-a="dk">重试</button></div></div>';
     const x = d.sents[d.i], R = d.res;
     let shown = esc(x.t);
-    if (R) shown = REC.mark(x.t, R.hit, { lang: "en", ok: "h", no: "m" });
+    if (R) shown = REC.mark(x.t, R.hit, { lang: RL(), ok: "h", no: "m" });
     s += '<div class="dk-n">第 ' + (d.i + 1) + " / " + d.sents.length + " 句" + (x.who ? " · " + esc(x.who) : "") + "</div>";
     s += '<div class="dk-t' + (d.show ? "" : " hid") + '">' + (d.show ? shown + (Z && (Z.lines || [])[x.li] ? '<span class="zh">' + esc(Z.lines[x.li]) + "</span>" : "") : "（先别看原文：听几遍，把听到的写下来）") + "</div>";
     const RC = d.rec && (d.rec.i == null || d.rec.i === d.i) ? d.rec : null, reps = +LG("sme:dkreps", 2) || 2, gap = +LG("sme:dkgap", 2) || 2;
     s += '<div class="dk-b"><button class="ui-btn" data-a="dk-prev" title="上一句（←）">⏮</button><button class="ui-btn pri" data-a="dk-play" title="播放这句（空格；R 重放）">▶ 这句</button><button class="ui-btn" data-a="dk-slow" title="慢放（S）">🐢 慢放</button><button class="ui-btn" data-a="dk-next" title="下一句（→）">⏭</button><button class="ui-btn" data-a="dk-show">' + (d.show ? "🙈 藏起原文" : "👀 看原文") + '</button><button class="ui-btn' + (RC && RC.on ? " on" : "") + '" data-a="dk-rec" title="跟着读这一句，逐词打分">' + (RC && RC.on ? "⏹ 读完了" : RC && RC.busy ? "打分中…" : "🎙 跟读") + "</button></div>";
     s += '<div class="dk-b" style="font-size:13px;color:var(--ui-muted);align-items:center"><button class="ui-btn' + (d.auto ? " on" : "") + '" data-a="dk-auto">' + (d.auto ? "⏸ 停止连播" : "🔁 自动连播") + "</button>每句 " + [1, 2, 3].map(n => '<button class="ui-btn' + (reps === n ? " on" : "") + '" data-reps="' + n + '">' + n + " 遍</button>").join("") + " 停 " + [1, 2, 4].map(n => '<button class="ui-btn' + (gap === n ? " on" : "") + '" data-gap="' + n + '">' + n + " 秒</button>").join("") + "</div>";
-    if (RC && RC.hit) { const sh = REC.mark(x.t, RC.hit, { lang: "en", ok: "h", no: "m" }); s += '<div class="dk-sc" style="margin:0 0 10px">🎙 跟读 <b>' + Math.round(RC.score * 100) + "%</b>" + (RC.score >= 0.9 ? " 👍" : " 红色的没读出来") + (RC.url ? ' <button class="ui-btn" data-a="dk-me">▶ 听我读的</button>' : "") + '<div class="dk-t" style="font-size:15.5px;margin:6px 0 0">' + sh + "</div>" + (RC.said ? '<div style="color:var(--ui-muted);font-size:13px">识别到：' + esc(RC.said) + "</div>" : "") + "</div>"; }
+    if (RC && RC.hit) { const sh = REC.mark(x.t, RC.hit, { lang: RL(), ok: "h", no: "m" }); s += '<div class="dk-sc" style="margin:0 0 10px">🎙 跟读 <b>' + Math.round(RC.score * 100) + "%</b>" + (RC.score >= 0.9 ? " 👍" : " 红色的没读出来") + (RC.url ? ' <button class="ui-btn" data-a="dk-me">▶ 听我读的</button>' : "") + '<div class="dk-t" style="font-size:15.5px;margin:6px 0 0">' + sh + "</div>" + (RC.said ? '<div style="color:var(--ui-muted);font-size:13px">识别到：' + esc(RC.said) + "</div>" : "") + "</div>"; }
     s += '<div style="color:var(--ui-muted);font-size:12px;margin:-4px 0 8px">快捷键：空格 播放这句 · ← → 上一句 / 下一句 · R 重放 · S 慢放；手机锁屏、耳机的「上一首 / 下一首」也能换句</div>';
     s += '<div class="dk-in"><input id="dk-in" placeholder="听写：把这句写下来，回车对答案" autocomplete="off" autocapitalize="off" spellcheck="false" value="' + esc(d.typed) + '"><button class="ui-btn" data-a="dk-check">对答案</button></div>';
     if (R) s += '<div class="dk-sc">听对 <b>' + Math.round(R.score * 100) + "%</b>" + (R.score >= 0.95 ? " 🎉 全对" : R.score >= 0.8 ? " 不错，红色的再听一遍" : " 红色的词没听出来，点 🐢 慢放多听几遍（已收进错题本）") + "</div>" + whyHtml(d);
@@ -607,7 +610,7 @@
     const PP = POS();
     const OF = OFF(), QR = LQR();
     const it = x => '<div class="sm-it" data-ep="' + esc(x.id) + '">' + pic(x.img, x.s || ser) + '<div class="t"><b>' + esc(x.t) + "</b><span>" + esc(x.d) + (D[x.id] ? ' · <em class="ok">✓ 听过</em>' : PP[x.id] ? " · ⏯ 听到 " + fmt(PP[x.id].t) : "") + (OF[x.id] ? " · 📥" : "") + (QR[x.id] ? " · 🧩 " + QR[x.id].got + "/" + QR[x.id].n : "") + diffShort(x.id) + "</span></div></div>";
-    return top + '<div class="sm-new" data-ep="' + esc(fresh.id) + '"><img src="' + esc(fresh.img) + '" alt=""><div><small>' + (story ? (fresh === n0 ? "👉 从这一集开始" : "👉 接着听下一集") : SM[ser][4] === "VOA" ? (fresh === n0 ? "🆕 最近一期" : "👉 还没听的最近一期") : SM[ser][4] === "BNE" ? (fresh === n0 ? "🆕 最新一篇" : "👉 还没听的最新一篇") : fresh === n0 ? "🆕 最新一期" : "👉 还没听的最新一期") + " · " + esc(fresh.d) + "</small><b>" + esc(fresh.t) + "</b><p>" + esc(fresh.p || "") + "</p></div></div>" +
+    return top + '<div class="sm-new" data-ep="' + esc(fresh.id) + '">' + (fresh.img ? '<img src="' + esc(fresh.img) + '" alt="">' : pic("", ser)) + '<div><small>' + (story ? (fresh === n0 ? "👉 从这一集开始" : "👉 接着听下一集") : SM[ser][4] === "VOA" ? (fresh === n0 ? "🆕 最近一期" : "👉 还没听的最近一期") : SM[ser][4] === "BNE" ? (fresh === n0 ? "🆕 最新一篇" : "👉 还没听的最新一篇") : fresh === n0 ? "🆕 最新一期" : "👉 还没听的最新一期") + " · " + esc(fresh.d) + "</small><b>" + esc(fresh.t) + "</b><p>" + esc(fresh.p || "") + "</p></div></div>" +
       '<div class="sm-grid">' + L.slice(0, MORE[ser] || (story || SM[ser][4] === "VOA" ? 120 : 40)).map(it).join("") + "</div>" + // 故事类、VOA 是固定的旧节目（50–60 期），全列出来
       (L.length > (MORE[ser] || (story || SM[ser][4] === "VOA" ? 120 : 40)) ? '<div style="text-align:center;margin:14px 0"><button class="ui-btn" data-a="more">显示更多（还有 ' + (L.length - (MORE[ser] || 40)) + " 期，往前到 " + esc((L[L.length - 1].d || "").slice(-4)) + " 年）</button></div>" : "");
   }

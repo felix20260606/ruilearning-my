@@ -153,7 +153,7 @@ async function users(req, env) {
   } catch (e) { return json({ ok: false, error: String(e && e.message || e) }, 500); }
 }
 // 列表信息放在每条记录的 metadata 里（上限 1024 字节，所以这里把标题、作者截短；完整标题在记录正文里）
-const meta = d => { const last = d.cues[d.cues.length - 1]; return { title: [...d.title].slice(0, 100).join(""), author: [...d.author].slice(0, 50).join(""), n: d.cues.length, tr: d.cues.filter(c => c.r).length, dur: Math.round(last.e || last.s), at: d.at }; };
+const meta = d => { const last = d.cues[d.cues.length - 1]; return { title: [...d.title].slice(0, 100).join(""), author: [...d.author].slice(0, 50).join(""), lang: String(d.lang || "en").slice(0, 8), n: d.cues.length, tr: d.cues.filter(c => c.r).length, dur: Math.round(last.e || last.s), at: d.at }; };
 const clean = (b, at) => ({ v: b.v, title: String(b.title || "").slice(0, 300), author: String(b.author || "").slice(0, 120), lang: String(b.lang || "en").slice(0, 12), tl: String(b.tl || "").slice(0, 12), at: at || Date.now(), cues: b.cues.slice(0, 6000).map(c => ({ s: +c.s || 0, e: +c.e || 0, t: String(c.t || "").slice(0, 600), r: String(c.r || "").slice(0, 600) })).filter(c => c.t) });
 const put = (kv, d) => kv.put("v/" + d.v, JSON.stringify(d), { metadata: meta(d) });
 async function listAll(kv) {
@@ -383,27 +383,27 @@ async function media(req, env) {
 // ---------- 例句（Tatoeba） ----------
 async function sent(req, env, u) {
   if (req.method === "OPTIONS") return json({ ok: true });
-  const pn = Math.min(30, +u.searchParams.get("pump") || 0);
+  const pn = Math.min(30, +u.searchParams.get("pump") || 0), de = u.searchParams.get("lang") === "de", FROM = de ? "deu" : "eng"; // 🇩🇪 lang=de：Tatoeba 的德语句子（带中文翻译）
   if (pn > 0) {
     try {
       const out = [];
       for (let i = 0; i < 3 && out.length < pn; i++) {
-        const r = await fetch("https://tatoeba.org/en/api_v0/search?from=eng&query=&sort=random&word_count_min=5&word_count_max=12&to=cmn&trans_filter=limit&trans_to=cmn&rand_seed=" + Math.random().toString(36).slice(2, 8), { headers: { "User-Agent": "ruilearning-my (personal study site)" } });
+        const r = await fetch("https://tatoeba.org/en/api_v0/search?from=" + FROM + "&query=&sort=random&word_count_min=5&word_count_max=12&to=cmn&trans_filter=limit&trans_to=cmn&rand_seed=" + Math.random().toString(36).slice(2, 8), { headers: { "User-Agent": "ruilearning-my (personal study site)" } });
         if (!r.ok) break; const j = await r.json();
         (j.results || []).forEach(x => { const ts = (x.translations || []).flat().filter(t => t && t.lang === "cmn"), t = ts.find(t => t.script === "Hans") || ts[0]; if (x.text && t && x.text.length <= 90 && !out.some(o => o.en === x.text)) out.push({ en: String(x.text), zh: String(t.text || "") }); });
       }
       return json({ ok: true, items: out.slice(0, pn) });
     } catch (e) { return json({ ok: false, error: String(e && e.message || e) }, 500); }
   }
-  const w = String(u.searchParams.get("w") || "").toLowerCase().trim();
-  if (!/^[a-z][a-z' -]{0,40}$/.test(w)) return json({ ok: false, error: "bad word" }, 400);
-  const kv = env.CAPTIONS, key = "s/" + w;
+  const w = String(u.searchParams.get("w") || "").normalize("NFC").toLowerCase().trim();
+  if (!(de ? /^\p{L}[\p{L}' -]{0,40}$/u : /^[a-z][a-z' -]{0,40}$/).test(w)) return json({ ok: false, error: "bad word" }, 400);
+  const kv = env.CAPTIONS, key = (de ? "s/de/" : "s/") + w;
   try {
     const hit = kv && (await kv.get(key, "json")); if (hit) return json({ ok: true, w, items: hit, cached: true });
-    const r = await fetch("https://tatoeba.org/en/api_v0/search?from=eng&query=" + encodeURIComponent(w.includes(" ") ? '"' + w + '"' : w) + "&sort=relevance&word_count_max=14&to=cmn&trans_filter=limit&trans_to=cmn", { headers: { "User-Agent": "ruilearning-my (personal study site)" }, cf: { cacheTtl: 86400 } });
+    const r = await fetch("https://tatoeba.org/en/api_v0/search?from=" + FROM + "&query=" + encodeURIComponent(w.includes(" ") ? '"' + w + '"' : w) + "&sort=relevance&word_count_max=14&to=cmn&trans_filter=limit&trans_to=cmn", { headers: { "User-Agent": "ruilearning-my (personal study site)" }, cf: { cacheTtl: 86400 } });
     if (!r.ok) return json({ ok: false, error: "tatoeba " + r.status }, 502);
-    const j = await r.json(), stem = w.length > 4 ? w.replace(/(e|s|es|ed|ing|y)$/, "") : w;
-    const re = new RegExp("\\b" + stem.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/ /g, "\\s+"), "i");
+    const j = await r.json(), stem = w.length > 4 ? w.replace(de ? /(en|er|es|e|n|s|t|st)$/ : /(e|s|es|ed|ing|y)$/, "") : w;
+    const re = de ? new RegExp("(^|[^\\p{L}])" + stem.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/ /g, "\\s+"), "iu") : new RegExp("\\b" + stem.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/ /g, "\\s+"), "i"); // 德语：\b 认不出 ä ö ü ß
     const items = (j.results || []).map(x => { const ts = (x.translations || []).flat().filter(t => t && t.lang === "cmn"), t = ts.find(t => t.script === "Hans") || ts[0]; return { en: String(x.text || ""), zh: t ? String(t.text || "") : "" }; })
       .filter(x => x.en && x.zh && x.en.length <= 100 && re.test(x.en)).slice(0, 12);
     if (kv && items.length) await cput(kv, key, JSON.stringify(items), { expirationTtl: 30 * 86400 }); // 没有例句的不存（随便编的词也会写一条，白占当天写入额度）
@@ -464,8 +464,57 @@ async function gtrans(text, tl, bd, sl) {
   } catch (e) {}
   return null;
 }
+// 🇩🇪 德语查词（/api/dict?lang=de&w=…）：中文（谷歌，按德语翻）+ 维基词典英文版的德语词条（词性、英文释义、德语例句、名词的性 der/die/das、音标；
+//   变形如 ging 会给出原形 lemma）+ Tatoeba 德语例句；存 KV「d/de/词」30 天。结构和英语的一样，多 gender、lemma 两个字段
+const WIKT_UA = { "User-Agent": "ruilearning-my (personal study site)" };
+const stripHtml = h => String(h || "").replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/\s+/g, " ").trim();
+async function wiktDe(w) {
+  const cap = w.charAt(0).toUpperCase() + w.slice(1), tries = [...new Set([w, cap, w.toLowerCase()])];
+  for (const t of tries) {
+    let j = null; try { const r = await fetch("https://en.wiktionary.org/api/rest_v1/page/definition/" + encodeURIComponent(t), { headers: WIKT_UA, cf: { cacheTtl: 86400 } }); if (r.ok) j = await r.json(); } catch (e) {}
+    if (!j || !Array.isArray(j.de) || !j.de.length) continue;
+    const en = [], lemmas = [];
+    j.de.forEach(x => (x.definitions || []).slice(0, 4).forEach(df => {
+      const def = stripHtml(df.definition); if (!def) return;
+      const lm = /\b(?:plural|singular|participle|preterite|subjunctive|imperative|inflection|form|comparative|superlative|genitive|dative|accusative|nominative|diminutive)\b[^.;]*?\bof\s+(\p{L}+)\s*$/u.exec(def); if (lm && lm[1] !== t) lemmas.push(lm[1]); /* 只认「…的变形」：plural of Haus、preterite of gehen */
+      if (en.length < 6) en.push({ pos: String(x.partOfSpeech || "").toLowerCase(), def, ex: df.parsedExamples && df.parsedExamples[0] ? stripHtml(df.parsedExamples[0].example) : "" });
+    }));
+    if (!en.length) continue;
+    let gender = "", phon = "";
+    try { // 名词的性、音标：页面源码里的 {{de-noun|n…}}、{{IPA|de|…}}
+      const r = await fetch("https://en.wiktionary.org/w/api.php?action=parse&prop=wikitext&format=json&formatversion=2&page=" + encodeURIComponent(t), { headers: WIKT_UA, cf: { cacheTtl: 86400 } });
+      const wt = r.ok ? String(((await r.json()).parse || {}).wikitext || "") : "", i = wt.indexOf("==German==");
+      if (i >= 0) { const rest = wt.slice(i + 10), e = rest.search(/\n==[^=]/), sec = e < 0 ? rest : rest.slice(0, e);
+        const g = /\{\{de-noun\|([mfn])\b/.exec(sec) || /\{\{de-ndecl\|([mfn])\b/.exec(sec); if (g) gender = { m: "der", f: "die", n: "das" }[g[1]];
+        const ip = /\{\{IPA\|de\|([^}|]+)/.exec(sec); if (ip) phon = ip[1].trim(); }
+    } catch (e) {}
+    return { title: t, en, gender, phon, lemma: lemmas[0] || "" };
+  }
+  return null;
+}
+async function dictDe(req, env, u) {
+  const w = String(u.searchParams.get("w") || "").normalize("NFC").trim().replace(/\s+/g, " ");
+  if (!w || w.length > 80 || !/^\p{L}[\p{L}0-9' .,?!-]*$/u.test(w)) return json({ ok: false, error: "bad word" }, 400);
+  const kv = env.CAPTIONS, key = "d/de/" + w.toLowerCase();
+  try {
+    const hit = kv && (await kv.get(key, "json")); if (hit && !(await freshOf(req, u, kv))) return json(Object.assign({ ok: true, cached: true }, hit));
+    const one = w.split(" ").length <= 3, single = !w.includes(" ");
+    const [g, wk, ex] = await Promise.all([
+      gtrans(w, "zh-CN", one, "de").catch(() => null),
+      single ? wiktDe(w).catch(() => null) : null,
+      w.length <= 40 ? sent(new Request("https://x/"), env, new URL("https://x/api/sent?lang=de&w=" + encodeURIComponent(w.toLowerCase()))).then(r => r.json()).catch(() => null) : null,
+    ]);
+    const out = { word: wk && wk.title || w, phon: wk ? wk.phon : "", audio: "", zh: "", zhs: [], en: wk ? wk.en : [], examples: [], gender: wk ? wk.gender : "", lemma: wk ? wk.lemma : "" };
+    if (g) { out.zh = (g.sentences || []).map(x => x.trans || "").join(""); out.zhs = (g.dict || []).slice(0, 4).map(x => ({ pos: x.pos || "", terms: (x.terms || []).slice(0, 6) })); }
+    if (ex && ex.ok) out.examples = (ex.items || []).slice(0, 5).map(x => [x.en, x.zh]);
+    if (!out.zh && !out.en.length) return json({ ok: false, error: "not found", word: w }, 404);
+    if (kv && out.zh && (out.en.length || out.zhs.length || out.examples.length)) await cput(kv, key, JSON.stringify(out), { expirationTtl: (single && !wk ? 1 : 30) * 86400 }); // 维基词典没连上 / 没有：只存 1 天
+    return json(Object.assign({ ok: true }, out));
+  } catch (e) { return json({ ok: false, error: String(e && e.message || e) }, 500); }
+}
 async function dict(req, env, u) {
   if (req.method === "OPTIONS") return json({ ok: true });
+  if (u.searchParams.get("lang") === "de") return dictDe(req, env, u);
   const w = String(u.searchParams.get("w") || "").trim().replace(/\s+/g, " ");
   if (!w || w.length > 80 || !/^[A-Za-z][A-Za-z0-9' .,?!-]*$/.test(w)) return json({ ok: false, error: "bad word" }, 400);
   const kv = env.CAPTIONS, key = "d/" + w.toLowerCase();
@@ -533,22 +582,26 @@ const NEWS_FEEDS = [
   ["Guardian", "https://www.theguardian.com/world/rss"], ["Guardian", "https://www.theguardian.com/science/rss"], ["Guardian", "https://www.theguardian.com/technology/rss"],
   ["NPR", "https://feeds.npr.org/1001/rss.xml"],
 ];
+// 🇩🇪 学德语（?lang=de）：tagesschau（ARD 新闻，正文干净；DW、Deutschlandfunk 的网页抽出来夹着导航，没用）
+const NEWS_FEEDS_DE = [["tagesschau", "https://www.tagesschau.de/xml/rss2/"], ["tagesschau", "https://www.tagesschau.de/wissen/index~rss2.xml"], ["tagesschau", "https://www.tagesschau.de/ausland/index~rss2.xml"], ["tagesschau", "https://www.tagesschau.de/wirtschaft/index~rss2.xml"]];
+// tagesschau 正文里的「Stand: 日期」、结尾的「Dieses Thema im Programm…」「Mehr zum Thema」去掉
+const deClean = t => { const P = t.split("\n\n"), out = []; for (const p of P) { if (/^(Dieses Thema im Programm|Mehr zum Thema|Über dieses Thema berichtete|Weitere Informationen|Quelle:)/i.test(p.trim())) break; if (/^Stand: \d/.test(p.trim())) continue; out.push(p); } return out.join("\n\n"); };
 function rssItems(xml, src) {
   const dec = s => String(s || "").replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;|&apos;|&#x27;/g, "'").replace(/&#(\d+);/g, (m, n) => String.fromCharCode(+n)).replace(/\s+/g, " ").trim();
   const tag = (x, n) => { const m = x.match(new RegExp("<" + n + "(?:\\s[^>]*)?>([\\s\\S]*?)</" + n + ">")); return m ? dec(m[1]) : ""; };
   return (xml.match(/<item[\s>][\s\S]*?<\/item>/g) || []).map(x => {
     let u = tag(x, "link"); if (src === "BBC") u = u.replace(/\?.*$/, "");
     return { t: tag(x, "title"), u, s: src, p: Date.parse(tag(x, "pubDate")) || 0 };
-  }).filter(i => i.t && /^https:\/\//.test(i.u) && !/\/(videos?|live|sounds|av|audio|gallery|picture|in-pictures|ng-interactive)\//.test(i.u));
+  }).filter(i => i.t && /^https:\/\//.test(i.u) && !/\/(videos?|live|sounds|av|audio|gallery|picture|in-pictures|ng-interactive|multimedia|livestream|liveblog)\//.test(i.u) && !/liveblog|-livestream/.test(i.u));
 }
 const newsDay = () => new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10);
 async function news(req, env, u) {
   if (req.method === "OPTIONS") return json({ ok: true });
   const qd = u.searchParams.get("d") || "", today = newsDay(), lo = new Date(Date.now() + 8 * 3600e3 - 30 * 86400e3).toISOString().slice(0, 10);
-  const d = /^\d{4}-\d{2}-\d{2}$/.test(qd) && qd >= lo && qd <= today ? qd : today, key = "news/" + d; // 只认最近 30 天（随便写个日期就多存一条，会被刷写入额度）
+  const de = u.searchParams.get("lang") === "de", d = /^\d{4}-\d{2}-\d{2}$/.test(qd) && qd >= lo && qd <= today ? qd : today, key = "news/" + (de ? "de/" : "") + d; // 只认最近 30 天（随便写个日期就多存一条，会被刷写入额度）
   if (!(await freshOf(req, u, env.CAPTIONS))) { const c = await env.CAPTIONS.get(key, "json"); if (c) return json(c); }
   const UA = { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36" };
-  const got = await Promise.all(NEWS_FEEDS.map(([s, f]) => fetch(f, { headers: UA }).then(r => (r.ok ? r.text() : "")).then(x => rssItems(x, s)).catch(() => [])));
+  const got = await Promise.all((de ? NEWS_FEEDS_DE : NEWS_FEEDS).map(([s, f]) => fetch(f, { headers: UA }).then(r => (r.ok ? r.text() : "")).then(x => rssItems(x, s)).catch(() => [])));
   const now = Date.now(), seen = new Set(); let all = [];
   for (const L of got) for (const i of L) { const k = i.t.toLowerCase(); if (seen.has(k) || seen.has(i.u)) continue; seen.add(k); seen.add(i.u); all.push(i); }
   const within = h => all.filter(i => i.p && now - i.p < h * 3600e3), r2 = within(48); all = r2.length >= 8 ? r2 : within(7 * 24); // 最近两天的；太少就放宽到一周，更旧的不要
@@ -557,7 +610,7 @@ async function news(req, env, u) {
   if (!all.length) return json({ ok: false, error: "no feeds" }, 502);
   let pick = null;
   for (const i of all.slice(0, 8)) {
-    const x = await extractArticle(i.u); if (!x.ok) continue;
+    const x = await extractArticle(i.u); if (!x.ok) continue; if (de) x.text = deClean(x.text);
     const n = x.text.split(/\s+/).length; if (n < 250) continue;
     let text = x.text.replace(/^[^\n]{0,200}\n\n/, m => (/[.!?"”]\s*$/.test(m.trim()) ? m : "")); // 第一段是标题（没有句号）就去掉，免得读两遍
     if (n > 1500) { const P = text.split("\n\n"), out = []; let c = 0; for (const p of P) { if (c > 1200) break; out.push(p); c += p.split(/\s+/).length; } text = out.join("\n\n"); }
@@ -882,8 +935,31 @@ async function dw(req, env, u) {
     return json(Object.assign({ ok: true }, ep));
   } catch (e) { return json({ ok: false, error: String(e && e.message || e) }, 502); }
 }
+// 🇩🇪 「📻 听力节目」学德语时的栏目 s=dw：DW「Langsam gesprochene Nachrichten」（慢速新闻），期号 dw/<文章号>；
+//   数据就是 /api/dw 的（同一份 KV 缓存），这里换成 /api/sme 的样子，听力页不用分两套
+const DW_MP3 = /^https:\/\/radiodownloaddw-a\.akamaihd\.net\/[^?#]+\.mp3$/;
+async function smeDw(req, env, u) {
+  const q = k => u.searchParams.get(k) || "", num = v => (/^dw\/(\d{5,10})$/.exec(v || "") || [])[1] || "";
+  const call = async qs => { const r = await dw(req, env, new URL("https://x/api/dw?" + qs)); return { status: r.status, j: await r.json() }; };
+  if (q("s") === "dw" && !q("ep")) { const { status, j } = await call("list=1"); if (!j.ok) return json(j, status); return json({ ok: true, s: "dw", list: (j.list || []).map(x => ({ id: "dw/" + x.id, t: x.t, d: x.d, p: "", img: "" })) }); } // p 是简介（BBC 的有），DW 列表没有
+  if (q("al")) { const id = num(q("al")); if (!id) return json({ ok: false, error: "bad id" }, 400); const { status, j } = await call("al=" + id + "&part=" + (+q("part") || 0)); return json(j, status); }
+  if (q("mp3")) { // 📥 离线下载：同 BBC，只转打开过的那期
+    const id = num(q("mp3")), x = id && (await env.CAPTIONS.get("dw/ep/" + id, "json"));
+    if (!x || !DW_MP3.test(x.mp3 || "")) return json({ ok: false, error: "open the episode first" }, 409);
+    const r = await fetch(x.mp3); if (!r.ok) return json({ ok: false, error: "mp3 " + r.status }, 502);
+    return new Response(r.body, { headers: { "content-type": "audio/mpeg", "cache-control": "private, max-age=86400", ...(r.headers.get("content-length") ? { "content-length": r.headers.get("content-length") } : {}) } });
+  }
+  const id = num(q("ep")); if (!id) return json({ ok: false, error: "bad ep" }, 400);
+  if (q("zh")) {
+    if (q("co")) { const hit = await env.CAPTIONS.get("dw/zh/" + id, "json"); return json(hit ? { ok: true, id: "dw/" + id, intro: "", q: [], vocab: [], vex: [], heads: [], lines: hit, cached: true } : { ok: false, error: "not cached" }); }
+    const { status, j } = await call("zh=1&ep=" + id); return json(j.ok ? { ok: true, id: "dw/" + id, intro: "", q: [], vocab: [], vex: [], heads: [], lines: j.lines } : j, status);
+  }
+  const { status, j } = await call("ep=" + id); if (!j.ok) return json(j, status);
+  return json({ ok: true, id: "dw/" + id, s: "dw", url: "https://learngerman.dw.com/de/x/a-" + id, title: j.title, mp3: j.mp3, intro: "", q: [], vocab: [], heads: [], lines: j.lines });
+}
 async function sme(req, env, u, ctx) {
   if (req.method === "OPTIONS") return json({ ok: true });
+  if (u.searchParams.get("s") === "dw" || /^dw\//.test(u.searchParams.get("ep") || u.searchParams.get("al") || u.searchParams.get("mp3") || "")) return smeDw(req, env, u);
   if (u.searchParams.get("al")) return smeAlign(env, u);
   if (u.searchParams.get("mp3")) { // 📥 离线下载：BBC 的 mp3 没开跨域，这里转一手（只转打开过的那几期、只转 downloads.bbc.co.uk / voa-audio.voanews.eu）
     const x = await env.CAPTIONS.get("sme/ep/" + u.searchParams.get("mp3"), "json");
@@ -967,12 +1043,27 @@ async function smeList(env, s, S, lk, ttl) {
 // POST /api/ai {task:"write", type:t1|t2|mail|free, prompt, text} → { ok, band:{TR,CC,LR,GRA,overall}, summary_zh, strengths_zh:[], improve_zh:[], rewrite }；没开 AI 时 { ok:false, error:"noai" }
 // POST /api/stt（请求体就是录音文件）→ { ok, text }：跟读打分用（Whisper 语音转文字）
 const AI_MODELS = ["@cf/meta/llama-3.3-70b-instruct-fp8-fast", "@cf/meta/llama-4-scout-17b-16e-instruct"]; // 备用：原来的 llama-3.1-8b-instruct 2026-05-30 下线了
+// 🇩🇪 学德语（请求里 lang:"de"）：下面每个提示词都有德语版；返回的 JSON 结构和英语完全一样（字段名 en 里放德语），网页不用分两套解析
+//   德语评分不用雅思：每项 0–25 分（同歌德 / telc 的四项），总分 0–100（60 及格），另给一个 CEFR 估计
+const isDe = b => b && b.lang === "de";
+const DE_WHO = "The learner is a Chinese native speaker learning German (beginner to intermediate, about CEFR A1-B1), living in Kuala Lumpur, Malaysia, working as a software developer. Their words come from speech recognition, so ignore capitalisation, punctuation and obvious mis-hearings; never comment on pronunciation.";
+const DE_RULE = "Always write correct, natural, modern Standard German as spoken in Germany (correct ä/ö/ü/ß, noun capitalisation, articles, cases, verb position).";
+const WRITE_SYS_DE = `You are a strict, experienced examiner for German as a foreign language (Goethe-Zertifikat / telc, levels A2-B1). Assess the candidate's German text with the four criteria used in those exams, each scored 0-25 points: Erfüllung der Aufgabe (TR), Kohärenz (CC), Wortschatz (LR), Strukturen / grammatische Richtigkeit (GRA). Be realistic for learners. ${DE_RULE}
+Reply with ONLY one JSON object, no markdown, exactly in this shape:
+{"band":{"TR":0,"CC":0,"LR":0,"GRA":0,"overall":0},"cefr":"A2","summary_zh":"2-3 sentences in Simplified Chinese","strengths_zh":["..."],"improve_zh":["specific, actionable advice in Simplified Chinese; quote the original German phrase and give a corrected / better German version"],"rewrite":"an improved version of the whole answer in German, same ideas and similar length, at about one CEFR level above the candidate"}
+Give 2-4 strengths_zh and 3-6 improve_zh. Each of TR/CC/LR/GRA is an integer 0-25; overall = their sum (0-100). cefr is your estimate of the text's level (A1, A2, B1, B2 or C1).`;
 const WRITE_SYS = `You are a strict, experienced IELTS writing examiner. Assess the candidate's answer using the official IELTS Writing band descriptors (Task Response / Task Achievement, Coherence and Cohesion, Lexical Resource, Grammatical Range and Accuracy). Use half bands (e.g. 6.5). Be realistic: most learner essays score 5.0-7.0; penalise answers under the word limit or off topic.
 Reply with ONLY one JSON object, no markdown, exactly in this shape:
 {"band":{"TR":0,"CC":0,"LR":0,"GRA":0,"overall":0},"summary_zh":"2-3 sentences in Simplified Chinese","strengths_zh":["..."],"improve_zh":["specific, actionable advice in Simplified Chinese; quote the original phrase and give a better English version"],"rewrite":"an improved version of the whole answer in English, same ideas and similar length, band 8 level"}
 Give 2-4 strengths_zh and 3-6 improve_zh. overall = mean of the four, rounded to the nearest half band.`;
 // 口语（web/speak.js）：AI 陪练聊天、聊完总结、话题回答点评。学习者：中文母语、住吉隆坡、程序员、英语约 B1
-const SPEAK_WHO = "The learner is a Chinese native speaker (about CEFR B1) living in Kuala Lumpur, Malaysia, working as a software developer. Their words come from speech recognition, so ignore capitalisation, punctuation and obvious mis-hearings; never comment on pronunciation.";
+const SPEAK_WHO_EN = "The learner is a Chinese native speaker (about CEFR B1) living in Kuala Lumpur, Malaysia, working as a software developer. Their words come from speech recognition, so ignore capitalisation, punctuation and obvious mis-hearings; never comment on pronunciation.";
+const SPEAK_WHO = SPEAK_WHO_EN;
+const CHAT_SYS_DE = scene => `You are a friendly, natural German conversation partner (Gesprächspartner). ${DE_WHO}
+Situation: ${scene || "casual chat about daily life, work or hobbies"}. Stay in character for this situation. ${DE_RULE} The learner imitates you, so never use broken German or dialect.
+Reply in natural spoken German, 1-2 short sentences (under 25 words), simple (A2 level: common words, short main clauses), and usually end with a question to keep the conversation going. Use "du" in casual situations and "Sie" with strangers, staff or officials, as a German would.
+Also check the learner's LAST message for a clear grammar or word-choice mistake (gender/article, case, verb position, conjugation, wrong word; not style, not punctuation, not capitalisation).
+Reply with ONLY one JSON object, no markdown: {"reply":"your reply in German","fix":null}  or, if the last learner message had a real mistake: {"reply":"...","fix":{"bad":"the wrong part they said","good":"the corrected German","why_zh":"一句简体中文解释"}}`;
 const CHAT_SYS = scene => `You are a friendly, natural English conversation partner. ${SPEAK_WHO}
 Situation: ${scene || "casual chat about daily life, work or hobbies"}. Stay in character for this situation, but always speak correct, natural English (never broken English or local slang the learner might copy), because the learner imitates you.
 Reply in natural spoken American English, 1-2 short sentences (under 30 words), simple enough for B1, and usually end with a question to keep the conversation going.
@@ -982,6 +1073,15 @@ const CHATSUM_SYS = `You are an English speaking coach. ${SPEAK_WHO} Review the 
 Reply with ONLY one JSON object, no markdown:
 {"summary_zh":"2-3 sentences in Simplified Chinese: how they did overall","good_zh":["things they did well, Simplified Chinese"],"fixes":[{"bad":"what they said","good":"correct / more natural version","why_zh":"简体中文解释"}],"phrases":[{"en":"a useful natural expression for this situation they could use next time","zh":"中文"}]}
 Give 1-3 good_zh, up to 6 fixes (only real problems, most important first), and 4-6 phrases.`;
+const CHATSUM_SYS_DE = `You are a German speaking coach. ${DE_WHO} ${DE_RULE} Review the whole conversation (the learner is "user").
+Reply with ONLY one JSON object, no markdown:
+{"summary_zh":"2-3 sentences in Simplified Chinese: how they did overall","good_zh":["things they did well, Simplified Chinese"],"fixes":[{"bad":"what they said","good":"correct / more natural German","why_zh":"简体中文解释（性、格、词序、变位……）"}],"phrases":[{"en":"a useful natural German expression for this situation they could use next time","zh":"中文"}]}
+Give 1-3 good_zh, up to 6 fixes (only real problems, most important first), and 4-6 phrases.`;
+const SPEAKRATE_SYS_DE = `You are a strict, experienced examiner for spoken German as a foreign language (Goethe-Zertifikat / telc, A2-B1). ${DE_WHO}
+Assess the transcript of their spoken answer to the question with three criteria, each an integer 0-25 points: Flüssigkeit und Kohärenz (FC), Wortschatz (LR), Strukturen / grammatische Richtigkeit (GRA). You cannot hear pronunciation, so do not score it. Be realistic for learners. ${DE_RULE}
+Reply with ONLY one JSON object, no markdown:
+{"band":{"FC":0,"LR":0,"GRA":0,"overall":0},"cefr":"A2","summary_zh":"2-3 sentences in Simplified Chinese","strengths_zh":["..."],"fixes":[{"bad":"exact phrase they said","good":"correct / better German","why_zh":"简体中文解释"}],"better":"an improved version of their answer in natural spoken German, same ideas, about 70-120 words, about one CEFR level above the candidate","better_zh":"中文翻译"}
+Give 1-3 strengths_zh and 3-6 fixes. overall = round((FC+LR+GRA)/75*100), i.e. 0-100. cefr is your estimate (A1, A2, B1, B2).`;
 const SPEAKRATE_SYS = `You are a strict, experienced IELTS speaking examiner. ${SPEAK_WHO}
 Assess the transcript of their spoken answer to the question, using IELTS Speaking band descriptors for Fluency and Coherence (FC), Lexical Resource (LR) and Grammatical Range and Accuracy (GRA); you cannot hear pronunciation, so do not score it. Use half bands. Be realistic: short or simple answers score 4.5-6.0.
 Reply with ONLY one JSON object, no markdown:
@@ -993,6 +1093,24 @@ Give three versions: casual (随意), neutral (中性), formal (正式). note_zh
 Example. Input: 不好意思，能帮我打包吗
 Output: {"items":[{"reg":"随意","en":"Sorry, can I get this to go?","note_zh":"在小店、mamak 随口说"},{"reg":"中性","en":"Excuse me, could you pack this up for me?","note_zh":"餐厅里礼貌地说"},{"reg":"正式","en":"Excuse me, would it be possible to have this packed to take away?","note_zh":"高级餐厅、很客气"}],"words":[{"en":"to go","zh":"打包带走"},{"en":"pack up","zh":"打包"}]}
 Reply with ONLY one JSON object in exactly that shape, no markdown.`;
+const HOWTO_SYS_DE = `You help a Chinese learner say things in natural German. ${DE_WHO} ${DE_RULE}
+They give you something in Chinese (or mixed Chinese/English/German). Translate the WHOLE meaning into natural spoken German, keeping every detail (who, what, when). Use normal capitalisation and punctuation.
+Give three versions: casual (随意, with du / among friends), neutral (中性, polite everyday, usually Sie), formal (正式, very polite / written-like, Sie). note_zh says in a few Chinese words when to use it.
+Example. Input: 不好意思，能帮我打包吗
+Output: {"items":[{"reg":"随意","en":"Sorry, kann ich das mitnehmen?","note_zh":"在小店、快餐店随口说"},{"reg":"中性","en":"Entschuldigung, könnten Sie mir das bitte einpacken?","note_zh":"餐厅里礼貌地说"},{"reg":"正式","en":"Entschuldigen Sie bitte, wäre es möglich, mir den Rest einzupacken?","note_zh":"很客气的场合"}],"words":[{"en":"mitnehmen","zh":"带走"},{"en":"einpacken","zh":"打包"}]}
+Reply with ONLY one JSON object in exactly that shape, no markdown.`;
+const USEWORD_SYS_DE = `You are a friendly German teacher. ${DE_WHO} ${DE_RULE}
+The learner was asked to say one German sentence using a target word or phrase. Judge whether they used it correctly and naturally (meaning, grammar, gender/case, verb position, collocation).
+Reply with ONLY one JSON object, no markdown: {"correct":true,"fixed":"their sentence corrected (same as theirs if already fine)","why_zh":"简体中文：哪里对 / 哪里错","better":"one more natural German example sentence with the target","better_zh":"中文"}`;
+const JUDGE_SYS_DE = `You are a friendly German speaking coach. ${DE_WHO} ${DE_RULE}
+Someone asked the learner a question in German and they answered quickly in speech. Judge if the answer makes sense as a reply (it does not need to be long or perfect).
+Reply with ONLY one JSON object, no markdown: {"correct":true,"fb_zh":"简体中文：一两句反馈","fix":null,"better":"a natural German reply a fluent speaker might give, 1-2 sentences"}  — set "fix" to {"bad":"...","good":"...","why_zh":"..."} only for a clear grammar/word mistake.`;
+const COACH_SYS_DE = `You are a warm, practical German speaking coach writing in Simplified Chinese for a beginner who does not know how to start practising speaking German. ${DE_WHO}
+You get their self-assessment and their practice history. Make a concrete plan for the NEXT 7 DAYS using only these sections of the app (use the key in "sec"):
+rescue (救命句：听不懂/想不起时的 40 句), intro (自我介绍), daily (每日一练), dialog (情景对话：听全文、跟读、角色扮演), func (常用表达), drill (句型操练), pron (发音：最小对立词、发音规则、重音、绕口令), shadow (跟读), quick (快问快答), chat (AI 陪练), howto (这句话德语怎么说), topic (话题卡，AI 点评).
+Reply with ONLY one JSON object, no markdown:
+{"level_zh":"一句话判断他现在的水平","advice_zh":"2-3 句最重要的建议","days":[{"day":1,"title":"今天的主题","steps":[{"do_zh":"具体做什么、做多久","sec":"rescue"}]}],"encourage_zh":"一句鼓励"}
+In "do_zh" write plain Chinese for the learner (never write the section keys like rescue/dialog in the text; the button shows the section). Exactly 7 days, 2-4 steps each, about 15-20 minutes a day, start easy (listen and repeat, Umlaute) and build up to talking with the AI and topics.`;
 const USEWORD_SYS = `You are a friendly English teacher. ${SPEAK_WHO}
 The learner was asked to say one sentence using a target word or phrase. Judge whether they used it correctly and naturally (meaning, grammar, collocation).
 Reply with ONLY one JSON object, no markdown: {"correct":true,"fixed":"their sentence corrected (same as theirs if already fine)","why_zh":"简体中文：哪里对 / 哪里错","better":"one more natural example sentence with the target","better_zh":"中文"}`;
@@ -1012,6 +1130,15 @@ Rewrite the news article for them in 250-350 words (never more than 380 words; l
 Then write 4 multiple-choice comprehension questions about the article (in English, 3 options each, only one correct) and pick 6-8 useful words or phrases from the ORIGINAL article that a B1 learner probably does not know.
 Reply with ONLY one JSON object, no markdown:
 {"simple":"the rewritten article","summary_zh":"两句简体中文概括","quiz":[{"q":"question","opts":["A","B","C"],"ans":0,"why_zh":"简体中文：为什么"}],"words":[{"en":"word or phrase as used in the article","zh":"中文意思"}]}`;
+const NEWSIMP_SYS_DE = `You are an expert writer of materials for German as a foreign language. The reader is a Chinese native speaker learning German (about CEFR A2-B1) who lives in Kuala Lumpur. ${DE_RULE}
+Rewrite the news article for them in 200-300 German words (never more than 330 words; leave out minor details), CEFR A2-B1 German ("einfache Sprache"): short main clauses, few subordinate clauses, common words, explain or replace rare words, keep all key facts, names and numbers correct, neutral tone. Separate paragraphs with a blank line.
+Then write 4 multiple-choice comprehension questions about the article (in simple German, 3 options each, only one correct) and pick 6-8 useful words or phrases from the ORIGINAL article that an A2-B1 learner probably does not know (nouns with their article, e.g. "die Regierung").
+Reply with ONLY one JSON object, no markdown:
+{"simple":"the rewritten article","summary_zh":"两句简体中文概括","quiz":[{"q":"question","opts":["A","B","C"],"ans":0,"why_zh":"简体中文：为什么"}],"words":[{"en":"German word or phrase as used in the article","zh":"中文意思"}]}`;
+const LQUIZ_SYS_DE = `You are an experienced teacher of German as a foreign language. The text is the transcript of a German radio programme for learners (for example Deutsche Welle "Langsam gesprochene Nachrichten"). Write 5 multiple-choice comprehension questions for a learner (CEFR A2-B1) who has just LISTENED to it (without reading). ${DE_RULE}
+Mix: 1 gist question (main topic), 2 detail questions (facts, numbers, places that are said clearly), 1 inference question, 1 meaning-in-context question about a useful word or phrase from the programme.
+Each question: simple German, 4 short options, exactly one correct, wrong options plausible. "ans" is the 0-based index of the correct option. "why_zh" is a short Chinese explanation quoting the key German words from the transcript.
+Reply with ONLY JSON: {"quiz":[{"q":"...","opts":["...","...","...","..."],"ans":0,"why_zh":"..."}]}`;
 async function aiJson(env, msgs, ok, maxTok) {
   let last = "";
   for (const m of AI_MODELS) {
@@ -1069,6 +1196,10 @@ const WHYMISS_SYS = `You are an English listening coach for Chinese learners. A 
 For each missed chunk explain in simple Chinese WHY it is hard to hear in natural British speech: linking (连读), weak forms (弱读), elision (吞音/省音), assimilation (同化), flapped or unreleased t/d (不完全爆破), contractions (缩读), homophones or near-homophones (同音/近音词), fast fixed phrases, or simply an uncommon word / name.
 Rules: "chunk" must be copied exactly from the sentence (2-5 words around the missed word, keep the original case); "sounds" shows how it actually sounds, written in simple English-like spelling (e.g. "wanna", "lemme", "kinda", "a-ni-dea", "ə" for weak vowels); "kind_zh" is the short Chinese name of the phenomenon; "why_zh" is 1-2 short Chinese sentences; at most 4 items, most important first. "tip_zh" is one short Chinese tip for practising this kind of sound.
 Reply with ONLY JSON: {"items":[{"chunk":"...","sounds":"...","kind_zh":"连读","why_zh":"..."}],"tip_zh":"..."}`;
+const WHYMISS_SYS_DE = `You are a German listening coach for Chinese learners. A learner did dictation of one sentence from a German radio programme for learners and missed some words.
+For each missed chunk explain in simple Chinese WHY it is hard to hear in spoken German: weak/reduced endings (-en, -er 弱读), elision (吞音, e.g. "haben" sounding like "ham"), linking across words (连读), assimilation (同化), final devoicing (尾音清化), glottal stop (喉塞音), compound nouns (复合词), separable verb prefixes at the end of the sentence (可分动词前缀在句尾), similar-sounding words (近音词), or simply an uncommon word / name.
+Rules: "chunk" must be copied exactly from the sentence (2-5 words around the missed word, keep the original case); "sounds" shows roughly how it actually sounds (simple German-like spelling or IPA, e.g. "ham", "ham'wa", "is'es", "ə" for weak vowels); "kind_zh" is the short Chinese name of the phenomenon; "why_zh" is 1-2 short Chinese sentences; at most 4 items, most important first. "tip_zh" is one short Chinese tip for practising this kind of sound.
+Reply with ONLY JSON: {"items":[{"chunk":"...","sounds":"...","kind_zh":"弱读","why_zh":"..."}],"tip_zh":"..."}`;
 // 🧩 听后小测：一期节目的文稿 → 5 道四选一（大意、细节、推断、态度、词义）
 const LQUIZ_SYS = `You are an experienced English listening teacher. The text is the transcript of a BBC Learning English radio programme. Write 5 multiple-choice comprehension questions for a learner (CEFR B1-B2) who has just LISTENED to it (without reading).
 Mix: 1 gist question (main topic / purpose), 2 detail questions (facts, numbers, examples that are said clearly), 1 inference or speaker-attitude question, 1 meaning-in-context question about a useful phrase from the programme.
@@ -1140,8 +1271,8 @@ async function ai(req, env) {
     if (b.task === "newsimp") {
       const t = String(b.text || "").split(/\s+/).slice(0, 1000).join(" "), title = clip(b.title, 300); if (t.split(" ").length < 80) return json({ ok: false, error: "bad body" }, 400);
       let hh = 2166136261; const hs = String(b.url || title || t.slice(0, 200)); for (let i = 0; i < hs.length; i++) { hh ^= hs.charCodeAt(i); hh = Math.imul(hh, 16777619); }
-      const key = "news/simp/" + (hh >>> 0).toString(36), c = env.CAPTIONS && !b.fresh ? await env.CAPTIONS.get(key, "json") : null; if (c) return json(Object.assign(c, { cached: 1 }));
-      const r = await aiJson(env, [{ role: "system", content: NEWSIMP_SYS }, { role: "user", content: "Title: " + title + "\n\n" + t }], o => typeof o.simple === "string" && o.simple.split(/\s+/).length > 80 && Array.isArray(o.quiz), 3800); // 输出要放得下改写稿 + 题目，太小会被截断
+      const key = "news/simp/" + (isDe(b) ? "de/" : "") + (hh >>> 0).toString(36), c = env.CAPTIONS && !b.fresh ? await env.CAPTIONS.get(key, "json") : null; if (c) return json(Object.assign(c, { cached: 1 }));
+      const r = await aiJson(env, [{ role: "system", content: isDe(b) ? NEWSIMP_SYS_DE : NEWSIMP_SYS }, { role: "user", content: "Title: " + title + "\n\n" + t }], o => typeof o.simple === "string" && o.simple.split(/\s+/).length > 80 && Array.isArray(o.quiz), 3800); // 输出要放得下改写稿 + 题目，太小会被截断
       if (r.ok) { r.quiz = (r.quiz || []).filter(q => q && q.q && Array.isArray(q.opts) && q.opts.length >= 2 && +q.ans >= 0 && +q.ans < q.opts.length).slice(0, 5); r.words = (Array.isArray(r.words) ? r.words : []).filter(w => w && w.en).slice(0, 10); if (env.CAPTIONS) await cput(env.CAPTIONS, key, JSON.stringify(r), { expirationTtl: 7 * 86400 }); }
       return json(r, r.ok ? 200 : 502);
     }
@@ -1149,36 +1280,36 @@ async function ai(req, env) {
     if (b.task === "chat" || b.task === "chatsum") {
       const H = (Array.isArray(b.history) ? b.history : []).slice(-16).map(x => ({ role: x && x.role === "assistant" ? "assistant" : "user", content: clip(x && x.content, 500) })).filter(x => x.content.trim());
       if (b.task === "chat") {
-        const r = await aiJson(env, [{ role: "system", content: CHAT_SYS(clip(b.scene, 400)) }].concat(H.length ? H : [{ role: "user", content: "(The conversation starts now. Greet me and open the conversation for this situation.)" }]), o => typeof o.reply === "string" && o.reply.trim(), 300);
+        const r = await aiJson(env, [{ role: "system", content: (isDe(b) ? CHAT_SYS_DE : CHAT_SYS)(clip(b.scene, 400)) }].concat(H.length ? H : [{ role: "user", content: isDe(b) ? "(The conversation starts now. Greet me in German and open the conversation for this situation.)" : "(The conversation starts now. Greet me and open the conversation for this situation.)" }]), o => typeof o.reply === "string" && o.reply.trim(), 300);
         return json(r.ok ? { ok: true, model: r.model, reply: String(r.reply).trim(), fix: r.fix && r.fix.bad && r.fix.good ? { bad: clip(r.fix.bad, 300), good: clip(r.fix.good, 300), why_zh: clip(r.fix.why_zh, 300) } : null } : r, r.ok ? 200 : 502);
       }
       if (H.filter(x => x.role === "user").length < 2) return json({ ok: false, error: "too short" }, 400);
       const conv = H.map(x => (x.role === "user" ? "user: " : "partner: ") + x.content).join("\n");
-      const r = await aiJson(env, [{ role: "system", content: CHATSUM_SYS }, { role: "user", content: "Situation: " + clip(b.scene, 400) + "\n\nConversation:\n" + conv }], o => typeof o.summary_zh === "string", 1200);
+      const r = await aiJson(env, [{ role: "system", content: isDe(b) ? CHATSUM_SYS_DE : CHATSUM_SYS }, { role: "user", content: "Situation: " + clip(b.scene, 400) + "\n\nConversation:\n" + conv }], o => typeof o.summary_zh === "string", 1200);
       return json(r, r.ok ? 200 : 502);
     }
     if (b.task === "howto") {
       const q = clip(b.text, 400).trim(); if (!q) return json({ ok: false, error: "bad body" }, 400);
-      const r = await aiJson(env, [{ role: "system", content: HOWTO_SYS }, { role: "user", content: q }], o => Array.isArray(o.items) && o.items.length, 700);
+      const r = await aiJson(env, [{ role: "system", content: isDe(b) ? HOWTO_SYS_DE : HOWTO_SYS }, { role: "user", content: q }], o => Array.isArray(o.items) && o.items.length, 700);
       return json(r, r.ok ? 200 : 502);
     }
     if (b.task === "useword") {
       const w = clip(b.word, 80).trim(), t = clip(b.text, 500).trim(); if (!w || !t) return json({ ok: false, error: "bad body" }, 400);
-      const r = await aiJson(env, [{ role: "system", content: USEWORD_SYS }, { role: "user", content: "Target: " + w + (b.zh ? " (" + clip(b.zh, 80) + ")" : "") + "\nLearner's sentence: " + t }], o => typeof o.correct === "boolean", 500);
+      const r = await aiJson(env, [{ role: "system", content: isDe(b) ? USEWORD_SYS_DE : USEWORD_SYS }, { role: "user", content: "Target: " + w + (b.zh ? " (" + clip(b.zh, 80) + ")" : "") + "\nLearner's sentence: " + t }], o => typeof o.correct === "boolean", 500);
       return json(r, r.ok ? 200 : 502);
     }
     if (b.task === "judge") {
       const q = clip(b.prompt, 300).trim(), t = clip(b.text, 600).trim(); if (!q || !t) return json({ ok: false, error: "bad body" }, 400);
-      const r = await aiJson(env, [{ role: "system", content: JUDGE_SYS }, { role: "user", content: "Question: " + q + "\nLearner's answer: " + t }], o => typeof o.correct === "boolean", 400);
+      const r = await aiJson(env, [{ role: "system", content: isDe(b) ? JUDGE_SYS_DE : JUDGE_SYS }, { role: "user", content: "Question: " + q + "\nLearner's answer: " + t }], o => typeof o.correct === "boolean", 400);
       return json(r, r.ok ? 200 : 502);
     }
     if (b.task === "whymiss") {
       const sent = clip(b.sent, 600).trim(), typed = clip(b.typed, 600).trim(), miss = (Array.isArray(b.missed) ? b.missed : []).map(x => clip(x, 60).trim()).filter(Boolean).slice(0, 12);
       if (!sent || !miss.length) return json({ ok: false, error: "bad body" }, 400);
-      const kv = env.CAPTIONS, ck = "wm/" + (await sha(sent + "|" + miss.join("|"))).slice(0, 32);
+      const kv = env.CAPTIONS, ck = "wm/" + (isDe(b) ? "de/" : "") + (await sha(sent + "|" + miss.join("|"))).slice(0, 32);
       if (kv) { const hit = await kv.get(ck, "json"); if (hit) return json(Object.assign({ ok: true, cached: true }, hit)); }
       const low = sent.toLowerCase(); let got = null;
-      const r = await aiJson(env, [{ role: "system", content: WHYMISS_SYS }, { role: "user", content: "Sentence: " + sent + "\nLearner wrote: " + (typed || "(nothing)") + "\nMissed words: " + miss.join(", ") }], o => {
+      const r = await aiJson(env, [{ role: "system", content: isDe(b) ? WHYMISS_SYS_DE : WHYMISS_SYS }, { role: "user", content: "Sentence: " + sent + "\nLearner wrote: " + (typed || "(nothing)") + "\nMissed words: " + miss.join(", ") }], o => {
         if (!isObj(o) || !Array.isArray(o.items)) return false;
         const it = o.items.filter(x => isObj(x) && typeof x.chunk === "string" && x.chunk.trim() && low.includes(x.chunk.trim().toLowerCase()) && typeof x.why_zh === "string").slice(0, 4).map(x => ({ chunk: clip(x.chunk, 80).trim(), sounds: clip(x.sounds, 80), kind_zh: clip(x.kind_zh, 20), why_zh: clip(x.why_zh, 300) }));
         return it.length ? !!(got = { items: it, tip_zh: clip(o.tip_zh, 200) }) : false;
@@ -1190,17 +1321,17 @@ async function ai(req, env) {
     if (b.task === "tr") { // 浏览器翻不了（谷歌连不上）时最后一道：后台翻一批句子（谷歌 → Workers AI）
       const T = (Array.isArray(b.texts) ? b.texts : []).slice(0, 200).map(x => clip(x, 1000));
       if (!T.length || T.join("").length > 40000) return json({ ok: false, error: "bad body" }, 400);
-      const kv = env.CAPTIONS, ck = T.length <= 3 ? "trc/" + (await sha(T.join("\n"))).slice(0, 32) : ""; // 查词这种一两个词的存起来（KV 每天写入有限，长的不存）
+      const kv = env.CAPTIONS, ck = T.length <= 3 ? "trc/" + (isDe(b) ? "de/" : "") + (await sha(T.join("\n"))).slice(0, 32) : ""; // 查词这种一两个词的存起来（KV 每天写入有限，长的不存）
       if (kv && ck) { const hit = await kv.get(ck, "json"); if (hit) return json({ ok: true, zh: hit, cached: true }); }
-      const zh = await smeZh(T, env); if (kv && ck && zh.every((x, i) => x || !T[i])) await cput(kv, ck, JSON.stringify(zh), { expirationTtl: 180 * 86400 });
+      const zh = await smeZh(T, env, isDe(b) ? "de" : undefined); if (kv && ck && zh.every((x, i) => x || !T[i])) await cput(kv, ck, JSON.stringify(zh), { expirationTtl: 180 * 86400 });
       return json({ ok: zh.some(Boolean), zh });
     }
     if (b.task === "lquiz") {
       const t = clip(b.text, 12000).trim(); if (t.split(/\s+/).length < 150) return json({ ok: false, error: "too short" }, 400);
-      const kv = env.CAPTIONS, ck = "lq/" + (await sha(t)).slice(0, 32);
+      const kv = env.CAPTIONS, ck = "lq/" + (isDe(b) ? "de/" : "") + (await sha(t)).slice(0, 32);
       if (kv && !b.again) { const hit = await kv.get(ck, "json"); if (hit) return json(Object.assign({ ok: true, cached: true }, hit)); }
       let got = null;
-      const r = await aiJson(env, [{ role: "system", content: LQUIZ_SYS }, { role: "user", content: (b.title ? "Title: " + clip(b.title, 200) + "\n\n" : "") + t }], o => {
+      const r = await aiJson(env, [{ role: "system", content: isDe(b) ? LQUIZ_SYS_DE : LQUIZ_SYS }, { role: "user", content: (b.title ? "Title: " + clip(b.title, 200) + "\n\n" : "") + t }], o => {
         if (!isObj(o) || !Array.isArray(o.quiz)) return false;
         const q = o.quiz.filter(x => isObj(x) && typeof x.q === "string" && Array.isArray(x.opts) && x.opts.length === 4 && x.opts.every(y => typeof y === "string" && y.trim()) && Number.isInteger(+x.ans) && +x.ans >= 0 && +x.ans < 4).slice(0, 5)
           .map(x => ({ q: clip(x.q, 300), opts: x.opts.map(y => clip(y, 200)), ans: +x.ans, why_zh: clip(x.why_zh, 300) }));
@@ -1213,25 +1344,28 @@ async function ai(req, env) {
     if (b.task === "exam") return examGen(env, b);
     if (b.task === "ieltsscript") return ieltsScript(env, b);
     if (b.task === "coach") {
-      const r = await aiJson(env, [{ role: "system", content: COACH_SYS }, { role: "user", content: clip(b.text, 3000) }], o => Array.isArray(o.days) && o.days.length, 2000);
+      const r = await aiJson(env, [{ role: "system", content: isDe(b) ? COACH_SYS_DE : COACH_SYS }, { role: "user", content: clip(b.text, 3000) }], o => Array.isArray(o.days) && o.days.length, 2000);
       return json(r, r.ok ? 200 : 502);
     }
     if (b.task === "speak") {
       if (text.split(/\s+/).length < 8) return json({ ok: false, error: "too short" }, 400);
-      const r = await aiJson(env, [{ role: "system", content: SPEAKRATE_SYS }, { role: "user", content: "Question: " + (prompt || "(not given)") + "\n\nTranscript of the candidate's spoken answer:\n" + text }], o => o.band && typeof o.better === "string", 1600);
-      if (r.ok && r.band) { const h = v => Math.round((+v || 0) * 2) / 2, B = r.band; ["FC", "LR", "GRA"].forEach(k => (B[k] = h(B[k]))); B.overall = h((B.FC + B.LR + B.GRA) / 3); } // 雅思只有整分和半分
+      const de = isDe(b), r = await aiJson(env, [{ role: "system", content: de ? SPEAKRATE_SYS_DE : SPEAKRATE_SYS }, { role: "user", content: "Question: " + (prompt || "(not given)") + "\n\nTranscript of the candidate's spoken answer:\n" + text }], o => o.band && typeof o.better === "string", 1600);
+      if (r.ok && r.band && de) { const p = v => Math.max(0, Math.min(25, Math.round(+v || 0))), B = r.band; ["FC", "LR", "GRA"].forEach(k => (B[k] = p(B[k]))); B.overall = Math.round((B.FC + B.LR + B.GRA) / 75 * 100); r.scale = "de"; r.cefr = /^[ABC][12]$/.test(r.cefr) ? r.cefr : ""; } // 德语：每项 0–25，总分 0–100
+      else if (r.ok && r.band) { const h = v => Math.round((+v || 0) * 2) / 2, B = r.band; ["FC", "LR", "GRA"].forEach(k => (B[k] = h(B[k]))); B.overall = h((B.FC + B.LR + B.GRA) / 3); } // 雅思只有整分和半分
       return json(r, r.ok ? 200 : 502);
     }
-    if (b.task !== "write" || text.split(/\s+/).length < 20) return json({ ok: false, error: "bad body" }, 400);
+    if (b.task !== "write" || text.split(/\s+/).length < (isDe(b) ? 15 : 20)) return json({ ok: false, error: "bad body" }, 400); // 德语 B1 有 40 词的任务
     const K1 = "IELTS Academic Writing Task 1 (report on visual data given as text, at least 150 words; needs an overview)", K2 = "IELTS Writing Task 2 (essay, at least 250 words)", KM = "an email / letter (IELTS General Training Task 1, at least 150 words)";
     const kind = { t1: K1, task1: K1, t2: K2, task2: K2, mail: KM, email: KM, free: "free writing (judge it like general academic English)" }[b.type] || "IELTS Writing Task 2 (essay, at least 250 words)";
-    const msgs = [{ role: "system", content: WRITE_SYS }, { role: "user", content: "Task type: " + kind + "\nQuestion: " + (prompt || "(not given)") + "\n\nCandidate's answer:\n" + text }];
+    const de = isDe(b), DK = { b1mail: "Goethe B1 Schreiben Teil 1: informal email to a friend (about 80 words, cover all points)", b1forum: "Goethe B1 Schreiben Teil 2: opinion post in an online forum (about 80 words)", b1formal: "Goethe B1 Schreiben Teil 3: short formal email (about 40 words)", b2forum: "Goethe B2 Schreiben Teil 1: forum post giving and justifying an opinion (about 150 words)", b2letter: "Goethe B2 Schreiben Teil 2: formal letter / email (about 100 words)", free: "free writing in German (judge it as general German at the learner's level)" };
+    const msgs = [{ role: "system", content: de ? WRITE_SYS_DE : WRITE_SYS }, { role: "user", content: "Task type: " + (de ? DK[b.type] || DK.free : kind) + "\nQuestion: " + (prompt || "(not given)") + "\n\nCandidate's answer:\n" + text }];
     let last = "";
     for (const m of AI_MODELS) {
       try {
         const r = await env.AI.run(m, { messages: msgs, max_tokens: 2048, temperature: 0.2 });
         const raw = r && (typeof r.response === "string" ? r.response : JSON.stringify(r.response || r));
         const o = pickJson(raw);
+        if (o && o.band && de) { const p = v => Math.max(0, Math.min(25, Math.round(+v || 0))), B = o.band; ["TR", "CC", "LR", "GRA"].forEach(k => (B[k] = p(B[k]))); B.overall = B.TR + B.CC + B.LR + B.GRA; return json({ ok: true, model: m, scale: "de", cefr: /^[ABC][12]$/.test(o.cefr) ? o.cefr : "", band: B, summary_zh: o.summary_zh || "", strengths_zh: o.strengths_zh || [], improve_zh: o.improve_zh || [], rewrite: o.rewrite || "" }); } // 德语：每项 0–25，总分 = 四项之和（0–100）
         if (o && o.band) return json({ ok: true, model: m, band: o.band, summary_zh: o.summary_zh || "", strengths_zh: o.strengths_zh || [], improve_zh: o.improve_zh || [], rewrite: o.rewrite || "" });
         last = "bad output";
       } catch (e) { last = String(e && e.message || e); }

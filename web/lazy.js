@@ -11,15 +11,15 @@
   "use strict";
   if (window.LAZY) return;
   const MODS = {
-    speak: { src: "speak.js?v=f1564f44", fns: ["speakShow"], el: { speakShow: "#view-speak" }, quiet: ["speakHide"] },
+    speak: { src: "speak.js?v=7e1e841d", fns: ["speakShow"], el: { speakShow: "#view-speak" }, quiet: ["speakHide"] },
     basic: { src: "basic.js?v=6f44a263", deps: ["speak"], fns: ["basicShow"], el: { basicShow: "#view-basic" } },
-    read: { src: "read.js?v=53955424", fns: ["readingShow", "readingNews", "readingOpen", "readTextDiff"], el: { readingShow: "#reading" }, quiet: ["readingRefresh"] },
-    listen: { src: "listen.js?v=cbffd9c5", fns: ["smeShow", "smeOpen"], el: { smeShow: "#sme" }, quiet: ["smePause"] },
+    read: { src: "read.js?v=47cda2c8", fns: ["readingShow", "readingNews", "readingOpen", "readTextDiff"], el: { readingShow: "#reading" }, quiet: ["readingRefresh"] },
+    listen: { src: "listen.js?v=f4333fe7", fns: ["smeShow", "smeOpen"], el: { smeShow: "#sme" }, quiet: ["smePause"] },
     drill: { src: "drill.js?v=f24f138e", deps: ["listen"], fns: ["drillShow", "drillReview"], el: { drillShow: "#drill" }, quiet: ["drillHide"] },
     exam: { src: "exam.js?v=c0953f36", fns: ["examShow"], el: { examShow: 0 } },
-    write: { src: "write.js?v=0b8cb009", fns: ["writingShow"], el: { writingShow: 0 } },
+    write: { src: "write.js?v=a6b7c11f", fns: ["writingShow"], el: { writingShow: 0 } },
     pitch: { src: "pitch.js?v=79ce25d1" }, // 🎵 跟读语调对比（口语页跟读后点「和原声比语调」才加载）
-    corpus: { src: "corpus.js?v=1a7151f1", fns: ["corpusShow"] }, // 🔎 真人例句（查词卡片上的按钮）
+    corpus: { src: "corpus.js?v=1693fdfa", fns: ["corpusShow"] }, // 🔎 真人例句（查词卡片上的按钮）
     commute: { src: "commute.js?v=e400f35a", fns: ["commuteShow"] }, // 🎧 通勤模式（「🔊 练习」首页的按钮）
     debasic: { src: "de-basic.js?v=24fdcf66", fns: ["deBasicShow"], el: { deBasicShow: "#view-basic" } }, // 🌱 德语入门（学德语时）
     grammar: { src: "grammar.js?v=19e2e8e7", fns: ["grammarShow"], el: { grammarShow: "#grammar" }, quiet: ["grammarRefresh"] },
@@ -66,7 +66,7 @@
   // 首页显示好以后，后台把剩下的一个个加载完（空闲时；手机省电模式下 requestIdleCallback 可能很晚，最多等 6 秒）
   function preload() {
     // 学德语时不预加载英语专用的页面（反正藏起来了）；学英语时不预加载德语入门
-    const DE = window.VL === "de", EN_ONLY = { speak: 1, basic: 1, read: 1, exam: 1, write: 1, grammar: 1, corpus: 1, pitch: 1 };
+    const DE = window.VL === "de", EN_ONLY = { basic: 1, exam: 1, grammar: 1, pitch: 1 }; // 说、读、写有德语版了
     const left = Object.keys(MODS).filter(n => !P[n] && (DE ? !EN_ONLY[n] : n !== "debasic"));
     const next = () => { const n = left.shift(); if (!n) return; need(n, true).catch(() => {}).then(() => idle(next)); };
     next();

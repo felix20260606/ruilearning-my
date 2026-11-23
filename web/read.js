@@ -31,7 +31,7 @@
       blocks = [];
       t.split("\n").forEach(l => { const p = blocks.length - 1; if (p >= 0 && !/[.!?:;"”’)\]…]$/.test(blocks[p]) && /^[a-z]/.test(l)) blocks[p] += " " + l; else blocks.push(l); });
     }
-    return blocks.map(b => b.replace(/\s+/g, " ").trim()).filter(b => /[A-Za-z]/.test(b));
+    return blocks.map(b => b.replace(/\s+/g, " ").trim()).filter(b => /[A-Za-zÀ-ɏ]/.test(b)); // 德语的 ä ö ü ß 也算字母
   }
   const splitSents = p => U.sents(p); // ✂️ 分句：全站共用（util.js，听力文稿、练习课、翻译、写作统计也用这一个）
   // 分词：[{ w 词, i 位置, first 是否句首（判断大写是不是专有名词用，规则同 vlevel.js 的 vsMark） }]
@@ -40,7 +40,7 @@
     while ((m = WORD_RE.exec(s))) { const prev = s.slice(0, m.index).replace(/\s+$/, ""); out.push({ w: m[0], i: m.index, first: !prev || /[.?!…“‘"'(\[:;—–\-]$/.test(prev) }); }
     return out;
   }
-  const isWord = w => /[A-Za-z]/.test(w);
+  const isWord = w => /[A-Za-zÀ-ɏ]/.test(w);
   const wordCount = t => tokens(t).filter(x => isWord(x.w)).length;
   // 标题：第一段很短、不以句号结尾就当标题；否则取开头 8 个词
   function titleOf(t) {
@@ -99,7 +99,49 @@ This way of living is convenient, but it is not perfect. Once, my phone died whi
 So I have made a small rule for myself. I still carry fifty ringgit, folded neatly behind my identity card. I rarely use it, but on the day my battery runs out, it will feel like the best money I have ever saved.` },
   ];
 
-  const PURE = { cleanText, splitParas, splitSents, tokens, wordCount, titleOf, parse, stems, SAMPLES };
+  // 🇩🇪 学德语时的示例短文（原创，A2–B1，和英语的几篇同样的题材）
+  const SAMPLES_DE = [
+    { id: "d:samstag", tag: "日常", title: "Ein ruhiger Samstagmorgen", text: `Am Samstag stelle ich keinen Wecker. Trotzdem wache ich meistens um sieben Uhr auf, aber ich bleibe noch ein paar Minuten im Bett und höre dem Regen zu. Es gibt kein Meeting und keinen Zug, deshalb fühlt sich der Morgen viel länger an als unter der Woche.
+
+Nach dem Aufstehen koche ich Kaffee und esse zwei Scheiben Toast mit Erdnussbutter. Ich frühstücke langsam am Fenster und schreibe eine kurze Liste mit Dingen, die ich heute machen möchte. Die Liste ist nie sehr ernst. Letzte Woche stand darauf: Gemüse kaufen, Mama anrufen, das Fahrradlicht reparieren und ein Kapitel in einem Buch lesen.
+
+Gegen zehn Uhr gehe ich zu dem kleinen Markt in der Nähe meiner Wohnung. Der Mann am Obststand kennt schon meinen Namen. Er sagt mir immer, welche Mangos heute am süßesten sind. Ich glaube ihm nicht immer, aber ich kaufe sie trotzdem.
+
+Am Nachmittag mache ich oft gar nichts. Ich lese, ich schlafe ein bisschen oder ich rufe einen Freund an. Ein langsamer Samstag ist für mich wie eine kleine Pause für den Kopf. Am Sonntag habe ich dann wieder Energie für die neue Woche.` },
+    { id: "d:homeoffice", tag: "工作", title: "Arbeiten im Homeoffice", text: `Seit zwei Jahren arbeite ich meistens von zu Hause. Ich bin Softwareentwickler, und mein Team sitzt in drei verschiedenen Ländern. Deshalb treffen wir uns fast nur in Videokonferenzen.
+
+Am Anfang fand ich das Homeoffice wunderbar. Ich musste nicht mehr im Stau stehen und konnte länger schlafen. Mittags habe ich selbst gekocht, und niemand hat gesehen, dass ich eine Jogginghose trage.
+
+Nach ein paar Monaten habe ich aber gemerkt, dass es auch Nachteile gibt. Ich habe zu lange gearbeitet, weil mein Büro und mein Wohnzimmer derselbe Raum sind. Außerdem habe ich manchmal den ganzen Tag mit keinem Menschen persönlich gesprochen.
+
+Heute habe ich ein paar feste Regeln. Ich beginne jeden Tag um neun Uhr und höre um sechs Uhr auf. In der Mittagspause gehe ich kurz spazieren, auch wenn es heiß ist. Und einmal pro Woche arbeite ich in einem Café oder treffe Kollegen im Büro.
+
+Ich glaube, das Homeoffice ist weder perfekt noch schlecht. Man muss nur lernen, gut damit umzugehen.` },
+    { id: "d:mamak", tag: "生活", title: "Essen im Mamak", text: `Wenn Freunde aus Deutschland mich in Kuala Lumpur besuchen, nehme ich sie immer mit in einen Mamak. Ein Mamak ist ein einfaches Restaurant, das oft bis spät in die Nacht oder sogar rund um die Uhr geöffnet ist. Die Tische stehen meistens draußen, und es ist laut und lebendig.
+
+Das bekannteste Getränk ist Teh Tarik, ein süßer Tee mit Milch. Der Kellner gießt ihn von einem Becher in den anderen, bis oben Schaum entsteht. Dazu bestellt man Roti Canai, ein dünnes, knuspriges Fladenbrot mit Curry-Soße.
+
+Meine Freunde sind oft überrascht, wie günstig das Essen ist. Für zwei Personen bezahlt man selten mehr als zwanzig Ringgit, also ungefähr vier Euro. Außerdem schaut im Mamak jeder Fußball, und bei einem Tor jubelt das ganze Restaurant.
+
+Für mich ist der Mamak mehr als ein Restaurant. Hier trifft man Nachbarn, Kollegen und manchmal auch Fremde, mit denen man über das Spiel spricht. Wer Malaysia kennenlernen möchte, sollte mindestens einmal um Mitternacht im Mamak sitzen.` },
+    { id: "d:melaka", tag: "旅行", title: "Ein Wochenende in Melaka", text: `Letztes Wochenende bin ich mit dem Bus nach Melaka gefahren. Die Fahrt von Kuala Lumpur hat ungefähr zwei Stunden gedauert, und das Ticket war sehr billig.
+
+Melaka ist eine alte Hafenstadt mit einer langen Geschichte. Hier haben Portugiesen, Niederländer und Briten gelebt, und man sieht ihre Spuren bis heute. Am bekanntesten ist der rote Platz mit der Christ Church und dem Uhrturm.
+
+Am Abend bin ich über den Nachtmarkt in der Jonker Street gelaufen. Es war sehr voll, aber die Stimmung war toll. Ich habe Chicken Rice Balls probiert und einen kalten Cendol getrunken, ein Dessert mit Kokosmilch und Palmzucker.
+
+Am Sonntagmorgen habe ich eine Bootsfahrt auf dem Fluss gemacht. An den Hauswänden gibt es viele bunte Bilder, und man fährt langsam unter kleinen Brücken durch. Danach bin ich müde, aber glücklich zurück nach Kuala Lumpur gefahren.
+
+Wenn ich wieder Zeit habe, möchte ich noch einmal nach Melaka fahren, aber dann unter der Woche, wenn weniger Touristen da sind.` },
+    { id: "d:bargeld", tag: "观点", title: "Brauche ich noch Bargeld?", text: `In Malaysia bezahle ich fast alles mit dem Handy. Im Supermarkt, im Café und sogar am kleinen Essensstand scanne ich einen QR-Code, und fertig. Mein Portemonnaie liegt oft tagelang zu Hause.
+
+In Deutschland ist das anders. Viele Deutsche bezahlen noch gern mit Bargeld, besonders kleine Beträge. In manchen Bäckereien und Restaurants kann man sogar nur bar bezahlen. Für Besucher aus Asien ist das oft eine Überraschung.
+
+Das Bezahlen mit dem Handy ist bequem, aber nicht perfekt. Einmal war mein Akku leer, als ich an der Tankstelle bezahlen wollte. Die Kassiererin musste warten, während ich in allen Taschen nach Münzen gesucht habe. Das war mir sehr peinlich.
+
+Deshalb habe ich jetzt eine kleine Regel. Ich habe immer fünfzig Ringgit dabei, gefaltet hinter meinem Ausweis. Ich brauche das Geld fast nie. Aber an dem Tag, an dem mein Akku wieder leer ist, wird es das beste Geld sein, das ich je hatte.` },
+  ];
+  const PURE = { cleanText, splitParas, splitSents, tokens, wordCount, titleOf, parse, stems, SAMPLES, SAMPLES_DE };
   if (typeof module === "object" && module && module.exports) module.exports = PURE;
   if (typeof document === "undefined") return; // node 测试：只要上面的纯函数（要先加载 util.js）
   const { esc, LG, LS, tip } = U; // 全站共用的小工具（util.js）
@@ -108,7 +150,9 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
   const say = t => { try { speak(t); } catch (e) {} };
   const reEsc = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const isSheet = () => { try { return matchMedia("(max-width: 600px)").matches; } catch (e) { return innerWidth <= 600; } };
-  const KEY = "reading:docs", MAX_DOCS = 20, MAX_CHARS = 80000, WPM = 150; // 学英语的人按每分钟 150 词估阅读时间
+  // 🇩🇪 学德语：示例短文、今日新闻（tagesschau，/api/news?lang=de）、朗读、翻译都换成德语；生词率 / 水平分布按英语词频算，德语不显示
+  const DE = window.VL === "de", LGN = DE ? "德语" : "英文", LGC = DE ? "de" : "en", SAMPLE_LIST = DE ? SAMPLES_DE : SAMPLES;
+  const KEY = "reading:docs", MAX_DOCS = 20, MAX_CHARS = 80000, WPM = DE ? 100 : 150; // 学英语的人按每分钟 150 词估阅读时间；德语初学按 100
   const LEVELS = [1000, 2000, 3000, 4000, 5000, 6000, 8000, 10000, 15000];
   // 水平分布条：按词频排名分档（排名来自插件同一份词频表 VS_RANK）
   const BANDS = [["前 1000", "#8EE5A1"], ["1000–3000", "#6FD3FF"], ["3000–6000", "#C59BEF"], ["6000–1.2万", "#FFB86B"], ["1.2万以后", "#FF8A7A"], ["人名 / 数字", "#5d636b"]];
@@ -254,6 +298,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
     return { ready, n, mins: Math.max(1, Math.round(n / WPM)), unkN, rate: n ? unkN / n : 0, bands, unk: [...unk.values()].sort((a, b) => b.c - a.c || a.r - b.r) };
   }
   function statsHtml() {
+    if (DE) { const n = P.sents.reduce((c, s) => c + tokens(s).filter(t => isWord(t.w)).length, 0); return '<div class="ra-nums"><span><b>' + n + "</b> 词</span><span>约 <b>" + Math.max(1, Math.round(n / WPM)) + "</b> 分钟</span></div>"; }
     const a = analyze(), tot = a.bands.reduce((x, y) => x + y, 0) || 1, pct = x => Math.round(x * 1000) / 10 + "%";
     const pl = plugLevel(), opt = (v, t) => '<option value="' + v + '"' + (String(lvSel) === String(v) ? " selected" : "") + ">" + t + "</option>";
     const sel = '<label>生词标准 <select id="ra-lv">' + opt("auto", pl >= 0 ? "跟随插件（" + pl + " 词）" : "跟随插件（未设置，按 3000）") + LEVELS.map(v => opt(v, "常用 " + v + " 词以内算认识")).join("") + "</select></label>";
@@ -276,7 +321,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
   function setPos(i) { if (!doc || doc.pos === i) return; doc.pos = i; clearTimeout(posTimer); posTimer = setTimeout(() => { const L = docs(), x = L.find(y => y.id === doc.id); if (x) { x.pos = doc.pos; saveDocs(L); } }, 800); }
   function openDoc(text, title, id) {
     text = cleanText(text);
-    if (!text || !/[A-Za-z]/.test(text)) { showMsg("先粘贴一段英文文章"); return; }
+    if (!text || !/[A-Za-zÀ-ɏ]/.test(text)) { showMsg("先粘贴一段" + LGN + "文章"); return; }
     if (text.length > MAX_CHARS) { text = text.slice(0, MAX_CHARS); tip("文章太长，只保留前 " + MAX_CHARS / 10000 + " 万字"); }
     const old = docs().find(x => (id && x.id === id) || x.text === text);
     doc = { id: old ? old.id : id || "d" + Date.now().toString(36), title: title || (old && old.title) || titleOf(text), text, at: Date.now(), pos: old ? old.pos || 0 : 0 };
@@ -292,7 +337,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
     if (fetching) return; fetching = true; showMsg("正在抓取正文…", true); const b = root.querySelector('[data-a="url"]'); if (b) b.disabled = true;
     let j = null; try { const r = await fetch("/api/readurl?url=" + encodeURIComponent(u)); j = await r.json(); } catch (e) { j = null; }
     fetching = false; if (b) b.disabled = false;
-    if (j && j.ok && j.text && /[A-Za-z]/.test(j.text)) { showMsg(""); urlDraft = ""; openDoc(j.text, j.title ? String(j.title).trim() : ""); }
+    if (j && j.ok && j.text && /[A-Za-zÀ-ɏ]/.test(j.text)) { showMsg(""); urlDraft = ""; openDoc(j.text, j.title ? String(j.title).trim() : ""); }
     else { showMsg("这个网站抓不到，请直接粘贴正文"); tip("这个网站抓不到，请直接粘贴正文"); }
   }
 
@@ -307,7 +352,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
     const c = LG("reading:news", null);
     if (!force && c && c.date === nday() && c.text) { NEWS = c; return; }
     if (newsBusy) return; newsBusy = true; newsErr = ""; paintNews();
-    U.json("/api/news?d=" + nday()).then(j => { newsBusy = false; if (j && j.ok && j.text) { NEWS = j; LS("reading:news", j); } else newsErr = j.error === "net" ? "今天的新闻没取到（网络问题）" : "今天的新闻还没取到，过一会儿再试"; paintNews(); if (NEWS && newsOpenAfter && view === "home") newsRead(); newsOpenAfter = false; })
+    U.json("/api/news?d=" + nday() + (DE ? "&lang=de" : "")).then(j => { newsBusy = false; if (j && j.ok && j.text) { NEWS = j; LS("reading:news", j); } else newsErr = j.error === "net" ? "今天的新闻没取到（网络问题）" : "今天的新闻还没取到，过一会儿再试"; paintNews(); if (NEWS && newsOpenAfter && view === "home") newsRead(); newsOpenAfter = false; })
       .catch(() => { newsBusy = false; newsErr = "今天的新闻没取到（网络问题）"; paintNews(); });
   }
   function newsHtml() {
@@ -346,7 +391,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
   async function newsSimp() {
     if (!NEWS) return; const have = simpOf(NEWS); if (have) { openDoc(have.simple, "（简单版）" + NEWS.title, newsId(NEWS) + ":s"); return; }
     if (simpBusy) return; simpBusy = true; paintNews(); tip("AI 正在改写成简单版，大约半分钟…");
-    const j = await AI.ask("newsimp", { url: NEWS.url, title: NEWS.title, text: NEWS.text });
+    const j = await AI.ask("newsimp", { lang: LGC, url: NEWS.url, title: NEWS.title, text: NEWS.text });
     simpBusy = false;
     if (!(j && j.ok && j.simple)) { paintNews(); tip(j.ok ? "AI 改写失败了，过一会儿再试" : AI.msg(j, "AI 改写失败了，过一会儿再试")); return; }
     const id = newsId(NEWS); U.keep("reading:newsq", id, { simple: j.simple, summary_zh: j.summary_zh || "", quiz: j.quiz || [], words: j.words || [], at: Date.now() }, { max: 20 }); // 💾 全站共用的缓存（util.js）：最多 20 篇
@@ -378,14 +423,14 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
       return '<div class="ra-it" data-a="open" data-id="' + esc(d.id) + '"><div class="t"><b>' + esc(d.title || "未命名文章") + "</b><span>" + esc(fmtAt(d.at)) + " · " + wordCount(d.text) + " 词" + (pc > 0 ? " · 读到 " + Math.min(100, pc) + "%" : "") + '</span></div><button class="del" data-a="del" data-id="' + esc(d.id) + '">删除</button><i>›</i></div>'; }).join("") + "</div>"
       : '<div class="ra-empty">还没有读过的文章。粘贴一篇，或者先读下面的示例。</div>';
     newsLoad();
-    root.innerHTML = '<div class="ra-head"><h2>📰 阅读</h2><span>粘贴英文文章或网址，点词查词，一键加入生词本</span></div>' +
+    root.innerHTML = '<div class="ra-head"><h2>📰 阅读</h2><span>粘贴' + LGN + '文章或网址，点词查词，一键加入生词本</span></div>' +
       '<div id="ra-newsbox">' + newsHtml() + "</div>" +
-      '<div class="ra-card"><textarea id="ra-text" placeholder="把英文文章粘贴到这里…（直接粘贴网址也行）">' + esc(draft) + "</textarea>" +
+      '<div class="ra-card"><textarea id="ra-text" placeholder="把' + LGN + '文章粘贴到这里…（直接粘贴网址也行）">' + esc(draft) + "</textarea>" +
       '<div class="ra-row"><input id="ra-url" inputmode="url" placeholder="或者填文章网址 https://…" autocomplete="off" autocapitalize="off" spellcheck="false" value="' + esc(urlDraft) + '"><button class="ui-btn" data-a="url">抓取</button></div>' +
       '<div class="ra-msg' + (msgOk ? " ok" : "") + '" id="ra-msg">' + esc(msg) + '</div><div class="ra-row end"><button class="ui-btn pri" data-a="go">开始阅读 →</button></div></div>' +
       '<div class="ra-sec">📚 我的文章<small>最近 ' + MAX_DOCS + " 篇，只存在这台设备</small></div>" + mine +
       '<div class="ra-sec">✨ 示例短文<small>每篇 200 词左右</small></div><div class="ra-grid">' +
-      SAMPLES.map(s => '<div class="ra-it" data-a="sample" data-id="' + s.id + '"><div class="t"><b>' + esc(s.title) + '</b><span><em class="tg">' + esc(s.tag) + "</em>" + wordCount(s.text) + ' 词</span><div class="pv">' + esc(splitSents(splitParas(s.text)[0])[0]) + "</div></div><i>›</i></div>").join("") + "</div>";
+      SAMPLE_LIST.map(s => '<div class="ra-it" data-a="sample" data-id="' + s.id + '"><div class="t"><b>' + esc(s.title) + '</b><span><em class="tg">' + esc(s.tag) + "</em>" + wordCount(s.text) + ' 词</span><div class="pv">' + esc(splitSents(splitParas(s.text)[0])[0]) + "</div></div><i>›</i></div>").join("") + "</div>";
   }
   function drawRead() {
     const skip0 = P.paras.length > 1 && P.paras[0].map(i => P.sents[i]).join(" ") === doc.title; // 第一段就是标题：不重复显示
@@ -413,7 +458,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
       hiSent(i); setPos(i);
       let done = false;
       const next = () => { if (done || tts !== run) return; done = true; clearTimeout(run.t); run.t = setTimeout(() => step(i + 1), 220); };
-      TTS.sys(P.sents[i], { lang: "en", end: next }); // 全站共用的朗读（tts.js），声音、语速和「⚙ 设置」里选的一样
+      TTS.sys(P.sents[i], { lang: LGC, end: next }); // 全站共用的朗读（tts.js），声音、语速和「⚙ 设置」里选的一样
       run.t = setTimeout(next, 5000 + P.sents[i].length * 140); // 有些浏览器偶尔不触发 onend：超时也往下读
     };
     setTimeout(() => step(Math.max(0, Math.min(from || 0, P.sents.length - 1))), 80);
@@ -462,7 +507,7 @@ So I have made a small rule for myself. I still carry fifty ringgit, folded neat
       if (a === "news-list") { newsList = !newsList; paintNews(); return; }
       if (a === "news-retry") { newsLoad(true); return; }
       if (a === "news-pick") { const x = NEWS && NEWS.list && NEWS.list[+b.dataset.i]; if (x) newsFetch(x).then(ok => { if (ok) newsRead(); }); return; }
-      if (a === "sample") { const s = SAMPLES.find(x => x.id === b.dataset.id); if (s) openDoc(s.text, s.title, s.id); return; }
+      if (a === "sample") { const s = SAMPLE_LIST.find(x => x.id === b.dataset.id); if (s) openDoc(s.text, s.title, s.id); return; }
       if (a === "url") { urlDraft = (root.querySelector("#ra-url") || {}).value || ""; fromUrl(urlDraft); return; }
       if (a === "go") {
         const v = ((root.querySelector("#ra-text") || {}).value || "").trim();

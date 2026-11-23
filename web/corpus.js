@@ -20,14 +20,16 @@
   #cp .src button{border:1px solid var(--ui-line-2);background:var(--ui-surface-2);color:var(--ui-ink);border-radius:8px;padding:3px 10px;font:inherit;font-size:13px;cursor:pointer}
   #cp .vid{position:relative;width:100%;aspect-ratio:16/9;margin-top:8px;border-radius:10px;overflow:hidden;background:#000}#cp .vid iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
   #cp .more{display:block;text-align:center;margin:12px 0 4px;color:var(--ui-pur-text,var(--ui-pur));font-weight:700}`;
+  // 🇩🇪 学德语：例句库换 web/corpus-de.json（德语视频字幕 + DW 慢速新闻文稿，tools/build-corpus.mjs --lang de），变形按 de-forms.js 推原形
+  const DE = window.VL === "de", SRC_B = DE ? "DW 慢速新闻" : "BBC";
   let root = null, DATA = null, loading = null, playing = -1, q = "", hits = [];
   function load() {
     if (DATA) return Promise.resolve(DATA);
-    return loading || (loading = U.json("/corpus.json").then(j => { loading = null; if (j && Array.isArray(j.s)) DATA = j; return DATA; }));
+    return loading || (loading = U.json(DE ? "/corpus-de.json" : "/corpus.json").then(j => { loading = null; if (j && Array.isArray(j.s)) DATA = j; return DATA; }));
   }
   // 这个词的各种写法都算：句子里的每个词推回原形（vsKeys），和搜的词比；短语按整段找
   const toks = s => String(s).toLowerCase().replace(/[’‘]/g, "'").match(/[\p{L}\p{N}]+(?:'[\p{L}]+)*/gu) || [];
-  const keys = w => { try { if (typeof window.vsKeys === "function") return [w].concat(window.vsKeys(w)); } catch (e) {} const o = [w]; for (const x of ["s", "es", "ed", "d", "ing", "'s"]) if (w.endsWith(x) && w.length - x.length >= 3) o.push(w.slice(0, -x.length)); return o; };
+  const keys = w => { try { if (DE && window.DE_FORMS) return window.DE_FORMS.keys(w); if (!DE && typeof window.vsKeys === "function") return [w].concat(window.vsKeys(w)); } catch (e) {} const o = [w]; for (const x of ["s", "es", "ed", "d", "ing", "'s"]) if (w.endsWith(x) && w.length - x.length >= 3) o.push(w.slice(0, -x.length)); return o; };
   function search(text) {
     const Q = toks(text); if (!Q.length || !DATA) return [];
     const out = [], one = Q.length === 1, want = new Set(keys(Q[0]));
@@ -44,12 +46,12 @@
   function draw(msg) {
     const bd = root.querySelector(".bd");
     if (msg) { bd.innerHTML = '<div class="st">' + msg + "</div>"; return; }
-    const yg = '<a class="more" href="https://youglish.com/pronounce/' + encodeURIComponent(q) + '/english" target="_blank" rel="noopener">在 YouGlish 上听更多（全 YouTube 的例子）↗</a>';
-    if (!hits.length) { bd.innerHTML = '<div class="st">例句库里还没有「' + esc(q) + "」（例句库 = 你看过、存过字幕的 " + DATA.docs.filter(d => d[0] === "y").length + " 个视频 + BBC 最近几期节目，每 6 小时更新）</div>" + yg; return; }
+    const yg = '<a class="more" href="https://youglish.com/pronounce/' + encodeURIComponent(q) + (DE ? "/german" : "/english") + '" target="_blank" rel="noopener">在 YouGlish 上听更多（全 YouTube 的例子）↗</a>';
+    if (!hits.length) { bd.innerHTML = '<div class="st">例句库里还没有「' + esc(q) + "」（例句库 = 你看过、存过字幕的 " + DATA.docs.filter(d => d[0] === "y").length + " 个视频 + " + SRC_B + " 最近几期节目，每 6 小时更新）</div>" + yg; return; }
     bd.innerHTML = '<div class="st">找到 ' + hits.length + " 句" + (hits.length >= 30 ? "（只列前 30）" : "") + "</div>" + hits.map((h, i) => {
       const d = DATA.docs[h.r[0]], yt = d[0] === "y";
       return '<div class="it"><div class="en">' + mark(h.r[3], h.w) + "</div>" + (h.r[4] ? '<div class="zh">' + esc(h.r[4]) + "</div>" : "") +
-        '<div class="src">' + (yt ? '<button data-play="' + i + '">' + (playing === i ? "■ 收起" : "▶ " + fmt(h.r[1])) + "</button>🎬 " : '<button data-ep="' + i + '">打开这一期</button>📻 BBC · ') + esc(d[2]).slice(0, 90) + "</div>" +
+        '<div class="src">' + (yt ? '<button data-play="' + i + '">' + (playing === i ? "■ 收起" : "▶ " + fmt(h.r[1])) + "</button>🎬 " : '<button data-ep="' + i + '">打开这一期</button>📻 ' + SRC_B + " · ") + esc(d[2]).slice(0, 90) + "</div>" +
         (yt && playing === i ? '<div class="vid"><iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(d[1]) + "?autoplay=1&start=" + Math.max(0, Math.floor(h.r[1]) - 1) + "&end=" + Math.ceil(h.r[2] + 1) + '&rel=0&playsinline=1" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>' : "") + "</div>";
     }).join("") + yg;
   }

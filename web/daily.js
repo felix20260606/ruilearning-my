@@ -63,7 +63,7 @@
   // ---------- ✏️ 用新词造句（「写」的轻量版）：按日期从难词、在学的词里挑 3 个，各写一句，AI（/api/ai task useword）判对错 ----------
   const hashOf = s => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
   function sentWords() {
-    const all = (typeof words !== "undefined" && Array.isArray(words) ? words : []).filter(w => w && w.word && /^[A-Za-z][A-Za-z' -]*$/.test(w.word) && (w.type || "word") !== "pattern" && (w.type || "word") !== "sentence");
+    const all = (typeof words !== "undefined" && Array.isArray(words) ? words : []).filter(w => w && w.word && /^[A-Za-zÀ-ɏ][A-Za-zÀ-ɏ' -]*$/.test(w.word) && (w.type || "word") !== "pattern" && (w.type || "word") !== "sentence");
     const hard = (window.pumpHard ? window.pumpHard() : []).map(h => all.find(w => w.id === h.id)).filter(Boolean);
     const lrn = all.filter(w => w.status !== "known" && !hard.includes(w)), h0 = hashOf(lday());
     const pickN = (L, n) => L.slice().sort((a, b) => hashOf(lday() + a.id) - hashOf(lday() + b.id)).slice(0, n);
@@ -75,9 +75,9 @@
   let sentOpen = false, sentBusy = {};
   async function sentCheck(w, text) {
     text = String(text || "").trim(); if (!text) { tip("先写一句"); return; }
-    if (!new RegExp("\\b" + w.word.split(/\s+/)[0].replace(/[.*+?^${}()|[\]\\]/g, "\\$&").slice(0, 5), "i").test(text)) { tip("句子里要用上「" + w.word + "」"); return; }
+    if (!new RegExp("(^|[^\\p{L}])" + w.word.split(/\s+/)[0].slice(0, 5).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "iu").test(text)) { tip("句子里要用上「" + w.word + "」"); return; }
     sentBusy[w.word] = 1; draw();
-    const j = await AI.ask("useword", { word: w.word, zh: w.zh, text });
+    const j = await AI.ask("useword", { lang: DE ? "de" : "en", word: w.word, zh: w.zh, text });
     delete sentBusy[w.word];
     sentSave(w.word, { t: text, r: j && j.ok ? { correct: !!j.correct, fixed: j.fixed || "", why_zh: j.why_zh || "", better: j.better || "", better_zh: j.better_zh || "" } : null, at: Date.now() });
     if (!j.ok) tip(AI.msg(j, "AI 没回应") + "，句子先记下了");
@@ -111,7 +111,7 @@
       { id: "read", ic: "📖", t: "读", sub: "读「📰 今日新闻」（觉得难就点「✨ 简单版 + 小测」），或者阅读里任意一篇；点不认识的词查意思、收进生词本", prog: rd.length ? "今天读了：" + rd.map(d => d.title).slice(0, 2).join("、") : "", pct: rd.length ? 1 : 0, auto: rd.length > 0, min: 10 },
       { id: "write", ic: "✍️", t: "写", sub: "在「✍️ 写 → 📝 写作批改」写一段交给它批改；时间不够就用下面 3 个词各造一句（AI 帮你看对不对）", prog: [wr.length ? "今天批改了 " + wr.length + " 篇" : "", sn ? "造句 " + Math.min(sn, 3) + " / 3" : ""].filter(Boolean).join(" · "), pct: wr.length ? 1 : sn / 3, auto: wr.length > 0 || sn >= 3, min: 10, extra: '<button class="dy-chk' + (sentOpen ? " on" : "") + '" data-sent="1">✏️ 用新词造 3 句</button>', more: sentOpen ? sentHtml() : "" },
     ].filter(x => o.on[x.id] && (!DE || DE_ON[x.id]));
-    if (DE) L.forEach(x => { if (x.id === "listen") x.sub = "「🎧 听 → 🧩 练习课」做一节德语课（或者把做错的复习 5 句）；或者「🎧 听力练习」做 10 张听力 / 听写卡（练你德语生词本里的词）"; });
+    if (DE) L.forEach(x => { if (x.id === "listen") x.sub = "「🎧 听 → 🧩 练习课」做一节德语课（或者把做错的复习 5 句）；或者「📻 听力节目」听一期 DW 慢速新闻；或者「🎧 听力练习」做 10 张听力 / 听写卡（练你德语生词本里的词）"; });
     L.forEach(x => { x.man = !!man[x.id]; x.ok = x.auto || x.man; });
     return L;
   }
@@ -238,7 +238,7 @@
 
   let root = null, back = null, showSet = false, went = false;
   // 🇩🇪 学德语时只排有德语内容的两项（词、听）；说、读、写、雅思都是英语专用的（tabs.js 也把它们藏起来了）
-  const DE = !!(window.VL && window.VL !== "en"), DE_ON = { word: 1, listen: 1 };
+  const DE = !!(window.VL && window.VL !== "en"), DE_ON = { word: 1, listen: 1, speak: 1, read: 1, write: 1 }; // 说、读、写也有德语版了
   function draw() {
     if (!root) return;
     const L = tasks(), D = record(L), n = L.filter(x => x.ok).length, st = streak(D), next = L.find(x => !x.ok), o = opt();

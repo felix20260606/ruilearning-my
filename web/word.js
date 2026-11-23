@@ -31,7 +31,7 @@
   #wd-pop{position:fixed;z-index:9000;display:none;width:340px;max-width:calc(100vw - 16px);max-height:60vh;overflow:auto;background:var(--ui-surface,#26282c);border:1px solid var(--ui-line-2,#454950);border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.45);padding:12px 14px;color:var(--ui-ink,#eee);font-family:var(--ui-font,system-ui);text-align:left}
   #wd-pop.on{display:block}
   #wd-pop.sheet{left:0!important;right:0;top:auto!important;bottom:0;width:auto;max-width:none;max-height:72vh;border-radius:18px 18px 0 0;border-bottom:0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px))}
-  #wd-pop .hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap}#wd-pop .hd b{font-size:22px}#wd-pop .hd .ph{color:var(--ui-muted);font-size:14px}
+  #wd-pop .hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap}#wd-pop .hd b{font-size:22px}#wd-pop .hd .ph{color:var(--ui-muted);font-size:14px}#wd-pop .gd{font-size:15px;font-weight:800;border-radius:6px;padding:1px 6px;vertical-align:3px}#wd-pop .gd.der{color:#6fb3ff;background:rgba(111,179,255,.14)}#wd-pop .gd.die{color:#ff8fa3;background:rgba(255,143,163,.14)}#wd-pop .gd.das{color:#7ce3b8;background:rgba(124,227,184,.14)}
   #wd-pop .hd button{border:0;background:var(--ui-surface-2,#2d2f34);color:var(--ui-ink-2);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:15px}#wd-pop .hd .x{margin-left:auto;background:none}
   #wd-pop .mk{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}#wd-pop .mk button{flex:1 1 auto;min-height:36px;border-radius:9px;border:1px solid var(--ui-line-2,#454950);background:var(--ui-surface-2,#2d2f34);color:var(--ui-ink,#eee);font:inherit;font-size:13px;cursor:pointer;padding:0 8px}
   #wd-pop .mk button.on{background:var(--ui-pur,#9C3FD0);border-color:var(--ui-pur,#9C3FD0);color:#fff}#wd-pop .vs-wns{margin-top:8px}
@@ -104,7 +104,7 @@
   async function dict(w) {
     const k = w.toLowerCase(); if (DC.has(k)) return DC.get(k);
     const get = async q => { try { if (window.dictGet) return await window.dictGet(q); const r = await fetch("/api/dict?w=" + encodeURIComponent(q)); if (!r.ok) return null; const j = await r.json(); return j && j.ok ? j : null; } catch (e) { return null; } };
-    let j = await get(k); const l = lemma(k); if (!j && l && l !== k) j = await get(l);
+    let j = await get(k); const l = DE() ? (j && j.lemma) || "" : lemma(k); if (!j && l && l !== k) j = await get(l); // 德语：变形查不到时用后台给的原形（ging → gehen）
     if (j) DC.set(k, j); return j;
   }
 
@@ -144,7 +144,7 @@
   function html(w, d, loading) {
     const word = (d && d.word) || w, cam = "https://dictionary.cambridge.org/dictionary/english-chinese-simplified/" + encodeURIComponent(word.toLowerCase());
     const g = pEl && typeof VS_GRAM_NAME !== "undefined" ? [...pEl.classList].filter(c => /^g-/.test(c)).map(c => VS_GRAM_NAME[c.slice(2)]).filter(Boolean) : [];
-    let h = '<div class="hd"><b>' + esc(word) + "</b>" + (d && d.phon ? '<span class="ph">' + esc(d.phon) + "</span>" : "") + '<button data-a="psay" data-t="' + esc(word) + '" title="朗读">🔊</button><button class="x" data-a="px" title="关闭">✕</button></div>';
+    let h = '<div class="hd"><b>' + (d && d.gender ? '<span class="gd ' + esc(d.gender) + '">' + esc(d.gender) + "</span> " : "") + esc(word) + "</b>" + (d && d.lemma ? '<span class="ph">← ' + esc(d.lemma) + "</span>" : "") + (d && d.phon ? '<span class="ph">' + esc(d.phon) + "</span>" : "") + '<button data-a="psay" data-t="' + esc(word) + '" title="朗读">🔊</button><button class="x" data-a="px" title="关闭">✕</button></div>';
     if (loading) h += '<div class="ld">查询中…</div>';
     else if (d) {
       const zh = (Array.isArray(d.zh) ? d.zh.join("；") : d.zh || "") + (Array.isArray(d.zhs) && d.zhs.length ? "（" + d.zhs.map(x => (x.pos ? x.pos + " " : "") + (x.terms || []).slice(0, 3).join("、")).join("；") + "）" : "");
@@ -154,10 +154,10 @@
     } else h += '<div class="ld">（没查到释义）</div>';
     if (!loading) {
       if (pSent && pOpt && pOpt.showCtx) h += '<div class="ctx">' + esc(pSent).replace(new RegExp("(^|[^\\p{L}])(" + reEsc(esc(w)) + ")(?![\\p{L}])", "iu"), "$1<b>$2</b>") + (pOpt.zh ? "<small>" + esc(pOpt.zh) + "</small>" : "") + "</div>";
-      const extra = vsOk() && V().sheetExtra ? V().sheetExtra(word, pEl) : ""; // 语法、单词注释、📌 将要学习 / ✅ 已掌握 / 不学习（同插件）
+      const extra = vsOk() && V().sheetExtra && window.VL !== "de" ? V().sheetExtra(word, pEl) : ""; // 德语：插件的难度（英语词频）和标记（英语）不适用 // 语法、单词注释、📌 将要学习 / ✅ 已掌握 / 不学习（同插件）
       if (extra) h += extra; else if (g.length) h += '<div class="gm">这里的语法：' + esc(g.join(" · ")) + "</div>";
     }
-    return h + '<div class="act">' + (loading ? "" : addBtn(word)) + (window.VL && window.VL !== "en" ? "" : '<button class="ui-btn" data-a="pcorp" title="看这个词在真人视频、BBC 节目里怎么说">🔎 真人例句</button>') + (window.VL === "de" ? '<a href="https://www.dict.cc/?s=' + encodeURIComponent(word) + '" target="_blank" rel="noopener">dict.cc 德英词典 ↗</a>' : '<a href="' + cam + '" target="_blank" rel="noopener">Cambridge 词典 ↗</a>') + "</div>";
+    return h + '<div class="act">' + (loading ? "" : addBtn(word)) + (window.VL && window.VL !== "en" && window.VL !== "de" ? "" : '<button class="ui-btn" data-a="pcorp" title="看这个词在真人视频、' + (window.VL === "de" ? "DW 慢速新闻" : "BBC 节目") + '里怎么说">🔎 真人例句</button>') + (window.VL === "de" ? '<a href="https://www.dict.cc/?s=' + encodeURIComponent(word) + '" target="_blank" rel="noopener">dict.cc 德英词典 ↗</a>' : '<a href="' + cam + '" target="_blank" rel="noopener">Cambridge 词典 ↗</a>') + "</div>";
   }
   async function open(w, el, opt) { // opt：{ sent 例句, zh 例句的中文, quiet 不自动读, onAdd(词), showCtx 卡片里显示这句 }
     build(); w = String(w || "").replace(/’/g, "'").trim(); if (!w) return;

@@ -3,7 +3,7 @@
    TR.text(英文, {tl}) → 中文（整段，太长自动按句子拆开翻）；全都不行就抛错
    TR.lines(句子数组, {tl, ai}) → 一样长的中文数组（翻不出的是 ""）；合并成一次请求（每批 1500 字以内，3 批同时），行数对不上就一行行翻；ai:false 不用后台 AI 补
    TR.word(词, {tl}) → { zh: [意思…]（第一个是直译）, pos: [{p 词性, w: [意思…]}] }；查不到给空的
-   tl 目标语言默认 "zh-CN"，sl 原文语言默认 "en"（练习课学德语时传 "de"）；出错都记进 U.log("tr", …) */
+   tl 目标语言默认 "zh-CN"，sl 原文语言默认跟着正在学的语言（window.VL：英语 "en"、德语 "de"）；出错都记进 U.log("tr", …) */
 (function () {
   "use strict";
   if (window.TR) return;
@@ -11,6 +11,7 @@
   const G = (q, tl, dict, sl) => "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + encodeURIComponent(sl || "en") + "&tl=" + encodeURIComponent(tl || "zh-CN") + "&dt=t" + (dict ? "&dt=bd" : "") + "&q=" + encodeURIComponent(q);
   const get = (u, o) => (window.NET && NET.g ? NET.g(u, o) : fetch(u)); // o.noAI：谷歌不通时不请后台 AI 代翻（查词、ai:false 的时候）
   const MEM = new Map(), WM = new Map(), WP = new Map(), WMISS = new Map();
+  const VLS = () => (window.VL && window.VL !== "en" ? window.VL : "en"); // 没指定原文语言：跟着正在学的语言（学德语时翻德语）
   async function google(q, tl, sl) {
     const r = await get(G(q, tl, false, sl)); if (!r.ok) throw new Error("google " + r.status);
     const j = await r.json(); return ((j && j[0]) || []).map(x => (x && x[0]) || "").join("");
@@ -20,7 +21,7 @@
     const j = r.ok && (await r.json()), t = j && j.responseData && j.responseData.translatedText; if (!t || /MYMEMORY WARNING/i.test(t)) throw new Error("mymemory"); return t;
   }
   async function text(q, o) {
-    o = o || {}; q = String(q || "").trim(); if (!q) return ""; const tl = o.tl || "zh-CN", sl = o.sl || "en", k = sl + ">" + tl + "|" + q;
+    o = o || {}; q = String(q || "").trim(); if (!q) return ""; const tl = o.tl || "zh-CN", sl = o.sl || VLS(), k = sl + ">" + tl + "|" + q;
     if (MEM.has(k)) return MEM.get(k);
     const parts = []; let cur = "";
     U.sents(q).forEach(s => { if (cur && (cur + " " + s).length > 1500) { parts.push(cur); cur = s; } else cur = cur ? cur + " " + s : s; }); if (cur) parts.push(cur); // ✂️ 全站共用的分句（util.js）
@@ -34,7 +35,7 @@
     const r = out.join(""); if (r) MEM.set(k, r); return r;
   }
   async function lines(arr, o) {
-    o = o || {}; const tl = o.tl || "zh-CN", sl = o.sl || "en", K = t => sl + ">" + tl + "|" + String(t || "").trim(), out = arr.map(t => MEM.get(K(t)) || "");
+    o = o || {}; const tl = o.tl || "zh-CN", sl = o.sl || VLS(), K = t => sl + ">" + tl + "|" + String(t || "").trim(), out = arr.map(t => MEM.get(K(t)) || "");
     const go = async idx => {
       const r = await get(G(idx.map(i => String(arr[i]).replace(/\s+/g, " ")).join("\n"), tl, false, sl), { noAI: o.ai === false }); if (!r.ok) throw new Error("google " + r.status);
       const zh = (((await r.json()) || [])[0] || []).map(x => (x && x[0]) || "").join("").split("\n").map(x => x.trim());
@@ -48,8 +49,8 @@
     let fails = 0;
     for (let i = 0; i < chunks.length; i += 3) await Promise.all(chunks.slice(i, i + 3).map(c => go(c).catch(e => { fails++; log("谷歌翻译一批失败", String(e.message || e)); })));
     let miss = arr.map((t, i) => (t && !out[i] ? i : -1)).filter(i => i >= 0);
-    if (miss.length && o.ai !== false && window.AI && tl === "zh-CN" && sl === "en") { // 剩下的请后台 AI 翻（一次最多 120 句）
-      for (let k = 0; k < miss.length; k += 120) { const part = miss.slice(k, k + 120), j = await AI.ask("tr", { texts: part.map(i => arr[i]) }); if (j && Array.isArray(j.zh)) part.forEach((i, n) => { if (j.zh[n]) out[i] = j.zh[n]; }); }
+    if (miss.length && o.ai !== false && window.AI && tl === "zh-CN" && (sl === "en" || sl === "de")) { // 剩下的请后台 AI 翻（一次最多 120 句）
+      for (let k = 0; k < miss.length; k += 120) { const part = miss.slice(k, k + 120), j = await AI.ask("tr", { texts: part.map(i => arr[i]), lang: sl }); if (j && Array.isArray(j.zh)) part.forEach((i, n) => { if (j.zh[n]) out[i] = j.zh[n]; }); }
       miss = arr.map((t, i) => (t && !out[i] ? i : -1)).filter(i => i >= 0);
     }
     arr.forEach((t, i) => { if (t && out[i]) MEM.set(K(t), out[i]); });

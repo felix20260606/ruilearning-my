@@ -11,18 +11,30 @@
   "use strict";
 
   /* ================= 一、内置数据 ================= */
-  const TYPES = {
+  // 🇩🇪 学德语（window.VL === "de"）：题型换成歌德 B1 / B2 的写作（写信、论坛发言、正式邮件），题库、连接词、从句 / 被动的判断都换德语；
+  //   评分是 AI 按歌德 / telc 四项（每项 25 分，总分 100，60 及格）；语法拼写还是 LanguageTool（de-DE）；英语词频那几项（用词水平、同义词、口语化）不做
+  const DEW = typeof window !== "undefined" && window.VL === "de";
+  const TYPES_EN = {
     task2: { t: "IELTS Task 2 议论文", s: "Task 2", words: 250, min: 40 },
     task1: { t: "IELTS Task 1 图表描述", s: "Task 1", words: 150, min: 20 },
     email: { t: "邮件 / 书信", s: "书信", words: 150, min: 20 },
     free: { t: "自由写作", s: "自由", words: 0, min: 30 },
   };
+  const TYPES_DE = {
+    b1mail: { t: "B1 写信给朋友", s: "B1 Teil 1", words: 80, min: 20 },
+    b1forum: { t: "B1 论坛发表看法", s: "B1 Teil 2", words: 80, min: 25 },
+    b1formal: { t: "B1 正式邮件", s: "B1 Teil 3", words: 40, min: 15 },
+    b2forum: { t: "B2 论坛长文", s: "B2 Teil 1", words: 150, min: 50 },
+    b2letter: { t: "B2 正式信件", s: "B2 Teil 2", words: 100, min: 25 },
+    free: { t: "自由写作", s: "自由", words: 0, min: 30 },
+  };
+  const TYPES = DEW ? TYPES_DE : TYPES_EN;
   const T2_END = "\n\nGive reasons for your answer and include any relevant examples from your own knowledge or experience. Write at least 250 words.";
   const T1_END = "\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.";
   const EM_END = "\n\nWrite at least 150 words. You do NOT need to write any addresses.";
 
   // 题库（原创练习题，不是真题）
-  const BANK = {
+  const BANK_EN = {
     task2: [
       ["教育", "Some people believe that universities should mainly prepare students for specific careers, while others think the main purpose of higher education is to develop independent and critical thinking. Discuss both views and give your own opinion."],
       ["教育", "In many countries, school students are given more homework than ever before. Do the advantages of this outweigh the disadvantages?"],
@@ -79,9 +91,52 @@
       ["未来", "Describe what you think a typical working day will look like in 2040."],
     ],
   };
-  BANK.task2.forEach(x => (x[1] += T2_END));
-  BANK.task1.forEach(x => (x[1] += T1_END));
-  BANK.email.forEach(x => (x[1] += EM_END));
+  BANK_EN.task2.forEach(x => (x[1] += T2_END));
+  BANK_EN.task1.forEach(x => (x[1] += T1_END));
+  BANK_EN.email.forEach(x => (x[1] += EM_END));
+  // 🇩🇪 德语题库（原创，仿歌德 B1 / B2 的题型）
+  const DE_P = pts => "\n\nSchreiben Sie zu folgenden Punkten:\n" + pts.map(p => "– " + p).join("\n");
+  const BANK_DE = {
+    b1mail: [
+      ["生活", "Sie sind vor einem Monat in eine neue Wohnung umgezogen. Ein Freund / eine Freundin konnte beim Umzug nicht helfen. Schreiben Sie ihm / ihr eine E-Mail." + DE_P(["Beschreiben Sie: Wie ist die neue Wohnung?", "Begründen Sie: Warum sind Sie umgezogen?", "Machen Sie einen Vorschlag für ein Treffen."]) + "\n\nSchreiben Sie eine E-Mail (circa 80 Wörter)."],
+      ["旅行", "Sie haben letztes Wochenende einen Ausflug gemacht. Ihre Freundin Anna war nicht dabei. Schreiben Sie Anna eine E-Mail." + DE_P(["Beschreiben Sie: Wohin sind Sie gefahren und was haben Sie gemacht?", "Begründen Sie: Was hat Ihnen am besten gefallen?", "Machen Sie einen Vorschlag für einen gemeinsamen Ausflug."]) + "\n\nSchreiben Sie eine E-Mail (circa 80 Wörter)."],
+      ["工作", "Sie haben eine neue Arbeitsstelle. Ihr Freund Jonas möchte wissen, wie es Ihnen geht. Schreiben Sie Jonas eine E-Mail." + DE_P(["Beschreiben Sie: Was machen Sie in der neuen Firma?", "Begründen Sie: Was gefällt Ihnen, was nicht?", "Machen Sie einen Vorschlag: Wann können Sie sich treffen?"]) + "\n\nSchreiben Sie eine E-Mail (circa 80 Wörter)."],
+      ["节日", "Sie haben mit Freunden ein Fest gefeiert (zum Beispiel Chinesisches Neujahr). Ihre Freundin Lea aus Deutschland kennt das Fest nicht. Schreiben Sie Lea eine E-Mail." + DE_P(["Beschreiben Sie: Wie haben Sie gefeiert?", "Begründen Sie: Warum ist das Fest für Sie wichtig?", "Machen Sie einen Vorschlag: Lea soll nächstes Jahr mitfeiern."]) + "\n\nSchreiben Sie eine E-Mail (circa 80 Wörter)."],
+      ["学习", "Sie machen seit zwei Monaten einen Deutschkurs. Ihr Freund Tom möchte auch Deutsch lernen. Schreiben Sie Tom eine E-Mail." + DE_P(["Beschreiben Sie: Wie ist der Kurs?", "Begründen Sie: Warum lernen Sie Deutsch?", "Machen Sie einen Vorschlag: Wie kann Tom anfangen?"]) + "\n\nSchreiben Sie eine E-Mail (circa 80 Wörter)."],
+    ],
+    b1forum: [
+      ["科技", "Sie haben im Radio eine Diskussion über das Thema „Handys in der Schule“ gehört. Im Online-Gästebuch der Sendung finden Sie folgende Meinung:\n\n„Handys sollten in der Schule komplett verboten sein. Die Kinder können sich sonst nicht konzentrieren.“\n\nSchreiben Sie nun Ihre Meinung (circa 80 Wörter)."],
+      ["工作", "Sie haben im Fernsehen eine Diskussion über das Thema „Homeoffice“ gesehen. Im Online-Gästebuch der Sendung finden Sie folgende Meinung:\n\n„Im Homeoffice arbeitet man weniger. Alle sollten wieder ins Büro kommen.“\n\nSchreiben Sie nun Ihre Meinung (circa 80 Wörter)."],
+      ["环境", "Sie haben im Radio eine Diskussion über das Thema „Fliegen und Umwelt“ gehört. Im Online-Gästebuch der Sendung finden Sie folgende Meinung:\n\n„Kurze Flüge sollte man verbieten. Man kann auch mit dem Zug fahren.“\n\nSchreiben Sie nun Ihre Meinung (circa 80 Wörter)."],
+      ["生活", "Sie haben im Fernsehen eine Diskussion über das Thema „In der Stadt oder auf dem Land wohnen?“ gesehen. Im Online-Gästebuch der Sendung finden Sie folgende Meinung:\n\n„Auf dem Land ist das Leben viel besser als in der Stadt.“\n\nSchreiben Sie nun Ihre Meinung (circa 80 Wörter)."],
+      ["健康", "Sie haben im Radio eine Diskussion über das Thema „Fast Food“ gehört. Im Online-Gästebuch der Sendung finden Sie folgende Meinung:\n\n„Fast Food ist ungesund. Man sollte es nur noch selten essen.“\n\nSchreiben Sie nun Ihre Meinung (circa 80 Wörter)."],
+    ],
+    b1formal: [
+      ["工作", "Sie haben morgen einen Termin bei Ihrer Chefin, Frau Weber. Sie können aber nicht kommen. Schreiben Sie Frau Weber eine E-Mail. Entschuldigen Sie sich höflich und berichten Sie, warum Sie nicht kommen können. Schlagen Sie einen neuen Termin vor.\n\nSchreiben Sie eine E-Mail (circa 40 Wörter). Vergessen Sie nicht die Anrede und den Gruß am Schluss."],
+      ["学习", "Sie sind in einem Deutschkurs. Nächste Woche können Sie zweimal nicht kommen. Schreiben Sie Ihrem Kursleiter, Herrn Schmidt, eine E-Mail. Entschuldigen Sie sich höflich und erklären Sie den Grund. Fragen Sie, wie Sie die Hausaufgaben bekommen.\n\nSchreiben Sie eine E-Mail (circa 40 Wörter). Vergessen Sie nicht die Anrede und den Gruß am Schluss."],
+      ["生活", "Ihr Nachbar, Herr Becker, hat Sie zu seinem Geburtstag eingeladen. Sie können leider nicht kommen. Schreiben Sie Herrn Becker eine E-Mail. Bedanken Sie sich für die Einladung und erklären Sie, warum Sie nicht kommen können.\n\nSchreiben Sie eine E-Mail (circa 40 Wörter). Vergessen Sie nicht die Anrede und den Gruß am Schluss."],
+      ["看病", "Sie haben übermorgen einen Termin in der Arztpraxis von Dr. Klein. Sie müssen den Termin verschieben. Schreiben Sie der Praxis eine E-Mail. Entschuldigen Sie sich, nennen Sie den Grund und bitten Sie um einen neuen Termin.\n\nSchreiben Sie eine E-Mail (circa 40 Wörter). Vergessen Sie nicht die Anrede und den Gruß am Schluss."],
+    ],
+    b2forum: [
+      ["科技", "Sie möchten in einem Internetforum einen Beitrag zum Thema „Künstliche Intelligenz im Alltag“ schreiben.\n– Äußern Sie Ihre Meinung zu künstlicher Intelligenz im Alltag.\n– Nennen Sie Vorteile von KI-Anwendungen.\n– Beschreiben Sie mögliche Gefahren.\n– Machen Sie einen Vorschlag, wie man KI sinnvoll nutzen kann.\n\nSchreiben Sie circa 150 Wörter."],
+      ["工作", "Sie möchten in einem Internetforum einen Beitrag zum Thema „Vier-Tage-Woche“ schreiben.\n– Äußern Sie Ihre Meinung zur Vier-Tage-Woche.\n– Nennen Sie Vorteile für Arbeitnehmer.\n– Nennen Sie mögliche Nachteile für Firmen.\n– Beschreiben Sie, wie es in Ihrem Heimatland oder Ihrer Firma ist.\n\nSchreiben Sie circa 150 Wörter."],
+      ["社会", "Sie möchten in einem Internetforum einen Beitrag zum Thema „Im Ausland leben“ schreiben.\n– Äußern Sie Ihre Meinung zum Leben im Ausland.\n– Nennen Sie Vorteile.\n– Nennen Sie Schwierigkeiten, die man haben kann.\n– Berichten Sie von Ihren eigenen Erfahrungen.\n\nSchreiben Sie circa 150 Wörter."],
+      ["环境", "Sie möchten in einem Internetforum einen Beitrag zum Thema „Plastik vermeiden“ schreiben.\n– Äußern Sie Ihre Meinung zum Thema.\n– Nennen Sie Gründe, warum Plastik ein Problem ist.\n– Beschreiben Sie, was jeder Einzelne tun kann.\n– Machen Sie einen Vorschlag für Politik oder Unternehmen.\n\nSchreiben Sie circa 150 Wörter."],
+    ],
+    b2letter: [
+      ["投诉", "Sie haben online eine Kaffeemaschine bestellt. Das Gerät ist nach einer Woche kaputtgegangen, und der Kundenservice hat noch nicht geantwortet. Schreiben Sie eine Beschwerde an die Firma „Haushalt24“.\n– Beschreiben Sie das Problem.\n– Erklären Sie, was Sie schon unternommen haben.\n– Sagen Sie, was Sie jetzt erwarten.\n\nSchreiben Sie circa 100 Wörter. Achten Sie auf Anrede, Gruß und einen höflichen, formellen Stil."],
+      ["工作", "Sie haben eine Stellenanzeige für ein Praktikum als Softwareentwickler/in in Berlin gelesen. Schreiben Sie eine E-Mail an Frau Lange von der Personalabteilung.\n– Stellen Sie sich kurz vor.\n– Erklären Sie, warum Sie sich für das Praktikum interessieren.\n– Fragen Sie nach Arbeitszeiten und Bezahlung.\n\nSchreiben Sie circa 100 Wörter. Achten Sie auf Anrede, Gruß und einen höflichen, formellen Stil."],
+      ["住房", "In Ihrem Mietshaus ist seit drei Wochen die Heizung kaputt. Schreiben Sie eine E-Mail an Ihre Hausverwaltung.\n– Beschreiben Sie das Problem.\n– Erklären Sie, welche Folgen das für Sie hat.\n– Bitten Sie um eine schnelle Lösung und nennen Sie eine Frist.\n\nSchreiben Sie circa 100 Wörter. Achten Sie auf Anrede, Gruß und einen höflichen, formellen Stil."],
+    ],
+    free: [
+      ["日常", "Beschreiben Sie einen ganz normalen Tag in Ihrem Leben: Wann stehen Sie auf, was machen Sie bei der Arbeit, was machen Sie am Abend?"],
+      ["介绍", "Stellen Sie Ihre Stadt vor: Was kann man dort sehen, essen und erleben? Was gefällt Ihnen, was nicht?"],
+      ["学习", "Warum lernen Sie Deutsch? Was ist für Sie schwierig, was macht Ihnen Spaß?"],
+      ["回忆", "Erzählen Sie von Ihrer schönsten Reise. Wohin sind Sie gefahren, mit wem, und was haben Sie erlebt? (Schreiben Sie im Perfekt.)"],
+      ["计划", "Was möchten Sie in den nächsten fünf Jahren machen? Schreiben Sie über Arbeit, Wohnen und Freizeit."],
+    ],
+  };
+  const BANK = DEW ? BANK_DE : BANK_EN;
 
   // 常见词 → 高级同义词（约 60 组）
   const SYN = {
@@ -154,7 +209,7 @@
   ];
 
   /* ================= 二、本地分析（纯函数） ================= */
-  const WORD_RE = /\d+(?:[.,]\d+)+|[A-Za-z0-9]+(?:['’\-][A-Za-z0-9]+)*/g; // 3.5、1,000 算一个词
+  const WORD_RE = DEW ? /\d+(?:[.,]\d+)+|[\p{L}0-9]+(?:['’\-][\p{L}0-9]+)*/gu : /\d+(?:[.,]\d+)+|[A-Za-z0-9]+(?:['’\-][A-Za-z0-9]+)*/g; // 3.5、1,000 算一个词；德语的 ä ö ü ß 也是字母
   const words = text => String(text || "").match(WORD_RE) || [];
   const countWords = text => words(text).length;
   const lc = w => String(w).toLowerCase().replace(/’/g, "'");
@@ -252,30 +307,43 @@
   }
 
   // 连接词统计：长的短语先匹配，匹配过的位置抹掉，避免 even though 又算一次 though
+  // 🇩🇪 德语的连接词（Konnektoren）
+  const LINKS_DE = [
+    { k: "add", t: "递进", w: ["außerdem", "darüber hinaus", "zudem", "nicht nur", "sondern auch", "auch", "und"] },
+    { k: "contrast", t: "转折对比", w: ["trotzdem", "dennoch", "allerdings", "jedoch", "obwohl", "im gegensatz dazu", "einerseits", "andererseits", "während", "aber", "sondern"] },
+    { k: "cause", t: "因果", w: ["deshalb", "deswegen", "daher", "darum", "aus diesem grund", "folglich", "weil", "da", "denn", "sodass", "so dass"] },
+    { k: "example", t: "举例", w: ["zum beispiel", "beispielsweise", "z. b.", "z.b.", "vor allem", "insbesondere", "wie zum beispiel"] },
+    { k: "sum", t: "总结", w: ["zusammenfassend", "insgesamt", "alles in allem", "zum schluss", "abschließend", "kurz gesagt"] },
+    { k: "order", t: "顺序", w: ["zuerst", "zunächst", "erstens", "zweitens", "drittens", "danach", "dann", "anschließend", "schließlich", "zum schluss", "später"] },
+    { k: "view", t: "观点", w: ["meiner meinung nach", "ich bin der meinung", "ich finde", "ich glaube", "ich denke", "meiner ansicht nach", "aus meiner sicht"] },
+    { k: "similar", t: "类比", w: ["genauso", "ebenso", "ähnlich", "auf die gleiche weise"] },
+  ];
   function connectives(text, type) {
+    const LK = DEW ? LINKS_DE : LINKS, AZ = DEW ? "a-zäöüß" : "a-z";
     let s = " " + lc(text).replace(/\s+/g, " ") + " ";
     const all = [];
-    LINKS.forEach(g => g.w.forEach(p => all.push([p, g.k])));
+    LK.forEach(g => g.w.forEach(p => all.push([p, g.k])));
     all.sort((a, b) => b[0].length - a[0].length);
     const used = {};
-    LINKS.forEach(g => (used[g.k] = {}));
+    LK.forEach(g => (used[g.k] = {}));
     all.forEach(([p, k]) => {
       const esc = p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const re = new RegExp("(^|[^a-z'])" + esc + (/[a-z]$/.test(p) ? "(?![a-z'])" : ""), "g");
+      const re = new RegExp("(^|[^" + AZ + "'])" + esc + (/[a-zäöüß]$/.test(p) ? "(?![" + AZ + "'])" : ""), "g");
       s = s.replace(re, (m, pre) => { used[k][p] = (used[k][p] || 0) + 1; return pre + " ".repeat(m.length - pre.length); });
     });
-    const cats = LINKS.map(g => {
+    const cats = LK.map(g => {
       const u = used[g.k], total = Object.values(u).reduce((a, b) => a + b, 0);
-      return { k: g.k, t: g.t, used: u, total, unused: g.w.filter(p => !u[p] && !/,$/.test(p) && !/^(and|but|so|then|i think|also|yet)$/.test(p)) };
+      return { k: g.k, t: g.t, used: u, total, unused: g.w.filter(p => !u[p] && !/,$/.test(p) && !/^(and|but|so|then|i think|also|yet|und|aber|auch|dann|ich finde|ich glaube|ich denke)$/.test(p)) };
     });
-    const distinct = cats.reduce((a, c) => a + Object.keys(c.used).filter(p => !/^(and|but|so|then)$/.test(p)).length, 0);
+    const distinct = cats.reduce((a, c) => a + Object.keys(c.used).filter(p => !/^(and|but|so|then|und|aber|dann|auch)$/.test(p)).length, 0);
     const total = cats.reduce((a, c) => a + c.total, 0);
     const tips = [], nW = countWords(text), C = Object.fromEntries(cats.map(c => [c.k, c]));
     cats.forEach(c => Object.entries(c.used).forEach(([p, n]) => {
-      const lim = /^(and|but|so)$/.test(p) ? 8 : 3;
+      const lim = /^(and|but|so|und|aber)$/.test(p) ? 8 : 3;
       if (n >= lim && n / c.total >= 0.5) tips.push("「" + p + "」用了 " + n + " 次，" + c.t + "还可以用：" + c.unused.slice(0, 4).join(" / "));
     }));
-    if (nW >= 120 && distinct < 4) tips.push("连接词种类偏少（" + distinct + " 种），句子之间的逻辑关系不够清楚，可以多用 however、moreover、as a result、for instance 等");
+    if (DEW && nW >= 60 && distinct < 3) tips.push("连接词种类偏少（" + distinct + " 种）：可以多用 deshalb、trotzdem、außerdem、zum Beispiel、weil / obwohl（注意 weil、obwohl 后面动词放句尾，deshalb、trotzdem 后面动词紧跟在第二位）");
+    if (!DEW && nW >= 120 && distinct < 4) tips.push("连接词种类偏少（" + distinct + " 种），句子之间的逻辑关系不够清楚，可以多用 however、moreover、as a result、for instance 等");
     if (type === "task2" && nW >= 120) {
       if (!C.contrast.total || Object.keys(C.contrast.used).every(p => p === "but")) tips.push("几乎没有转折：讨论另一方观点或让步时可以用 " + C.contrast.unused.slice(0, 4).join(" / "));
       if (!C.example.total) tips.push("没有举例的连接词：可以用 " + C.example.unused.slice(0, 4).join(" / ") + " 引出例子");
@@ -290,8 +358,10 @@
 
   // 复杂句：含从句标志词的句子
   const SUB_RE = /\b(which|that|who|whom|whose|although|though|because|if|while|whereas|when|unless|since|until|once|where|whether|so that|even if|provided that|as long as)\b/i;
+  // 德语：从句连词，或者逗号后面跟关系代词（, der / die / das / den / dem / deren / dessen / denen / welche…）
+  const SUB_RE_DE = /(^|[^\p{L}])(dass|weil|wenn|obwohl|damit|ob|als|während|nachdem|bevor|sodass|falls|seitdem|bis|indem|sobald|solange)(?![\p{L}])|,\s*(der|die|das|den|dem|deren|dessen|denen|welche[rsmn]?|wo|was)(?![\p{L}])/iu;
   function complexSentences(sents) {
-    const hit = sents.filter(s => SUB_RE.test(s));
+    const hit = sents.filter(s => (DEW ? SUB_RE_DE : SUB_RE).test(s));
     return { n: hit.length, ratio: sents.length ? hit.length / sents.length : 0 };
   }
 
@@ -299,7 +369,10 @@
   const PP_IRR = "made|done|given|taken|seen|known|shown|built|written|found|held|kept|left|lost|paid|sold|spent|told|thought|brought|bought|caught|taught|chosen|driven|eaten|fallen|forgotten|hidden|grown|thrown|worn|broken|spoken|stolen|beaten|born|cut|put|set|hit|hurt|shut|spread|led|fed|met|sent|understood|drawn|begun|won|felt|heard|meant|run";
   const PASSIVE_RE = new RegExp("\\b(?:am|is|are|was|were|be|been|being)\\s+(?:(?:not|also|often|usually|widely|generally|always|never|still|now|largely|mainly|increasingly|being|\\w+ly)\\s+){0,2}(\\w+ed|" + PP_IRR + ")\\b", "gi");
   const NOT_PP = /^(tired|interested|bored|excited|worried|married|pleased|surprised|satisfied|scared|frightened|ashamed|red|bed|shed|need|seed|speed|feed|hundred|indeed|sacred|naked|wicked|beloved|aged|talented|skilled|crowded|complicated|sophisticated|advanced|detailed|related|limited|qualified|experienced|educated|dedicated|determined|devoted|supposed)$/i;
+  // 德语被动：werden 的各种形式 + 后面不远处的过去分词（ge…t / ge…en / …iert），或者 worden
+  const PASSIVE_DE = /(^|[^\p{L}])(werde|wirst|wird|werden|werdet|wurde|wurdest|wurden|wurdet)(?![\p{L}])[^.!?]{0,80}?(?:^|[^\p{L}])(ge\p{L}{2,}(?:t|en)|\p{L}{3,}iert)(?![\p{L}])|(^|[^\p{L}])worden(?![\p{L}])/giu;
   function passives(text) {
+    if (DEW) { const L = [], s = String(text || ""); let m; PASSIVE_DE.lastIndex = 0; while ((m = PASSIVE_DE.exec(s))) L.push(m[0].trim().slice(0, 60)); return { n: L.length, list: L.slice(0, 6) }; }
     const out = []; let m;
     PASSIVE_RE.lastIndex = 0;
     while ((m = PASSIVE_RE.exec(text))) if (!NOT_PP.test(m[1])) out.push(m[0]);
@@ -369,6 +442,7 @@
 
   // 本地粗估分：只根据 a（错误数）和 b（本地分析）估 LR、GRA，粗估仅供参考
   function estimate(loc, cats, ltOk) {
+    if (DEW) return null; // 粗估分是按雅思分数和英语词频的经验规则：学德语不估（看 AI 的 100 分制评分）
     if (!loc || loc.words < 50) return null;
     const per = x => (x / loc.words) * 100, clamp = x => Math.max(4, Math.min(8, Math.round(x * 2) / 2));
     const lrWhy = [], graWhy = [];
@@ -528,9 +602,10 @@
   /* ---------- 状态 ---------- */
   const d0 = LG("writing:draft", null) || {};
   const st = {
-    type: TYPES[d0.type] ? d0.type : "task2", prompt: d0.prompt || "", text: d0.text || "", elapsed: +d0.elapsed || 0,
-    running: false, tick: null, warned: false, view: "write", lang: LG("writing:lang", "en-US"),
+    type: TYPES[d0.type] ? d0.type : DEW ? "b1mail" : "task2", prompt: d0.prompt || "", text: d0.text || "", elapsed: +d0.elapsed || 0,
+    running: false, tick: null, warned: false, view: "write", lang: LG("writing:lang", DEW ? "de-DE" : "en-US"),
   };
+  if (DEW && !/^de-/.test(st.lang)) st.lang = "de-DE"; // writing:lang 按语言分开存（boot.js），这里再保险一下
   let host = null, res = null, histView = null, pop = null, mask = null, saveT = null, ltCalls = [], vocabP = null;
 
   function saveDraft(now) {
@@ -592,7 +667,7 @@
     s += '<div class="wr-card"><h3>② 写作</h3><div class="wr-bar"><div class="wr-wc" id="wr-wc"></div><div class="wr-tm" id="wr-tm"><b id="wr-tmv"></b><button class="ui-btn sm" data-a="timer" id="wr-tmb"></button><button class="ui-btn sm" data-a="treset" title="计时归零">↺</button></div></div>';
     s += '<textarea id="wr-text" class="wr-text" spellcheck="false" autocapitalize="sentences" placeholder="在这里写作文……草稿会自动保存在这台设备上">' + esc(st.text) + "</textarea>";
     s += '<div class="wr-act"><button class="ui-btn pri" data-a="check" id="wr-check"' + (res && (res.ltLoading || res.aiLoading) && !res.readonly ? " disabled" : "") + ">✅ 批改</button><button class=\"ui-btn sm\" data-a=\"clear\">清空正文</button>" +
-      '<div class="wr-privacy">语法检查会把文本发送到 LanguageTool（免费公共服务）<select id="wr-lang" title="拼写按哪种英语检查"><option value="en-US"' + (st.lang === "en-US" ? " selected" : "") + '>美式拼写</option><option value="en-GB"' + (st.lang === "en-GB" ? " selected" : "") + ">英式拼写</option></select><br>AI 评分发送到本站后台（Cloudflare Workers AI）</div></div></div>";
+      '<div class="wr-privacy">语法检查会把文本发送到 LanguageTool（免费公共服务）' + (DEW ? '<select id="wr-lang" title="拼写按哪种德语检查">' + [["de-DE", "德国"], ["de-AT", "奥地利"], ["de-CH", "瑞士"]].map(([v, t]) => '<option value="' + v + '"' + (st.lang === v ? " selected" : "") + ">" + t + "</option>").join("") + "</select>" : '<select id="wr-lang" title="拼写按哪种英语检查"><option value="en-US"' + (st.lang === "en-US" ? " selected" : "") + '>美式拼写</option><option value="en-GB"' + (st.lang === "en-GB" ? " selected" : "") + ">英式拼写</option></select>") + "<br>AI 评分发送到本站后台（Cloudflare Workers AI）</div></div></div>";
     s += '<div id="wr-res">' + (res && !res.readonly ? drawRes(res) : "") + "</div>";
     return s;
   }
@@ -641,10 +716,10 @@
     const ai = r.ai && r.ai.band;
     // 总览
     s += '<div class="wr-card"><h3>📋 批改结果<small>' + esc(new Date(r.at).toLocaleString("zh-CN", { hour12: false })) + " · " + esc(TYPES[r.type] ? TYPES[r.type].s : r.type) + "</small></h3><div class=\"wr-sum\">" +
-      tile("词数", loc.words, TYPES[r.type] && TYPES[r.type].words ? (loc.words >= TYPES[r.type].words ? "达标" : "少于 " + TYPES[r.type].words + "，TR 会扣分") : "", loc.words >= (TYPES[r.type] || {}).words ? "g" : "r") +
+      tile("词数", loc.words, TYPES[r.type] && TYPES[r.type].words ? (loc.words >= TYPES[r.type].words ? "达标" : "少于 " + TYPES[r.type].words + (DEW ? "，任务完成分会扣" : "，TR 会扣分")) : "", loc.words >= (TYPES[r.type] || {}).words ? "g" : "r") +
       tile("语法拼写问题", r.ltLoading ? "…" : r.ltErr ? "—" : nIss, r.ltLoading ? "检查中" : r.ltErr ? "检查失败" : r.fixed ? "已改 " + r.fixed + " 处" : "", nIss ? "o" : "g") +
-      tile("AI 总分", r.aiLoading ? "…" : ai && ai.overall != null ? bandStr(ai.overall) : "—", r.aiLoading ? "评分中" : ai ? "Workers AI" : "未开启 / 失败") +
-      tile("本地粗估 LR / GRA", r.est ? bandStr(r.est.LR) + " / " + bandStr(r.est.GRA) : "—", r.est ? "粗估，仅供参考" : "字数太少", "o") + "</div>";
+      tile("AI 总分", r.aiLoading ? "…" : ai && ai.overall != null ? scoreStr(r.ai, ai.overall) : "—", r.aiLoading ? "评分中" : ai ? (r.ai.scale === "de" ? "满分 100 · 60 及格" + (r.ai.cefr ? " · 约 " + esc(r.ai.cefr) : "") : "Workers AI") : "未开启 / 失败") +
+      (DEW ? "" : tile("本地粗估 LR / GRA", r.est ? bandStr(r.est.LR) + " / " + bandStr(r.est.GRA) : "—", r.est ? "粗估，仅供参考" : "字数太少", "o")) + "</div>";
     if (r.text !== st.text && !r.readonly) s += '<div class="wr-note">⚠️ 正文在批改后改过了，下面的标注对应批改时的文字；要更新请再点一次「批改」。</div>';
     s += "</div>";
     s += drawLT(r, cats) + drawLocal(r) + drawAI(r);
@@ -652,6 +727,7 @@
   }
   const isNum = x => typeof x === "number" && isFinite(x);
   const bandStr = x => (x != null && x !== "" && isNum(+x) ? (+x).toFixed(1) : "—");
+  const scoreStr = (A, x) => (A && A.scale === "de" ? (x != null && isNum(+x) ? String(Math.round(+x)) : "—") : bandStr(x)); // 德语：整数分（每项 /25，总分 /100）
 
   function drawLT(r, cats) {
     let s = '<div class="wr-card" id="wr-lt"><h3>a) 语法拼写<small>LanguageTool · ' + esc(r.lang || "en-US") + "</small></h3>";
@@ -684,7 +760,25 @@
     return s;
   }
 
+  function drawLocalDe(r) { // 🇩🇪 德语：句子、段落、用词多样性、连接词、从句、被动（英语词频那几项不做）
+    const L = r.local;
+    let s = '<div class="wr-card"><h3>b) 本地分析<small>不联网，在你的设备上算</small></h3><div class="wr-sum">';
+    const al = L.avgLen, alN = al < 7 ? ["偏短，试试用 weil / dass / wenn 连起来", "o"] : al > 25 ? ["偏长，注意断句", "o"] : ["合适", "g"];
+    const mt = L.mattr, mtN = mt >= 0.78 ? ["丰富", "g"] : mt >= 0.68 ? ["一般", "o"] : ["偏单一", "r"];
+    s += tile("句数", L.sentences) + tile("平均句长", al + " 词", alN[0], alN[1]) + tile("段落数", L.paragraphs) + tile("用词多样性 TTR", L.ttrRaw.toFixed(2), "MATTR " + mt.toFixed(2) + " · " + mtN[0], mtN[1]) + "</div>";
+    const K = L.links;
+    s += '<div class="wr-sub">连接词 Konnektoren<small>共 ' + K.total + " 处，" + K.distinct + " 种（不算 und / aber / dann / auch）</small></div><div class=\"wr-lk\">" +
+      K.cats.map(c => { const u = Object.entries(c.used).sort((a, b) => b[1] - a[1]); return "<div><b>" + c.t + " · " + c.total + "</b>" + (u.length ? esc(u.map(([p, n]) => p + (n > 1 ? "×" + n : "")).join("、")) : '<span class="z">没用到 · 可用 ' + esc(c.unused.slice(0, 3).join(" / ")) + "</span>") + "</div>"; }).join("") + "</div>";
+    if (K.tips.length) s += '<ul class="wr-tips">' + K.tips.map(t => "<li>" + esc(t) + "</li>").join("") + "</ul>";
+    const C = L.complex, P = L.passive;
+    s += '<div class="wr-sub">句子结构</div><div class="wr-sum">' +
+      tile("从句 Nebensätze", C.n + " / " + L.sentences, Math.round(C.ratio * 100) + "% · " + (C.ratio >= 0.35 ? "不错" : C.ratio >= 0.2 ? "可以再多一些" : "偏少"), C.ratio >= 0.35 ? "g" : C.ratio >= 0.2 ? "o" : "r") +
+      tile("被动 Passiv", P.n, P.n ? "有被动，句式有变化" : "B2 可以适当用被动", P.n ? "g" : "o") + "</div>";
+    s += '<div class="wr-note">从句 = 含 dass / weil / wenn / obwohl / als / nachdem 等连词，或逗号后接关系代词（der / die / das…）的句子；别忘了从句里动词放句尾。' + (P.list.length ? "被动：" + esc(P.list.join("；")) : "") + "</div>";
+    return s + "</div>";
+  }
   function drawLocal(r) {
+    if (DEW) return drawLocalDe(r);
     const L = r.local, T = TYPES[r.type] || {};
     let s = '<div class="wr-card"><h3>b) 本地分析<small>不联网，在你的设备上算</small></h3><div class="wr-sum">';
     const al = L.avgLen, alN = al < 10 ? ["偏短，多用复合句", "r"] : al > 30 ? ["偏长，注意断句", "o"] : al < 13 ? ["稍短", "o"] : ["合适", "g"];
@@ -735,18 +829,22 @@
 
   function drawAI(r) {
     let s = '<div class="wr-card"><h3>c) 评分</h3>';
+    if (DEW) return s + drawAIBody(r);
     // 本地粗估
     const E = r.est;
     s += '<div class="wr-sub" style="margin-top:0">本地粗估分 <span class="wr-tag-est">粗估，仅供参考</span><small>只根据上面 a、b 的数据按经验规则估算，不看内容和逻辑</small></div>';
     if (!E) s += '<div class="wr-note">字数太少（少于 50 词），不估分。</div>';
     else s += '<div class="wr-est">' + tile("LR 词汇", bandStr(E.LR), E.lrWhy.join("、") || "—") + tile("GRA 语法", bandStr(E.GRA), (E.graWhy.join("、") || "—") + (E.noLT ? "（语法检查没成功，没算错误数）" : "")) + "</div>";
-    // AI
-    s += '<div class="wr-sub">AI 评分<small>Cloudflare Workers AI，按雅思四项评分标准</small></div>';
+    return s + drawAIBody(r);
+  }
+  function drawAIBody(r) {
+    let s = '<div class="wr-sub"' + (DEW ? ' style="margin-top:0"' : "") + ">AI 评分<small>Cloudflare Workers AI，" + (DEW ? "按歌德 / telc 四项标准（每项 25 分，总分 100，60 及格）" : "按雅思四项评分标准") + "</small></div>";
     if (r.aiLoading) return s + '<div class="wr-load">AI 正在评分，可能要十几秒……</div></div>';
     if (r.aiErr) return s + (r.aiErr === "noai" ? '<div class="wr-info">AI 评分未开启（需要在 Cloudflare 打开 Workers AI，免费）</div>' : '<div class="wr-err">AI 评分失败：' + esc(r.aiErr) + "</div>") + (r.readonly ? "" : '<div style="margin-top:8px"><button class="ui-btn sm" data-a="reai">重试 AI 评分</button></div>') + "</div>";
     const A = r.ai; if (!A) return s + '<div class="wr-note">没有 AI 结果。</div></div>';
     const B = A.band || {};
-    if (["TR", "CC", "LR", "GRA", "overall"].some(k => B[k] != null)) s += '<div class="wr-band">' + [["TR", r.type === "task1" ? "TA 任务" : "TR 任务"], ["CC", "CC 连贯"], ["LR", "LR 词汇"], ["GRA", "GRA 语法"], ["overall", "总分"]].map(([k, t]) => '<div class="' + (k === "overall" ? "all" : "") + '"><span>' + t + "</span><b>" + (B[k] == null || B[k] === "" ? "—" : bandStr(B[k])) + "</b></div>").join("") + "</div>";
+    const LAB = A.scale === "de" ? [["TR", "任务完成 /25"], ["CC", "连贯 /25"], ["LR", "词汇 /25"], ["GRA", "语法 /25"], ["overall", "总分 /100" + (A.cefr ? " · " + A.cefr : "")]] : [["TR", r.type === "task1" ? "TA 任务" : "TR 任务"], ["CC", "CC 连贯"], ["LR", "LR 词汇"], ["GRA", "GRA 语法"], ["overall", "总分"]];
+    if (["TR", "CC", "LR", "GRA", "overall"].some(k => B[k] != null)) s += '<div class="wr-band">' + LAB.map(([k, t]) => '<div class="' + (k === "overall" ? "all" : "") + '"><span>' + t + "</span><b>" + (B[k] == null || B[k] === "" ? "—" : scoreStr(A, B[k])) + "</b></div>").join("") + "</div>";
     if (A.summary_zh) s += '<p style="margin:10px 0 0;font-size:14px;line-height:1.65">' + esc(A.summary_zh) + "</p>";
     if (A.strengths_zh && A.strengths_zh.length) s += '<div class="wr-sub">👍 优点</div><ul class="wr-tips">' + A.strengths_zh.map(x => "<li>" + esc(x) + "</li>").join("") + "</ul>";
     if (A.improve_zh && A.improve_zh.length) s += '<div class="wr-sub">🔧 改进建议</div><ul class="wr-tips">' + A.improve_zh.map(x => "<li>" + esc(x) + "</li>").join("") + "</ul>";
@@ -767,7 +865,7 @@
       (histView.prompt ? '<div class="wr-card"><h3>题目</h3><div class="wr-rw" style="font-size:13.5px">' + esc(histView.prompt) + "</div></div>" : "") + '<div id="wr-hdet">' + drawRes(histView) + "</div>";
     if (!h.length) return '<div class="wr-empty">还没有批改记录。写完点「批改」，结果会自动存在这里（最多 ' + HMAX + " 条）。</div>";
     return '<div class="wr-note" style="margin-bottom:8px">存在这台设备的浏览器里，最多 ' + HMAX + ' 条，新的在前。</div><div class="wr-hist">' + h.map(x => {
-      const sc = x.ai && x.ai.band && x.ai.band.overall != null ? bandStr(x.ai.band.overall) : "—";
+      const sc = x.ai && x.ai.band && x.ai.band.overall != null ? scoreStr(x.ai, x.ai.band.overall) + (x.ai.scale === "de" ? "/100" : "") : "—";
       return '<div class="wr-hi"><div class="t" data-a="hopen" data-id="' + esc(x.id) + '"><b>' + esc((x.prompt || "（没有题目）").split("\n")[0]) + "</b><span>" + esc(new Date(x.at).toLocaleString("zh-CN", { hour12: false })) + " · " + esc(TYPES[x.type] ? TYPES[x.type].s : "") + " · " + x.words + " 词 · " + (x.ltErr ? "语法检查失败" : x.issues + " 个问题") + (x.est ? " · 粗估 LR " + bandStr(x.est.LR) + " / GRA " + bandStr(x.est.GRA) : "") + '</span></div><div class="sc" data-a="hopen" data-id="' + esc(x.id) + '" style="cursor:pointer">' + sc + '<small>AI 分</small></div><button class="ui-btn sm" data-a="hdel" data-id="' + esc(x.id) + '" title="删除这条">🗑</button></div>';
     }).join("") + "</div>";
   }
@@ -814,19 +912,20 @@
   async function callAI(r) {
     r.aiLoading = true; r.aiErr = ""; r.ai = null; redrawRes();
     try {
-      const j = await AI.ask("write", { type: r.type, prompt: r.prompt, text: r.text }, { timeout: 120000 }); // 全站共用的调 AI（ai.js）
+      const j = await AI.ask("write", { lang: DEW ? "de" : "en", type: r.type, prompt: r.prompt, text: r.text }, { timeout: 120000 }); // 全站共用的调 AI（ai.js）
       if (!j.ok) throw j.error === "noai" || j.status === 404 || j.status === 405 || j.status === 501 ? "noai" : AI.msg(j, "AI 评分失败，请稍后重试");
       if (!j.band && !j.summary_zh && !j.rewrite) throw "AI 返回的格式不对";
       const nb = x => { const v = parseFloat(x); return isFinite(v) ? Math.max(0, Math.min(9, Math.round(v * 2) / 2)) : null; };
       const B = j.band || {}, arr = a => (Array.isArray(a) ? a : a ? [a] : []).map(String).filter(Boolean).slice(0, 10);
-      r.ai = { band: { TR: nb(B.TR), CC: nb(B.CC), LR: nb(B.LR), GRA: nb(B.GRA), overall: nb(B.overall) }, summary_zh: String(j.summary_zh || ""), strengths_zh: arr(j.strengths_zh), improve_zh: arr(j.improve_zh), rewrite: String(j.rewrite || "") };
+      const de = j.scale === "de", n25 = x => { const v = parseFloat(x); return isFinite(v) ? Math.max(0, Math.min(25, Math.round(v))) : null; }, n100 = x => { const v = parseFloat(x); return isFinite(v) ? Math.max(0, Math.min(100, Math.round(v))) : null; };
+      r.ai = { scale: de ? "de" : "", cefr: de && /^[ABC][12]$/.test(j.cefr || "") ? j.cefr : "", band: de ? { TR: n25(B.TR), CC: n25(B.CC), LR: n25(B.LR), GRA: n25(B.GRA), overall: n100(B.overall) } : { TR: nb(B.TR), CC: nb(B.CC), LR: nb(B.LR), GRA: nb(B.GRA), overall: nb(B.overall) }, summary_zh: String(j.summary_zh || ""), strengths_zh: arr(j.strengths_zh), improve_zh: arr(j.improve_zh), rewrite: String(j.rewrite || "") };
     } catch (e) { r.aiErr = typeof e === "string" ? e : e && e.message ? e.message : "noai"; }
     r.aiLoading = false; redrawRes();
   }
 
   async function check() {
     const text = st.text, n = countWords(text);
-    if (n < 20) { say("至少写 20 个词再批改"); return; }
+    const minW = DEW ? 15 : 20; if (n < minW) { say("至少写 " + minW + " 个词再批改"); return; }
     if (res && (res.ltLoading || res.aiLoading)) return;
     const r = { id: "w" + Date.now().toString(36), at: Date.now(), type: st.type, prompt: st.prompt.trim(), text, lang: st.lang, matches: [], filter: "all", fixed: 0, ltLoading: true, aiLoading: true };
     res = r; runLocal(r); redrawRes();
@@ -846,8 +945,8 @@
     for (const m of r.matches) {
       if (L.length >= 10) break;
       if (!(m.cat === "grammar" || m.cat === "spell") || !m.rep || !m.rep[0] || !m.length) continue;
-      const wrong = T.substr(m.offset, m.length); if (!/[a-z]/i.test(wrong) || wrong.trim() === m.rep[0].trim()) continue;
-      if (m.cat === "spell" && /^[A-Z]/.test(wrong)) continue;
+      const wrong = T.substr(m.offset, m.length); if (!/[a-zäöüß]/i.test(wrong) || wrong.trim() === m.rep[0].trim()) continue;
+      if (m.cat === "spell" && /^[A-Z]/.test(wrong) && !DEW) continue; // 英语：大写开头多半是人名地名；德语名词本来就大写，照收
       let a = m.offset, b = m.offset + m.length;
       while (a > 0 && !/[.!?\n]/.test(T[a - 1])) a--;
       while (b < T.length && !/[.!?\n]/.test(T[b])) b++;
@@ -970,7 +1069,7 @@
       else if (A === "hload" && histView) {
         if (st.text.trim() && st.text !== histView.text && !(await U.ask("载入会替换写作区现在的正文和题目，继续？", { ok: "载入" }))) return;
         const r = histView; if (!r) return; timer(false);
-        st.type = TYPES[r.type] ? r.type : "task2"; st.prompt = r.prompt; st.text = r.text; st.lang = r.lang || st.lang;
+        st.type = TYPES[r.type] ? r.type : DEW ? "b1mail" : "task2"; st.prompt = r.prompt; st.text = r.text; st.lang = r.lang || st.lang;
         r.readonly = false; res = r; histView = null; st.view = "write"; saveDraft(true); draw();
       }
     });

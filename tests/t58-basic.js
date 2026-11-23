@@ -17,7 +17,7 @@ ok(/<div id="view-basic"><\/div>/.test(h) && /basic: \{ src: "basic\.js\?v=\w+",
 ok(/g==='basic'/.test(h), "?go=basic");
 ok(/saved==='write'&&localStorage\.getItem\('en_sub_write'\)==='grammar'\)saved='basic'/.test(h), "old 写→语法 lands on 入门→语法");
 // 口语页：入门 / 发音不在「说」里列，嵌在入门里时只显示那一栏
-ok(/const MOVED = \["start", "pron"\]/.test(sp) && /SECS\.filter\(x => !MOVED\.includes\(x\[0\]\)\)/.test(sp), "speak hides moved secs");
+ok(/const MOVED = DE \? \[\] : \["start", "pron"\]/.test(sp) && /SECS\.filter\(x => !MOVED\.includes\(x\[0\]\)\)/.test(sp), "speak hides moved secs");
 ok(/\}\)\[only \|\| sec\]\(\)/.test(sp) && /window\.speakShow = o =>/.test(sp), "speakShow(only)");
 ok(/if \(!sec \|\| MOVED\.includes\(sec\)\) sec = "daily"/.test(sp), "說 defaults to daily");
 // basic.js：首页每张卡都有跳转

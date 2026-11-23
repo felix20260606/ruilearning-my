@@ -52,8 +52,8 @@
   // ---------- 例句：词条自带的 + Tatoeba 例句库（/api/sent，后台缓存）；听力每次换着听，最近听过的往后排 ----------
   const SENT = {}, heard = LG("pump:heard", {});
   const sentFor = w => { const k = String(w.word || "").toLowerCase().trim(); if (!hasEn(w) || w.type === "sentence" || /\s.*\s.*\s/.test(k) || k in SENT) return Promise.resolve(); SENT[k] = null;
-    if (window.VL && window.VL !== "en") return Promise.resolve(SENT[k] = []); // 🇩🇪 例句库（Tatoeba，后台）只有英语句子：学德语时只用词条自带的例句
-    return U.json("/api/sent?w=" + encodeURIComponent(k)).then(j => { if (!j.items && j.ok === false) delete SENT[k]; else SENT[k] = j.items || []; }); };
+    const de = window.VL === "de"; if (window.VL && window.VL !== "en" && !de) return Promise.resolve(SENT[k] = []); // 例句库（Tatoeba，后台）有英语、德语句子（带中文）
+    return U.json("/api/sent?" + (de ? "lang=de&" : "") + "w=" + encodeURIComponent(k)).then(j => { if (!j.items && j.ok === false) delete SENT[k]; else SENT[k] = j.items || []; }); };
   let day = LG("pump:day", { d: "", n: 0 }); if (day.d !== today()) day = { d: today(), n: 0 };
   let cards = [], at = 0, bad = 0, playing = false, root = null;
   // 🔙 页面历史：在首页还是在练（练到一半没法恢复，所以只支持「后退 = 停下回首页」）
@@ -353,7 +353,7 @@
     cards.forEach((c, i) => { c.last = !cards.slice(i + 1).some(x => x.w.id === c.w.id); });
     if (only) { enter(); return; } // 只练跟读 / 听写：不补额外句子
     // 名额还有剩：例句库的额外句子补满（不记进度，同 PhrasePump 的 pump）
-    if (p.pump && (!window.VL || window.VL === "en")) U.json("/api/sent?pump=" + p.pump).then(j => { if (!playing) return; (j.items || []).forEach((x, i) => cards.push({ w: { id: "pump_" + i, word: "", zh: "", pump: 1 }, s: { en: x.en, zh: x.zh, src: "tatoeba" }, i: 0, k: "listen", last: true, rev: 0 })); if (cards[at]) show(); });
+    if (p.pump && (!window.VL || window.VL === "en" || window.VL === "de")) U.json("/api/sent?pump=" + p.pump + (window.VL === "de" ? "&lang=de" : "")).then(j => { if (!playing) return; (j.items || []).forEach((x, i) => cards.push({ w: { id: "pump_" + i, word: "", zh: "", pump: 1 }, s: { en: x.en, zh: x.zh, src: "tatoeba" }, i: 0, k: "listen", last: true, rev: 0 })); if (cards[at]) show(); });
     enter();
   }
   function grade(c, ok) {

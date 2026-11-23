@@ -226,6 +226,9 @@
   #wt-sheet .mk{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}#wt-sheet .mk button{flex:1 1 auto;min-height:36px;border-radius:9px;border:1px solid var(--ui-line-2,#454950);background:var(--ui-surface-2,#2d2f34);color:var(--ui-ink,#E6E8EB);font:inherit;font-size:13.5px;cursor:pointer}
   #wt-sheet .mk button.on{background:var(--ui-pur,#9C3FD0);border-color:var(--ui-pur,#9C3FD0);color:#fff}`;
   let VS = null, vsP = null; // VS = { S 插件设置, sents 已保存短语（拆成词） }
+  // 🇩🇪 学德语（window.VL === "de"）：只列德语字幕的视频（/api/cap 列表的 lang，插件存字幕时带的）；学英语时不列德语视频。
+  //   德语字幕不按英语词频上色、不标英语句型 / 语法（插件那套只会英语），点词照样查（word.js 按德语查）
+  const DE = window.VL === "de", langOk = x => (DE ? /^de/i.test((x && x.lang) || "") : !/^de/i.test((x && x.lang) || ""));
   function vsLoad() {
     if (vsP) return vsP;
     vsP = (async () => {
@@ -265,13 +268,14 @@
     let n = 0; return h.replace(re, (a, cl, w) => { const t = tag[n++]; return t ? '<span class="vs-w ' + cl + " " + t + '" data-w="' + w + '">' : a; });
   }
   function vsHtml(t) {
-    const S = VS.S; let h = vsMark(esc(t), S);
+    const S = DE ? Object.assign({}, VS.S, { showMarks: false, showGram: false }) : VS.S; let h = vsMark(esc(t), S);
+    if (DE) return h.replace(/<span class="vs-w /g, '<span class="wt-w vs-w ');
     if (S.showGram !== false && /\s/.test(t) && typeof vsGramHtml === "function") h = vsGramHtml(h).replace(/ g-(\w+)(?=[ "])/g, (a, c) => (S["g_" + c] === false ? "" : a));
     return vsPh(h).replace(/<span class="vs-w /g, '<span class="wt-w vs-w ');
   }
   let vsPats = [];
   function vsPatHtml(c) { // 句型 / 习语 / 短语动词 / 口语缩略 / 连读：当前句下面一排小标签（同插件）
-    vsPats = []; if (!VS || !c) return "";
+    vsPats = []; if (!VS || !c || DE) return "";
     const ws = (c.t.match(VS_WORD_RE) || []), S = VS.S;
     if (S.showPat !== false && typeof vsPatterns === "function") vsPats = vsPatterns(ws, 3, c.t) || [];
     if (typeof vsSentNotes === "function") vsPats = vsPats.concat(vsSentNotes(ws, c.t, S, Math.max(1, 5 - vsPats.length), [].concat(...vsPats.map(p => p.keys))) || []);
@@ -492,7 +496,7 @@
     if (!items.length) {
       box.innerHTML = listState === "loading" ? '<div class="wt-empty">正在读取视频列表…</div>'
         : listState === "err" ? '<div class="wt-empty">视频列表没读出来（网络问题）。<br><button class="wt-btn" data-act="retry">重试</button></div>'
-        : '<div class="wt-empty">还没有视频。有三种方法加进来：<ol><li>电脑上装好「双语字幕」插件，在 YouTube 看任意带字幕的视频约 20 秒，会自动出现在这里。</li><li>手机上用 Safari 书签小工具（见上面「📱 手机上给任意视频加字幕」）。</li><li>上面直接粘贴 YouTube 链接，可以先看视频（暂时没有字幕）。</li></ol><br><button class="wt-btn" data-act="bm">设置手机书签</button></div>';
+        : DE ? '<div class="wt-empty">还没有德语视频。电脑上装好「双语字幕」插件，在 YouTube 看带德语字幕的视频约 20 秒，会自动出现在这里（学英语时存的英语视频在英语那边）。</div>' : '<div class="wt-empty">还没有视频。有三种方法加进来：<ol><li>电脑上装好「双语字幕」插件，在 YouTube 看任意带字幕的视频约 20 秒，会自动出现在这里。</li><li>手机上用 Safari 书签小工具（见上面「📱 手机上给任意视频加字幕」）。</li><li>上面直接粘贴 YouTube 链接，可以先看视频（暂时没有字幕）。</li></ol><br><button class="wt-btn" data-act="bm">设置手机书签</button></div>';
       return;
     }
     let list = items.filter(x => {
@@ -527,11 +531,11 @@
   const notGone = list => (list || []).filter(x => !gone[x.v] || (x.at || 0) > gone[x.v]);
   let listSeq = 0;
   async function loadList(manual) {
-    const my = ++listSeq; allItems = LS.get("wt:list", []); if (allItems.length) listState = "ok"; drawList();
+    const my = ++listSeq; allItems = (LS.get("wt:list", []) || []).filter(langOk); if (allItems.length) listState = "ok"; drawList();
     const rb = $("#wt-ref"); rb.classList.add("spin");
     try {
       const r = await fetch(API + "?list=1"), j = await r.json(); if (my !== listSeq) return;
-      if (j && j.ok) { allItems = notGone(j.items); listState = "ok"; LS.set("wt:list", allItems); drawList(); if (manual) tip("已刷新，共 " + allItems.length + " 个视频"); }
+      if (j && j.ok) { const all = notGone(j.items); allItems = all.filter(langOk); listState = "ok"; LS.set("wt:list", all); drawList(); if (manual) tip("已刷新，共 " + allItems.length + " 个视频"); }
       else throw new Error(j && j.error);
     } catch (e) { if (my !== listSeq) return; if (!allItems.length) { listState = "err"; drawList(); } if (manual) tip("刷新失败，请检查网络"); }
     finally { if (my === listSeq) rb.classList.remove("spin"); }

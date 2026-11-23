@@ -51,11 +51,24 @@
   const DE = () => window.VL && window.VL !== "en";
   const GROUPS_DE = [
     ["🎧 听", [
-      ["stt", "🎙", "练习课跟读打分", "次", 4, 1, "drill"],
+      ["sme:al", "🎯", "DW 慢速新闻 · 逐词对时间", "期", 47, 6, "sme"],
+      ["ai:lquiz", "🧩", "听后小测", "次", 190, 1, "sme"],
+      ["stt", "🎙", "跟读打分", "次", 4, 1, "drill"],
       ["ai:whymiss", "🤔", "为什么没听出来", "次", 50, 1, "drill"],
-      ["dw:al", "🇩🇪", "德语慢速新闻对时间", "期", 47, 6, "drill"],
+      ["dw:al", "🇩🇪", "练习课慢速新闻对时间", "期", 47, 6, "drill"],
     ]],
-    ["🌱 入门", [
+    ["🗣 说", [
+      ["ai:chat", "🤖", "AI 陪练", "轮", 70, 1, "s:chat"],
+      ["ai:chatsum", "📋", "陪练结束总结", "次", 135, 1, "s:chat"],
+      ["ai:speak", "🗣", "话题回答点评", "次", 100, 1, "s:topic"],
+      ["ai:judge", "⚡", "快问快答判断", "题", 40, 1, "s:quick"],
+      ["ai:howto", "🧰", "这句话怎么说", "次", 70, 1, "s:tools"],
+    ]],
+    ["📖 读 · ✍️ 写 · 🌱 入门", [
+      ["ai:newsimp", "📰", "新闻简单版 + 小测", "篇", 270, 1, "read"],
+      ["ai:write", "✍️", "写作批改（歌德 B1 / B2）", "篇", 250, 1, "write"],
+      ["ai:useword", "📘", "用生词造句（每日一练）", "句", 50, 1, "useword"],
+      ["ai:coach", "🧭", "AI 教练定 7 天计划", "次", 230, 1, "coach"],
       ["stt", "🎙", "德语入门跟读打分", "次", 4, 1, "debasic"],
     ]],
   ];
@@ -68,7 +81,7 @@
     }
     if (g === "sme" || g === "drill") return en("listen", g);
     if (g === "debasic") return en("basic", "satz");
-    if (g === "coach") return en("basic", "speak");
+    if (g === "coach") return DE() ? goTo("s:start") : en("basic", "speak"); // 德语：AI 教练在「🗣 说 → 🌱 入门」
     if (g === "useword") { const el = document.querySelector("#view-daily [data-sent]"); if (el) el.scrollIntoView({ block: "center" }); return; }
     en(g);
   }
