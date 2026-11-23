@@ -106,3 +106,7 @@ html[data-lang="de"].show-basic-home #view-basic{display:block;background:var(--
 html[data-lang="de"].show-basic.has-sec #en-secbar{display:flex!important}
 @media (max-width:1023px){html[data-lang="de"].show-basic-home #view-basic{padding-top:calc(150px + var(--sat,0px))}}
 @media (min-width:1024px){html[data-lang="de"].show-basic-home #view-basic{padding-top:108px}}
+
+/* 🧭 旅游标签只留「我的足迹」「导航」，其他的收进「⋯ 更多」（tabs.js）；正在看的那个就算收起来也显示 */
+#trip-dest .seg-wrap:not(.open) .dx:not(.on){display:none}
+#dest-more{opacity:.75}

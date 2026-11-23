@@ -49,6 +49,7 @@ footer{text-align:center;color:var(--soft);font-size:11px;margin-top:24px;line-h
   .sec{font-size:15px;margin:30px 2px 12px}
 }
 </style><link rel="stylesheet" href="theme.css">
+<script src="trip-state.js"></script>
 </head><body>
 <div class="wrap">
   <div class="head">
@@ -59,6 +60,7 @@ footer{text-align:center;color:var(--soft);font-size:11px;margin-top:24px;line-h
 
   <div class="sec">▍🗺 我的足迹</div>
   <div class="grid">
+    <div class="nc" data-go="sights"><span class="em">📍</span><b>吉隆坡景点大全 · 去过的打勾</b><p>市区和周边能当天来回的景点全列出来：照片、地址、怎么坐车、开放时间、门票、待多久；去过的打 ✅、想去的标 ⭐，换设备也在</p><span class="tag g">新</span></div>
     <div class="nc" data-go="foot"><span class="em">🗺</span><b>我的足迹 · 吉隆坡这一趟</b><p>去过的地方汇总成一篇：黑风洞、布城、马六甲、槟城（兰卡威、新加坡还没去），加上走之前还能去哪</p><span class="tag">新</span></div>
   </div>
 
@@ -94,5 +96,11 @@ document.querySelectorAll('.nc').forEach(function(c){
     if(go){try{parent.postMessage({tripGo:go},'*');}catch(e){}}
   });
 });
+// ✅ 去过的卡片：看「我的足迹」里点的记录（trip-state.js，id = "foot:<地方>"）；没点过就用页面上写的默认
+var FOOT={lk:"langkawi",pg:"penang",mel1:"melaka",mel:"melaka",sg2:"sg",sg:"sg"},DEF={};
+document.querySelectorAll(".nc[data-go]").forEach(function(c){var g=c.getAttribute("data-go");if(FOOT[g])DEF[g]=c.classList.contains("done");});
+function paint(){document.querySelectorAll(".nc[data-go]").forEach(function(c){var g=c.getAttribute("data-go");if(!FOOT[g])return;var r=TRIPST.get("foot:"+FOOT[g]),v=r?!!r.been:DEF[g],b=c.querySelector(".been");
+  c.classList.toggle("done",v);if(v&&!b){b=document.createElement("span");b.className="been";b.textContent="✅ 去过";c.insertBefore(b,c.firstChild);}else if(!v&&b)b.remove();});}
+paint();TRIPST.on(paint);TRIPST.sync();
 </script>
 </body></html>

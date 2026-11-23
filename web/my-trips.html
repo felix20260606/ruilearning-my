@@ -49,18 +49,23 @@
   .nav .go{background:var(--ui-pur,#8b5cf6);color:#fff;border-color:transparent}
   footer{text-align:center;color:var(--soft);font-size:12px;margin-top:26px;line-height:1.8}
   @media (max-width:520px){.hero h1{font-size:28px}.ph h2{font-size:19px}}
+  /* 点标记就能改：✅ 已去过 ⇄ ⏳ 还没去（存到 trip-state.js，导航页的卡片跟着变） */
+  button.been{font:inherit;font-size:13px;font-weight:900;cursor:pointer}button.been:after{content:" ⇄";font-weight:500;opacity:.7}
+  .hint{font-size:12px;opacity:.8;margin-top:10px}
 </style><link rel="stylesheet" href="theme.css">
+<script src="trip-state.js"></script>
 </head><body>
 <div class="hero"><div class="hin">
   <div class="k">My Footprints · Kuala Lumpur</div>
   <h1>🗺 我的足迹</h1>
   <div class="sub">住在吉隆坡这段时间，去过的地方都在这一篇 · 11/30 回国</div>
   <div class="stats">
-    <div class="stat"><b>4</b><span>个地方去过</span></div>
-    <div class="stat"><b>2</b><span>个还没去（兰卡威、新加坡）</span></div>
+    <div class="stat"><b id="n-been">4</b><span>个地方去过</span></div>
+    <div class="stat"><b id="n-no">2</b><span id="t-no">个还没去</span></div>
     <div class="stat"><b>4</b><span>篇详细行程</span></div>
     <div class="stat"><b>11/29</b><span>深夜回国</span></div>
   </div>
+  <div class="hint">👆 下面每一站右上角的「✅ 已去过 / ⏳ 还没去」点一下就能改，换设备也在</div>
 </div></div>
 <div class="wrap">
 
@@ -146,7 +151,7 @@
         <li>11/30 重庆中转 10 小时：补觉或进城吃小面、坐长江索道，15:55 飞杭州</li>
       </ul>
       <div class="tip"><b>天气：</b>11 月雨季，上午户外、下午容易雷阵雨。东海岸海岛（热浪岛、停泊岛、刁曼岛）这时候停航。</div>
-      <div class="nav"><a href="#toc">↑ 目录</a><a href="#sg">‹ 上一段：新加坡</a><button class="go" data-go="last6">🧭 吉隆坡周边 · 挑一天去 ›</button></div>
+      <div class="nav"><a href="#toc">↑ 目录</a><a href="#sg">‹ 上一段：新加坡</a><button class="go" data-go="sights">📍 吉隆坡景点大全 ›</button><button class="go" data-go="last6">🧭 吉隆坡周边 · 挑一天去 ›</button></div>
     </div>
   </section>
 
@@ -154,10 +159,27 @@
 </div>
 <script>
 // 「📖 看详细行程」：切到旅游中心对应的那一篇（在网站里是 iframe，交给外面的 tabs.js；单独打开时直接跳过去）
-var FILES={last6:"last6-trip.html",mel1:"malacca-1day.html",pg:"penang-trip.html",lk:"langkawi-trip.html",sg2:"sg-2day.html"};
+var FILES={sights:"kl-sights.html",last6:"last6-trip.html",mel1:"malacca-1day.html",pg:"penang-trip.html",lk:"langkawi-trip.html",sg2:"sg-2day.html"};
 document.querySelectorAll("[data-go]").forEach(function(b){b.addEventListener("click",function(){
   var g=b.getAttribute("data-go");
   if(window.parent&&window.parent!==window){try{parent.postMessage({tripGo:g},"*");}catch(e){}}else location.href=FILES[g];
 });});
+// ✅ 去过 / ⏳ 还没去：页面上写的是默认值，点了以后记在 TRIPST（id = "foot:<这一段的 id>"），导航页的卡片也看这个
+var PL=["batu","putra","melaka","penang","langkawi","sg"],DEF={};
+PL.forEach(function(id){var sec=document.getElementById(id),b=sec&&sec.querySelector(".ph .been");if(!b)return;DEF[id]=!b.classList.contains("no");
+  var nb=document.createElement("button");nb.type="button";nb.className=b.className;nb.title="点一下改成去过 / 还没去";b.replaceWith(nb);
+  nb.addEventListener("click",function(){var v=!been(id);TRIPST.set("foot:"+id,{been:v});if(window.parent&&parent.U&&parent.U.tip)parent.U.tip(v?"记下了：去过":"改成还没去");});});
+function been(id){var r=TRIPST.get("foot:"+id);return r?!!r.been:!!DEF[id];}
+function paint(){
+  var nb=0,no=[];
+  PL.forEach(function(id){var sec=document.getElementById(id);if(!sec)return;var v=been(id),b=sec.querySelector(".ph .been"),h=sec.querySelector(".pb h3"),a=document.querySelector('.toc a[href="#'+id+'"]');
+    if(v)nb++;else no.push(sec.querySelector(".ph h2").textContent.split(" ")[0]);
+    if(b){b.classList.toggle("no",!v);b.textContent=v?"✅ 已去过":"⏳ 还没去";}
+    if(h)h.textContent=v?"去过的":"可以玩的（详细行程里排好了）";
+    if(a){a.classList.toggle("done",v);var ck=a.querySelector(".ck");if(ck){ck.classList.toggle("no",!v);ck.textContent=v?"✅ 去过":"还没去";}}});
+  document.getElementById("n-been").textContent=nb;document.getElementById("n-no").textContent=no.length;
+  document.getElementById("t-no").textContent=no.length?"个还没去（"+no.join("、")+"）":"个还没去";
+}
+paint();TRIPST.on(paint);TRIPST.sync();
 </script>
 </body></html>

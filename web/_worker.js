@@ -414,7 +414,7 @@ async function sent(req, env, u) {
 // ---------- 个人的学习资料 /api/mine（按人分开，换设备也在）：阅读的文章、作文批改历史、词汇量测试 ----------
 // GET  ?k=reading|writing|vtest → { ok, items:{ id:{v, at} | {del:1, at} } }（删除记号保留 60 天）
 // POST {k, changes:{ id:{v,at}|{del:1,at} }} → 同一项以 at 新的为准，返回合并后的 { ok, items }
-const MINE_LIST = ["reading", "writing", "vtest", "speak", "daily", "sme", "err", "exam"], MINE_K = new RegExp("^(" + MINE_LIST.join("|") + ")$"); // err：「❌ 错题本」（errbook.js）；exam：雅思听力 / 阅读模考的成绩（exam.js） // daily：「📅 每日」的设置、手动打勾、每天完成几项；sme：「📻 6 分钟英语」听过哪几期 // speak：口语页的练习记录、每日打卡、AI 陪练记录、录音存档索引（speak.js）
+const MINE_LIST = ["reading", "writing", "vtest", "speak", "daily", "sme", "err", "exam", "trip"], MINE_K = new RegExp("^(" + MINE_LIST.join("|") + ")$"); // trip：「📍 吉隆坡景点大全」勾的去过 / 想去（kl-sights.html） // err：「❌ 错题本」（errbook.js）；exam：雅思听力 / 阅读模考的成绩（exam.js） // daily：「📅 每日」的设置、手动打勾、每天完成几项；sme：「📻 6 分钟英语」听过哪几期 // speak：口语页的练习记录、每日打卡、AI 陪练记录、录音存档索引（speak.js）
 async function mine(req, env, u) {
   if (req.method === "OPTIONS") return json({ ok: true });
   const kv = env.CAPTIONS; if (!kv) return json({ ok: false, error: "KV binding CAPTIONS is missing" }, 500);

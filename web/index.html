@@ -39,7 +39,7 @@ if(/[?&]debug\b/.test(location.search))setTimeout(function(){U.showLogs();},800)
 </head>
 <body>
 
-<link rel="stylesheet" href="index.css?v=7822b8a1">
+<link rel="stylesheet" href="index.css?v=6c4da4cb">
 <script>try{if(window.name==='vocab'&&/[#&]add=/.test(location.hash))document.documentElement.className+=' collect-mode';}catch(e){}</script>
 <div id="collect-overlay" style="display:none;position:fixed;inset:0;z-index:99999;background:#1d1e21;color:#E6E8EB;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;font-family:'PingFang SC','Noto Sans SC','Microsoft YaHei',system-ui,sans-serif">
   <div style="font-size:42px;margin-bottom:10px">📒</div>
@@ -206,13 +206,14 @@ if(/[?&]debug\b/.test(location.search))setTimeout(function(){U.showLogs();},800)
     <div class="seg-wrap">
       <button id="dest-foot" type="button">🗺 我的足迹</button>
       <button id="dest-tnav" class="on" type="button">🧭 导航</button>
-      <button id="dest-lk" type="button">🦅 兰卡威3天2晚</button>
-      <button id="dest-pg" type="button">🏝 槟城3天2晚 ✅</button>
-      <button id="dest-sg2" type="button">🇸🇬 新加坡2天1夜</button>
-      <button id="dest-sg" type="button">🇸🇬 新加坡3天2夜</button>
-      <button id="dest-mel1" type="button">☀️ 马六甲1日 ✅</button>
-      <button id="dest-mel" type="button">🏝 马六甲2日 ✅</button>
-      <button id="dest-db" type="button">🚗 东北</button>
+      <button id="dest-lk" class="dx" type="button">🦅 兰卡威3天2晚</button>
+      <button id="dest-pg" class="dx" type="button">🏝 槟城3天2晚</button>
+      <button id="dest-sg2" class="dx" type="button">🇸🇬 新加坡2天1夜</button>
+      <button id="dest-sg" class="dx" type="button">🇸🇬 新加坡3天2夜</button>
+      <button id="dest-mel1" class="dx" type="button">☀️ 马六甲1日</button>
+      <button id="dest-mel" class="dx" type="button">🏝 马六甲2日</button>
+      <button id="dest-db" class="dx" type="button">🚗 东北</button>
+      <button id="dest-more" type="button" title="其他行程（导航页里也都有）">⋯ 更多</button>
     </div>
   </div>
   <div id="triprow"></div>
@@ -391,7 +392,7 @@ if(/[?&]debug\b/.test(location.search))setTimeout(function(){U.showLogs();},800)
 <script src="de-forms.js?v=5bf6555d"></script>
 <script src="vocab.js?v=ae936d37"></script>
 
-<script src="tabs.js?v=5f5693e3"></script>
+<script src="tabs.js?v=05c95edd"></script>
 <script src="lang.js?v=0f6b8436"></script>
 <script src="tts.js?v=0f37f87f"></script>
 <script src="rec.js?v=0f113726"></script>
