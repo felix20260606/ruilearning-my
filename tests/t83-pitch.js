@@ -1,0 +1,20 @@
+// 🎵 跟读语调对比（web/pitch.js）：用合成的升调 / 降调 / 平调声音检查音高曲线、相似度和起伏（node 里跑，不用浏览器）
+const fs = require("fs"), path = require("path"), vm = require("vm");
+let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); } };
+const ctx = { window: {}, console, Math, Float32Array, Array, Promise }; ctx.window = ctx; vm.createContext(ctx);
+vm.runInContext(fs.readFileSync(path.join(__dirname, "..", "web", "pitch.js"), "utf8"), ctx);
+const P = ctx.PITCH, SR = 16000;
+const tone = (a, b, sec, sil) => { const n = SR * sec, x = new Float32Array(n + SR * sil * 2); let ph = 0; for (let i = 0; i < n; i++) { const f = a + (b - a) * i / n; ph += 2 * Math.PI * f / SR; x[SR * sil + i] = 0.5 * Math.sin(ph) + 0.2 * Math.sin(2 * ph); } return x; };
+const up = P.track(tone(120, 240, 2, 0.3)), up2 = P.track(tone(130, 250, 3, 0.2)), dn = P.track(tone(240, 120, 2.6, 0.1)), flat = P.track(tone(180, 182, 2, 0.1));
+const v = up.f.filter(x => x != null);
+ok(Math.abs(up.dur - 2) < 0.1, "leading / trailing silence trimmed: " + up.dur);
+ok(v[0] < -4 && v[v.length - 1] > 4 && up.sd > 2.5, "rising tone → rising curve (about one octave)");
+ok(flat.sd < 0.3, "flat tone → flat curve");
+const sim = (A, B) => { const n = 120, rs = f => Array.from({ length: n }, (_, i) => f[Math.min(f.length - 1, Math.round(i / (n - 1) * (f.length - 1)))]); const a = rs(A.f), b = rs(B.f), both = a.map((x, i) => (x != null && b[i] != null ? [x, b[i]] : null)).filter(Boolean); const ma = both.reduce((s, p) => s + p[0], 0) / both.length, mb = both.reduce((s, p) => s + p[1], 0) / both.length; let c = 0, va = 0, vb = 0; both.forEach(([x, y]) => { c += (x - ma) * (y - mb); va += (x - ma) ** 2; vb += (y - mb) ** 2; }); return c / Math.sqrt(va * vb); };
+ok(sim(up, up2) > 0.95, "same shape, different speed / pitch → similar");
+ok(sim(up, dn) < -0.9, "opposite shape → not similar");
+const r = { a: up.f.slice(0, 120), b: dn.f.slice(0, 120), sim: 0.8, rate: 1.5, ref: up, mine: flat };
+const h = P.html(r); ok(/<svg/.test(h) && /很像/.test(h) && /比较平/.test(h) && /慢不少/.test(h), "chart + tips (similar, flat voice, too slow)");
+const S = fs.readFileSync(path.join(__dirname, "..", "web", "speak.js"), "utf8");
+ok(/data-pitch=/.test(S) && /LAZY\.need\("pitch"\)/.test(S), "speak: 🎵 button, pitch.js loaded on demand");
+console.log(fail ? fail + " FAILED" : "t83 pitch: all ok"); process.exit(fail ? 1 : 0);

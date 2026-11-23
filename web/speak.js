@@ -162,7 +162,7 @@
     if (y.url) { try { if (x.url) URL.revokeObjectURL(x.url); } catch (e) {} x.url = y.url; }
     if (y.noai) x.noai = true;
     x.busy = false; x.said = text;
-    if (r.target) { x.res = text ? align(r.target, text) : null; if (x.res) x.best = Math.max(x.best || 0, x.res.score); }
+    if (r.target) { x.res = text ? align(r.target, text) : null; if (x.res) x.best = Math.max(x.best || 0, x.res.score); x.tgt = r.target; x.blob = blob; x.pt = ""; } // 🎵 语调对比要用（pitch.js）
     if (blob && (r.target || r.key.indexOf("t:") === 0)) archive(r.key, x, r.target, blob); // 存进「📼 我的录音」
     paintRec(r.key);
     if (r.after) r.after(x);
@@ -176,6 +176,13 @@
   }
   const pct = v => Math.round((v || 0) * 100);
   function recBtn(key, target, max, label) { const x = RES[key] || {}; return '<button class="sk-ib rec' + (x.on ? " on" : "") + '" data-rec="' + esc(key) + '" data-t="' + esc(target || "") + '" data-max="' + (max || 20) + '">' + (x.on ? "⏹ 停止" : "🎙 " + (label || (x.url ? "再读" : "跟读"))) + "</button>"; }
+  // 原声：预先生成好的 AI 语音文件（不花额度）；还没生成的，点了「比语调」才现做一句（约 80 neurons，做过的有缓存）
+  const refSrc = t => { try { if (!window.TTS || !TTS.srcOf) return ""; const s = TTS.srcOf(t, ""); if (s && s.indexOf("/tts/") === 0) return s; const c = TTS.clean ? TTS.clean(t) : String(t || "").trim(); return c && c.length <= 600 && /[a-z]/i.test(c) ? "/api/tts?v=asteria&t=" + encodeURIComponent(c) : ""; } catch (e) { return ""; } };
+  function pitchOf(key) {
+    const x = RES[key]; if (!x || !x.blob) return; x.pt = '<span class="said">🎵 正在分析……</span>'; paintRec(key);
+    const go = () => window.PITCH.compare(refSrc(x.tgt), x.blob).then(r => { x.pt = window.PITCH.html(r); }, e => { x.pt = '<span class="said">没分析出来（' + esc(String(e && e.message || e)).slice(0, 60) + "）</span>"; }).then(() => paintRec(key));
+    if (window.PITCH) go(); else if (window.LAZY) LAZY.need("pitch").then(go, () => { x.pt = '<span class="said">没加载出来，网络不通？</span>'; paintRec(key); });
+  }
   function resHtml(key) {
     const x = RES[key]; if (!x) return "";
     const k = esc(key);
@@ -187,6 +194,8 @@
     else if (x.said) h += '<div class="said">识别到：' + esc(x.said) + "</div>";
     else if (x.url && !x.err) h += '<div class="said">' + (SR || !x.noai ? "没识别出文字，可以回放听听自己读得怎么样" : "这个浏览器转不了文字（Brave 不行；换 Chrome / Safari，或在 Cloudflare 打开 Workers AI），可以回放和原声对比") + "</div>";
     if (x.url) h += '<div style="margin-top:6px"><audio controls src="' + x.url + '"></audio></div>';
+    // 🎵 语调对比：原声有预先生成的 AI 语音（/tts/…mp3）才能比；点一下才分析（在浏览器里算，不花额度）
+    if (x.url && x.blob && x.tgt && refSrc(x.tgt)) h += x.pt ? '<div style="margin-top:8px">' + x.pt + "</div>" : '<div style="margin-top:6px"><button class="sk-ib" data-pitch="' + k + '" title="把你的音高曲线和原声画在一起：哪里该升调、该重读、语速差多少">🎵 和原声比语调</button></div>';
     return '<div class="sk-res">' + h + "</div>";
   }
   function paintRec(key) {
@@ -843,6 +852,7 @@
       const ar = t.closest("[data-arch]"); if (ar) { playArchived(ar.dataset.arch); return; }
       const wd = t.closest("[data-word]"); if (wd) { sayWord(wd.dataset.word); return; }
       const sy = t.closest("[data-say]"); if (sy) { if (RP || SH) { RP = null; SH = null; } say(sy.dataset.say, { slow: !!sy.dataset.slow, who: sy.dataset.who || "" }); return; }
+      const pq = t.closest("[data-pitch]"); if (pq) { pitchOf(pq.dataset.pitch); return; }
       const rx = t.closest("[data-rec-x],[data-rec-re]"); if (rx) { recAbort(rx.dataset.recX || rx.dataset.recRe, !!rx.dataset.recRe); return; }
       const rb = t.closest("[data-rec]"); if (rb) {
         const key = rb.dataset.rec, tgt = rb.dataset.t, max = +rb.dataset.max || 20;
