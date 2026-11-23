@@ -1358,8 +1358,27 @@ async function cfUsage(env, from, to) {
   }
   return days;
 }
+// 存储（Workers KV）的用量：同一个令牌（Account Analytics: Read）就能读。免费额度按 UTC 天：读 10 万、写 / 删 / 列出各 1000，存 1 GB
+//   → { days: { "YYYY-MM-DD": { read, write, delete, list } }, keys, bytes }
+async function cfKV(env, from, to) {
+  const q = "query($a:String!,$s:Date!,$e:Date!){viewer{accounts(filter:{accountTag:$a}){kvOperationsAdaptiveGroups(limit:1000,filter:{date_geq:$s,date_leq:$e}){sum{requests} dimensions{date actionType}} kvStorageAdaptiveGroups(limit:100,filter:{date_geq:$s,date_leq:$e},orderBy:[date_DESC]){max{keyCount byteCount} dimensions{date namespaceId}}}}}";
+  const r = await fetch("https://api.cloudflare.com/client/v4/graphql", { method: "POST", headers: { Authorization: "Bearer " + env.CF_API_TOKEN, "Content-Type": "application/json" }, body: JSON.stringify({ query: q, variables: { a: String(env.CF_ACCOUNT_ID).trim(), s: from, e: to } }) });
+  const j = await r.json().catch(() => null);
+  if (!r.ok || !j) throw new Error("Cloudflare 接口 " + r.status);
+  if (j.errors && j.errors.length) throw new Error(String(j.errors[0].message || "GraphQL error").slice(0, 200));
+  const acc = j.data && j.data.viewer && j.data.viewer.accounts && j.data.viewer.accounts[0]; if (!acc) throw new Error("账户 ID 不对，或密钥没有这个账户的权限");
+  const days = {};
+  for (const g of acc.kvOperationsAdaptiveGroups || []) {
+    const d = g.dimensions && g.dimensions.date, a = String(g.dimensions && g.dimensions.actionType || "").toLowerCase(); if (!d || !a) continue;
+    const D = days[d] || (days[d] = { read: 0, write: 0, delete: 0, list: 0 }); D[a] = (D[a] || 0) + (+(g.sum && g.sum.requests) || 0);
+  }
+  // 存了多少：最新那天，各个命名空间加起来
+  const st = acc.kvStorageAdaptiveGroups || [], last = st.length ? st[0].dimensions.date : "", seen = new Set(); let keys = 0, bytes = 0;
+  for (const g of st) { if (g.dimensions.date !== last || seen.has(g.dimensions.namespaceId)) continue; seen.add(g.dimensions.namespaceId); keys += +(g.max && g.max.keyCount) || 0; bytes += +(g.max && g.max.byteCount) || 0; }
+  return { days, keys, bytes, at: last };
+}
 async function usage(req, env) {
-  const cache = typeof caches !== "undefined" ? caches.default : null, ck = new Request("https://use.cache/v2");
+  const cache = typeof caches !== "undefined" ? caches.default : null, ck = new Request("https://use.cache/v3");
   if (cache) { const c = await cache.match(ck); if (c) return c; }
   const days = {}, from = new Date(Date.now() - 6 * 864e5).toISOString().slice(0, 10);
   if (env.CAPTIONS) {
@@ -1380,9 +1399,11 @@ async function usage(req, env) {
     for (const d of new Set(Object.keys(days).concat(Object.keys(C)))) { const D = days[d] || (days[d] = { m: {}, f: {}, e: 0 }); D.est = D.m; D.m = (C[d] && C[d].m) || {}; }
     src = "cf";
   } catch (e) { why = String(e && e.message || e).slice(0, 200); }
+  let kv = null;
+  if (env.CF_API_TOKEN && env.CF_ACCOUNT_ID) try { kv = await cfKV(env, from, useDay()); } catch (e) { kv = { why: String(e && e.message || e).slice(0, 200) }; } // 读不到存储用量不影响 AI 那部分
   for (const d in days) for (const g of ["m", "f", "est"]) for (const n in days[d][g] || {}) days[d][g][n][1] = Math.round(days[d][g][n][1]);
   const now = new Date(), reset = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
-  const res = new Response(JSON.stringify({ ok: true, src, why, today: useDay(), limit: 10000, reset, days, at: Date.now() }), { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "max-age=30" } });
+  const res = new Response(JSON.stringify({ ok: true, src, why, today: useDay(), limit: 10000, reset, days, kv, kvLimit: { read: 100000, write: 1000, delete: 1000, list: 1000, bytes: 1e9 }, at: Date.now() }), { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "max-age=30" } });
   if (cache) await cache.put(ck, res.clone()); // Cloudflare 的数字有几分钟延迟，缓存 30 秒够了
   return res;
 }

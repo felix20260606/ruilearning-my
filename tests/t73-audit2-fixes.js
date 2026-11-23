@@ -92,6 +92,18 @@ const res = (j, st) => ({ ok: (st || 200) < 400, status: st || 200, json: async 
     const out = await E3.win.TR.lines(["one", "bad", "three"], { ai: false });
     ok(out[0] === "译one" && out[1] === "" && out[2] === "译three", "row-by-row fallback continues after a bad row: " + JSON.stringify(out));
   }
+  // ---- ⑥ /api/usage 带上存储（KV）用量 ----
+  {
+    const Wk = (await import(path.join(__dirname, "..", "web", "_worker.js"))).default;
+    const kv = { list: async () => ({ keys: [], list_complete: true }), get: async () => null, put: async () => {} };
+    const today = new Date().toISOString().slice(0, 10);
+    const of = globalThis.fetch; globalThis.fetch = async (u, o) => { const q = JSON.parse(o.body).query;
+      if (/kvOperations/.test(q)) return new Response(JSON.stringify({ data: { viewer: { accounts: [{ kvOperationsAdaptiveGroups: [{ sum: { requests: 57 }, dimensions: { date: today, actionType: "write" } }, { sum: { requests: 900 }, dimensions: { date: today, actionType: "read" } }], kvStorageAdaptiveGroups: [{ max: { keyCount: 502, byteCount: 10e6 }, dimensions: { date: today, namespaceId: "n1" } }] }] } } }));
+      return new Response(JSON.stringify({ data: { viewer: { accounts: [{ aiInferenceAdaptiveGroups: [] }] } } })); };
+    const r = await Wk.fetch(new Request("https://x.test/api/usage"), { CAPTIONS: kv, CF_API_TOKEN: "t", CF_ACCOUNT_ID: "a" }); const j = await r.json();
+    globalThis.fetch = of;
+    ok(j.ok && j.kv && j.kv.days[today].write === 57 && j.kv.days[today].read === 900 && j.kv.keys === 502 && j.kvLimit.write === 1000, "usage includes KV: " + JSON.stringify(j.kv).slice(0, 160));
+  }
   // ---- 源码检查：几处修法还在 ----
   const word = W("word.js"), watch = W("watch.js"), daily = W("daily.js"), rec = W("rec.js"), net = W("net.js");
   ok(/ok === true \|\| status\(lw\) !== "kn"/.test(word), "WORD.add does not downgrade known words");

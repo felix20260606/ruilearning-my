@@ -72,7 +72,7 @@
   .qa-bar u{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:var(--ui-pur);transition:width .4s}.qa-bar.warn u{background:var(--ui-orange)}.qa-bar.full u{background:var(--ui-red)}
   .qa-scale{grid-column:1/-1;display:flex;justify-content:space-between;font-size:11px;color:var(--ui-muted);font-variant-numeric:tabular-nums}
   .qa-st{grid-column:1/-1;font-size:13px;font-weight:700}.qa-st.warn{color:var(--ui-orange)}.qa-st.full{color:var(--ui-red)}
-  .qa-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:14px;margin-top:14px}
+  .qa-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:14px;margin-top:14px}.qa-grid>.qa-box:nth-child(3){grid-column:1/-1}
   .qa-box{background:color-mix(in srgb,var(--ui-surface-2) 70%,transparent);border:1px solid var(--ui-line);border-radius:14px;padding:12px 13px}
   .qa-box h4{margin:0 0 8px;font-size:13.5px;display:flex;align-items:baseline;gap:6px}.qa-box h4 small{color:var(--ui-muted);font-weight:500;font-size:12px}
   .qa-m{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:6px 0;border-top:1px solid var(--ui-line)}.qa-m:first-of-type{border-top:0}
@@ -113,6 +113,21 @@
   const sum = o => Object.values(o || {}).reduce((a, x) => a + (+x[1] || 0), 0);
   function left(reset) { const ms = Math.max(0, reset - Date.now()), h = Math.floor(ms / 3.6e6), m = Math.floor(ms % 3.6e6 / 6e4); return (h ? h + " 小时 " : "") + m + " 分"; }
   function resetClock(reset) { const d = new Date(reset); return d.getHours() + ":" + String(d.getMinutes()).padStart(2, "0"); }
+  // 🗄 存储（Workers KV）用量：/api/usage 的 kv（Cloudflare 后台的数字，同一个令牌）；免费额度按 UTC 天，最容易用完的是「写」（每天 1000 次）
+  function kvHtml(short) {
+    const K = J && J.kv, KL = (J && J.kvLimit) || { read: 1e5, write: 1000, delete: 1000, list: 1000, bytes: 1e9 }; if (!K) return "";
+    if (K.why) return short ? "" : '<div class="qa-box"><h4>🗄 存储用量</h4><div class="qa-wks">读不到 Cloudflare 的存储用量：' + esc(K.why) + "</div></div>";
+    const T = (K.days || {})[J.today] || {}, n = k => +T[k] || 0;
+    if (short) return " · 存储今天写了 <b style=\"color:var(--ui-ink)\">" + fmt(n("write")) + "</b> / " + fmt(KL.write);
+    const row = (k, name, sub) => { const v = n(k), lim = KL[k], p = Math.min(100, v / lim * 100); return '<div class="qa-m' + (v ? "" : " zero") + '"><div><b>' + name + "</b><small>" + sub + '</small></div><div class="v">' + fmt(v) + "<small> / " + fmt(lim) + '</small></div><div class="tr"><u style="width:' + p + "%;" + (p >= 80 ? "background:var(--ui-red,#e5484d)" : "") + '"></u></div></div>'; };
+    const ds = Array.from({ length: 7 }, (_, i) => new Date(Date.parse(J.today + "T00:00:00Z") - (6 - i) * 864e5).toISOString().slice(0, 10));
+    const wk = ds.map(d => { const x = (K.days || {})[d] || {}; return '<span title="' + d + '（UTC）：写 ' + fmt(+x.write || 0) + "、读 " + fmt(+x.read || 0) + '">' + (d === J.today ? "今天" : d.slice(5)) + " <b>" + fmt(+x.write || 0) + "</b></span>"; }).join("");
+    const mb = (+K.bytes || 0) / 1e6;
+    return '<div class="qa-box"><h4>🗄 存储用量（Workers KV）<small>Cloudflare 数据 · 按 UTC 日期，每天 8:00 重置</small></h4>' +
+      row("write", "写入", "保存生词本、练习记录、缓存…（最容易用完）") + row("read", "读取", "打开页面、查词、同步") + row("list", "列出", "看历史、额度统计") + row("delete", "删除", "删缓存、删数据") +
+      '<div class="qa-m"><div><b>已存</b><small>' + fmt(+K.keys || 0) + ' 条</small></div><div class="v">' + (mb < 10 ? mb.toFixed(1) : Math.round(mb)) + '<small> MB / 1 GB</small></div><div class="tr"><u style="width:' + Math.min(100, (+K.bytes || 0) / KL.bytes * 100) + '%"></u></div></div>' +
+      '<div class="qa-ft">最近 7 天写入：' + wk + "</div></div>";
+  }
   function html() {
     let C = document.getElementById("qa-css"); if (!C) { C = document.createElement("style"); C.id = "qa-css"; C.textContent = CSS; document.head.append(C); }
     load();
@@ -123,7 +138,7 @@
     const T = day(J, J.today), used = sum(T.m), rest = Math.max(0, LIMIT - used), pct = Math.min(100, used / LIMIT * 100);
     const lv = pct >= 100 ? "full" : pct >= 80 ? "warn" : "";
     const side = '<div class="qa-side">总量 <b>' + fmt(LIMIT) + "</b> / 天<br>已用 <b>" + fmt(used) + "</b>（" + Math.round(pct) + "%）<br>" + resetClock(J.reset) + " 重置 · 还有 " + left(J.reset) + "</div>";
-    if (!open) return '<div class="qa">' + head('今天还剩 <b style="color:var(--ui-ink);font-size:14px">' + fmt(rest) + "</b> / " + fmt(LIMIT) + " · " + left(J.reset) + "后重置") + '<div class="qa-bar ' + lv + '" style="margin-top:8px"><u style="width:' + pct + '%"></u></div></div>';
+    if (!open) return '<div class="qa">' + head('今天还剩 <b style="color:var(--ui-ink);font-size:14px">' + fmt(rest) + "</b> / " + fmt(LIMIT) + " · " + left(J.reset) + "后重置" + kvHtml(true)) + '<div class="qa-bar ' + lv + '" style="margin-top:8px"><u style="width:' + pct + '%"></u></div></div>';
     // 每个模型
     const ML = MODELS.concat(Object.keys(T.m).filter(k => !MODELS.some(m => m[0] === k)).map(k => [k, k, "其它模型"]));
     const maxM = Math.max(1, ...ML.map(m => (T.m[m[0]] || [0, 0])[1]));
@@ -153,7 +168,7 @@
       (T.e ? '<div class="qa-st warn">今天有 ' + T.e + " 次 AI 调用失败（多半是额度用完）</div>" : "") + "</div>" +
       acts + feats +
       '<div class="qa-grid"><div class="qa-box"><h4>每个模型今天用了多少<small>neurons · 次数' + (J.src === "cf" ? " · Cloudflare 数据" : " · 估算") + "</small></h4>" + models + "</div>" +
-      '<div class="qa-box"><h4>最近 7 天<small>按 UTC 日期，虚线 = 每天 1 万</small></h4>' + wk + '<div class="qa-wks">前 6 天平均每天 ' + fmt(avgN) + "（" + Math.round(avgN / LIMIT * 100) + "%）。每天早上 6:30 GitHub 会自动预先生成 AI 语音（最多约 5,000），算在当天的额度里；白天练习最好留在 5,000 以内，加起来就不会超过 1 万。</div></div></div>" +
+      '<div class="qa-box"><h4>最近 7 天<small>按 UTC 日期，虚线 = 每天 1 万</small></h4>' + wk + '<div class="qa-wks">前 6 天平均每天 ' + fmt(avgN) + "（" + Math.round(avgN / LIMIT * 100) + "%）。每天早上 6:30 GitHub 会自动预先生成 AI 语音（最多约 5,000），算在当天的额度里；白天练习最好留在 5,000 以内，加起来就不会超过 1 万。</div></div>" + kvHtml() + "</div>" +
       '<div class="qa-note">「还能做几次」= 今天剩下的 ÷ 每次大约花多少，点卡片直接去做；已经生成过的（AI 语音、BBC 对过时间、新闻简单版、出过的题）再打开不花额度。' + (J.src === "cf" ? "模型用量是 Cloudflare 记的；「今天用了」和单次花费是网站自己按功能记的估算，加起来和 Cloudflare 的数可能差一点。" : '数字是网站后台按 <a href="https://developers.cloudflare.com/workers-ai/platform/pricing/" target="_blank" rel="noopener">官方价格</a> 估的。') + "</div>" + setup + "</div>";
   }
   document.addEventListener("click", e => {
