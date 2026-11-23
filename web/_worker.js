@@ -1183,6 +1183,14 @@ Reply with ONLY one JSON object, no markdown:
 {"notes":[{"s":"a German note line with ____ where the answer goes","a":"ONE to THREE words or a number, copied exactly from the transcript (same spelling, case and umlauts)","why_zh":"简体中文解释，引用原话"}],
  "mcq":[{"q":"German question","opts":["A text","B text","C text"],"ans":0,"why_zh":"..."}]}
 Exactly 6 notes and 4 mcq, all in the order the information is heard. Notes must paraphrase the context but the answer words must appear exactly in the transcript.`;
+// 判断题第二道检查：另让 AI 只看原文判断每一句（不告诉它原答案），和出题时的答案不一样的那句不要（AI 偶尔会把答案标反）
+const EXAM_TF_CHECK_DE = `You check true/false/not-given reading questions against a German passage. For each numbered statement decide ONLY from the passage: TRUE (the passage says the same), FALSE (the passage says the opposite or something incompatible), NOT GIVEN (the passage does not say). Read carefully: negations, recommendations vs. orders, "some" vs. "all", numbers.
+Reply with ONLY JSON: {"a":["TRUE|FALSE|NOT GIVEN", ...]} with one answer per statement, in order.`;
+async function examTfCheck(env, text, tf) {
+  const r = await aiJson(env, [{ role: "system", content: EXAM_TF_CHECK_DE }, { role: "user", content: "Passage:\n" + text + "\n\nStatements:\n" + tf.map((x, i) => i + 1 + ". " + x.s).join("\n") }], o => isObj(o) && Array.isArray(o.a) && o.a.length === tf.length, 300);
+  if (!r.ok) return tf; // 检查没做成：照原样（不因为检查失败就出不了题）
+  return tf.filter((x, i) => String(r.a[i] || "").toUpperCase().replace(/_/g, " ").trim() === x.a);
+}
 const exNormEn = s => String(s || "").toLowerCase().replace(/[’']/g, "'").replace(/[^a-z0-9' ]+/g, " ").replace(/\s+/g, " ").trim(), exNorm = exNormEn;
 const exNormDe = s => String(s || "").normalize("NFC").toLowerCase().replace(/[’']/g, "'").replace(/[^\p{L}0-9' ]+/gu, " ").replace(/\s+/g, " ").trim(); // 德语：保留 ä ö ü ß
 function examClean(o, mode, text, de) {
@@ -1273,6 +1281,10 @@ async function examGen(env, b) {
   if (!r.ok || !got) { // 说清楚哪里不合格，方便查
     const nz = de ? exNormDe : exNorm, n = k => Array.isArray(last && last[k]) ? last[k].length : 0, T = " " + nz(text) + " ", miss = ((last && (last.notes || last.gaps)) || []).filter(x => x && x.a && !T.includes(" " + nz(x.a) + " ")).map(x => x.a).slice(0, 4);
     return json({ ok: false, error: r.error || "bad output", detail: last ? Object.keys(last).map(k => k + ":" + n(k)).join(" ") + (miss.length ? " | 答案不在原文：" + miss.join(", ") : "") : "" }, 502);
+  }
+  if (de && mode === "reading") { // 🇩🇪 判断题再核对一遍；核对后少于 2 道或没有对 / 错混着，就算这次没出好（再点一次重出）
+    got.tfng = await examTfCheck(env, text, got.tfng);
+    if (got.tfng.length < 2) return json({ ok: false, error: "判断题核对没通过，再出一次" }, 502);
   }
   got.model = r.model; if (kv) await cput(kv, ck, JSON.stringify(got), { expirationTtl: 60 * 86400 });
   return json(Object.assign({ ok: true }, got));
