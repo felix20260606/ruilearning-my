@@ -53,6 +53,14 @@ function make(o) {
     const ev = []; await REC.toggle("a", { done: x => ev.push(x) }); REC.stop(false); await sleep(800);
     ok(ev.length === 1 && /neurons/.test(ev[0].err) && ev[0].url === "blob:1", "stt failure → done with err: " + (ev[0] && ev[0].err));
   }
+  { // ④b 手机上 AI 额度用完以后：下一次只开浏览器识别（不和录音抢麦克风），能识别出字
+    const st0 = {}; let mrMade = 0;
+    const { REC, st } = make({ ua: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)", stt: () => ({ ok: false, status: 500, json: async () => ({ ok: false, error: "4006: daily free allocation of 10,000 neurons" }) }) });
+    void st0; void mrMade;
+    await REC.toggle("a", { done: () => {} }); REC.stop(false); await sleep(100);
+    ok(st.sr === 0, "first recording on iPhone: recorder only");
+    await REC.toggle("b", { done: () => {} }); ok(st.sr === 1, "after quota error: browser recognition used instead"); REC.stop(true);
+  }
   { // ⑤
     const { REC, st } = make({});
     const ev = []; await REC.toggle("a", { cancel: () => ev.push("cancel"), done: () => ev.push("done") }); REC.stop(true); await sleep(2200);

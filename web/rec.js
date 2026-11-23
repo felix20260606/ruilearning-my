@@ -21,6 +21,10 @@
 
   // 手机上：浏览器自带的语音识别和录音同时用麦克风会互相抢（iPhone 尤其明显：录不到声音、之后几次都录不了），只在电脑上一起开；手机上靠后台识别
   const MOBILE = typeof navigator !== "undefined" && (/Android|iP(hone|ad|od)/.test(navigator.userAgent || "") || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
+  // 后台识别用完了今天的 AI 额度：到 UTC 换天（北京时间 8 点）之前，手机上改用浏览器自带的识别（不录音频、不能回放，但能打分）
+  let sttDownTill = 0;
+  const sttDown = () => Date.now() < sttDownTill;
+  const nextUtcDay = () => { const d = new Date(); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1); };
   const endTracks = r => { try { if (r.stream) r.stream.getTracks().forEach(t => t.stop()); } catch (e) {} };
   function stop(cancel) {
     const r = rec; if (!r) return; rec = null; if (r.pending) { r.cancelled = true; return; } // 还在等麦克风：start 拿到以后看到被取消，会自己关掉
@@ -53,13 +57,15 @@
     } catch (e) { late = true; return ph.cancelled ? false : fail(micErr(e)); }
     if (rec !== ph) { stream.getTracks().forEach(t => t.stop()); return false; }
     const lang = curLang(o), r = rec = { key, o, lang, stream, chunks: [], srText: "", fin: false };
-    try {
+    const srOnly = MOBILE && SR && sttDown(); // 手机 + 后台识别今天用不了：只开浏览器识别（两样一起开会抢麦克风）
+    if (srOnly) { endTracks(r); r.stream = null; }
+    if (!srOnly) try {
       r.mr = new MediaRecorder(stream); r.mr.ondataavailable = e => { if (e.data && e.data.size) r.chunks.push(e.data); };
       r.mr.onstop = () => { endTracks(r); finish(r); };
       r.mr.onerror = () => { endTracks(r); if (rec === r) rec = null; clearTimeout(r.t); finish(r); };
       r.mr.start();
     } catch (e) { r.mr = null; }
-    if (SR && (!MOBILE || !r.mr)) try { const sr = r.sr = new SR(); sr.lang = bcp(lang); sr.interimResults = false; sr.continuous = true; sr.onresult = e => { r.srText = [...e.results].map(y => y[0].transcript).join(" "); }; sr.onerror = () => {}; sr.start(); } catch (e) { r.sr = null; }
+    if (SR && (!MOBILE || !r.mr || srOnly)) try { const sr = r.sr = new SR(); sr.lang = bcp(lang); sr.interimResults = false; sr.continuous = true; sr.onresult = e => { r.srText = [...e.results].map(y => y[0].transcript).join(" "); }; sr.onerror = () => {}; sr.start(); } catch (e) { r.sr = null; }
     if (!r.mr && !r.sr) { endTracks(r); rec = null; return fail("这个浏览器不能录音"); }
     r.t = setTimeout(() => { if (rec === r) stop(false); }, Math.min(130, o.max || 20) * 1000);
     if (o.start) try { o.start(); } catch (e) {}
@@ -71,7 +77,7 @@
     if (r.fin) return; r.fin = true;
     if (r.cancel) { if (r.o.cancel) try { r.o.cancel(); } catch (e) {} return; }
     const size = r.chunks.reduce((a, c) => a + (c.size || 0), 0);
-    const blob = size > 600 ? new Blob(r.chunks, { type: r.chunks[0].type || "audio/webm" }) : null, x = { key: r.key, blob, url: "", text: "", noai: false, err: "" };
+    const blob = r.mr && size > 600 ? new Blob(r.chunks, { type: r.chunks[0].type || "audio/webm" }) : null, x = { key: r.key, blob, url: "", text: "", noai: false, err: "" };
     try {
       if (r.o.busy) try { r.o.busy(); } catch (e) {}
       if (blob) {
@@ -81,10 +87,11 @@
           const resp = await fetch("/api/stt" + (r.lang !== "en" ? "?lang=" + r.lang : ""), { method: "POST", headers: { "Content-Type": blob.type }, body: blob, signal: ac ? ac.signal : undefined });
           const j = await resp.json().catch(() => null);
           if (j && j.ok) x.text = j.text || ""; else if (j && j.error === "noai") x.noai = true; else x.err = (j && j.error) || "http " + resp.status;
+          if (/neuron|4006|daily free|quota|exceeded/i.test(x.err)) sttDownTill = nextUtcDay();
         } catch (e) { x.err = e && e.name === "AbortError" ? "timeout" : "net"; }
         finally { clearTimeout(tm); }
-      } else x.err = "empty";
-      if (!x.text && r.sr) { await new Promise(res => setTimeout(res, 600)); x.text = r.srText || ""; } // 浏览器语音识别的结果稍晚一点才到
+      } else if (r.mr) x.err = "empty";
+      if (!x.text && r.sr) { await new Promise(res => setTimeout(res, r.mr ? 600 : 1200)); x.text = r.srText || ""; if (!x.text && !r.mr) x.err = x.err || "empty"; } // 浏览器语音识别的结果稍晚一点才到
       if (x.text) x.err = "";
     } catch (e) { x.err = x.err || "err"; }
     finally { if (r.o.done) try { r.o.done(x); } catch (e) { if (window.U) U.log("rec", "录完后处理出错", String(e && e.message || e)); } }

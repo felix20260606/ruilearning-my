@@ -156,7 +156,7 @@
   // 没识别出来的原因 → 给人看的话
   const recErrText = e => !e ? "" : e === "empty" ? "没录到声音：靠近一点、说大声一点再试；还不行就刷新页面（麦克风可能被别的程序占着）"
     : e === "timeout" ? "识别太慢没等到结果（网络慢？），点「🎙 再读」再试一次" : e === "net" ? "网络断了，识别没发出去：连上网再试"
-    : /neuron|quota|limit|4006|exceeded/i.test(e) ? "今天的 AI 识别额度用完了（北京时间早上 8 点恢复）；录音还能回放" : "识别出错：" + e;
+    : /neuron|quota|limit|4006|exceeded/i.test(e) ? "今天的 AI 识别额度用完了（北京时间早上 8 点恢复）：这次的录音还能回放；接下来改用浏览器自带的识别（手机上这样录的不能回放）" : "识别出错：" + e;
   function recDone(r, y) {
     const x = RES[r.key] = RES[r.key] || {}, blob = y.blob, text = y.text; x.on = false; x.err = text ? "" : y.err || "";
     if (y.url) { try { if (x.url) URL.revokeObjectURL(x.url); } catch (e) {} x.url = y.url; }
