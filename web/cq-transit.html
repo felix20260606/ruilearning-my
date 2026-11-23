@@ -1,0 +1,217 @@
+<!doctype html><html lang="zh-CN"><head>
+<link rel="icon" href="/icon.svg?v=c523a8a0" type="image/svg+xml"><link rel="icon" href="/favicon.ico?v=c615e9d4" sizes="48x48"><link rel="apple-touch-icon" href="/icon-192.png?v=aa949b6f">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>重庆中转 · 半天城市暴走</title>
+<meta name="theme-color" content="#1d1e21">
+<meta name="color-scheme" content="dark">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- 🌶 重庆中转 10 小时（11/30：3U8196 05:15 落地江北 T3 → 3U8081 15:55 飞杭州）：不睡觉，地铁进城暴走半天，照着走就行。
+     从旅游中心导航页「中国」的卡片打开（没有单独的标签）。时间、票价是 2026-11 网上查到的参考，以现场为准 -->
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--ink:#1E2733;--soft:#7C8794;--line:#E5EAE8;--bg:#EFF2F1;--paper:#FFFFFF;--paper-2:#F1F4F3;
+    --display:"Fraunces",Georgia,"Songti SC",serif;--font:"Noto Sans SC",-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.75;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:0 16px 70px}
+  .hero{position:relative;color:#fff;padding:50px 22px 42px;text-align:center;overflow:hidden;background:linear-gradient(150deg,#6b1f1f 0%,#3a2226 50%,#222128 100%)}
+  .hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 16% 12%,rgba(255,120,90,.22),transparent 46%),radial-gradient(circle at 88% 80%,rgba(255,184,107,.12),transparent 50%)}
+  .hin{position:relative}.hero .k{font-family:var(--display);font-size:12px;letter-spacing:.28em;text-transform:uppercase;font-weight:700}
+  .hero h1{font-family:var(--display);font-size:34px;margin:10px 0 6px;font-weight:900}.hero .sub{font-size:15px;opacity:.95;margin-bottom:18px}
+  .stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+  .stat{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:10px 16px;min-width:96px}
+  .stat b{display:block;font-family:var(--display);font-size:21px;font-weight:900}.stat span{font-size:12px;opacity:.92}
+  .rl{margin-top:18px;font-size:13.5px;background:rgba(0,0,0,.24);border:1px solid rgba(255,255,255,.06);display:inline-block;padding:10px 16px;border-radius:14px;line-height:1.9}
+  .box{background:var(--paper);border:1px solid var(--line);border-radius:var(--ui-radius,16px);padding:16px 18px;margin:18px 0;scroll-margin-top:12px}
+  .box h2{font-family:var(--display);font-size:18px;font-weight:900;margin-bottom:8px}.box p,.box li{font-size:14px}.box ul{padding-left:20px}
+  .warn{border-color:rgba(255,120,90,.55)}.warn h2{color:#ff8a6b}
+  .toc{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+  .toc a{display:flex;gap:10px;align-items:center;text-decoration:none;color:inherit;background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:9px 12px}
+  .toc a:hover{border-color:var(--ui-pur-line,#6d3a8f)}.toc .d{font-family:var(--display);font-weight:900;font-size:13px;color:var(--soft);min-width:46px}.toc b{display:block;font-size:14px}.toc small{display:block;color:var(--soft);font-size:12px;line-height:1.45}
+  .st{background:var(--paper);border:1px solid var(--line);border-radius:var(--ui-radius,16px);margin:14px 0;overflow:hidden;scroll-margin-top:12px}
+  .sh{display:flex;align-items:center;gap:12px;color:#fff;padding:13px 18px;background:linear-gradient(120deg,#6b1f1f,#a33a2a)}
+  .st.go .sh{background:linear-gradient(120deg,#183f55,#24678a)}.st.see .sh{background:linear-gradient(120deg,#4d2570,#7d38ab)}.st.eat .sh{background:linear-gradient(120deg,#5c3913,#94601f)}
+  .sh .t{font-family:var(--display);font-size:18px;font-weight:900;min-width:58px}.sh .em{font-size:26px}.sh>div{flex:1}.sh h3{font-size:17px;font-weight:900}.sh p{font-size:12.5px;opacity:.95}
+  .sh .c{flex:0 0 auto;font-size:12px;font-weight:800;border-radius:999px;padding:3px 10px;background:rgba(255,255,255,.16);white-space:nowrap}
+  .sb{padding:10px 18px 14px;font-size:14.5px}.sb ol,.sb ul{padding-left:20px}.sb li{margin:4px 0}
+  .tip{background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:9px 12px;margin-top:8px;font-size:13.5px;color:var(--soft)}.tip b{color:var(--ink)}
+  .key{display:inline-block;font-size:12px;font-weight:800;border-radius:6px;padding:0 6px;background:rgba(255,120,90,.18);color:#ff8a6b;margin-right:4px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}td,th{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}th{color:var(--soft);font-size:12.5px}
+  .nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.nav a{font-size:13px;text-decoration:none;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:5px 13px}
+  footer{text-align:center;color:var(--soft);font-size:12px;margin-top:26px;line-height:1.8}
+  @media (max-width:520px){.hero h1{font-size:27px}.sh{flex-wrap:wrap}}
+</style><link rel="stylesheet" href="theme.css">
+</head><body>
+<div class="hero"><div class="hin">
+  <div class="k">Chongqing · 10h Transit · No Sleep</div>
+  <h1>🌶 重庆中转 · 半天暴走</h1>
+  <div class="sub">11/30（周一）· 05:15 落地江北 T3 → 15:55 飞杭州 · 地铁进城，照着走</div>
+  <div class="stats">
+    <div class="stat"><b>~6h</b><span>在城里</span></div>
+    <div class="stat"><b>5</b><span>个打卡点</span></div>
+    <div class="stat"><b>12:40</b><span>最晚往回走</span></div>
+    <div class="stat"><b>≈¥150</b><span>全部花费</span></div>
+  </div>
+  <div class="rl">✈️ 落地 → 🚇 10 号线进城 → 🍜 小面 → 🚡 长江索道 → 🏮 洪崖洞 + 千厮门大桥 → 🚝 李子坝轻轨穿楼 → 🍲 火锅 → 🚇 回 T3 → ✈️ 杭州</div>
+</div></div>
+<div class="wrap">
+
+  <div class="box warn">
+    <h2>⚠️ 三条铁律</h2>
+    <ul>
+      <li><b>12:40 必须往机场走</b>（不管玩到哪）；<b>13:55 前</b>到 T3 国内出发。托运截止一般是起飞前 45 分钟，安检排队也要时间</li>
+      <li><b>今天是周一</b>：三峡博物馆等博物馆周一闭馆，别去</li>
+      <li><b>重庆 10 度左右、常有雾、地面湿</b>：外套穿上，鞋要防滑；全程上坡下坎，比看地图累</li>
+    </ul>
+  </div>
+
+  <nav class="box" id="toc">
+    <h2>📍 时间线 · 点哪段跳到哪段</h2>
+    <ol class="toc">
+      <li><a href="#s1"><span class="d">05:15</span><span><b>落地、入境</b><small>行李怎么办</small></span></a></li>
+      <li><a href="#s2"><span class="d">06:35</span><span><b>地铁进城</b><small>10 号线 → 6 号线 → 小什字</small></span></a></li>
+      <li><a href="#s3"><span class="d">07:45</span><span><b>吃小面</b><small>小什字 / 解放碑</small></span></a></li>
+      <li><a href="#s4"><span class="d">08:00</span><span><b>长江索道</b><small>过江看山城</small></span></a></li>
+      <li><a href="#s5"><span class="d">09:30</span><span><b>洪崖洞 + 千厮门大桥</b><small>白天人少</small></span></a></li>
+      <li><a href="#s6"><span class="d">10:45</span><span><b>李子坝轻轨穿楼</b><small>2 号线</small></span></a></li>
+      <li><a href="#s7"><span class="d">11:30</span><span><b>火锅午饭</b><small>一个人怎么吃</small></span></a></li>
+      <li><a href="#s8"><span class="d">12:40</span><span><b>回机场</b><small>地铁 / 打车</small></span></a></li>
+      <li><a href="#prep"><span class="d">🎒</span><span><b>出发前准备 + 花费</b><small>手机、App、不睡觉怎么撑</small></span></a></li>
+    </ol>
+  </nav>
+
+  <section class="st" id="s1">
+    <div class="sh"><span class="t">05:15</span><span class="em">✈️</span><div><h3>落地江北 T3 · 入境</h3><p>3U8196 · 约 1 小时出来</p></div></div>
+    <div class="sb">
+      <ol>
+        <li>落地前 40 分钟醒来，<b>换上外套</b>，手机开中国卡 / 漫游</li>
+        <li>入境：中国护照走<b>自助通道</b> → 取托运行李（如果托运了）→ 海关，06:20 左右出来</li>
+        <li><b>行李：</b>
+          <ul>
+            <li>两个包都随身带上飞机的：背包背着走，手提包建议寄存</li>
+            <li><b>寄存</b>：T3 <b>4 楼出发层</b>值机岛西侧、24 小时免费休息区旁边有行李寄存（按件按天收费，几块到几十块，以现场为准）<span class="key">现场问</span> 找不到就问机场问询台「行李寄存在哪」</li>
+            <li>托运了的大包：寄存在同一个地方，下午回来取出来<b>重新托运</b>（两张票分开，不能直挂）</li>
+          </ul>
+        </li>
+        <li>洗把脸、上个厕所、买瓶水，<b>06:30 去地铁站</b>（T3 航站楼直接连着地铁站，跟着「地铁 / 轨道交通」的牌子走）</li>
+      </ol>
+      <div class="nav"><a href="#toc">↑ 时间线</a><a href="#s2">下一段 ›</a></div>
+    </div>
+  </section>
+
+  <section class="st go" id="s2">
+    <div class="sh"><span class="t">06:35</span><span class="em">🚇</span><div><h3>地铁进城 → 小什字</h3><p>约 1 小时 · 几块钱</p></div><span class="c">¥5–7</span></div>
+    <div class="sb">
+      <ol>
+        <li>支付宝打开<b>「乘车码」</b>（搜「重庆轨道」或直接用支付宝乘车码，第一次要开通）刷码进站</li>
+        <li>坐 <b>10 号线</b>（江北机场 T3 航站楼站，首班约 06:35）→ <b>红土地</b>站下，换 <b>6 号线</b> → <b>小什字</b>站下<small style="display:block;color:var(--soft)">7:40 左右到；以高德地图实时导航为准，换乘按地图来</small></li>
+        <li>出站走路就是江边、解放碑一带</li>
+      </ol>
+      <div class="tip"><b>不想换乘 / 赶时间：</b>出口打网约车（滴滴 / 高德打车）到「长江索道（新华路站）」，约 40 分钟、七八十元。</div>
+      <div class="nav"><a href="#toc">↑ 时间线</a><a href="#s1">‹ 上一段</a><a href="#s3">下一段 ›</a></div>
+    </div>
+  </section>
+
+  <section class="st eat" id="s3">
+    <div class="sh"><span class="t">07:45</span><span class="em">🍜</span><div><h3>早饭：重庆小面</h3><p>小什字 / 解放碑附近，早上就开门</p></div><span class="c">¥10–20</span></div>
+    <div class="sb">
+      <ul>
+        <li>点 <b>小面（二两）</b> 或 <b>豌杂面</b>，再加一碗<b>红油抄手</b>；跟老板说<b>「微辣」</b></li>
+        <li>挑本地人排队、门口一排小凳子的那种；高德 / 大众点评搜「小面」看附近评分</li>
+        <li>没睡觉：这时候来一杯咖啡（解放碑一带瑞幸、Manner 都有）</li>
+      </ul>
+      <div class="nav"><a href="#toc">↑ 时间线</a><a href="#s2">‹ 上一段</a><a href="#s4">下一段 ›</a></div>
+    </div>
+  </section>
+
+  <section class="st see" id="s4">
+    <div class="sh"><span class="t">08:00</span><span class="em">🚡</span><div><h3>长江索道 · 过江看山城</h3><p>北站：渝中区新华路（长安寺）→ 南站：南岸上新街（龙门浩）</p></div><span class="c">往返 ¥50</span></div>
+    <div class="sb">
+      <ul>
+        <li>营业约 <b>08:00 开始</b>，平日 7:45 开始卖票；<b>买往返（50 元）</b>，单程 30 元<span class="key">以现场为准</span></li>
+        <li>坐 3 分钟过长江，站在<b>朝下游的窗边</b>看两岸山城和江面；周一早上人最少</li>
+        <li>到了南岸可以在<b>龙门浩老街</b>走 15 分钟（老建筑、江景），再坐回北岸</li>
+        <li>大雾天看不远，但雾里坐索道也很有感觉；只坐一程也行</li>
+      </ul>
+      <div class="nav"><a href="#toc">↑ 时间线</a><a href="#s3">‹ 上一段</a><a href="#s5">下一段 ›</a></div>
+    </div>
+  </section>
+
+  <section class="st see" id="s5">
+    <div class="sh"><span class="t">09:30</span><span class="em">🏮</span><div><h3>洪崖洞 + 千厮门大桥</h3><p>从索道北站走过去约 15–20 分钟 · 免费</p></div><span class="c">免费</span></div>
+    <div class="sb">
+      <ul>
+        <li><b>洪崖洞</b>：沿着悬崖盖的吊脚楼，白天人少、能慢慢拍；里面上上下下 11 层，<b>从顶层（沧白路那边）进去、一路往下走</b>最省力</li>
+        <li>走上 <b>千厮门大桥</b>人行道，回头拍洪崖洞全景 + 嘉陵江、长江交汇</li>
+        <li>店铺 10 点以后陆续开门，可以买点手信（麻花、牛肉干、火锅底料——<b>火锅底料别放随身包</b>，过安检会被扣）</li>
+      </ul>
+      <div class="nav"><a href="#toc">↑ 时间线</a><a href="#s4">‹ 上一段</a><a href="#s6">下一段 ›</a></div>
+    </div>
+  </section>
+
+  <section class="st go" id="s6">
+    <div class="sh"><span class="t">10:45</span><span class="em">🚝</span><div><h3>李子坝轻轨穿楼</h3><p>2 号线李子坝站 · 观景平台免费</p></div><span class="c">¥2–4</span></div>
+    <div class="sb">
+      <ol>
+        <li>从洪崖洞走到最近的 <b>2 号线</b>车站（临江门 / 较场口，高德导航，10–15 分钟）</li>
+        <li>坐 2 号线到 <b>李子坝</b>站，约 15 分钟；出站过马路就是<b>观景平台</b>（免费，别理路边收费带路的）</li>
+        <li>列车几分钟一趟，看两三趟从楼里穿出来；拍照站平台中间偏左</li>
+        <li>旁边 <b>李子坝公园</b>（抗战遗址，免费）可以走走</li>
+      </ol>
+      <div class="nav"><a href="#toc">↑ 时间线</a><a href="#s5">‹ 上一段</a><a href="#s7">下一段 ›</a></div>
+    </div>
+  </section>
+
+  <section class="st eat" id="s7">
+    <div class="sh"><span class="t">11:30</span><span class="em">🍲</span><div><h3>火锅午饭</h3><p>李子坝 / 鹅岭附近，或者坐回解放碑吃</p></div><span class="c">¥60–100</span></div>
+    <div class="sb">
+      <ul>
+        <li>一个人：高德 / 大众点评搜<b>「一人食火锅」「单人小火锅」</b>，或者老火锅店点「鸳鸯锅 + 三四样菜」</li>
+        <li>必点：<b>毛肚、鸭肠、黄喉</b>（七上八下涮 10 几秒）；油碟 = 香油 + 蒜泥</li>
+        <li><b>微辣</b>就够辣了；下午还要坐飞机，别吃太撑、别喝冰的太多</li>
+        <li>不想吃火锅：再来一碗小面 + 酸辣粉，二十块搞定</li>
+      </ul>
+      <div class="nav"><a href="#toc">↑ 时间线</a><a href="#s6">‹ 上一段</a><a href="#s8">下一段 ›</a></div>
+    </div>
+  </section>
+
+  <section class="st" id="s8">
+    <div class="sh"><span class="t">12:40</span><span class="em">🏃</span><div><h3>回机场（最晚这个点出发）</h3><p>13:55 前到 T3 国内出发</p></div><span class="c">¥6 / ¥80</span></div>
+    <div class="sb">
+      <ul>
+        <li><b>地铁（便宜）</b>：高德导航到「江北机场 T3 航站楼」，大约要 1 小时 10 分钟、换乘一两次（李子坝出发一般是 2 号线 → 3 号线 / 10 号线）</li>
+        <li><b>打车（稳）</b>：滴滴 / 高德打车，约 40–50 分钟、七八十到一百元；中午不太堵，累了就直接打车</li>
+        <li>到了 T3：<b>4 楼出发</b> → 取寄存的行李 → 四川航空柜台值机 / 托运（3U8081）→ 安检 → 登机口</li>
+        <li>15:55 起飞，<b>飞机上睡 1.5–2 小时</b>；18:10 到杭州萧山 T4</li>
+      </ul>
+      <div class="nav"><a href="#toc">↑ 时间线</a><a href="#s7">‹ 上一段</a><a href="#prep">准备 ›</a></div>
+    </div>
+  </section>
+
+  <section class="box" id="prep">
+    <h2>🎒 出发前准备（11/29 在吉隆坡就弄好）</h2>
+    <ul>
+      <li><b>手机</b>：中国手机卡能用（落地能收短信）；支付宝能付款；装好<b>高德地图</b>（地铁实时导航）、滴滴；充电宝充满</li>
+      <li><b>支付宝乘车码</b>：先在支付宝里开通「重庆」的乘车码，落地直接刷</li>
+      <li><b>衣服</b>：外套、长裤放随身包；重庆潮湿阴冷，比吉隆坡低 15–20 度</li>
+      <li><b>不睡觉怎么撑</b>：11/29 下午先补觉 3–4 小时（见「吉隆坡周边 6 天」11/29）；飞机上能睡多少睡多少；早上 8 点一杯咖啡，中午别吃太饱；下午飞机上睡；到杭州 <b>9 点前睡</b></li>
+    </ul>
+    <h2 style="margin-top:12px">💰 花费（一个人）</h2>
+    <table>
+      <tr><th>项目</th><th>大约</th></tr>
+      <tr><td>地铁来回</td><td>¥10–15（打车回机场就 ¥80–100）</td></tr>
+      <tr><td>行李寄存</td><td>几块到几十块</td></tr>
+      <tr><td>小面 + 抄手 + 咖啡</td><td>¥30–40</td></tr>
+      <tr><td>长江索道往返</td><td>¥50</td></tr>
+      <tr><td>火锅</td><td>¥60–100</td></tr>
+      <tr><td><b>合计</b></td><td><b>约 ¥150–200</b>（打车回机场约 ¥250）</td></tr>
+    </table>
+    <div class="tip"><b>说明：</b>地铁首班、索道时间票价、寄存位置是 2026 年 11 月网上查到的，出门前用高德看一眼实时路线，索道票价以现场为准。</div>
+    <div class="nav"><a href="#toc">↑ 时间线</a></div>
+  </section>
+
+  <footer>想改路线跟 Claude 说一声 · 前一天怎么安排在「吉隆坡周边 6 天」</footer>
+</div>
+</body></html>
