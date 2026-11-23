@@ -43,7 +43,13 @@
   table{width:100%;border-collapse:collapse;font-size:13.5px}td,th{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}th{color:var(--soft);font-size:12.5px}
   .nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.nav a{font-size:13px;text-decoration:none;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:5px 13px}
   footer{text-align:center;color:var(--soft);font-size:12px;margin-top:26px;line-height:1.8}
-  @media (max-width:520px){.hero h1{font-size:27px}.dh h2{font-size:18px}.dh{flex-wrap:wrap}}
+  .pics{display:grid;gap:2px;line-height:0;background:var(--line)}.pics.n2{grid-template-columns:1.3fr 1fr}.pics.n3{grid-template-columns:1.3fr 1fr 1fr}
+  .pics a{position:relative;display:block;min-width:0}.pics img{width:100%;height:190px;object-fit:cover;display:block;background:var(--paper-2)}
+  .pics .cap{position:absolute;left:7px;bottom:7px;max-width:calc(100% - 14px);font-size:11.5px;line-height:1.5;color:#fff;background:rgba(0,0,0,.58);padding:2px 9px;border-radius:999px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .addr{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:12px 0 0}.addr .a{flex:1 1 100%;font-size:13px;color:var(--soft)}
+  .gmap{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:700;color:var(--jade-deep,#c59bef);background:var(--ui-pur-soft,rgba(197,155,239,.12));border:1px solid rgba(197,155,239,.3);border-radius:999px;padding:4px 12px;text-decoration:none;line-height:1.5}
+  .gmap:hover{border-color:var(--ui-pur-line,#6d3a8f)}
+  @media (max-width:520px){.hero h1{font-size:27px}.dh h2{font-size:18px}.dh{flex-wrap:wrap}.pics img{height:150px}.pics.n3{grid-template-columns:1fr 1fr}.pics.n3 a:first-child{grid-column:1/-1}.pics.n3 a:first-child img{height:180px}}
 </style><link rel="stylesheet" href="theme.css">
 </head><body>
 <div class="hero"><div class="hin">
@@ -54,7 +60,7 @@
     <div class="stat"><b>1</b><span>天云顶</span></div>
     <div class="stat"><b>1</b><span>天瓜拉雪兰莪</span></div>
     <div class="stat"><b>4</b><span>天吉隆坡市区</span></div>
-    <div class="stat"><b>≈RM 350</b><span>全部花费（估）</span></div>
+    <div class="stat"><b>≈RM 400</b><span>全部花费（估）</span></div>
   </div>
 </div></div>
 <div class="wrap">
@@ -87,6 +93,7 @@
 
   <section class="day city" id="d1">
     <div class="dh"><span class="em">🏛</span><div><h2>11/24（二）老城 + 茨厂街 + 晚上看蓝池</h2><p>全程走路，只坐两段 LRT · 景点都免费</p></div><span class="cost">约 RM 40</span></div>
+    <div class="pics n3"><a href="https://commons.wikimedia.org/wiki/File:Kuala_Lumpur_Malaysia_Sultan-Abdul-Samad-Building-01.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Kuala%20Lumpur%20Malaysia%20Sultan-Abdul-Samad-Building-01.jpg?width=600" alt="苏丹阿都沙末大厦"><span class="cap">独立广场 · 苏丹阿都沙末大厦</span></a><a href="https://commons.wikimedia.org/wiki/File:Kwai_Chai_Hong_3.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Kwai%20Chai%20Hong%203.jpg?width=600" alt="鬼仔巷"><span class="cap">鬼仔巷壁画</span></a><a href="https://commons.wikimedia.org/wiki/File:River_of_Life_at_Masjid_Jamek.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/River%20of%20Life%20at%20Masjid%20Jamek.jpg?width=600" alt="河流之光"><span class="cap">占美清真寺 · 河流之光</span></a></div>
     <div class="db">
       <ul class="tl">
         <li><span class="t">09:00</span><span class="go">LRT</span>坐到 <b>Masjid Jamek</b> 站（Kelana Jaya 线 / Ampang 线都到）→ 走 5 分钟到<b>独立广场</b><small>苏丹阿都沙末大厦（铜顶红砖楼）、旗杆、草坪，免费；早上光线好、不热</small></li>
@@ -99,28 +106,32 @@
         <li><span class="t">20:30</span>茨厂街夜市逛一圈吃晚饭 → LRT 回家</li>
       </ul>
       <div class="rain"><b>☔ 下雨：</b>中央艺术坊、Merchant's Lane 咖啡馆都在室内；国家纺织博物馆（独立广场旁）也可以躲雨。</div>
+      <div class="addr"><span class="a">🗺 今天的地点（点开导航）</span><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Merdeka%20Square%20Kuala%20Lumpur" target="_blank" rel="noopener">📍 独立广场</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Masjid%20Jamek%20Sultan%20Abdul%20Samad" target="_blank" rel="noopener">📍 占美清真寺</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Central%20Market%20Kuala%20Lumpur" target="_blank" rel="noopener">📍 中央艺术坊</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Petaling%20Street" target="_blank" rel="noopener">📍 茨厂街</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Kwai%20Chai%20Hong" target="_blank" rel="noopener">📍 鬼仔巷</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Sri%20Mahamariamman%20Temple%20Kuala%20Lumpur" target="_blank" rel="noopener">📍 马里安曼兴都庙</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=River%20of%20Life%20Masjid%20Jamek" target="_blank" rel="noopener">📍 河流之光</a></div>
       <div class="nav"><a href="#toc">↑ 6 天一览</a><a href="#d2">下一天 ›</a></div>
     </div>
   </section>
 
   <section class="day hill" id="d2">
-    <div class="dh"><span class="em">🚡</span><div><h2>11/25（三）云顶高原 1 日</h2><p>工作日人少 · 从 Tropika 去：LRT 到 TBS 坐巴士最近 · 带外套 · <a href="genting-1day.html" data-go="genting" style="color:#fff;font-weight:800;text-decoration:underline">照着走的完整版 ›</a></p></div><span class="cost">约 RM 50–70</span></div>
+    <div class="dh"><span class="em">🚡</span><div><h2>11/25（三）云顶高原 1 日</h2><p>工作日人少 · 从 Tropika 去：LRT 到 TBS 坐巴士最近 · 带外套 · <a href="genting-1day.html" data-go="genting" style="color:#fff;font-weight:800;text-decoration:underline">照着走的完整版 ›</a></p></div><span class="cost">约 RM 65–90</span></div>
+    <div class="pics n2"><a href="https://commons.wikimedia.org/wiki/File:Chin_Swee_Caves_Temple_Pagoda.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Chin%20Swee%20Caves%20Temple%20Pagoda.jpg?width=600" alt="清水岩庙宝塔"><span class="cap">清水岩庙九层宝塔</span></a><a href="https://commons.wikimedia.org/wiki/File:201906_Awana_Skyway_03.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/201906%20Awana%20Skyway%2003.jpg?width=600" alt="Awana 缆车"><span class="cap">Awana 缆车</span></a></div>
     <div class="db">
       <ul class="tl">
-        <li><span class="t">08:00</span><span class="go">LRT/MRT</span>到 <b>KL Sentral</b>，找去云顶的快线巴士柜台，买<b>来回票</b>（终点选 <b>Awana Skyway</b> 缆车站）<small>单程约 RM 10–20；有「巴士 + 缆车」套票更划算。柜台搬过位置，以 Resorts World Genting 官网公告为准，也可以前一天在 redBus / busonlineticket 买好</small></li>
-        <li><span class="t">08:30</span>上车，约 1 小时到 Awana</li>
-        <li><span class="t">09:40</span>坐 <b>Awana Skyway 缆车</b>，<b>中途在 Chin Swee 站下</b> → <b>清水岩庙</b>：云雾里的寺庙、九层塔、大佛，免费<small>云顶最值得的一站，上午雾少看得远</small></li>
-        <li><span class="t">11:30</span>再坐缆车到山顶 <b>SkyAvenue</b> 商场：逛一圈，午饭在美食广场（比餐厅便宜）</li>
-        <li><span class="t">14:00</span>坐缆车下山，逛 Awana 旁边的 <b>Genting Highlands Premium Outlets</b>（不买也能逛）</li>
-        <li><span class="t">16:00</span>坐巴士回 KL Sentral，晚饭在 <b>Brickfields 小印度</b>（KL Sentral 走过去 5 分钟）吃印度菜</li>
+        <li><span class="t">07:50</span><span class="go">LRT</span>Awan Besar 坐 4 站到 <b>Bandar Tasik Selatan</b>，走天桥进 <b>TBS</b><small>来回巴士票前一天晚上在 busonlineticket / easybook 买好，终点选 <b>Awana SkyWay</b></small></li>
+        <li><span class="t">09:00</span>TBS 上车，约 1.5 小时到 Awana（单程约 RM 10–18）</li>
+        <li><span class="t">10:30</span>坐 <b>Awana SkyWay 缆车</b>（单程约 RM 11），<b>中途在 Chin Swee 站下</b> → <b>清水岩庙</b>：九层宝塔、大佛，免费<small>云顶最值得的一站，上午雾少看得远</small></li>
+        <li><span class="t">12:00</span>再坐缆车到山顶 <b>SkyAvenue</b> 商场：午饭在美食广场（比餐厅便宜）</li>
+        <li><span class="t">14:30</span>坐缆车下山，逛 <b>Genting Highlands Premium Outlets</b>（不买也能逛）</li>
+        <li><span class="t">16:30</span>巴士回 TBS → LRT 回 Awan Besar，18:30 左右到家；晚饭 <b>Pavilion Bukit Jalil</b></li>
       </ul>
       <div class="tip"><b>省钱：</b>不进主题公园（门票贵）。山上下雨起雾就待在 SkyAvenue 室内，缆车照常开。</div>
+      <div class="addr"><span class="a">🗺 今天的地点（点开导航）</span><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Terminal%20Bersepadu%20Selatan" target="_blank" rel="noopener">📍 TBS</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Awana%20SkyWay%20Station%20Genting%20Highlands" target="_blank" rel="noopener">📍 Awana 缆车站</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Chin%20Swee%20Caves%20Temple" target="_blank" rel="noopener">📍 清水岩庙</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=SkyAvenue%20Genting%20Highlands" target="_blank" rel="noopener">📍 SkyAvenue</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Genting%20Highlands%20Premium%20Outlets" target="_blank" rel="noopener">📍 奥特莱斯</a></div>
       <div class="nav"><a href="#toc">↑ 6 天一览</a><a href="#d1">‹ 上一天</a><a href="#d3">下一天 ›</a></div>
     </div>
   </section>
 
   <section class="day city" id="d3">
     <div class="dh"><span class="em">🏙</span><div><h2>11/26（四）双子塔 + 甘榜巴鲁 + 武吉免登</h2><p>LRT KLCC 站 / Kampung Baru 站 · 晚上看夜景</p></div><span class="cost">约 RM 40（上天桥另算）</span></div>
+    <div class="pics n3"><a href="https://commons.wikimedia.org/wiki/File:The_Petronas_Twin_Towers_%26_KLCC_Park.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/The%20Petronas%20Twin%20Towers%20%26%20KLCC%20Park.jpg?width=600" alt="双子塔"><span class="cap">KLCC 公园看双子塔</span></a><a href="https://commons.wikimedia.org/wiki/File:Kampung_Baru%2C_Kuala_Lumpur%2C_2010.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Kampung%20Baru%2C%20Kuala%20Lumpur%2C%202010.jpg?width=600" alt="甘榜巴鲁"><span class="cap">甘榜巴鲁的马来高脚屋</span></a><a href="https://commons.wikimedia.org/wiki/File:Jalan_Alor_-_Kuala_Lumpur.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Jalan%20Alor%20-%20Kuala%20Lumpur.jpg?width=600" alt="Jalan Alor"><span class="cap">Jalan Alor 美食街</span></a></div>
     <div class="db">
       <ul class="tl">
         <li><span class="t">09:00</span><span class="go">LRT</span>坐到 <b>KLCC</b> 站 → <b>KLCC 公园</b>：从公园湖边拍双子塔全景，免费<small>想上 41 楼天桥 + 86 楼观景台：提前在双子塔官网或 Klook 买票（外国人票价几十到一百多马币，按时段入场）——不上也完全可以</small></li>
@@ -132,29 +143,33 @@
         <li><span class="t">20:30</span>想再看一次夜景：坐回 KLCC，<b>KLCC 公园喷泉 + 双子塔夜景</b>（喷泉晚上有表演）</li>
       </ul>
       <div class="rain"><b>☔ 下雨：</b>KLCC → 武吉免登之间有<b>空中走廊（KLCC–Bukit Bintang Pedestrian Walkway）</b>，有顶、有空调，下雨也能走过去。</div>
+      <div class="addr"><span class="a">🗺 今天的地点（点开导航）</span><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=KLCC%20Park" target="_blank" rel="noopener">📍 KLCC 公园</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Suria%20KLCC" target="_blank" rel="noopener">📍 阳光广场</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Nasi%20Lemak%20Wanjo%20Kampung%20Baru" target="_blank" rel="noopener">📍 Nasi Lemak Wanjo</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Saloma%20Link" target="_blank" rel="noopener">📍 萨洛玛天桥</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Pavilion%20Kuala%20Lumpur" target="_blank" rel="noopener">📍 Pavilion</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Jalan%20Alor" target="_blank" rel="noopener">📍 Jalan Alor</a></div>
       <div class="nav"><a href="#toc">↑ 6 天一览</a><a href="#d2">‹ 上一天</a><a href="#d4">下一天 ›</a></div>
     </div>
   </section>
 
   <section class="day sea" id="d4">
-    <div class="dh"><span class="em">🐒</span><div><h2>11/27（五）瓜拉雪兰莪 1 日</h2><p>公交去回 · 古炮台、灯塔、银叶猴、海鲜</p></div><span class="cost">约 RM 70–90</span></div>
+    <div class="dh"><span class="em">🐒</span><div><h2>11/27（五）瓜拉雪兰莪 1 日</h2><p>公交去回 · 古炮台、灯塔、银叶猴、海鲜 · <a href="kselangor-1day.html" data-go="ks" style="color:#fff;font-weight:800;text-decoration:underline">照着走的完整版 ›</a></p></div><span class="cost">约 RM 95–125</span></div>
+    <div class="pics n3"><a href="https://commons.wikimedia.org/wiki/File:Bukit_Melawati_Lighthouse.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Bukit%20Melawati%20Lighthouse.jpg?width=600" alt="马六甲山灯塔"><span class="cap">马六甲山灯塔</span></a><a href="https://commons.wikimedia.org/wiki/File:Silvery_leaf_monkey_mother_and_baby.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Silvery%20leaf%20monkey%20mother%20and%20baby.jpg?width=600" alt="银叶猴"><span class="cap">银叶猴和橘色小猴</span></a><a href="https://commons.wikimedia.org/wiki/File:Kuala_Selangor_Nature_Park_%28230319%29_01.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Kuala%20Selangor%20Nature%20Park%20%28230319%29%2001.jpg?width=600" alt="瓜雪自然公园"><span class="cap">瓜雪自然公园</span></a></div>
     <div class="db">
       <ul class="tl">
-        <li><span class="t">08:15</span><span class="go">LRT/KTM</span>坐到 <b>Bandar Tasik Selatan</b> 站，走天桥进 <b>TBS 巴士总站</b></li>
-        <li><span class="t">09:00</span>坐快线巴士去 <b>Kuala Selangor</b><small>约 1.5 小时、单程约 RM 20（Starmart / Sri Theven 等），前一天在 busonlineticket 买好。<b>更便宜但更慢</b>：Hub Lebuh Pudu（MRT Pasar Seni / LRT Plaza Rakyat 旁）坐 <b>100 路</b>市郊巴士，约 2 小时多、几块钱，半小时左右一班</small></li>
+        <li><span class="t">07:45</span><span class="go">LRT</span>Awan Besar 坐 4 站到 <b>Bandar Tasik Selatan</b> 站，走天桥进 <b>TBS 巴士总站</b></li>
+        <li><span class="t">09:00</span>坐快线巴士去 <b>Kuala Selangor</b><small>约 1.5–2 小时、单程约 RM 20（早上的是 Sri Theven 09:00），前一天在 busonlineticket 买好来回。<b>更便宜但更慢</b>：Hub Lebuh Pudu（MRT Pasar Seni / LRT Plaza Rakyat 旁）坐 <b>100 路</b>市郊巴士，约 2 小时多、几块钱，半小时左右一班</small></li>
         <li><span class="t">10:45</span>到瓜雪镇上，Grab 5 分钟上 <b>马六甲山（Bukit Melawati）</b>：古炮台、老灯塔、皇陵、可以看海<small>免费；山上的<b>银叶猴</b>很亲人，别喂、别拿着塑料袋晃</small></li>
         <li><span class="t">12:30</span>Grab 过桥去 <b>Pasir Penambang 渔村</b>吃<b>海鲜午饭</b>（一个人点一两样：辣椒蟹、炒啦啦、咸蛋虾），人均 RM 30–50</li>
         <li><span class="t">14:00</span>回镇上，<b>瓜雪自然公园（Taman Alam）</b>红树林木栈道走一走（小额门票，看天气）</li>
-        <li><span class="t">15:30</span>坐巴士回 KL（快线回 TBS，或 100 路回 Pudu）<small>回程车也最好早上一起买；17:30 左右到 KL</small></li>
+        <li><span class="t">16:00</span>坐巴士回 KL（Starmart 快线回 TBS 约 RM 23，或 100 路回 Pudu）<small>回程车最好前一天一起买；18:30–19:00 到家</small></li>
       </ul>
       <div class="tip"><b>方案 B · 想看萤火虫 / 天空之镜：</b>这两样都要报一日团（萤火虫天黑后才看，公交回不来；天空之镜要坐船出海，只在大退潮的日子有）。在 Klook / 携程搜「瓜拉雪兰莪 萤火虫」或「天空之镜」，选<b>拼团</b>、看 27 号有没有出发、含不含接送；价格从一两百到几百马币不等。报了团就不用按上面的时间线走。</div>
       <div class="rain"><b>☔ 下雨：</b>马六甲山和渔村都是露天，大雨就早点回 KL；早上出发最稳。</div>
+      <div class="addr"><span class="a">🗺 今天的地点（点开导航）</span><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Terminal%20Bersepadu%20Selatan" target="_blank" rel="noopener">📍 TBS</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Bukit%20Melawati%20Kuala%20Selangor" target="_blank" rel="noopener">📍 马六甲山</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Pasir%20Penambang%20Kuala%20Selangor" target="_blank" rel="noopener">📍 Pasir Penambang 渔村</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Kuala%20Selangor%20Nature%20Park" target="_blank" rel="noopener">📍 自然公园</a></div>
       <div class="nav"><a href="#toc">↑ 6 天一览</a><a href="#d3">‹ 上一天</a><a href="#d5">下一天 ›</a></div>
     </div>
   </section>
 
   <section class="day city" id="d5">
     <div class="dh"><span class="em">🕌</span><div><h2>11/28（六）湖滨公园一带 + 天后宫 + 小印度</h2><p>一两趟 Grab + 走路</p></div><span class="cost">约 RM 50–70</span></div>
+    <div class="pics n3"><a href="https://commons.wikimedia.org/wiki/File:Kuala_Lumpur_Malaysia_National-Mosque-02.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Kuala%20Lumpur%20Malaysia%20National-Mosque-02.jpg?width=600" alt="国家清真寺"><span class="cap">国家清真寺</span></a><a href="https://commons.wikimedia.org/wiki/File:Kuala_Lumpur_Malaysia_Islamic-Arts-Museum-01.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Kuala%20Lumpur%20Malaysia%20Islamic-Arts-Museum-01.jpg?width=600" alt="伊斯兰艺术馆"><span class="cap">伊斯兰艺术馆</span></a><a href="https://commons.wikimedia.org/wiki/File:Thean_Hou_Temple_outview_%28220116%29.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Thean%20Hou%20Temple%20outview%20%28220116%29.jpg?width=600" alt="天后宫"><span class="cap">天后宫</span></a></div>
     <div class="db">
       <ul class="tl">
         <li><span class="t">09:00</span><span class="go">Grab</span>到 <b>国家清真寺（Masjid Negara）</b>：伞形屋顶的现代清真寺<small>游客开放时间避开祈祷，门口借长袍；免费</small></li>
@@ -165,30 +180,34 @@
         <li><span class="t">18:30</span>回家附近吃晚饭，早点休息</li>
       </ul>
       <div class="rain"><b>☔ 下雨：</b>上午先去伊斯兰艺术馆（室内），等雨停再去清真寺和植物园；天后宫屋檐多，小雨也能逛。</div>
+      <div class="addr"><span class="a">🗺 今天的地点（点开导航）</span><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Masjid%20Negara" target="_blank" rel="noopener">📍 国家清真寺</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Islamic%20Arts%20Museum%20Malaysia" target="_blank" rel="noopener">📍 伊斯兰艺术馆</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Perdana%20Botanical%20Garden" target="_blank" rel="noopener">📍 Perdana 植物园</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Brickfields%20Little%20India" target="_blank" rel="noopener">📍 Brickfields 小印度</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Thean%20Hou%20Temple" target="_blank" rel="noopener">📍 天后宫</a></div>
       <div class="nav"><a href="#toc">↑ 6 天一览</a><a href="#d4">‹ 上一天</a><a href="#d6">下一天 ›</a></div>
     </div>
   </section>
 
   <section class="day city" id="d6">
     <div class="dh"><span class="em">🛍</span><div><h2>11/29（日）手信 + 下午补觉 + 晚上去机场</h2><p>今晚只能在飞机上睡 3 小时左右：下午先把觉补够</p></div><span class="cost">约 RM 30 + 手信 + 去机场</span></div>
+    <div class="pics n1"><a href="https://commons.wikimedia.org/wiki/File:Kuala_Lumpur_Sentral_Station_%28KL_Sentral%29.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Kuala%20Lumpur%20Sentral%20Station%20%28KL%20Sentral%29.jpg?width=600" alt="KL Sentral"><span class="cap">KL Sentral：坐 KLIA Ekspres 去机场</span></a></div>
     <div class="db">
       <ul class="tl">
-        <li><span class="t">09:30</span>超市买手信最便宜：<b>Mydin、Lotus's、AEON</b> 任一家（白咖啡、咖椰酱、Beryl's 巧克力、饼干）<small>液体、酱料要放托运；买之前想好托运只有 23 公斤</small></li>
-        <li><span class="t">12:00</span>午饭（正常吃）→ 回住处<b>收拾行李、称重</b><small>托运 1 件 23KG（28 寸以内），手提 1 件 8KG；充电宝、证件、手机随身；<b>外套放手提里</b>——明早重庆只有十度左右</small></li>
+        <li><span class="t">09:30</span>超市买手信最便宜：<b>Mydin、Lotus's、AEON</b> 任一家（白咖啡、咖椰酱、Beryl's 巧克力、饼干）<small>这次不托运：<b>液体、酱料超过 100ml 带不上飞机</b>，咖椰酱、辣椒酱这类就别买了，或者挑 100ml 以下的小瓶</small></li>
+        <li><span class="t">12:00</span>午饭（正常吃）→ 回住处<b>收拾行李、称重</b><small>两个包都随身：手提 1 件 + 背包，各不超过 8KG（四川航空经济舱以官网 / 值机柜台为准）；充电宝、证件、手机随身；<b>外套放最上面</b>——明早重庆只有十度左右</small></li>
         <li><span class="t">14:00–18:00</span><b>补觉 3–4 小时</b>：拉窗帘、手机静音、定两个闹钟<small>今天 14 点以后别喝咖啡、奶茶；睡不着也躺着闭眼</small></li>
         <li><span class="t">18:30</span>晚饭吃清淡、七分饱（别太辣太油，晚上要坐 4 个半小时飞机）；交还钥匙 / 退房</li>
         <li><span class="t">20:30</span>到 <b>KL Sentral</b> 坐 <b>KLIA Ekspres</b> 去 <b>KLIA 第 1 航站楼（T1）</b>，28 分钟<small>最省心；想省钱坐机场巴士约 1 小时、十几马币，但晚上要留足时间</small></li>
-        <li><span class="t">21:30</span>到 KLIA T1 → 找<b>四川航空</b>柜台值机（国际航班提前 3 小时）<small>选<b>靠窗</b>的座位（靠着睡、不被叫起来让人）；问一句「托运行李能直挂杭州吗？」——两张票分开买的，多半不能，到重庆要自己取出来再托运</small></li>
+        <li><span class="t">21:30</span>到 KLIA T1 → 找<b>四川航空</b>柜台值机（国际航班提前 3 小时）<small>选<b>靠窗</b>的座位（靠着睡、不被叫起来让人）；两个包都随身，不用托运，值完机直接过安检</small></li>
         <li><span class="t">22:30</span>出境、安检，到登机口附近找个地方坐；最后在机场买点水</li>
         <li><span class="t">00:45</span><b>3U8196 起飞</b>：上了飞机就戴<b>眼罩、耳塞</b>，套<b>颈枕</b>，跟空乘说<b>不用叫醒吃饭</b>，起飞后马上睡<small>4 小时 30 分，能睡 3 小时左右；落地前 40 分钟醒来，换上外套</small></li>
       </ul>
       <div class="tip"><b>补觉要点：</b>这两天最缺的是今晚。下午的 3–4 小时最关键，飞机上那 3 小时是加分；明天在重庆按下面「方案 A」再补 4 小时，晚上到杭州早点睡，就能补回来。</div>
+      <div class="addr"><span class="a">🗺 今天的地点（点开导航）</span><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=Mydin" target="_blank" rel="noopener">📍 Mydin 超市</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=KL%20Sentral%20KLIA%20Ekspres" target="_blank" rel="noopener">📍 KL Sentral 机场快线</a><a class="gmap" href="https://www.google.com/maps/search/?api=1&amp;query=KLIA%20Terminal%201" target="_blank" rel="noopener">📍 KLIA T1</a></div>
       <div class="nav"><a href="#toc">↑ 6 天一览</a><a href="#d5">‹ 上一天</a><a href="#d7">下一天 ›</a></div>
     </div>
   </section>
 
   <section class="day" id="d7">
     <div class="dh"><span class="em">🌶</span><div><h2>11/30（一）重庆中转 10 小时 → 杭州</h2><p>05:15 落地江北 T3 · 13:55 前回 T3 · 15:55 飞杭州</p></div><span class="cost">约 ¥150–350</span></div>
+    <div class="pics n2"><a href="https://commons.wikimedia.org/wiki/File:Hongya_Cave_20180520.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Hongya%20Cave%2020180520.jpg?width=600" alt="洪崖洞"><span class="cap">洪崖洞</span></a><a href="https://commons.wikimedia.org/wiki/File:Liziba_Station_with_02031_%2820191224152311%29.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Liziba%20Station%20with%2002031%20%2820191224152311%29.jpg?width=600" alt="李子坝轻轨穿楼"><span class="cap">李子坝轻轨穿楼</span></a></div>
     <div class="db">
       <table>
         <tr><th>航班</th><th>起飞</th><th>到达</th></tr>
@@ -196,8 +215,8 @@
         <tr><td><b>3U8081</b> 重庆 → 杭州</td><td>11/30 15:55 · 江北 T3</td><td>18:10 · 杭州萧山 T4</td></tr>
       </table>
       <ul class="tl" style="margin-top:12px">
-        <li><span class="t">05:15</span>落地 → <b>入境</b>（中国护照走自助通道）→ 取托运行李 → 海关<small>大约 1 小时，06:30 左右出来；重庆这时 10 度上下、常有雾，先把外套穿上</small></li>
-        <li><span class="t">06:30</span>两张票分开的：<b>托运行李要自己带着或寄存</b>，下午国内航班再重新托运（柜台一般起飞前 2–3 小时才开）<small>T3 到达层有<b>行李寄存</b>，按件按天收费，几十元以内，以现场为准</small></li>
+        <li><span class="t">05:15</span>落地 → <b>入境</b>（中国护照走自助通道）→ 海关（没有托运，不用等行李）<small>大约 1 小时，06:30 左右出来；重庆这时 10 度上下、常有雾，先把外套穿上</small></li>
+        <li><span class="t">06:30</span>两个包都随身：进城的话手提包可以<b>寄存</b>，只背背包<small>T3 有<b>行李寄存</b>（位置见「重庆中转」那篇），按件按天收费，几十元以内，以现场为准</small></li>
       </ul>
       <div class="opt"><b>方案 A · 补觉为主（推荐，昨晚没睡够就选这个）</b>
         <ul class="tl">
@@ -206,23 +225,24 @@
           <li><span class="t">07:00–11:00</span><b>睡 4 小时</b>：先洗个热水澡，拉窗帘、耳塞，定 10:50 和 11:00 两个闹钟</li>
           <li><span class="t">11:15</span>退房，附近吃一顿<b>重庆火锅</b>（一个人点「单人锅」或微辣，别吃太撑）或<b>重庆小面 + 抄手</b></li>
           <li><span class="t">12:45</span>回 T3（接驳车或打车）</li>
-          <li><span class="t">13:15</span>国内出发 → 四川航空柜台<b>托运行李</b>（截止一般是起飞前 45 分钟，别卡点）→ 安检 → 登机口附近休息</li>
+          <li><span class="t">13:15</span>国内出发 → 四川航空柜台 / 自助机<b>值机</b>（截止一般是起飞前 45 分钟，别卡点）→ 安检 → 登机口附近休息</li>
           <li><span class="t">15:55</span>飞杭州，<b>飞机上再睡 1–2 小时</b>；18:10 到萧山 T4</li>
         </ul>
       </div>
       <div class="opt"><b>方案 B · 进城转一圈（飞机上睡得还行就选这个）</b> <a href="cq-transit.html" data-go="cq" style="color:var(--ui-pur,#a78bfa);font-weight:800">🌶 照着走的完整版 ›</a>
         <ul class="tl">
-          <li><span class="t">06:30</span>托运箱在 T3 <b>寄存</b>，只背随身的包</li>
+          <li><span class="t">06:30</span>手提包在 T3 <b>寄存</b>，只背背包</li>
           <li><span class="t">06:45</span><b>地铁 10 号线</b>（江北机场 T3 航站楼站）进城，用<b>高德 / 百度地图</b>导航到 <b>解放碑 / 小什字</b> 一带，约 1 小时<small>支付宝「乘车码」直接刷；打车约 40 分钟、七八十元</small></li>
           <li><span class="t">08:00</span>早饭：<b>重庆小面</b> + 抄手，解放碑附近随便一家排队的</li>
           <li><span class="t">08:45</span><b>长江索道</b>（新华路站上，坐到南岸再坐回来）：坐缆车看两江和山城，早上排队短<small>票价几十元，以现场为准</small></li>
           <li><span class="t">10:00</span>走到 <b>洪崖洞</b>（白天人少，吊脚楼）→ 江边看 <b>千厮门大桥</b>，顺着山城步道走走</li>
           <li><span class="t">11:00</span>早点吃<b>火锅</b>午饭（洪崖洞附近，或小面再来一碗），别吃太撑</li>
-          <li><span class="t">12:00</span>地铁回机场（约 1 小时）→ <b>13:00</b> 到 T3 取寄存的行李 → 托运 → 安检</li>
+          <li><span class="t">12:00</span>地铁回机场（约 1 小时）→ <b>13:00</b> 到 T3 取寄存的包 → 值机 → 安检</li>
           <li><span class="t">15:55</span>飞杭州，<b>飞机上睡 2 小时</b>；晚上到杭州<b>9 点前睡</b></li>
         </ul>
       </div>
       <div class="tip"><b>别忘了：</b>回国先打开中国手机卡 / 漫游，支付宝、高德要能用；最晚 13:55 前回到 T3（国内航班提前 2 小时）；火锅和小面都很辣，点「微辣」，下午还要坐飞机。</div>
+      <div class="addr"><span class="a">🗺 今天的地点（点开导航）</span><a class="gmap" href="https://uri.amap.com/search?keyword=%E6%B1%9F%E5%8C%97%E5%9B%BD%E9%99%85%E6%9C%BA%E5%9C%BAT3%E8%88%AA%E7%AB%99%E6%A5%BC&amp;city=%E9%87%8D%E5%BA%86&amp;callnative=1" target="_blank" rel="noopener">📍 江北 T3（高德）</a><a class="gmap" href="https://uri.amap.com/search?keyword=%E9%95%BF%E6%B1%9F%E7%B4%A2%E9%81%93%E5%8C%97%E7%AB%99&amp;city=%E9%87%8D%E5%BA%86&amp;callnative=1" target="_blank" rel="noopener">📍 长江索道</a><a class="gmap" href="https://uri.amap.com/search?keyword=%E6%B4%AA%E5%B4%96%E6%B4%9E&amp;city=%E9%87%8D%E5%BA%86&amp;callnative=1" target="_blank" rel="noopener">📍 洪崖洞</a><a class="gmap" href="https://uri.amap.com/search?keyword=%E6%9D%8E%E5%AD%90%E5%9D%9D%E8%BD%BB%E8%BD%A8%E7%A9%BF%E6%A5%BC%E8%A7%82%E6%99%AF%E5%B9%B3%E5%8F%B0&amp;city=%E9%87%8D%E5%BA%86&amp;callnative=1" target="_blank" rel="noopener">📍 李子坝</a></div>
       <div class="nav"><a href="#toc">↑ 6 天一览</a><a href="#d6">‹ 上一天</a><a href="#money">花费 ›</a></div>
     </div>
   </section>
@@ -232,13 +252,13 @@
     <table>
       <tr><th>哪天</th><th>大约</th></tr>
       <tr><td>11/24 老城（两段 LRT + 吃饭）</td><td>RM 40</td></tr>
-      <tr><td>11/25 云顶（来回巴士 + 缆车 + 吃饭）</td><td>RM 50–70</td></tr>
+      <tr><td>11/25 云顶（LRT + 来回巴士 + 缆车 + 吃饭）</td><td>RM 65–90</td></tr>
       <tr><td>11/26 双子塔一带（不上天桥）</td><td>RM 40</td></tr>
-      <tr><td>11/27 瓜拉雪兰莪（快线来回 + Grab + 海鲜）</td><td>RM 70–90</td></tr>
+      <tr><td>11/27 瓜拉雪兰莪（快线来回 + Grab + 海鲜）</td><td>RM 95–125</td></tr>
       <tr><td>11/28 湖滨公园 + 天后宫（Grab + 艺术馆 + 吃饭）</td><td>RM 50–70</td></tr>
       <tr><td>11/29 收尾（不算手信）+ KLIA Ekspres</td><td>RM 30 + RM 50 左右（坐机场巴士只要十几）</td></tr>
       <tr><td>11/30 重庆：钟点房 + 火锅（方案 A）/ 地铁 + 索道 + 吃（方案 B）</td><td>约 ¥200–350 / ¥150–250</td></tr>
-      <tr><td><b>合计</b></td><td><b>马来西亚约 RM 340–400</b> + 重庆一两百到三百多元；加上双子塔天桥、萤火虫团这些可选的另算</td></tr>
+      <tr><td><b>合计</b></td><td><b>马来西亚约 RM 370–450</b> + 重庆一两百到三百多元；加上双子塔天桥、萤火虫团这些可选的另算</td></tr>
     </table>
     <div class="tip"><b>说明：</b>价格、开放时间是 2026 年 11 月网上查到的参考，景点偶尔调整，出门前用 Google 地图看一眼当天开放时间。</div>
     <div class="nav"><a href="#toc">↑ 6 天一览</a></div>
