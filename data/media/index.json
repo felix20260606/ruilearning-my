@@ -49,6 +49,11 @@
   "name": "ph_standing_in",
   "sig": "1795336252604:35031:11183:15171"
  },
+ "med:s:ph|stripped away": {
+  "dir": "s",
+  "name": "ph_stripped_away",
+  "sig": "1795403776090:24515:15763:11807"
+ },
  "med:s:ph|urged on": {
   "dir": "s",
   "name": "ph_urged_on",
@@ -164,6 +169,11 @@
   "name": "genes",
   "sig": "1795078589872:0:16847:0"
  },
+ "med:w:genuinely": {
+  "dir": "w",
+  "name": "genuinely",
+  "sig": "1795404348735:22143:15495:16447"
+ },
  "med:w:good-looking": {
   "dir": "w",
   "name": "good_looking",
@@ -224,6 +234,11 @@
   "name": "negotiate",
   "sig": "1795355594774:24635:22287:15983"
  },
+ "med:w:nerd": {
+  "dir": "w",
+  "name": "nerd",
+  "sig": "1795403758377:22711:14743:15763"
+ },
  "med:w:net": {
   "dir": "w",
   "name": "net",
@@ -243,6 +258,11 @@
   "dir": "w",
   "name": "offended",
   "sig": "1795089953495:42739:21983:25475"
+ },
+ "med:w:opponent": {
+  "dir": "w",
+  "name": "opponent",
+  "sig": "1795404379289:19103:10355:8547"
  },
  "med:w:pickpocket": {
   "dir": "w",
@@ -308,6 +328,11 @@
   "dir": "w",
   "name": "stereotypes",
   "sig": "1795090110156:42751:23675:0"
+ },
+ "med:w:stripped": {
+  "dir": "w",
+  "name": "stripped",
+  "sig": "1795403776024:24515:15763:11807"
  },
  "med:w:substance": {
   "dir": "w",

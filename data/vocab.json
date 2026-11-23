@@ -41946,6 +41946,96 @@
         ]
       ],
       "tip": ""
+    },
+    {
+      "id": "v_nerd",
+      "type": "word",
+      "word": "nerd",
+      "phon": "/nˈɝd/",
+      "en": "A person who is intellectual but generally introverted.",
+      "zh": "书呆子",
+      "tag": "视频",
+      "date": "2026-11-23",
+      "forms": [],
+      "examples": [
+        [
+          "The {nerd} behind the legend. Here's where things get delightfully",
+          "传奇背后的书呆子。接下来发生的事情既古怪"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_stripped_away",
+      "type": "phrase",
+      "word": "stripped away",
+      "phon": "",
+      "en": "",
+      "zh": "被剥夺了",
+      "tag": "视频",
+      "date": "2026-11-23",
+      "forms": [],
+      "examples": [
+        [
+          "weird and weirdly lovable. If you {stripped away} the five rings, the MVP",
+          "又可爱，令人忍俊不禁。如果把"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_stripped",
+      "type": "word",
+      "word": "stripped",
+      "phon": "/stɹˈɪpt/",
+      "en": "Made of strips.",
+      "zh": "剥离的；剥夺；褫；脱掉",
+      "tag": "视频",
+      "date": "2026-11-23",
+      "forms": [],
+      "examples": [
+        [
+          "weird and weirdly lovable. If you {stripped} away the five rings, the MVP",
+          "又可爱，令人忍俊不禁。如果把"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_genuinely",
+      "type": "word",
+      "word": "genuinely",
+      "phon": "/dʒˈɛnjəwənli/",
+      "en": "In a genuine manner; truthfully, truly.",
+      "zh": "真诚地",
+      "tag": "视频",
+      "date": "2026-11-23",
+      "forms": [],
+      "examples": [
+        [
+          "he wants the world to see it, but because he {genuinely} loves cars, the",
+          "他想让全世界都看到，而是因为他真心热爱汽车、"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_opponent",
+      "type": "word",
+      "word": "opponent",
+      "phon": "/əpˈoʊnənt/",
+      "en": "One who opposes another; one who works or takes a position against someone or something; one who attempts to stop the progress of someone or…",
+      "zh": "对手；敌手；反对者；仵",
+      "tag": "视频",
+      "date": "2026-11-23",
+      "forms": [],
+      "examples": [
+        [
+          "{opponent} on the basketball court ever could. Duncan alleged that he",
+          "篮球场上任何对手都无法做到的。邓肯声称，由于"
+        ]
+      ],
+      "tip": ""
     }
   ],
   "progress": {
