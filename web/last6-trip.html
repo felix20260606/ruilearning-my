@@ -2,12 +2,13 @@
 <link rel="icon" href="/icon.svg?v=c523a8a0" type="image/svg+xml"><link rel="icon" href="/favicon.ico?v=c615e9d4" sizes="48x48"><link rel="apple-touch-icon" href="/icon-192.png?v=aa949b6f">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>最后 6 天 · 一个人省钱版</title>
+<title>最后 6 天 · 照着走就行</title>
 <meta name="theme-color" content="#1d1e21">
 <meta name="color-scheme" content="dark">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
-<!-- ⏳ 回国前最后 6 天（11/24–29，11/30 飞机）：一个人、公共交通、省钱；近的一日游，金马伦 + 怡保连成一个小环线。价格是 2026-11 网上查到的参考价，订票时以官网为准 -->
+<!-- ⏳ 回国前最后 6 天（11/24–29，11/30 飞机）：一个人、公共交通、省钱。云顶 1 日 + 瓜拉雪兰莪 1 日 + 4 天吉隆坡市区，每天写到坐哪条线、哪站下、几点、大约多少钱。
+     价格、时间是 2026-11 网上查到的参考，出门前以官网 / 现场为准 -->
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   :root{--ink:#1E2733;--soft:#7C8794;--line:#E5EAE8;--bg:#EFF2F1;--paper:#FFFFFF;--paper-2:#F1F4F3;
@@ -22,8 +23,8 @@
   .stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
   .stat{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:10px 16px;min-width:96px}
   .stat b{display:block;font-family:var(--display);font-size:21px;font-weight:900}.stat span{font-size:12px;opacity:.92}
-  .box{background:var(--paper);border:1px solid var(--line);border-radius:var(--ui-radius,16px);padding:16px 18px;margin:18px 0}
-  .box h2{font-family:var(--display);font-size:18px;font-weight:900;margin-bottom:8px}
+  .box{background:var(--paper);border:1px solid var(--line);border-radius:var(--ui-radius,16px);padding:16px 18px;margin:18px 0;scroll-margin-top:12px}
+  .box h2{font-family:var(--display);font-size:18px;font-weight:900;margin-bottom:8px}.box p,.box li{font-size:14px}.box ul{padding-left:20px}
   .toc{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
   .toc a{display:flex;gap:10px;align-items:center;text-decoration:none;color:inherit;background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:9px 12px}
   .toc a:hover{border-color:var(--ui-pur-line,#6d3a8f)}.toc .d{font-family:var(--display);font-weight:900;font-size:13px;color:var(--soft);min-width:54px}.toc b{display:block;font-size:14.5px}.toc small{display:block;color:var(--soft);font-size:12px;line-height:1.45}
@@ -34,13 +35,13 @@
   .cost{flex:0 0 auto;font-size:12.5px;font-weight:800;border-radius:999px;padding:4px 11px;background:rgba(255,255,255,.16);white-space:nowrap}
   .db{padding:12px 20px 16px;font-size:14.5px}
   .tl{list-style:none;border-left:3px solid var(--ui-pur-line,#6d3a8f);margin:6px 0 4px 6px;padding-left:14px}
-  .tl li{position:relative;margin:9px 0}.tl li:before{content:"";position:absolute;left:-21px;top:8px;width:11px;height:11px;border-radius:50%;background:var(--ui-pur,#8b5cf6)}
+  .tl li{position:relative;margin:10px 0}.tl li:before{content:"";position:absolute;left:-21px;top:8px;width:11px;height:11px;border-radius:50%;background:var(--ui-pur,#8b5cf6)}
   .tl .t{font-family:var(--display);font-weight:900;color:var(--soft);font-size:13px;margin-right:6px}.tl small{display:block;color:var(--soft);font-size:12.5px;line-height:1.55}
+  .go{display:inline-block;font-size:12px;font-weight:800;border-radius:6px;padding:0 6px;margin-right:4px;background:rgba(139,92,246,.18);color:var(--ui-pur,#a78bfa)}
   .tip{background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:10px 13px;margin-top:10px;font-size:13.5px;color:var(--soft)}.tip b{color:var(--ink)}
-  .opt{border:1px dashed var(--line-2,var(--line));border-radius:12px;padding:10px 13px;margin-top:10px;font-size:14px}.opt b{color:var(--ink)}
+  .rain{border:1px dashed var(--line-2,var(--line));border-radius:12px;padding:9px 13px;margin-top:8px;font-size:13.5px;color:var(--soft)}.rain b{color:var(--ink)}
   table{width:100%;border-collapse:collapse;font-size:13.5px}td,th{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}th{color:var(--soft);font-size:12.5px}
   .nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.nav a{font-size:13px;text-decoration:none;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:5px 13px}
-  a.ext{color:var(--ui-pur,#a78bfa)}
   footer{text-align:center;color:var(--soft);font-size:12px;margin-top:26px;line-height:1.8}
   @media (max-width:520px){.hero h1{font-size:27px}.dh h2{font-size:18px}.dh{flex-wrap:wrap}}
 </style><link rel="stylesheet" href="theme.css">
@@ -48,12 +49,12 @@
 <div class="hero"><div class="hin">
   <div class="k">Last 6 Days · Solo · Budget</div>
   <h1>⏳ 回国前最后 6 天</h1>
-  <div class="sub">11/24–29 · 一个人 · 公共交通 · 能省就省 · 11/30 飞机</div>
+  <div class="sub">11/24–29 · 一个人 · 公共交通 · 照着走就行 · 11/30 飞机</div>
   <div class="stats">
-    <div class="stat"><b>6</b><span>天</span></div>
-    <div class="stat"><b>4</b><span>个新地方</span></div>
-    <div class="stat"><b>2</b><span>晚在外面住</span></div>
-    <div class="stat"><b>≈RM 650</b><span>全部花费（估）</span></div>
+    <div class="stat"><b>1</b><span>天云顶</span></div>
+    <div class="stat"><b>1</b><span>天瓜拉雪兰莪</span></div>
+    <div class="stat"><b>4</b><span>天吉隆坡市区</span></div>
+    <div class="stat"><b>≈RM 350</b><span>全部花费（估）</span></div>
   </div>
 </div></div>
 <div class="wrap">
@@ -61,99 +62,121 @@
   <nav class="box" id="toc">
     <h2>📍 6 天一览 · 点哪天跳到哪天</h2>
     <ol class="toc">
-      <li><a href="#d1"><span class="d">11/24 二</span><span><b>🚡 云顶高原 1 日</b><small>KL Sentral 巴士 1 小时 · 缆车 · 清水岩庙</small></span></a></li>
-      <li><a href="#d2"><span class="d">11/25 三</span><span><b>🍵 去金马伦</b><small>TBS 巴士 4 小时 · 住丹那拉打</small></span></a></li>
-      <li><a href="#d3"><span class="d">11/26 四</span><span><b>🍵 茶园 → ☕ 怡保</b><small>半天路虎团 · 下午巴士去怡保 · 住怡保</small></span></a></li>
-      <li><a href="#d4"><span class="d">11/27 五</span><span><b>☕ 怡保 → 回 KL</b><small>老街 + 山洞寺庙 · 晚上 ETS 火车回</small></span></a></li>
-      <li><a href="#d5"><span class="d">11/28 六</span><span><b>🪞 瓜拉雪兰莪 / 休息</b><small>三个方案选一个</small></span></a></li>
-      <li><a href="#d6"><span class="d">11/29 日</span><span><b>🛍 吉隆坡收尾</b><small>天后宫 · 茨厂街 · 买手信 · 收拾</small></span></a></li>
-      <li><a href="#d7"><span class="d">11/30 一</span><span><b>✈️ 去机场</b><small>最便宜：KL Sentral 机场巴士</small></span></a></li>
-      <li><a href="#money"><span class="d">💵</span><span><b>花费 + 订票清单</b><small>出发前订好这几样</small></span></a></li>
+      <li><a href="#d1"><span class="d">11/24 二</span><span><b>🏛 老城 + 茨厂街 + 夜看蓝池</b><small>独立广场 · 占美清真寺 · 鬼仔巷 · 河流之光</small></span></a></li>
+      <li><a href="#d2"><span class="d">11/25 三</span><span><b>🚡 云顶高原 1 日</b><small>KL Sentral 巴士 · 缆车 · 清水岩庙</small></span></a></li>
+      <li><a href="#d3"><span class="d">11/26 四</span><span><b>🏙 双子塔 + 甘榜巴鲁 + 武吉免登</b><small>KLCC 公园 · 椰浆饭 · 萨洛玛天桥 · Jalan Alor</small></span></a></li>
+      <li><a href="#d4"><span class="d">11/27 五</span><span><b>🐒 瓜拉雪兰莪 1 日</b><small>TBS 巴士 · 马六甲山古炮台 · 银叶猴 · 海鲜</small></span></a></li>
+      <li><a href="#d5"><span class="d">11/28 六</span><span><b>🕌 湖滨公园 + 天后宫 + 小印度</b><small>国家清真寺 · 伊斯兰艺术馆 · 香蕉叶饭</small></span></a></li>
+      <li><a href="#d6"><span class="d">11/29 日</span><span><b>🛍 买手信 + 收拾</b><small>中央艺术坊 · 超市 · 最后一顿</small></span></a></li>
+      <li><a href="#d7"><span class="d">11/30 一</span><span><b>✈️ 去机场</b><small>KL Sentral 机场巴士</small></span></a></li>
+      <li><a href="#prep"><span class="d">🎒</span><span><b>出门前准备 + 花费</b><small>交通卡 · App · 报团在哪里</small></span></a></li>
     </ol>
   </nav>
 
-  <div class="box">
-    <h2>🧭 为什么这样排</h2>
-    <p style="font-size:14px">近的（云顶、瓜雪、市区）都是一日游，当天回 KL 住。远的两个连成一个小环线：<b>KL → 金马伦 → 怡保 → KL</b>，金马伦到怡保只要 2 小时巴士，不用走回头路，省一趟车钱和半天时间。11 月是雨季，每天<b>户外排上午</b>，下午容易雷阵雨就进室内或在车上。</p>
-  </div>
+  <section class="box" id="prep">
+    <h2>🎒 出门前准备（照做一遍）</h2>
+    <ul>
+      <li><b>Touch 'n Go 卡</b>：LRT / MRT / 单轨 / 市区巴士都能刷，在任意 LRT 站柜台或 7-Eleven 买、充值（带点现金充值）</li>
+      <li><b>App</b>：Grab（打车、比路边出租便宜）、Google 地图（实时公交路线）、Klook 或携程（报团、买门票）</li>
+      <li><b>天气</b>：11 月雨季，上午出门、下午 3 点后常有雷阵雨 → 带折叠伞；每天都排了下雨的备选</li>
+      <li><b>穿着</b>：进清真寺、印度庙要盖住肩膀和膝盖（清真寺门口一般有长袍借）；云顶山上 18–23 度带外套</li>
+      <li><b>报团在哪里</b>：一个人选 <b>Klook（客路）/ 携程</b>的「拼团 / Join-in」，有中文、能用支付宝微信、多数能免费取消；住处前台和茨厂街小旅行社有时更便宜但多半只收现金。这次只有想看<b>萤火虫 / 天空之镜</b>才需要报团（11/27 那天的方案 B）</li>
+    </ul>
+    <div class="nav"><a href="#toc">↑ 6 天一览</a></div>
+  </section>
 
-  <section class="day hill" id="d1">
-    <div class="dh"><span class="em">🚡</span><div><h2>11/24（二）云顶高原 1 日</h2><p>KL Sentral 坐巴士 1 小时 · 山上 18–23 度，带件外套</p></div><span class="cost">约 RM 40–60</span></div>
+  <section class="day city" id="d1">
+    <div class="dh"><span class="em">🏛</span><div><h2>11/24（二）老城 + 茨厂街 + 晚上看蓝池</h2><p>全程走路，只坐两段 LRT · 景点都免费</p></div><span class="cost">约 RM 40</span></div>
     <div class="db">
       <ul class="tl">
-        <li><span class="t">08:30</span>KL Sentral 坐去云顶的快线巴士（终点选 Awana Skyway 缆车站）<small>单程约 RM 10–20（不同终点、套票价不一样；有「巴士 + 缆车」套票更划算，网上或 KL Sentral 柜台买）</small></li>
-        <li><span class="t">09:45</span>坐 Awana Skyway 缆车上山，<b>中途在 Chin Swee 站下</b>看清水岩庙（免费，云海里的寺庙，最值得）<small>工作日人少，排队短</small></li>
-        <li><span class="t">11:30</span>继续坐缆车到山顶 SkyAvenue 商场，逛逛、吃午饭（商场美食广场比餐厅便宜）</li>
-        <li><span class="t">14:00</span>下山，Awana 附近的 Genting Highlands Premium Outlets 名牌奥特莱斯（不买也能逛）</li>
-        <li><span class="t">16:00–17:00</span>坐巴士回 KL Sentral<small>回程票最好早上一起买，周末傍晚常满</small></li>
+        <li><span class="t">09:00</span><span class="go">LRT</span>坐到 <b>Masjid Jamek</b> 站（Kelana Jaya 线 / Ampang 线都到）→ 走 5 分钟到<b>独立广场</b><small>苏丹阿都沙末大厦（铜顶红砖楼）、旗杆、草坪，免费；早上光线好、不热</small></li>
+        <li><span class="t">10:00</span>走回 <b>占美清真寺</b>（两河交汇处，吉隆坡名字的由来）<small>非祈祷时间可以进去，门口借长袍；周五中午不开放（今天周二没问题）</small></li>
+        <li><span class="t">11:00</span>走 10 分钟到<b>中央艺术坊（Central Market）</b>逛手工艺品，先看看手信价格，最后一天再买</li>
+        <li><span class="t">12:00</span>过马路就是<b>茨厂街（Petaling Street）</b>：午饭吃 <b>金莲记福建面</b> 或 街边 <b>猪肠粉 / 煲仔饭</b><small>人均 RM 10–20</small></li>
+        <li><span class="t">13:30</span><b>鬼仔巷（Kwai Chai Hong）</b>壁画小巷 → <b>马里安曼兴都庙</b>（彩色塔门，免费，进去脱鞋）→ <b>关帝庙</b>（就在对面）</li>
+        <li><span class="t">15:00</span>下午雨多：回住处休息，或者去 <b>Merchant's Lane</b> 这类老店屋咖啡馆坐坐</li>
+        <li><span class="t">19:30</span>回到 <b>Masjid Jamek</b> 站，看<b>河流之光（River of Life）蓝池</b>：灯光、喷泉、清真寺倒影<small>灯一般 7 点半左右亮，喷泉开开停停，等一会儿；免费</small></li>
+        <li><span class="t">20:30</span>茨厂街夜市逛一圈吃晚饭 → LRT 回家</li>
       </ul>
-      <div class="tip"><b>省钱：</b>不进室内外主题公园（门票贵），云顶最好看的是缆车和清水岩庙，都几乎不花钱。</div>
+      <div class="rain"><b>☔ 下雨：</b>中央艺术坊、Merchant's Lane 咖啡馆都在室内；国家纺织博物馆（独立广场旁）也可以躲雨。</div>
       <div class="nav"><a href="#toc">↑ 6 天一览</a><a href="#d2">下一天 ›</a></div>
     </div>
   </section>
 
   <section class="day hill" id="d2">
-    <div class="dh"><span class="em">🍵</span><div><h2>11/25（三）KL → 金马伦高原</h2><p>TBS 巴士约 4 小时 · 住丹那拉打（Tanah Rata）</p></div><span class="cost">约 RM 100–150</span></div>
+    <div class="dh"><span class="em">🚡</span><div><h2>11/25（三）云顶高原 1 日</h2><p>工作日人少 · KL Sentral 巴士 1 小时 · 带外套</p></div><span class="cost">约 RM 50–70</span></div>
     <div class="db">
       <ul class="tl">
-        <li><span class="t">08:30</span>TBS（Bandar Tasik Selatan 站）坐巴士去 Tanah Rata<small>约 RM 25–50（Unititi Express / CS Travel 等），3.5–4.5 小时；easybook / busonlineticket 提前一两天订。最便宜的 Pahang Lin Siong 从 Pekeliling 出发，不在 TBS</small></li>
-        <li><span class="t">13:00</span>到丹那拉打，入住小镇上的背包客栈 / 民宿<small>单间约 RM 50–100，床位更便宜；住小镇中心，走路就能吃饭、坐车</small></li>
-        <li><span class="t">14:00</span>午饭后去路边的 Cameron Bharat 茶园（Grab 几块钱）喝茶看茶田<small>下午常下雨，茶馆里坐着看雨也很好</small></li>
-        <li><span class="t">晚上</span>小镇上吃一顿<b>金马伦火锅（steamboat）</b>，一个人点单人份<small>早点睡，明天 8 点多出发</small></li>
+        <li><span class="t">08:00</span><span class="go">LRT/MRT</span>到 <b>KL Sentral</b>，找去云顶的快线巴士柜台，买<b>来回票</b>（终点选 <b>Awana Skyway</b> 缆车站）<small>单程约 RM 10–20；有「巴士 + 缆车」套票更划算。柜台搬过位置，以 Resorts World Genting 官网公告为准，也可以前一天在 redBus / busonlineticket 买好</small></li>
+        <li><span class="t">08:30</span>上车，约 1 小时到 Awana</li>
+        <li><span class="t">09:40</span>坐 <b>Awana Skyway 缆车</b>，<b>中途在 Chin Swee 站下</b> → <b>清水岩庙</b>：云雾里的寺庙、九层塔、大佛，免费<small>云顶最值得的一站，上午雾少看得远</small></li>
+        <li><span class="t">11:30</span>再坐缆车到山顶 <b>SkyAvenue</b> 商场：逛一圈，午饭在美食广场（比餐厅便宜）</li>
+        <li><span class="t">14:00</span>坐缆车下山，逛 Awana 旁边的 <b>Genting Highlands Premium Outlets</b>（不买也能逛）</li>
+        <li><span class="t">16:00</span>坐巴士回 KL Sentral，晚饭在 <b>Brickfields 小印度</b>（KL Sentral 走过去 5 分钟）吃印度菜</li>
       </ul>
-      <div class="tip"><b>注意：</b>晚上只有十几度，带长袖外套；山路弯，容易晕车的上车前吃晕车药。</div>
+      <div class="tip"><b>省钱：</b>不进主题公园（门票贵）。山上下雨起雾就待在 SkyAvenue 室内，缆车照常开。</div>
       <div class="nav"><a href="#toc">↑ 6 天一览</a><a href="#d1">‹ 上一天</a><a href="#d3">下一天 ›</a></div>
     </div>
   </section>
 
-  <section class="day hill" id="d3">
-    <div class="dh"><span class="em">🌿</span><div><h2>11/26（四）BOH 茶园 + 苔藓森林 → 怡保</h2><p>上午半天团 · 下午巴士 2 小时去怡保 · 住怡保老街</p></div><span class="cost">约 RM 150–200</span></div>
+  <section class="day city" id="d3">
+    <div class="dh"><span class="em">🏙</span><div><h2>11/26（四）双子塔 + 甘榜巴鲁 + 武吉免登</h2><p>LRT KLCC 站 / Kampung Baru 站 · 晚上看夜景</p></div><span class="cost">约 RM 40（上天桥另算）</span></div>
     <div class="db">
       <ul class="tl">
-        <li><span class="t">08:45</span>参加<b>半天路虎团</b>（客栈 / 小镇旅行社都能报，前一天晚上订）<small>一个人最省钱的办法：山上公交很少，Grab 来回几个点反而贵；半天团通常包 BOH 茶园、苔藓森林、蝴蝶园、草莓园，约 RM 60–100</small></li>
-        <li><span class="t">13:00</span>回小镇吃午饭</li>
-        <li><span class="t">14:30</span>Tanah Rata 巴士站坐车去怡保（到 Amanjaya 总站）<small>约 2 小时，十几到二十几马币；到了 Grab 去老街</small></li>
-        <li><span class="t">17:30</span>入住怡保老街一带的客栈<small>约 RM 60–100</small></li>
-        <li><span class="t">晚上</span>怡保<b>芽菜鸡</b>（安记 / 老黄，两家对门）+ 河粉</li>
+        <li><span class="t">09:00</span><span class="go">LRT</span>坐到 <b>KLCC</b> 站 → <b>KLCC 公园</b>：从公园湖边拍双子塔全景，免费<small>想上 41 楼天桥 + 86 楼观景台：提前在双子塔官网或 Klook 买票（外国人票价几十到一百多马币，按时段入场）——不上也完全可以</small></li>
+        <li><span class="t">10:30</span><b>阳光广场（Suria KLCC）</b>商场吹空调，楼下 Isetan 超市可以先看看手信</li>
+        <li><span class="t">12:00</span><span class="go">LRT</span>坐一站到 <b>Kampung Baru</b>：城市中间的马来村落，高脚木屋对着摩天楼<small>午饭吃 <b>Nasi Lemak Wanjo</b>（椰浆饭，RM 10 左右）</small></li>
+        <li><span class="t">13:30</span>走 <b>萨洛玛天桥（Saloma Link）</b>回 KLCC 方向（白天拍，晚上会亮灯）</li>
+        <li><span class="t">14:30</span>下午雨多：回住处休息，或去 <b>Aquaria 水族馆</b>（KLCC 会展中心，收费）</li>
+        <li><span class="t">18:00</span><span class="go">MRT</span>坐到 <b>Bukit Bintang</b> 站：<b>Pavilion</b> 门口拍照 → 走 5 分钟到 <b>Jalan Alor 美食街</b>吃晚饭（沙爹、烤鸡翅、炒粿条）</li>
+        <li><span class="t">20:30</span>想再看一次夜景：坐回 KLCC，<b>KLCC 公园喷泉 + 双子塔夜景</b>（喷泉晚上有表演）</li>
       </ul>
+      <div class="rain"><b>☔ 下雨：</b>KLCC → 武吉免登之间有<b>空中走廊（KLCC–Bukit Bintang Pedestrian Walkway）</b>，有顶、有空调，下雨也能走过去。</div>
       <div class="nav"><a href="#toc">↑ 6 天一览</a><a href="#d2">‹ 上一天</a><a href="#d4">下一天 ›</a></div>
     </div>
   </section>
 
-  <section class="day city" id="d4">
-    <div class="dh"><span class="em">☕</span><div><h2>11/27（五）怡保一天 → 晚上回 KL</h2><p>走路 + 一两趟 Grab · ETS 火车 2.5 小时回 KL Sentral</p></div><span class="cost">约 RM 70–110</span></div>
+  <section class="day sea" id="d4">
+    <div class="dh"><span class="em">🐒</span><div><h2>11/27（五）瓜拉雪兰莪 1 日</h2><p>公交去回 · 古炮台、灯塔、银叶猴、海鲜</p></div><span class="cost">约 RM 70–90</span></div>
     <div class="db">
       <ul class="tl">
-        <li><span class="t">08:00</span>老街喝<b>白咖啡</b>当早餐（新源隆 / 南香）+ 鸡蛋挞</li>
-        <li><span class="t">09:00</span>走路逛老街：<b>二奶巷</b>、壁画街、怡保火车站（白色殖民建筑）、Birch 纪念钟楼<small>都在步行圈，免费</small></li>
-        <li><span class="t">11:30</span>Grab 去城南的山洞寺庙：<b>极乐洞（Kek Lok Tong）</b>穿过山洞是湖和花园，旁边<b>三宝洞（Sam Poh Tong）</b><small>都免费；Grab 单程约 RM 10</small></li>
-        <li><span class="t">14:00</span>回老街吃午饭，<b>奇峰豆腐花（Funny Mountain）</b>当甜品；下午躲雨可以在咖啡馆坐坐</li>
-        <li><span class="t">17:00 左右</span>怡保火车站坐 <b>ETS</b> 回 KL Sentral<small>约 2.5 小时，经济舱约 RM 25–45（灵活票价，越早订越便宜）；ktmb.com.my 或 KTMB 官方 App 提前订，周五傍晚的车容易满</small></li>
+        <li><span class="t">08:15</span><span class="go">LRT/KTM</span>坐到 <b>Bandar Tasik Selatan</b> 站，走天桥进 <b>TBS 巴士总站</b></li>
+        <li><span class="t">09:00</span>坐快线巴士去 <b>Kuala Selangor</b><small>约 1.5 小时、单程约 RM 20（Starmart / Sri Theven 等），前一天在 busonlineticket 买好。<b>更便宜但更慢</b>：Hub Lebuh Pudu（MRT Pasar Seni / LRT Plaza Rakyat 旁）坐 <b>100 路</b>市郊巴士，约 2 小时多、几块钱，半小时左右一班</small></li>
+        <li><span class="t">10:45</span>到瓜雪镇上，Grab 5 分钟上 <b>马六甲山（Bukit Melawati）</b>：古炮台、老灯塔、皇陵、可以看海<small>免费；山上的<b>银叶猴</b>很亲人，别喂、别拿着塑料袋晃</small></li>
+        <li><span class="t">12:30</span>Grab 过桥去 <b>Pasir Penambang 渔村</b>吃<b>海鲜午饭</b>（一个人点一两样：辣椒蟹、炒啦啦、咸蛋虾），人均 RM 30–50</li>
+        <li><span class="t">14:00</span>回镇上，<b>瓜雪自然公园（Taman Alam）</b>红树林木栈道走一走（小额门票，看天气）</li>
+        <li><span class="t">15:30</span>坐巴士回 KL（快线回 TBS，或 100 路回 Pudu）<small>回程车也最好早上一起买；17:30 左右到 KL</small></li>
       </ul>
-      <div class="tip"><b>省钱：</b>怡保老街和山洞寺庙都不要门票，主要花在吃上。</div>
+      <div class="tip"><b>方案 B · 想看萤火虫 / 天空之镜：</b>这两样都要报一日团（萤火虫天黑后才看，公交回不来；天空之镜要坐船出海，只在大退潮的日子有）。在 Klook / 携程搜「瓜拉雪兰莪 萤火虫」或「天空之镜」，选<b>拼团</b>、看 27 号有没有出发、含不含接送；价格从一两百到几百马币不等。报了团就不用按上面的时间线走。</div>
+      <div class="rain"><b>☔ 下雨：</b>马六甲山和渔村都是露天，大雨就早点回 KL；早上出发最稳。</div>
       <div class="nav"><a href="#toc">↑ 6 天一览</a><a href="#d3">‹ 上一天</a><a href="#d5">下一天 ›</a></div>
     </div>
   </section>
 
-  <section class="day sea" id="d5">
-    <div class="dh"><span class="em">🪞</span><div><h2>11/28（六）瓜拉雪兰莪（三个方案选一个）</h2><p>前面三天跑得多，这天看体力</p></div><span class="cost">RM 0–几百</span></div>
+  <section class="day city" id="d5">
+    <div class="dh"><span class="em">🕌</span><div><h2>11/28（六）湖滨公园一带 + 天后宫 + 小印度</h2><p>一两趟 Grab + 走路</p></div><span class="cost">约 RM 50–70</span></div>
     <div class="db">
-      <div class="opt"><b>方案 A · 省钱一日游（约 RM 60–80）</b>：KL 坐巴士去瓜拉雪兰莪（约 1.5 小时，单程约 RM 20，班次以订票网站为准）→ <b>马六甲山（Bukit Melawati）</b>看古炮台、灯塔和银叶猴（免费）→ 渔村吃<b>海鲜午餐</b>→ 下午坐巴士回 KL。萤火虫要天黑才看，没车不好回来，这个方案不看。</div>
-      <div class="opt"><b>方案 B · 想拍「天空之镜」（贵）</b>：只能报一日团（含往返车 + 出海的船），网上看到的价格从几百马币起；而且只在大退潮的日子有，团的出发时间前一天才通知。想去的话先在 Klook / Trip.com 看 28 号有没有团、价格能不能接受。</div>
-      <div class="opt"><b>方案 C · 在 KL 休息</b>：睡个懒觉，下午去 KLCC 公园、双子塔楼下商场，晚上看双子塔夜景。一分钱不花也很好。</div>
+      <ul class="tl">
+        <li><span class="t">09:00</span><span class="go">Grab</span>到 <b>国家清真寺（Masjid Negara）</b>：伞形屋顶的现代清真寺<small>游客开放时间避开祈祷，门口借长袍；免费</small></li>
+        <li><span class="t">10:00</span>走过马路到<b>伊斯兰艺术馆</b>（亚洲最好的伊斯兰艺术博物馆之一，有空调）<small>门票几十马币以内，以现场为准；不想花钱就只看大厅和穹顶</small></li>
+        <li><span class="t">11:30</span>走 / Grab 到 <b>Perdana 植物园（湖滨公园）</b>：湖边散步，免费；附近有<b>国家英雄纪念碑</b></li>
+        <li><span class="t">13:00</span>Grab 去 <b>Brickfields 小印度</b>吃<b>香蕉叶饭</b>（Sri Paandi / Vishalatchi Food 一类，RM 15 左右）</li>
+        <li><span class="t">15:00</span>Grab 约 RM 10 去 <b>天后宫（Thean Hou Temple）</b>：红灯笼、能看 KL 天际线，免费<small>傍晚光线最好，可以待到 17:30</small></li>
+        <li><span class="t">18:30</span>回家附近吃晚饭，早点休息</li>
+      </ul>
+      <div class="rain"><b>☔ 下雨：</b>上午先去伊斯兰艺术馆（室内），等雨停再去清真寺和植物园；天后宫屋檐多，小雨也能逛。</div>
       <div class="nav"><a href="#toc">↑ 6 天一览</a><a href="#d4">‹ 上一天</a><a href="#d6">下一天 ›</a></div>
     </div>
   </section>
 
   <section class="day city" id="d6">
-    <div class="dh"><span class="em">🛍</span><div><h2>11/29（日）吉隆坡收尾 + 收拾行李</h2><p>LRT / MRT + 一两趟 Grab</p></div><span class="cost">约 RM 50 + 手信</span></div>
+    <div class="dh"><span class="em">🛍</span><div><h2>11/29（日）买手信 + 收拾行李</h2><p>轻松的一天 · 早点睡</p></div><span class="cost">约 RM 30 + 手信</span></div>
     <div class="db">
       <ul class="tl">
-        <li><span class="t">09:00</span><b>天后宫</b>（Grab 过去，免费）：红灯笼、能看到 KL 的天际线</li>
-        <li><span class="t">10:30</span>茨厂街 / <b>鬼仔巷</b>（Kwai Chai Hong）壁画小巷，吃个早午饭</li>
-        <li><span class="t">12:00</span><b>中央艺术坊（Central Market）</b>买手信：白咖啡、咖椰酱、Beryl's 巧克力（超市比旅游店便宜，可以去 Mydin / 99 Speedmart / 大超市对比一下）</li>
-        <li><span class="t">下午</span>回住处收拾行李、称重（液体、榴莲制品别带上飞机）</li>
-        <li><span class="t">晚上</span>最后一顿：武吉免登 <b>Jalan Alor</b> 夜市，早点睡</li>
+        <li><span class="t">10:00</span>超市买手信最便宜：<b>Mydin、Lotus's、AEON</b> 任一家（白咖啡、咖椰酱、Beryl's 巧克力、马来西亚饼干）<small>比 Central Market 和机场便宜不少</small></li>
+        <li><span class="t">12:00</span>想买工艺品 / 印花布：回 <b>Central Market</b>（第一天已经看过价格）</li>
+        <li><span class="t">14:00</span>回住处<b>收拾行李、称重</b><small>液体放托运；榴莲制品别带上飞机；充电宝随身</small></li>
+        <li><span class="t">18:00</span>最后一顿吃这次最想再吃的（推荐回 Jalan Alor 或茨厂街）→ 早点睡</li>
       </ul>
       <div class="nav"><a href="#toc">↑ 6 天一览</a><a href="#d5">‹ 上一天</a><a href="#d7">下一天 ›</a></div>
     </div>
@@ -163,36 +186,27 @@
     <div class="dh"><span class="em">✈️</span><div><h2>11/30（一）去机场</h2><p>国际航班提前 3 小时到</p></div><span class="cost">约 RM 15–55</span></div>
     <div class="db">
       <ul class="tl">
-        <li><b>最便宜：</b>KL Sentral 坐机场巴士去 KLIA / KLIA2，约 1 小时、十几马币<small>先确认航班在 KLIA（T1）还是 KLIA2（亚航等廉航）</small></li>
-        <li><b>最快：</b>KLIA Ekspres 机场快线 28–33 分钟，贵一些（几十马币）<small>早上高峰、或者行李多时选它</small></li>
+        <li><b>最便宜：</b>到 <b>KL Sentral</b> 坐机场巴士去 KLIA / KLIA2，约 1 小时、十几马币<small>先看清航班在 KLIA（T1）还是 KLIA2（亚航等廉航）</small></li>
+        <li><b>最快：</b><b>KLIA Ekspres</b> 机场快线 28–33 分钟，几十马币；周一早高峰、行李多就选它</li>
       </ul>
       <div class="nav"><a href="#toc">↑ 6 天一览</a><a href="#d6">‹ 上一天</a><a href="#money">花费 ›</a></div>
     </div>
   </section>
 
-  <section class="box" id="money" style="scroll-margin-top:12px">
+  <section class="box" id="money">
     <h2>💵 花费估算（一个人）</h2>
     <table>
-      <tr><th>项目</th><th>大约</th></tr>
-      <tr><td>云顶来回巴士 + 缆车</td><td>RM 30–50</td></tr>
-      <tr><td>KL → 金马伦巴士</td><td>RM 25–50</td></tr>
-      <tr><td>金马伦半天团</td><td>RM 60–100</td></tr>
-      <tr><td>金马伦 → 怡保巴士</td><td>RM 15–25</td></tr>
-      <tr><td>怡保 → KL ETS</td><td>RM 25–45</td></tr>
-      <tr><td>住 2 晚（金马伦 + 怡保）</td><td>RM 110–200</td></tr>
-      <tr><td>瓜雪方案 A</td><td>RM 60–80（方案 C 是 0）</td></tr>
-      <tr><td>吃饭 6 天 + Grab</td><td>RM 200–280</td></tr>
-      <tr><td><b>合计</b></td><td><b>约 RM 550–800</b>（不算手信、不算天空之镜团）</td></tr>
+      <tr><th>哪天</th><th>大约</th></tr>
+      <tr><td>11/24 老城（两段 LRT + 吃饭）</td><td>RM 40</td></tr>
+      <tr><td>11/25 云顶（来回巴士 + 缆车 + 吃饭）</td><td>RM 50–70</td></tr>
+      <tr><td>11/26 双子塔一带（不上天桥）</td><td>RM 40</td></tr>
+      <tr><td>11/27 瓜拉雪兰莪（快线来回 + Grab + 海鲜）</td><td>RM 70–90</td></tr>
+      <tr><td>11/28 湖滨公园 + 天后宫（Grab + 艺术馆 + 吃饭）</td><td>RM 50–70</td></tr>
+      <tr><td>11/29 收尾（不算手信）</td><td>RM 30</td></tr>
+      <tr><td>11/30 机场巴士</td><td>RM 15</td></tr>
+      <tr><td><b>合计</b></td><td><b>约 RM 300–360</b>；加上双子塔天桥、萤火虫团这些可选的，约 RM 400–600</td></tr>
     </table>
-    <h2 style="margin-top:14px">🎫 出发前订好</h2>
-    <ul style="font-size:14px;padding-left:20px">
-      <li>11/25 TBS → 金马伦巴士（easybook / busonlineticket）</li>
-      <li>11/25、11/26 两晚住宿（金马伦丹那拉打、怡保老街）</li>
-      <li>11/27 怡保 → KL Sentral 的 ETS（ktmb.com.my 或 KTMB 官方 App，越早越便宜）</li>
-      <li>11/26 金马伦半天团（到了客栈再报也来得及）</li>
-      <li>想拍天空之镜：先查 28 号有没有团</li>
-    </ul>
-    <div class="tip"><b>说明：</b>价格是 2026 年 11 月在订票网站上查到的参考价，不同公司、不同日子不一样，订的时候以官网为准。</div>
+    <div class="tip"><b>说明：</b>价格、开放时间是 2026 年 11 月网上查到的参考，景点偶尔调整，出门前用 Google 地图看一眼当天开放时间。</div>
     <div class="nav"><a href="#toc">↑ 6 天一览</a></div>
   </section>
 
