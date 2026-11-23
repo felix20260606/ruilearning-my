@@ -1391,6 +1391,28 @@ async function cfKV(env, from, to) {
   for (const g of st) { if (g.dimensions.date !== last || seen.has(g.dimensions.namespaceId)) continue; seen.add(g.dimensions.namespaceId); keys += +(g.max && g.max.keyCount) || 0; bytes += +(g.max && g.max.byteCount) || 0; }
   return { days, keys, bytes, at: last };
 }
+// 🏆 家庭排行（「📅 每日」最上面）：GET /api/board?lang= → { ok, users: [{ id, name, days: { 日期: 卡片数 }, frz: [断签保护用掉的日期] }] }
+//   每个人的卡片数取自他自己的插件数据「stat|日期」（「🔊 练习」每练一张记一笔，换设备也在），断签保护取自 /api/mine 的 daily「frz:日期」；
+//   只给最近 60 天；只读，结果缓存 5 分钟（不写 KV）
+async function board(req, env, u) {
+  if (req.method === "OPTIONS") return json({ ok: true });
+  const kv = env.CAPTIONS; if (!kv) return json({ ok: false, error: "KV binding CAPTIONS is missing" }, 500);
+  const lg = u.searchParams.get("lang") || ""; if (lg && !LANG_OK.test(lg)) return json({ ok: false, error: "bad lang" }, 400);
+  const lp = lg && lg !== "en" ? "l/" + lg + "/" : "", cache = typeof caches !== "undefined" ? caches.default : null, ck = new Request("https://board.cache/v1?l=" + lp);
+  if (cache) { const c = await cache.match(ck); if (c) return c; }
+  try {
+    const from = new Date(Date.now() + 8 * 3600e3 - 60 * 864e5).toISOString().slice(0, 10), out = [];
+    for (const x of await usersList(kv, true)) {
+      const pre = (x.id ? "u/" + x.id + "/" : "") + lp, [e, m] = await Promise.all([kv.get(pre + EXT_KEY, "json"), kv.get(pre + "mine:daily", "json")]), days = {}, frz = [];
+      const it = (e && e.items) || {}; for (const k in it) if (k.indexOf("stat|") === 0 && k.slice(5) >= from && it[k] && !it[k].del && it[k].v) days[k.slice(5)] = +it[k].v.n || 0;
+      const mi = (m && m.items) || {}; for (const k in mi) if (k.indexOf("frz:") === 0 && mi[k] && !mi[k].del && k.slice(4) >= from) frz.push(k.slice(4));
+      out.push({ id: x.id, name: x.name, days, frz });
+    }
+    const res = new Response(JSON.stringify({ ok: true, users: out, at: Date.now() }), { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "max-age=300", "access-control-allow-origin": "*" } });
+    if (cache) await cache.put(ck, res.clone());
+    return res;
+  } catch (er) { return json({ ok: false, error: String(er && er.message || er) }, 500); }
+}
 async function usage(req, env) {
   const cache = typeof caches !== "undefined" ? caches.default : null, ck = new Request("https://use.cache/v3");
   if (cache) { const c = await cache.match(ck); if (c) return c; }
@@ -1426,6 +1448,7 @@ export default {
   async fetch(req, env, ctx) {
     const u = new URL(req.url);
     if (u.pathname === "/api/usage") return usage(req, env);
+    if (u.pathname === "/api/board") return board(req, env, u);
     env = meter(env, ctx, u);
     if (API_PATHS.includes(u.pathname)) return cap(req, env, u);
     if (u.pathname === VOCAB_PATH) return vocab(req, env);

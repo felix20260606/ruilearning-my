@@ -52,12 +52,23 @@
     return out;
   }
   // 连续学习天数：从今天往回数；今天还没练不算断（从昨天开始数）
-  function streakOf(daily, now) {
-    let k = dayKey(now), s = 0; const act = x => daily[x] && daily[x].n > 0;
+  // 🛡 断签保护（同 Duolingo 的 streak freeze）：每个月 2 张；漏了一天、而前一天练过，就自动用一张，连续天数不断（那一天不算进天数）
+  //   fz = { set: 用过的日期 Set, from: 从哪天开始有这个功能, per: 每月几张, add(日期) 用掉一张时记下来 }；不传 = 和以前一样
+  const FRZ_FROM = "2026-11-23", FRZ_PER = 2;
+  const frzLeft = (set, month) => FRZ_PER - [...set].filter(d => d.slice(0, 7) === month).length;
+  function streakOf(daily, now, fz) {
+    let k = dayKey(now), s = 0, guard = 0; const act = x => daily[x] && daily[x].n > 0;
     if (!act(k)) k = addDay(k, -1);
-    while (act(k)) { s++; k = addDay(k, -1); }
+    while (guard++ < 5000) {
+      if (act(k)) { s++; k = addDay(k, -1); continue; }
+      if (fz && fz.set.has(k)) { k = addDay(k, -1); continue; } // 用过保护卡的一天：不断（也不算进天数）
+      if (fz && fz.add && k >= (fz.from || FRZ_FROM) && act(addDay(k, -1)) && frzLeft(fz.set, k.slice(0, 7)) > 0) { fz.set.add(k); fz.add(k); k = addDay(k, -1); continue; }
+      break;
+    }
     return s;
   }
+  // 最长连续天数（徽章用）
+  function bestStreak(daily) { const ks = Object.keys(daily).filter(k => daily[k] && daily[k].n > 0).sort(); let b = 0, c = 0, prev = ""; for (const k of ks) { c = prev && addDay(prev, 1) === k ? c + 1 : 1; b = Math.max(b, c); prev = k; } return b; }
   // 未来 14 天要复习的数量：有 due 用 due，没有用 at + 半衰期（回忆率降到 50%）；status = known 的不复习（同 pump.js）
   function forecastOf(W, S, now, types) {
     const days = []; for (let i = 0; i < AHEAD; i++) days.push({ k: dayKey(dayStart(now) + i * DAY + 3600e3 * 12), n: 0 });
@@ -143,8 +154,9 @@
   const vtLevel = size => { const L = VT_LEVELS.find(x => size < x[0]); return { cefr: L[1], ielts: L[2] }; };
 
   // ======================= 下面是页面部分 =======================
-  const API = { dayKey, mergeDaily, streakOf, forecastOf, distOf, curveOf, bucketOf, masteryLocal, vtBuild, vtEstimate, vtLevel, VT_BANDS, VT_POOL, VT_FAKE };
+  const API = { dayKey, mergeDaily, streakOf, bestStreak, frzLeft, forecastOf, distOf, curveOf, bucketOf, masteryLocal, vtBuild, vtEstimate, vtLevel, VT_BANDS, VT_POOL, VT_FAKE };
   if (typeof module === "object" && module.exports) module.exports = API;
+  if (typeof window !== "undefined") window.STATS = API; // 「📅 每日」的家庭排行也用同一个连续天数算法
   if (typeof document === "undefined") return;
   const { esc } = U; // 全站共用的小工具（util.js）
   window.statsDayKey = (ts) => dayKey(ts == null ? Date.now() : ts);
@@ -217,7 +229,11 @@
     const SP = LG("speak:log", {}); for (const k in SP) { const v = +SP[k] || 0; if (!v || !/^\d{4}-\d{2}-\d{2}$/.test(k)) continue; const r = daily[k] && !daily[k].est ? daily[k] : (daily[k] = { n: 0, ok: 0, fail: 0, nw: 0, sec: 0 }); r.sp = v; r.n = (r.n || 0) + v; }
     let mastered = 0, learning = 0, untouched = 0;
     L.forEach(w => { const m = mfn(w); if (m >= 1) mastered++; else if (S[w.id]) learning++; else untouched++; });
-    return { now, S, L, daily, tk, today: td && !td.est ? td.n : 0, todayEst: td && td.est ? td.n : 0, streak: streakOf(daily, now), days: Object.keys(daily).filter(k => daily[k].n > 0).length, mastered, learning, untouched };
+    // 🛡 断签保护：用过的日期存本机 vocab:frz + 同步到 daily「frz:日期」（换设备、家庭排行都认）
+    const F = LG("vocab:frz", {}) || {}, fset = new Set(Object.keys(F));
+    const fz = { set: fset, add: d => { F[d] = 1; LS("vocab:frz", F); if (window.CLOUD) CLOUD.chan("daily").put("frz:" + d, 1); if (window.U) U.tip("🛡 " + d.slice(5) + " 没练，用了一张断签保护卡，连续天数没断（这个月还剩 " + frzLeft(fset, d.slice(0, 7)) + " 张）"); } };
+    const streak = streakOf(daily, now, fz);
+    return { now, S, L, daily, tk, today: td && !td.est ? td.n : 0, todayEst: td && td.est ? td.n : 0, streak, frzLeft: frzLeft(fset, tk.slice(0, 7)), best: Math.max(bestStreak(daily), streak), cards: Object.keys(daily).reduce((a, k) => a + (+daily[k].n || 0), 0), days: Object.keys(daily).filter(k => daily[k].n > 0).length, mastered, learning, untouched };
   }
 
   // ---------- 画图（纯 SVG） ----------
@@ -304,7 +320,7 @@
   function tilesHtml(d) {
     const t = (cls, big, unit, lab, to) => '<div class="st-tile' + (cls ? " " + cls : "") + '"' + (to ? ' data-to="' + to + '" tabindex="0" role="link"' : "") + '><b>' + big + (unit ? "<small>" + unit + "</small>" : "") + "</b><span>" + lab + "</span></div>"; // to：点了跳到哪（util.js 的 data-to）
     return '<div class="st-tiles">' +
-      t("fire", "🔥 " + d.streak, "天", d.streak ? "连续学习" : "今天练一下就开始连续", "daily") +
+      t("fire", "🔥 " + d.streak, "天", (d.streak ? "连续学习" : "今天练一下就开始连续") + ' · <span title="漏练一天会自动用一张，连续天数不断；每月 2 张">🛡 本月还剩 ' + d.frzLeft + " 张</span>", "daily") +
       t("", d.today || d.todayEst, d.today ? "张" : d.todayEst ? "个词" : "张", d.today ? "今天的卡片" : d.todayEst ? "今天练过的词（推算）" : "今天还没练", "notebook/pump") +
       t("", d.mastered, "个", "🏆 已掌握", "notebook/list?f=known&amp;c=all") +
       t("", d.learning, "个", "学习中" + (d.untouched ? ' · 还有 <u data-to="notebook/list?f=fresh&amp;c=all">' + d.untouched + " 个没练过</u>" : ""), "notebook/list?f=practicing&amp;c=all") +
@@ -343,7 +359,7 @@
     if (!K[day] || K[day][0] !== known || K[day][1] !== total) { K[day] = [known, total]; LS("vocab:kn", K); if (C) C.put("kn:" + day, [known, total]); }
     const hit = MS.filter(m => known >= m && !M[m]);
     if (hit.length) { hit.forEach(m => { M[m] = day; if (C) C.put("ms:" + m, day); }); LS("vocab:ms", M); U.tip("🏅 已掌握 " + hit[hit.length - 1] + " 个词！"); }
-    if (!msPulled && C) { msPulled = true; C.get(60e3).then(it => { let ch = false; for (const k in it || {}) { const x = it[k]; if (!x || x.del) continue; if (k.indexOf("kn:") === 0 && !K[k.slice(3)] && Array.isArray(x.v)) { K[k.slice(3)] = x.v; ch = true; } if (k.indexOf("ms:") === 0 && !M[k.slice(3)] && x.v) { M[k.slice(3)] = x.v; ch = true; } } if (ch) { LS("vocab:kn", K); LS("vocab:ms", M); if (root && root.classList.contains("on")) draw(); } }).catch(() => {}); } // 换设备：把别的设备记的拉过来
+    if (!msPulled && C) { msPulled = true; C.get(60e3).then(it => { let ch = false; const FZ = LG("vocab:frz", {}) || {}; for (const k in it || {}) { const x = it[k]; if (!x || x.del) continue; if (k.indexOf("kn:") === 0 && !K[k.slice(3)] && Array.isArray(x.v)) { K[k.slice(3)] = x.v; ch = true; } if (k.indexOf("ms:") === 0 && !M[k.slice(3)] && x.v) { M[k.slice(3)] = x.v; ch = true; } if (k.indexOf("frz:") === 0 && !FZ[k.slice(4)]) { FZ[k.slice(4)] = 1; ch = true; } } if (ch) { LS("vocab:kn", K); LS("vocab:ms", M); LS("vocab:frz", FZ); if (root && root.classList.contains("on")) draw(); } }).catch(() => {}); } // 换设备：把别的设备记的拉过来
   }
   function msHtml(d) {
     const total = d.L.length, known = d.mastered; msRecord(known, total);
@@ -354,10 +370,11 @@
     const days = Object.keys(K).sort().slice(-60), pts = days.map(k => K[k][0]);
     let spark = "";
     if (pts.length >= 2) { const mx = Math.max(...pts, 1), mn = Math.min(...pts), w = 300, h = 46, x = i => (i / (pts.length - 1)) * w, y = v => h - 4 - ((v - mn) / Math.max(1, mx - mn)) * (h - 8); spark = '<svg viewBox="0 0 ' + w + " " + h + '" class="st-spark" preserveAspectRatio="none"><polyline fill="none" stroke="var(--ui-green)" stroke-width="2" points="' + pts.map((v, i) => x(i).toFixed(1) + "," + y(v).toFixed(1)).join(" ") + '"/></svg><div class="st-note">' + days[0] + " → " + days[days.length - 1] + "：" + pts[0] + " → " + pts[pts.length - 1] + " 个</div>"; }
-    return '<div class="st-card"><h3>🏅 词量里程碑</h3><p class="sub">已掌握 = 掌握度到 42 天的词（和顶上「🏆 已掌握」同一个数）</p>' +
+    return '<div class="st-card"><h3>🏅 里程碑和徽章</h3><p class="sub">已掌握 = 掌握度到 42 天的词（和顶上「🏆 已掌握」同一个数）</p>' +
       '<div class="st-ms-big"><b>' + known + '</b><span>个已掌握 · 收集了 ' + total + " 个</span></div>" +
       (next ? '<div class="st-ms-bar"><u style="width:' + pct + '%"></u></div><div class="st-note">下一站 <b>' + next + "</b>，还差 <b>" + (next - known) + "</b> 个</div>" : '<div class="st-note">🎉 所有里程碑都到了</div>') +
-      '<div class="st-ms-row">' + badges + "</div>" + spark +
+      '<div class="st-ms-row">' + badges + "</div>" + '<div class="st-ms-row">' + [[7, "🔥 连续 7 天"], [30, "🔥 连续 30 天"], [100, "🔥 连续 100 天"], [365, "🔥 连续一年"]].map(([n, t]) => '<span class="st-ms' + (d.best >= n ? " on" : "") + '" title="最长连续 ' + d.best + ' 天">' + (d.best >= n ? "" : "🔒 ") + t + "</span>").join("") +
+        [[1000, "🃏 1,000 张卡"], [5000, "🃏 5,000 张卡"], [10000, "🃏 1 万张卡"]].map(([n, t]) => '<span class="st-ms' + (d.cards >= n ? " on" : "") + '" title="一共练了 ' + d.cards + ' 张">' + (d.cards >= n ? "" : "🔒 ") + t + "</span>").join("") + "</div>" + spark +
       (window.VL && window.VL !== "en" ? "" : '<div class="st-ms-lv">' + (lv ? "📊 估计水平：<b>" + lv.cefr + "</b>（" + lv.ielts + "，词汇量约 " + vt.size + "，" + (ago ? ago + " 天前测的" : "今天测的") + "）" + (ago >= 30 ? ' · <u id="st-ms-vt">一个月了，再测一次看进步</u>' : "") : '📊 还没测过词汇量：<u id="st-ms-vt">测一下</u>（5 分钟，估出大概的 CEFR 等级）') + "</div>") + "</div>";
   }
   function heatHtml(d) {

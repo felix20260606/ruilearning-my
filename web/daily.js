@@ -176,7 +176,28 @@
   let showWk = null;
 
   // ---------- 页面 ----------
+  // ---------- 🏆 家庭排行（对标 Duolingo 的排行榜）：这周（周一起）每个家人练了多少张卡、连续几天、最近 7 天练了几天 ----------
+  //   数据：GET /api/board（后台读每个人的「stat|日期」和断签保护，缓存 5 分钟）；只有一个人时不显示；连续天数算法同「📊 统计」（stats.js 的 streakOf，用过断签保护卡的那天不断）
+  let BD = null, bdAt = 0, bdBusy = false;
+  function loadBoard() {
+    if (bdBusy || Date.now() - bdAt < 5 * 60e3) return; bdBusy = true;
+    U.json("/api/board" + (window.VL && window.VL !== "en" ? "?lang=" + window.VL : "")).then(j => { bdBusy = false; bdAt = Date.now(); if (j && j.ok) { BD = j.users; if (root && document.documentElement.classList.contains("show-daily")) draw(); } });
+  }
+  function boardHtml() {
+    loadBoard(); if (!BD || BD.length < 2) return "";
+    const today = U.day(), wd = (new Date(Date.parse(today + "T00:00:00+08:00")).getUTCDay() + 6) % 7, wk = Array.from({ length: wd + 1 }, (_, i) => U.dayAgo(today, wd - i)), d7 = Array.from({ length: 7 }, (_, i) => U.dayAgo(today, i));
+    const S = window.STATS, rows = BD.map(u => {
+      const daily = {}; for (const k in u.days) daily[k] = { n: u.days[k] };
+      const st = S && S.streakOf ? S.streakOf(daily, Date.parse(today + "T12:00:00+08:00"), { set: new Set(u.frz || []) }) : 0;
+      return { id: u.id, name: u.name, week: wk.reduce((a, k) => a + (u.days[k] || 0), 0), act: d7.filter(k => u.days[k] > 0).length, st };
+    }).sort((a, b) => b.week - a.week || b.st - a.st), top = Math.max(1, rows[0].week), me = window.VU || "";
+    return '<div class="dy-bd"><div class="dy-bd-h"><b>🏆 本周家庭排行</b><small>卡片数（背单词 + 听力卡），周一清零</small></div>' + rows.map((r, i) => '<div class="dy-bd-r' + (r.id === me ? " me" : "") + '"><span class="m">' + (["🥇", "🥈", "🥉"][i] || i + 1) + '</span><span class="n">' + esc(r.name) + (r.id === me ? "（我）" : "") + '</span><span class="b"><u style="width:' + Math.round(r.week / top * 100) + '%"></u></span><span class="v"><b>' + r.week + "</b> 张</span><span class=\"s\" title=\"连续天数 · 最近 7 天练了几天\">🔥" + r.st + " · " + r.act + "/7</span></div>").join("") + "</div>";
+  }
   const CSS = `
+  .dy-bd{background:var(--ui-surface);border:1px solid var(--ui-line);border-radius:14px;padding:12px 14px;margin:0 0 12px}.dy-bd-h{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}.dy-bd-h small{color:var(--ui-muted);font-size:12px}
+  .dy-bd-r{display:grid;grid-template-columns:28px minmax(60px,auto) 1fr auto auto;gap:8px;align-items:center;padding:6px 4px;border-radius:9px}.dy-bd-r.me{background:color-mix(in srgb,var(--ui-pur) 12%,transparent)}
+  .dy-bd-r .m{font-size:18px;text-align:center}.dy-bd-r .n{font-weight:700;white-space:nowrap}.dy-bd-r .b{height:8px;border-radius:4px;background:var(--ui-surface-2);overflow:hidden}.dy-bd-r .b u{display:block;height:100%;background:var(--ui-pur);border-radius:4px}
+  .dy-bd-r .v{font-size:13px;color:var(--ui-ink-2);white-space:nowrap}.dy-bd-r .v b{color:var(--ui-ink);font-size:15px}.dy-bd-r .s{font-size:12.5px;color:var(--ui-muted);white-space:nowrap}
   html.show-daily #view-en{display:none}html.show-daily #view-daily{display:block}#view-daily{display:none}
   .dy{max-width:860px;margin:0 auto;padding:calc(110px + env(safe-area-inset-top,0px)) 16px 90px;color:var(--ui-ink);font-family:var(--ui-font)}
   @media(min-width:1024px){.dy{padding-top:84px}}
@@ -232,6 +253,7 @@
     const exTxt = o.exam && !DE ? (exL > 0 ? '<span class="ex">🎓 离雅思还有 ' + exL + " 天" + (o.band ? "（目标 " + o.band + "）" : "") + "</span> · " : exL === 0 ? '<span class="ex">🎓 今天考试，加油！</span> · ' : "") : "";
     root.innerHTML = '<div class="dy">' +
       '<div id="dy-quota">' + (window.quotaHtml ? window.quotaHtml() : "") + "</div>" + // 🔋 AI 额度（quota.js）
+      boardHtml() + // 🏆 家庭排行
       '<div class="dy-hd"><h1>📅 每日一练</h1><p>每天按顺序做完这几项：' + (DE ? "词 → 听（德语）" : "词 → 听 → 说 → 读 → 写") + '。点「去练」直接跳过去，做完回来会自动打勾。</p><button class="ui-btn" data-act="wk">📊 本周小结</button><button class="ui-btn" data-act="set">⚙ 设置</button></div>' + set +
       (showWk ? weekHtml() : weekBrief()) +
       '<div class="dy-top"><div class="dy-ring" style="--p:' + (L.length ? Math.round(n / L.length * 100) : 0) + '"><div><div><b>' + n + "/" + L.length + '</b><span>今天</span></div></div></div>' +
