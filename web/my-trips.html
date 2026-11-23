@@ -147,7 +147,7 @@
       <h3>🛍 最后一天：吉隆坡收尾</h3>
       <ul><li>天后宫、鬼仔巷、Jalan Alor 夜市</li><li>手信：白咖啡、咖椰酱、Beryl's 巧克力</li></ul>
       <div class="tip"><b>天气：</b>11 月雨季，上午户外、下午容易雷阵雨。东海岸海岛（热浪岛、停泊岛、刁曼岛）这时候停航。</div>
-      <div class="nav"><a href="#toc">↑ 目录</a><a href="#sg">‹ 上一段：新加坡</a></div>
+      <div class="nav"><a href="#toc">↑ 目录</a><a href="#sg">‹ 上一段：新加坡</a><button class="go" data-go="last6">📅 一个人省钱版：按天排好的行程</button></div>
     </div>
   </section>
 
@@ -155,7 +155,7 @@
 </div>
 <script>
 // 「📖 看详细行程」：切到旅游中心对应的那一篇（在网站里是 iframe，交给外面的 tabs.js；单独打开时直接跳过去）
-var FILES={mel1:"malacca-1day.html",pg:"penang-trip.html",lk:"langkawi-trip.html",sg2:"sg-2day.html"};
+var FILES={last6:"last6-trip.html",mel1:"malacca-1day.html",pg:"penang-trip.html",lk:"langkawi-trip.html",sg2:"sg-2day.html"};
 document.querySelectorAll("[data-go]").forEach(function(b){b.addEventListener("click",function(){
   var g=b.getAttribute("data-go");
   if(window.parent&&window.parent!==window){try{parent.postMessage({tripGo:g},"*");}catch(e){}}else location.href=FILES[g];
