@@ -23,4 +23,5 @@ ok(/debasic: \{ src: "de-basic\.js/.test(W("lazy.js")), "lazy: de-basic register
   for (const k of ["start", "laut", "satz", "gram", "zahl"]) { const h = B.VIEWS[k](); ok(h.length > 500 && !/undefined/.test(h), "view " + k + " renders"); }
   ok(B.PHR.every(g => g[3].every(p => p[0] && p[1])), "every phrase has German + Chinese");
 }
+{ const q = W("quota.js"); ok(/const acts = \(DE\(\) \? GROUPS_DE : GROUPS\)/.test(q) && !/GROUPS_DE = \[[\s\S]*?(写作批改|AI 陪练|雅思)[\s\S]*?\];\n  function goTo/.test(q), "quota panel: German shows only German features"); }
 console.log(fail ? fail + " FAILED" : "t76 de isolation: all ok"); process.exit(fail ? 1 : 0);

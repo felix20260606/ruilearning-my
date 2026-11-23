@@ -47,6 +47,18 @@
       ["ai:coach", "🧭", "AI 教练定 7 天计划", "次", 230, 1, "coach"],
     ]],
   ];
+  // 🇩🇪 学德语时只列德语能用的（其它是英语专用的页面，切到德语时藏起来了）
+  const DE = () => window.VL && window.VL !== "en";
+  const GROUPS_DE = [
+    ["🎧 听", [
+      ["stt", "🎙", "练习课跟读打分", "次", 4, 1, "drill"],
+      ["ai:whymiss", "🤔", "为什么没听出来", "次", 50, 1, "drill"],
+      ["dw:al", "🇩🇪", "德语慢速新闻对时间", "期", 47, 6, "drill"],
+    ]],
+    ["🌱 入门", [
+      ["stt", "🎙", "德语入门跟读打分", "次", 4, 1, "debasic"],
+    ]],
+  ];
   function goTo(g) { // 跳到那个功能（英语的标签：window.enShow(标签, 小标签)）
     const en = (w, sub) => { if (typeof window.enShow === "function") window.enShow(w, sub); try { window.scrollTo(0, 0); } catch (e) {} };
     if (g.startsWith("s:")) { // 口语页：切过去以后点那一栏的按钮（同 daily.js 的 toSpeak）
@@ -55,6 +67,7 @@
       return;
     }
     if (g === "sme" || g === "drill") return en("listen", g);
+    if (g === "debasic") return en("basic", "satz");
     if (g === "coach") return en("basic", "speak");
     if (g === "useword") { const el = document.querySelector("#view-daily [data-sent]"); if (el) el.scrollIntoView({ block: "center" }); return; }
     en(g);
@@ -152,7 +165,7 @@
     // 剩下的还能做几次：单次花费 = 最近 7 天实际平均（至少 2 次才用），没有就用估计值
     const F7 = {}; ds.forEach(d => { const f = day(J, d).f; for (const k in f) { const a = F7[k] || (F7[k] = [0, 0]); a[0] += f[k][0]; a[1] += f[k][1]; } });
     const TF = T.f || {};
-    const acts = GROUPS.map(([gt, L]) => '<div class="qa-grp"><h5>' + gt + '</h5><div class="qa-acts">' + L.map(([k, ic, t, unit, def, mul, go]) => { const a = F7[k], real = a && a[0] >= 2 && a[1] > 0, per = (real ? a[1] / a[0] : def) * (mul || 1), td = TF[k]; return '<button class="qa-act" data-qgo="' + go + '" title="去' + esc(t) + '"><div class="n">' + fmt(Math.floor(rest / Math.max(1, per))) + "<small>" + unit + '</small></div><div class="t">' + ic + " " + esc(t) + '</div><div class="c">每' + unit + "约 " + fmt(per) + (real ? "（实测）" : "（估计）") + "</div>" + (td && td[1] >= 1 ? '<div class="u">今天用了 ' + fmt(td[1]) + " · " + td[0] + " 次</div>" : "") + "</button>"; }).join("") + "</div></div>").join("");
+    const acts = (DE() ? GROUPS_DE : GROUPS).map(([gt, L]) => '<div class="qa-grp"><h5>' + gt + '</h5><div class="qa-acts">' + L.map(([k, ic, t, unit, def, mul, go]) => { const a = F7[k], real = a && a[0] >= 2 && a[1] > 0, per = (real ? a[1] / a[0] : def) * (mul || 1), td = TF[k]; return '<button class="qa-act" data-qgo="' + go + '" title="去' + esc(t) + '"><div class="n">' + fmt(Math.floor(rest / Math.max(1, per))) + "<small>" + unit + '</small></div><div class="t">' + ic + " " + esc(t) + '</div><div class="c">每' + unit + "约 " + fmt(per) + (real ? "（实测）" : "（估计）") + "</div>" + (td && td[1] >= 1 ? '<div class="u">今天用了 ' + fmt(td[1]) + " · " + td[0] + " 次</div>" : "") + "</button>"; }).join("") + "</div></div>").join("");
     const setup = J.src === "cf" ? "" : '<details class="qa-set"' + (J.why && J.why !== "notset" ? " open" : "") + '><summary>' + (J.why === "notset" ? "🔌 接上 Cloudflare 精确数据（现在是网站自己估的）" : "⚠️ 读 Cloudflare 数据出错，暂时用估算：" + esc(J.why)) + "</summary><ol>" +
       '<li>打开 <a href="https://dash.cloudflare.com/profile/api-tokens" target="_blank" rel="noopener">Cloudflare → 我的个人资料 → API 令牌</a> →「创建令牌」→ 最下面「创建自定义令牌」</li>' +
       "<li>权限选 <b>帐户 · 帐户分析 · 读取</b>（Account · Account Analytics · Read），帐户资源选你的帐户，其它都不用加 → 创建，复制令牌（只显示一次）</li>" +
