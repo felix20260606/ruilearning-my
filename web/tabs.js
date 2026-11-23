@@ -16,7 +16,7 @@
   var FAT_FILES={nav:'fat-nav.html',calc:'jianzhi-calc.html',wrap:'jianzhi-wrap.html',x10:'jianzhi-exec10.html','14d':'jianzhi-14day.html',kl:'jianzhi-kl.html',ly:'jianzhi-linyi.html',bkk:'jianzhi-plan.html'};
   var row=document.getElementById('triprow'),empty=document.getElementById('tripempty');
   var destDb=document.getElementById('dest-db'),destMel=document.getElementById('dest-mel'),destMel1=document.getElementById('dest-mel1'),destSg=document.getElementById('dest-sg'),destSg2=document.getElementById('dest-sg2'),destPg=document.getElementById('dest-pg'),destLk=document.getElementById('dest-lk'),destTnav=document.getElementById('dest-tnav');
-  var MELAKA_FILE='malacca.html',MELAKA1_FILE='malacca-1day.html',SG_FILE='sg-trip.html',SG2_FILE='sg-2day.html',PG_FILE='penang-trip.html',LK_FILE='langkawi-trip.html',TNAV_FILE='trip-nav.html';
+  var FOOT_FILE='my-trips.html',destFoot=document.getElementById('dest-foot'),MELAKA_FILE='malacca.html',MELAKA1_FILE='malacca-1day.html',SG_FILE='sg-trip.html',SG2_FILE='sg-2day.html',PG_FILE='penang-trip.html',LK_FILE='langkawi-trip.html',TNAV_FILE='trip-nav.html';
   var grpEn=document.querySelector('.subgrp[data-l1="en"]'),grpLife=document.querySelector('.subgrp[data-l1="life"]');
   if(!l1En||!l1Life||!tNb)return;
   var root=document.documentElement, tripLoaded=false, fatLoaded=false;
@@ -59,12 +59,13 @@
     if(destPg)destPg.classList.toggle('on',d==='pg');
     if(destLk)destLk.classList.toggle('on',d==='lk');
     if(destTnav)destTnav.classList.toggle('on',d==='tnav');
+    if(destFoot)destFoot.classList.toggle('on',d==='foot');
     if(isDb){
       openDongbeiDefault();
     }else{
       if(row)row.style.display='none';
       if(empty)empty.style.display='none';
-      if(tf){tf.style.display='block';tf.setAttribute('src',d==='tnav'?TNAV_FILE:(d==='lk'?LK_FILE:(d==='pg'?PG_FILE:(d==='sg2'?SG2_FILE:(d==='sg'?SG_FILE:(d==='mel1'?MELAKA1_FILE:MELAKA_FILE))))));}
+      if(tf){tf.style.display='block';tf.setAttribute('src',d==='foot'?FOOT_FILE:d==='tnav'?TNAV_FILE:(d==='lk'?LK_FILE:(d==='pg'?PG_FILE:(d==='sg2'?SG2_FILE:(d==='sg'?SG_FILE:(d==='mel1'?MELAKA1_FILE:MELAKA_FILE))))));}
     }
     try{localStorage.setItem('trip_dest',d);}catch(e){}
     if(window.NAV)NAV.mark();
@@ -143,8 +144,8 @@
     }else if(which==='trip'){
       root.classList.add('show-trip');
       if(!tripLoaded){tripLoaded=true;
-        var d0='tnav';try{d0=localStorage.getItem('trip_dest')||'tnav';}catch(e){}
-        setDest((d0==='db'||d0==='mel'||d0==='mel1'||d0==='sg'||d0==='sg2'||d0==='pg'||d0==='lk'||d0==='tnav')?d0:'tnav');
+        var d0='foot';try{d0=localStorage.getItem('trip_dest')||'foot';if(!localStorage.getItem('trip:foot:seen')){localStorage.setItem('trip:foot:seen','1');d0='foot';}}catch(e){} // 新加的「🗺 我的足迹」第一次打开默认它
+        setDest((d0==='db'||d0==='mel'||d0==='mel1'||d0==='sg'||d0==='sg2'||d0==='pg'||d0==='lk'||d0==='tnav'||d0==='foot')?d0:'foot'); // 新加的「🗺 我的足迹」排最前、第一次默认它
       }
     }else if(which==='ielts'){
       root.classList.add('show-ielts');
@@ -201,8 +202,9 @@
   if(destDb)destDb.onclick=function(){setDest('db');};
   if(destMel)destMel.onclick=function(){setDest('mel');};
   if(destTnav)destTnav.onclick=function(){setDest('tnav');};
+  if(destFoot)destFoot.onclick=function(){setDest('foot');}; // 🗺 我的足迹（my-trips.html）
   if(destLk)destLk.onclick=function(){setDest('lk');};
-  window.addEventListener('message',function(e){var m={lk:'lk',pg:'pg',sg2:'sg2',sg:'sg',mel1:'mel1',mel:'mel',db:'db'};if(e&&e.data&&e.data.tripGo&&m[e.data.tripGo])setDest(m[e.data.tripGo]);});
+  window.addEventListener('message',function(e){var m={lk:'lk',pg:'pg',sg2:'sg2',sg:'sg',mel1:'mel1',mel:'mel',db:'db',foot:'foot'};if(e&&e.data&&e.data.tripGo&&m[e.data.tripGo])setDest(m[e.data.tripGo]);});
   if(destPg)destPg.onclick=function(){setDest('pg');};
   if(destSg2)destSg2.onclick=function(){setDest('sg2');};
   if(destSg)destSg.onclick=function(){setDest('sg');};
