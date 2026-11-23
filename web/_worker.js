@@ -739,7 +739,7 @@ function bneIndex(html) {
 }
 const bneFile = (base, lv) => BNE + base + (lv === 3 || lv === 6 ? "" : "-" + lv); // Level 3（简单篇）/ 6（进阶篇）就是文章本页
 async function bneArts(env, UA) {
-  const kv = env.CAPTIONS, hit = await kv.get("bne/arts", "json"); if (hit && Date.now() - hit.at < 6 * 3600e3) return hit.arts;
+  const kv = env.CAPTIONS, hit = await kv.get("bne/arts", "json"); if (hit && Date.now() - hit.at < 2 * 3600e3) return hit.arts; // 2 小时（以前 6 小时，加上列表缓存，新文章最晚半天才出现）
   const home = await fetch(BNE, { headers: UA }).then(r => (r.ok ? r.text() : "")).catch(() => "");
   const arc = (home.match(/href="(\d{4}-\d{4}\.html)"/g) || []).map(x => x.slice(6, -1)).sort().pop();
   const arts = bneIndex(home); if (arc) { const h2 = await fetch(BNE + arc, { headers: UA }).then(r => (r.ok ? r.text() : "")).catch(() => ""); bneIndex(h2).forEach(a => { if (!arts.some(b => b.base === a.base)) arts.push(a); }); }
@@ -882,7 +882,7 @@ async function dw(req, env, u) {
     return json(Object.assign({ ok: true }, ep));
   } catch (e) { return json({ ok: false, error: String(e && e.message || e) }, 502); }
 }
-async function sme(req, env, u) {
+async function sme(req, env, u, ctx) {
   if (req.method === "OPTIONS") return json({ ok: true });
   if (u.searchParams.get("al")) return smeAlign(env, u);
   if (u.searchParams.get("mp3")) { // 📥 离线下载：BBC 的 mp3 没开跨域，这里转一手（只转打开过的那几期、只转 downloads.bbc.co.uk / voa-audio.voanews.eu）
@@ -932,7 +932,21 @@ async function sme(req, env, u) {
   }
   const s = SME_S[u.searchParams.get("s") || "sme"] ? (u.searchParams.get("s") || "sme") : "", S = SME_S[s]; if (!S) return json({ ok: false, error: "bad s" }, 400);
   const lk = s === "sme" ? "sme/list" : "sme/list/" + s;
-  if (!fresh) { const c = await env.CAPTIONS.get(lk, "json"); if (c) return json(c); }
+  // 列表缓存：先马上给存着的；存了超过一段时间（分级新闻 / NPR 2 小时、BBC 每周的 3 小时）就在后台重新抓一次，下次打开就是新的
+  //   （以前直接存 6–12 小时，分级新闻的文章索引还另外缓存 6 小时，新出的一期最晚要半天才看得到）；不再更新的栏目（广播剧、VOA…）一周
+  const ttl = S.story || S.voa ? 7 * 86400 : 2 * 86400, stale = S.story || S.voa ? 7 * 86400e3 : S.npr || S.bne != null ? 2 * 3600e3 : 3 * 3600e3;
+  if (!fresh) {
+    const c = await env.CAPTIONS.get(lk, "json");
+    if (c && !(Date.now() - (+c.at || 0) > stale && ctx && ctx.waitUntil && !SME_BUSY[lk])) return json(c);
+    if (c) { SME_BUSY[lk] = 1; ctx.waitUntil(smeList(env, s, S, lk, ttl).catch(() => {}).finally(() => { delete SME_BUSY[lk]; })); return json(c); }
+  }
+  const out = await smeList(env, s, S, lk, ttl);
+  return out ? json(out) : json({ ok: false, error: "no list" }, 502);
+}
+const SME_BUSY = {};
+// 抓一个栏目的期数列表、排好序、存进 KV（带抓的时间 at）
+async function smeList(env, s, S, lk, ttl) {
+  const BASE = "https://www.bbc.co.uk/learningenglish/english/features/", UA = { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36" };
   const y = +newsDay().slice(0, 4), seen = new Set(), seenT = new Set(), list = [];
   const add = i => { const tk = i.t.toLowerCase(); if (seen.has(i.id) || (S.story && seenT.has(tk)) || (S.skip && S.skip.test(i.id))) return; seen.add(i.id); seenT.add(tk); list.push(i); }; // 广播剧同一集有两个地址（alice-ep01 / aliceinwonderland-ep01）：按标题去重
   if (S.voa) { const pages = await Promise.all([0, 1, 2, 3, 4].map(p => fetch(VOA + "/z/" + S.voa + (p ? "?p=" + p : ""), { headers: UA }).then(r => (r.ok ? r.text() : "")).catch(() => ""))); pages.forEach(h => voaIndex(h, s).forEach(add)); }
@@ -941,11 +955,11 @@ async function sme(req, env, u) {
   else for (const page of S.yearly ? Array.from({ length: Math.max(2, y - (S.from || y - 1) + 1) }, (_, k) => S.slug + "_" + (y - k)) : [S.slug]) { // 每周的栏目：今年往前一直到 from 年
     try { const r = await fetch(BASE + page, { headers: UA }); if (r.ok) smeIndex(await r.text(), S.slug, S.idp).forEach(add); } catch (e) {}
   }
-  if (!list.length) return json({ ok: false, error: "no list" }, 502);
+  if (!list.length) return null;
   if (S.story) { const st = storySort(list); list.length = 0; list.push(...st); }
   else if (S.voa || S.npr || S.bne != null) list.sort((p, q) => (Date.parse(q.d) || 0) - (Date.parse(p.d) || 0));
-  else list.sort((p, q) => (q.id.match(/\d{6}$/) || [""])[0].localeCompare((p.id.match(/\d{6}$/) || [""])[0])); // 期号 = 年月日，新的在前
-  const out = { ok: true, s, list: list.slice(0, 300) }; await cput(env.CAPTIONS, lk, JSON.stringify(out), { expirationTtl: S.story || S.voa ? 7 * 86400 : S.npr || S.bne != null ? 6 * 3600 : 12 * 3600 }); return json(out); // 不再更新的栏目（广播剧、大学英语、VOA）存一周；NPR、分级新闻 6 小时
+  else { const idk = x => (x.id.match(/\d{6}$/) || [""])[0]; list.sort((p, q) => (Date.parse(q.d) || 0) - (Date.parse(p.d) || 0) || idk(q).localeCompare(idk(p))); } // BBC 每周的：按页面上写的日期，新的在前（期号不一定对：ep-261122 其实是 11 月 12 日的）
+  const out = { ok: true, s, at: Date.now(), list: list.slice(0, 300) }; await cput(env.CAPTIONS, lk, JSON.stringify(out), { expirationTtl: ttl }); return out;
 }
 
 // ---------- AI（Cloudflare Workers AI，免费额度每天 1 万 neurons；要在 Pages 项目「设置 → 绑定」里加 Workers AI，变量名 AI）----------
@@ -1424,7 +1438,7 @@ export default {
     if (u.pathname === "/api/mine") return mine(req, env, u);
     if (u.pathname === "/api/readurl") return readurl(req, env, u);
     if (u.pathname === "/api/news") return news(req, env, u);
-    if (u.pathname === "/api/sme") return sme(req, env, u);
+    if (u.pathname === "/api/sme") return sme(req, env, u, ctx);
     if (u.pathname === "/api/dw") return dw(req, env, u);
     if (u.pathname === "/api/ai") return ai(req, env);
     if (u.pathname === "/api/stt") return stt(req, env);

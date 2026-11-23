@@ -29,7 +29,7 @@ const path = require("path");
   ok(r.j.ok && r.j.list.length === 3, "list " + JSON.stringify(r.j).slice(0, 300));
   ok(r.j.list[0].t === "Are microplastics harming us?" && r.j.list[0].d === "19 Nov " + y && r.j.list[0].p === "What's the last plastic thing you used?" && r.j.list[0].img === "https://img/1.jpg", "first item " + JSON.stringify(r.j.list[0]));
   ok(r.j.list[1].t === "Learning & ageing" && r.j.list[2].id.includes(String(y - 1)), "entities + previous year");
-  ok(kv.has("sme/list") && opts["sme/list"].expirationTtl === 12 * 3600, "list cached 12h");
+  ok(kv.has("sme/list") && opts["sme/list"].expirationTtl === 2 * 86400 && JSON.parse(kv.get("sme/list")).at > 0, "list stored with its fetch time (refreshed in the background after 3h)");
   const c1 = calls; r = await call("/api/sme"); ok(r.j.ok && calls === c1, "list from cache");
 
   const id = r.j.list[0].id;

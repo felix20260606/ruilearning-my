@@ -197,10 +197,12 @@
       if (pc) LS("sme:pos", P); if (ch || pc) { if (ch) LS("sme:done", D); draw(); } });
   }
 
+  const LAT = {}; // 每个栏目的列表是什么时候读的
   function loadList(s) {
     if (s === "new") { WKS().forEach(loadList); return; }
-    if (LISTS[s] || listBusy[s]) return; listBusy[s] = true;
-    const fin = l => { listBusy[s] = false; LISTS[s] = l; if (view === "home" && (ser === s || (ser === "new" && WKS().includes(s)))) draw(); };
+    // 读过的列表 30 分钟内直接用；页面一直开着（手机上的网页 App）超过 30 分钟，下次进来再问一次后台有没有新的一期（先照样显示旧的）
+    if ((LISTS[s] && Date.now() - (LAT[s] || 0) < 30 * 60e3) || listBusy[s]) return; listBusy[s] = true;
+    const fin = l => { listBusy[s] = false; LAT[s] = Date.now(); if (!l.length && LISTS[s] && LISTS[s].length) return; LISTS[s] = l; if (view === "home" && (ser === s || (ser === "new" && WKS().includes(s)))) draw(); };
     U.json("/api/sme?s=" + s).then(j => fin(j.ok ? j.list : []));
   }
   let openId = null; // 正在打开的那一期（加载完之前 EP 还是空的，页面历史要用）

@@ -14,7 +14,7 @@
     speak: { src: "speak.js?v=ea54186b", fns: ["speakShow"], el: { speakShow: "#view-speak" }, quiet: ["speakHide"] },
     basic: { src: "basic.js?v=6f44a263", deps: ["speak"], fns: ["basicShow"], el: { basicShow: "#view-basic" } },
     read: { src: "read.js?v=53955424", fns: ["readingShow", "readingNews", "readingOpen", "readTextDiff"], el: { readingShow: "#reading" }, quiet: ["readingRefresh"] },
-    listen: { src: "listen.js?v=10611718", fns: ["smeShow"], el: { smeShow: "#sme" }, quiet: ["smePause"] },
+    listen: { src: "listen.js?v=ff2e05be", fns: ["smeShow"], el: { smeShow: "#sme" }, quiet: ["smePause"] },
     drill: { src: "drill.js?v=f24f138e", deps: ["listen"], fns: ["drillShow", "drillReview"], el: { drillShow: "#drill" }, quiet: ["drillHide"] },
     exam: { src: "exam.js?v=c0953f36", fns: ["examShow"], el: { examShow: 0 } },
     write: { src: "write.js?v=0b8cb009", fns: ["writingShow"], el: { writingShow: 0 } },
