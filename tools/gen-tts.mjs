@@ -1,7 +1,7 @@
 // 全站 AI 真人语音：把固定的英文预先生成成 web/tts/<编号>.mp3，网页（web/tts.js）优先播这些静态文件（不花额度）。
 // 内容：口语 web/speak-data.js 的句子、生词本（线上 /api/vocab，主人和每个家人）的词 + 例句 + 相关词、雅思笔记 web/ielts-notes.html 的 data-say。
 // 编号 = FNV-1a 32 位（"声音|句子"），web/tts.js 的 key() 用同一个算法。
-// 每次最多生成 TTS_BUDGET 个字母（默认 3600，约 4,900 neurons；Workers AI 免费额度每天 1 万，白天练习留 5,000 左右），接口报错（额度用完等）就停下，下次接着做。
+// 每次最多生成 TTS_BUDGET 个字母（默认 3600，约 4,900 neurons），而且只用当天剩下没用完的额度（见下面 letterBudget），接口报错（额度用完等）就停下，下次接着做。
 // 用法：node tools/gen-tts.mjs            生成一批并更新 web/tts/index.json
 //       node tools/gen-tts.mjs --dry      只统计：一共多少句、多少字母、还剩多少没生成
 // GitHub Actions（.github/workflows/tts.yml）每天跑一次，直到全部生成完；以后新加的生词、改了 speak-data.js 也会自动补上。
@@ -14,6 +14,19 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = path.join(ROOT, "web/tts");
 const API = process.env.TTS_API || "https://ruilearning-my.pages.dev/api/tts";
 const BUDGET = +(process.env.TTS_BUDGET || 3600);
+// 只用当天（UTC 日，北京时间 8 点重置）剩下没用完的额度：先问网站 /api/usage 今天已经用了多少（Cloudflare 的数字），
+//   剩下的 − 留 600 当缓冲，按每个字母约 1.45 neurons 换成字母数，和 TTS_BUDGET 取小的。
+//   GitHub 定时任务常常晚一个小时才跑：已经过了 00:00 UTC（新的一天）就不跑，免得吃掉你白天的额度（--force 不管）
+export const NEURONS_PER_LETTER = 1.45, DAY_LIMIT = 10000, RESERVE = 600;
+export function letterBudget(usedToday, budget, utcHour, force) {
+  if (!force && !(utcHour >= 20)) return { letters: 0, why: "现在是 UTC " + utcHour + " 点（北京时间 " + ((utcHour + 8) % 24) + " 点）：新的一天刚开始，额度留给白天练习，这次不生成" };
+  const left = DAY_LIMIT - (+usedToday || 0) - RESERVE;
+  if (left <= 0) return { letters: 0, why: "今天的 AI 额度已经用了 " + Math.round(usedToday) + "，没有剩下的" };
+  return { letters: Math.min(budget, Math.floor(left / NEURONS_PER_LETTER)), why: "今天已用 " + Math.round(usedToday) + " neurons，剩下约 " + Math.round(left) + " 可以用来生成" };
+}
+async function usedToday() {
+  try { const r = await fetch(API.replace(/\/api\/tts$/, "/api/usage")); const j = await r.json(); const d = j.days && j.days[j.today]; if (!d) return 0; return Object.values(d.m || {}).reduce((a, x) => a + (+x[1] || 0), 0); } catch (e) { return null; }
+}
 const DRY = process.argv.includes("--dry");
 export const VOICES = { "": "asteria", A: "orion" }; // 默认（B 和其它所有句子）女声，对话里的 A 男声；改了要同步 web/speak.js 不用改（它读 index.json 里的 voices）
 
@@ -80,9 +93,13 @@ async function main() {
   const todo = L.filter(x => !have.has(x.k));
   const chars = a => a.reduce((n, x) => n + x.t.length, 0);
   console.log(`共 ${L.length} 句 ${chars(L)} 个字母；已生成 ${L.length - todo.length} 句，还剩 ${todo.length} 句 ${chars(todo)} 个字母`);
-  let used = 0, made = 0, stop = "";
+  let used = 0, made = 0, stop = "", LIM = BUDGET;
+  if (!DRY) {
+    const u = await usedToday(), b = u == null ? { letters: Math.min(BUDGET, 1500), why: "读不到今天的用量，保守只生成 1500 个字母" } : letterBudget(u, BUDGET, new Date().getUTCHours(), process.argv.includes("--force"));
+    LIM = b.letters; console.log("额度：" + b.why + " → 这次最多 " + LIM + " 个字母");
+  }
   if (!DRY) for (const x of todo) {
-    if (used + x.t.length > BUDGET) { stop = "到了今天的字母上限"; break; }
+    if (used + x.t.length > LIM) { stop = "到了这次能用的额度"; break; }
     let r;
     try { r = await fetch(API + "?v=" + x.v + "&t=" + encodeURIComponent(x.t)); } catch (e) { stop = "连不上：" + e.message; break; }
     const ct = r.headers.get("content-type") || "";

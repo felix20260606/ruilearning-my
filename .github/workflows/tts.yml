@@ -1,11 +1,12 @@
 # 全站 AI 真人语音：每天把还没生成的固定英文（口语句子、生词本的词和例句、雅思笔记）生成一批 mp3（web/tts/），有新文件就提交，Cloudflare Pages 跟着部署。
-# 一次最多 3600 个字母（约 4,900 neurons，2026-11-22 从 6000 降下来：加上白天练习，原来每天会超过 1 万）；Workers AI 免费额度每天 1 万 neurons，00:00 UTC（吉隆坡早上 8 点）重置。
-# 选在 22:30 UTC（吉隆坡早上 6:30）跑：用的是这一天快结束时剩下的额度，重置后白天练习不受影响。额度不够时生成到报错就停，第二天接着做。
+# Workers AI 免费额度每天 1 万 neurons，00:00 UTC（吉隆坡 / 北京早上 8 点）重置。
+# 只用这一天快结束时剩下没用完的额度：脚本先读网站 /api/usage 今天用了多少，剩下的（留 600 缓冲）才拿来生成，最多 3600 个字母（约 4,900 neurons）。
+# 22:00 UTC（早上 6 点）开始排队；GitHub 常常晚一个多小时才真的跑，过了 00:00 UTC（新的一天）脚本就不生成，免得吃掉白天的额度。
 # 全部生成完以后每天跑一次，只补新加的生词和句子；生词本新加的词当天先现场生成（/api/tts），第二天换成静态文件。也可以在 Actions 页面点「Run workflow」手动多跑一批。
 name: 生成口语 AI 语音
 on:
   schedule:
-    - cron: "30 22 * * *"
+    - cron: "0 22 * * *"
   workflow_dispatch:
 permissions:
   contents: write
@@ -19,7 +20,8 @@ jobs:
         with:
           node-version: 22
       - name: 生成一批
-        run: node tools/gen-tts.mjs
+        # 手动点「Run workflow」时加 --force：白天也能跑，但照样只用今天剩下的额度
+        run: node tools/gen-tts.mjs ${{ github.event_name == 'workflow_dispatch' && '--force' || '' }}
         env:
           # 每天最多生成多少个字母：GitHub 仓库 → Settings → Secrets and variables → Actions → Variables 里加 TTS_BUDGET（不设 = 3600，约 4,900 neurons）
           TTS_BUDGET: ${{ vars.TTS_BUDGET }}
