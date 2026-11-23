@@ -145,8 +145,8 @@
     }else if(which==='trip'){
       root.classList.add('show-trip');
       if(!tripLoaded){tripLoaded=true;
-        var d0='last6';try{d0=localStorage.getItem('trip_dest')||'last6';if(!localStorage.getItem('trip:last6:seen')){localStorage.setItem('trip:last6:seen','1');localStorage.setItem('trip:foot:seen','1');d0='last6';}}catch(e){} // 新加的「⏳ 最后6天」排最前、第一次打开默认它 // 新加的「🗺 我的足迹」第一次打开默认它
-        setDest((d0==='db'||d0==='mel'||d0==='mel1'||d0==='sg'||d0==='sg2'||d0==='pg'||d0==='lk'||d0==='tnav'||d0==='foot'||d0==='last6')?d0:'last6'); // 新加的「🗺 我的足迹」排最前、第一次默认它
+        var d0='foot';try{d0=localStorage.getItem('trip_dest')||'foot';if(!localStorage.getItem('trip:foot:seen')){localStorage.setItem('trip:foot:seen','1');d0='foot';}}catch(e){} // 「🗺 我的足迹」排最前、第一次打开默认它（「吉隆坡周边」没有单独的标签，从导航页卡片打开） // 新加的「🗺 我的足迹」第一次打开默认它
+        setDest((d0==='db'||d0==='mel'||d0==='mel1'||d0==='sg'||d0==='sg2'||d0==='pg'||d0==='lk'||d0==='tnav'||d0==='foot'||d0==='last6')?d0:'foot'); // 新加的「🗺 我的足迹」排最前、第一次默认它
       }
     }else if(which==='ielts'){
       root.classList.add('show-ielts');
@@ -204,7 +204,7 @@
   if(destMel)destMel.onclick=function(){setDest('mel');};
   if(destTnav)destTnav.onclick=function(){setDest('tnav');};
   if(destFoot)destFoot.onclick=function(){setDest('foot');};
-  if(destLast6)destLast6.onclick=function(){setDest('last6');}; // ⏳ 最后 6 天（last6-trip.html） // 🗺 我的足迹（my-trips.html）
+  if(destLast6)destLast6.onclick=function(){setDest('last6');}; // 🧭 吉隆坡周边 6 天（last6-trip.html）：没有单独的标签，从导航页卡片打开（destLast6 为空）
   if(destLk)destLk.onclick=function(){setDest('lk');};
   window.addEventListener('message',function(e){var m={lk:'lk',pg:'pg',sg2:'sg2',sg:'sg',mel1:'mel1',mel:'mel',db:'db',foot:'foot',last6:'last6'};if(e&&e.data&&e.data.tripGo&&m[e.data.tripGo])setDest(m[e.data.tripGo]);});
   if(destPg)destPg.onclick=function(){setDest('pg');};
