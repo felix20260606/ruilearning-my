@@ -1413,6 +1413,75 @@ async function board(req, env, u) {
     return res;
   } catch (er) { return json({ ok: false, error: String(er && er.message || er) }, 500); }
 }
+// 🔔 手机推送提醒（Web Push，不开网站也会弹）：
+//   GET  ?key=1            → { key: VAPID 公钥 }（第一次用时生成一对，存在 KV「push:vapid」）
+//   POST {sub, u, lang, time:"HH:MM"}  订阅 / 改时间（存 KV「push/<编号>」，编号 = endpoint 的 SHA-256 前 16 位）；POST {endpoint, off:1} 取消
+//   GET  ?peek=<编号>        → { title, body, url }：手机收到推送时 sw.js 来取这条要显示的话（今天练了没有、连续几天）
+//   POST {send:1}          → GitHub 定时任务（push.yml）每 30 分钟叫一次：到了各自的提醒时间（北京时间）、今天还没提醒过、今天还没练够的，推一条（不带内容，手机再来 peek）
+//   推送服务说这个订阅没了（404 / 410）就删掉；每个订阅一天最多一条
+const b64u = b => btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const b64uText = t => b64u(new TextEncoder().encode(t));
+const hash16 = async t => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)))].slice(0, 8).map(x => x.toString(16).padStart(2, "0")).join("");
+async function vapid(kv) {
+  let v = await kv.get("push:vapid", "json"); if (v && v.pub && v.jwk) return v;
+  const k = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign", "verify"]);
+  v = { pub: b64u(await crypto.subtle.exportKey("raw", k.publicKey)), jwk: await crypto.subtle.exportKey("jwk", k.privateKey) }; await kv.put("push:vapid", JSON.stringify(v)); return v;
+}
+async function vapidAuth(v, endpoint) {
+  const aud = new URL(endpoint).origin, now = Math.floor(Date.now() / 1000);
+  const head = b64uText(JSON.stringify({ typ: "JWT", alg: "ES256" })), body = b64uText(JSON.stringify({ aud, exp: now + 12 * 3600, sub: "https://ruilearning-my.pages.dev" }));
+  const key = await crypto.subtle.importKey("jwk", v.jwk, { name: "ECDSA", namedCurve: "P-256" }, false, ["sign"]);
+  const sig = await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, key, new TextEncoder().encode(head + "." + body));
+  return "vapid t=" + head + "." + body + "." + b64u(sig) + ", k=" + v.pub;
+}
+// 这个人今天练了几张、连续几天（同 /api/board：插件数据的 stat|日期 + 断签保护）
+async function pushInfo(kv, x) {
+  const pre = (x.u ? "u/" + x.u + "/" : "") + (x.lang && x.lang !== "en" ? "l/" + x.lang + "/" : ""), [e, m] = await Promise.all([kv.get(pre + EXT_KEY, "json"), kv.get(pre + "mine:daily", "json")]);
+  const it = (e && e.items) || {}, mi = (m && m.items) || {}, day = bjDay(), act = d => { const r = it["stat|" + d]; return r && !r.del && r.v && +r.v.n > 0; }, frz = d => mi["frz:" + d] && !mi["frz:" + d].del;
+  const prev = d => new Date(Date.parse(d + "T12:00:00Z") - 864e5).toISOString().slice(0, 10);
+  let k = act(day) ? day : prev(day), st = 0, g = 0; while (g++ < 4000 && (act(k) || frz(k))) { if (act(k)) st++; k = prev(k); }
+  const r = it["stat|" + day]; return { today: r && r.v ? +r.v.n || 0 : 0, streak: st };
+}
+function pushText(i) {
+  if (!i.today) return { title: "📚 今天还没练英语", body: i.streak ? "已经连续 " + i.streak + " 天了，练几张卡别断 🔥" : "打开练 10 张卡，几分钟就好", url: "/?go=pump" };
+  return { title: "👍 今天练了 " + i.today + " 张", body: "再来一组？" + (i.streak ? "连续 " + i.streak + " 天 🔥" : ""), url: "/?go=pump" };
+}
+async function push(req, env, u) {
+  if (req.method === "OPTIONS") return json({ ok: true });
+  const kv = env.CAPTIONS; if (!kv) return json({ ok: false, error: "KV binding CAPTIONS is missing" }, 500);
+  try {
+    if (req.method === "GET") {
+      if (u.searchParams.get("key")) return json({ ok: true, key: (await vapid(kv)).pub });
+      const h = u.searchParams.get("peek") || ""; if (!/^[0-9a-f]{16}$/.test(h)) return json({ ok: false, error: "bad id" }, 400);
+      const x = await kv.get("push/" + h, "json"); if (!x) return json(Object.assign({ ok: true }, pushText({ today: 0, streak: 0 })));
+      return json(Object.assign({ ok: true }, pushText(await pushInfo(kv, x))));
+    }
+    if (req.method !== "POST") return json({ ok: false, error: "method" }, 405);
+    const b = JSON.parse((await req.text()) || "{}");
+    if (b.send) { // 定时任务：到点的推一条
+      const v = await vapid(kv), day = bjDay(), nowHM = new Date(Date.now() + 8 * 3600e3).toISOString().slice(11, 16), out = { sent: 0, skip: 0, gone: 0 };
+      const L = await kv.list({ prefix: "push/" });
+      for (const k of L.keys) {
+        const x = await kv.get(k.name, "json"); if (!x || !x.sub || !x.sub.endpoint) continue;
+        const t = /^\d\d:\d\d$/.test(x.time || "") ? x.time : "20:00", late = (Date.parse("2000-01-01T" + nowHM + ":00Z") - Date.parse("2000-01-01T" + t + ":00Z")) / 60e3;
+        if (x.last === day || late < 0 || late > 180) continue; // 还没到点 / 过了 3 小时 / 今天推过
+        const i = await pushInfo(kv, x);
+        if (i.today >= 20) { x.last = day; await kv.put(k.name, JSON.stringify(x)); out.skip++; continue; } // 今天已经练够了：不打扰
+        const r = await fetch(x.sub.endpoint, { method: "POST", headers: { TTL: "43200", Urgency: "normal", Authorization: await vapidAuth(v, x.sub.endpoint), "Content-Length": "0" } }).catch(() => null);
+        if (r && (r.status === 404 || r.status === 410)) { await kv.delete(k.name); out.gone++; continue; }
+        if (r && r.ok) { x.last = day; await kv.put(k.name, JSON.stringify(x)); out.sent++; }
+      }
+      return json(Object.assign({ ok: true }, out));
+    }
+    if (b.off && typeof b.endpoint === "string") { await kv.delete("push/" + (await hash16(b.endpoint))); return json({ ok: true }); }
+    const sub = b.sub; if (!isObj(sub) || typeof sub.endpoint !== "string" || !/^https:\/\//.test(sub.endpoint) || sub.endpoint.length > 1000) return json({ ok: false, error: "bad sub" }, 400);
+    const uid = /^[a-z0-9]{0,12}$/.test(b.u || "") ? b.u || "" : "", lg = LANG_OK.test(b.lang || "") ? b.lang : "en", time = /^\d\d:\d\d$/.test(b.time || "") ? b.time : "20:00";
+    const id = await hash16(sub.endpoint), key = "push/" + id, old = await kv.get(key, "json");
+    const x = { sub: { endpoint: sub.endpoint, keys: isObj(sub.keys) ? { p256dh: String(sub.keys.p256dh || "").slice(0, 200), auth: String(sub.keys.auth || "").slice(0, 100) } : {} }, u: uid, lang: lg, time, last: old && old.time === time ? old.last || "" : "", at: Date.now() };
+    if (!old || JSON.stringify(old.sub) !== JSON.stringify(x.sub) || old.u !== uid || old.lang !== lg || old.time !== time) await kv.put(key, JSON.stringify(x));
+    return json({ ok: true, id });
+  } catch (e) { return json({ ok: false, error: String(e && e.message || e) }, 500); }
+}
 async function usage(req, env) {
   const cache = typeof caches !== "undefined" ? caches.default : null, ck = new Request("https://use.cache/v3");
   if (cache) { const c = await cache.match(ck); if (c) return c; }
@@ -1449,6 +1518,7 @@ export default {
     const u = new URL(req.url);
     if (u.pathname === "/api/usage") return usage(req, env);
     if (u.pathname === "/api/board") return board(req, env, u);
+    if (u.pathname === "/api/push") return push(req, env, u);
     env = meter(env, ctx, u);
     if (API_PATHS.includes(u.pathname)) return cap(req, env, u);
     if (u.pathname === VOCAB_PATH) return vocab(req, env);

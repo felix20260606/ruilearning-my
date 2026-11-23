@@ -1,0 +1,18 @@
+# 🔔 手机推送提醒：每 30 分钟叫一次网站后台，到了各人设的提醒时间（北京时间）、今天还没提醒过、今天还没练够的，推一条通知（见 web/_worker.js 的 /api/push）。
+# 每个订阅一天最多推一条；GitHub 定时任务常常晚几分钟到几十分钟，后台在提醒时间后 3 小时内都会补推。
+name: 手机推送提醒
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency: push-remind
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: 到点的推一条
+        run: |
+          curl -fsS --retry 2 -X POST -H "Content-Type: application/json" -d '{"send":1}' https://ruilearning-my.pages.dev/api/push

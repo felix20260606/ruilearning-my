@@ -37,6 +37,18 @@ self.addEventListener('fetch', e => {
     e.respondWith(netFirst(req, null, true));      // 脚本、样式：带 ?v= 的新版本断网时退回上次的旧版本
   }
 });
+// 🔔 手机推送（_worker.js 的 /api/push）：推送不带内容，收到后用自己订阅的编号去后台取这条要显示的话（今天练了没有、连续几天）
+self.addEventListener('push', e => {
+  const fallback = { title: '📚 该练英语了', body: '打开练几张卡吧', url: '/?go=pump' };
+  e.waitUntil(self.registration.pushManager.getSubscription().then(async sub => {
+    let m = fallback;
+    try {
+      if (sub) { const h = [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(sub.endpoint)))].slice(0, 8).map(x => x.toString(16).padStart(2, '0')).join('');
+        const r = await fetch('/api/push?peek=' + h, { cache: 'no-store' }); const j = await r.json(); if (j && j.ok && j.title) m = j; }
+    } catch (er) {}
+    return self.registration.showNotification(m.title, { body: m.body, icon: '/icon-192.png', badge: '/icon-192.png', tag: 'daily-push', data: { url: m.url || '/?go=pump' } });
+  }));
+});
 // 每日提醒的通知（stats.js 用 registration.showNotification 发出）：点一下打开练习页；已经开着就切过去
 self.addEventListener('notificationclick', e => {
   e.notification.close();

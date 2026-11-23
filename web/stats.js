@@ -436,13 +436,13 @@
   const standalone = () => (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
   function remindHtml() {
     const t = rmTime(), perm = typeof Notification === "undefined" ? "none" : Notification.permission;
-    const st = !t ? "提醒关着" : perm === "granted" ? '<span class="st-ok">✓ 每天 ' + esc(t) + " 提醒（网页开着时）</span>" : perm === "denied" ? "通知被浏览器拦了：到浏览器的网站设置里允许通知" : perm === "none" ? "这个浏览器不支持网页通知" + (isIOS() && !standalone() ? "（iPhone 要先添加到主屏幕）" : "") : "还没允许通知";
+    const st = !t ? "提醒关着" : perm === "granted" ? '<span class="st-ok">✓ 每天 ' + esc(t) + (pushed() ? " 推送到这台设备（不开网页也会弹；今天练够 20 张就不打扰）" : " 提醒（网页开着时）") + "</span>" : perm === "denied" ? "通知被浏览器拦了：到浏览器的网站设置里允许通知" : perm === "none" ? "这个浏览器不支持网页通知" + (isIOS() && !standalone() ? "（iPhone 要先添加到主屏幕）" : "") : "还没允许通知";
     return '<div class="st-card"><h3>⏰ 每日提醒</h3><p class="sub">到点提醒「今天有 N 个要复习」，点一下直接进练习</p>' +
-      '<div class="st-row"><input type="time" class="st-time" id="st-rm-time" value="' + esc(t || "20:00") + '"><button class="ui-btn pri" id="st-rm-on">' + (t && perm === "granted" ? "更新时间" : "开启网页通知") + "</button>" + (t ? '<button class="ui-btn" id="st-rm-off">关闭</button>' : "") + "</div>" +
+      '<div class="st-row"><input type="time" class="st-time" id="st-rm-time" value="' + esc(t || "20:00") + '"><button class="ui-btn pri" id="st-rm-on">' + (t && perm === "granted" ? "更新时间" : "开启提醒") + "</button>" + (t ? '<button class="ui-btn" id="st-rm-off">关闭</button>' : "") + "</div>" +
       '<div class="st-detail">' + st + (t && perm === "granted" ? ' · <a href="#" id="st-rm-test">试一下</a>' : "") + "</div>" +
       '<div class="st-row"><button class="ui-btn" id="st-rm-ics">📆 添加到日历（.ics）</button></div>' +
       '<div class="st-note"><b>最可靠的是「添加到日历」</b>：下载一个每天重复的日历事件（带提醒，点开就是练习页），手机、电脑都不用开着网页，免费。<br>' +
-      "网页通知只在网页（或装到桌面的 App）开着时才会响。<b>iPhone 必须先「添加到主屏幕」</b>，从桌面图标打开后才能开启网页通知（iOS 16.4 以上）。</div></div>";
+      "开启后，能推送的设备（安卓 Chrome、电脑上的 Chrome / Edge、<b>iPhone 先「添加到主屏幕」再从桌面图标打开</b>，iOS 16.4 以上）<b>不开网页也会到点推送</b>（今天还没练就提醒，练够 20 张就不打扰）；不支持推送的只在网页开着时提醒。每台设备要各自开一次。</div></div>";
   }
   function dueToday() { const f = forecastOf(W(), ST().srs || {}, Date.now(), pumpTypes()); return f.today; }
   function notify(n, test) {
@@ -453,7 +453,7 @@
     else plain();
   }
   function remindTick() { // 每 30 秒看一次：到了提醒时间、今天还没提醒过、有要复习的 → 提醒
-    const t = rmTime(); if (!t || !notifOK()) return;
+    const t = rmTime(); if (!t || !notifOK() || pushed()) return; // 开了手机推送：后台到点推，这里不再重复提醒
     const now = new Date(), hm = pad(now.getHours()) + ":" + pad(now.getMinutes()), tk = dayKey(now.getTime());
     let last = ""; try { last = localStorage.getItem("remind:last") || ""; } catch (e) {}
     if (hm < t || last === tk) return;
@@ -461,12 +461,31 @@
     try { localStorage.setItem("remind:last", tk); } catch (e) {}
     const n = dueToday(); if (n > 0) notify(n);
   }
+  // 🔔 手机推送（Web Push）：开通知时顺便订阅，到点由后台推（不开网页也会弹）；iPhone 要先「添加到主屏幕」
+  const pushOK = () => "serviceWorker" in navigator && "PushManager" in window && typeof Notification !== "undefined";
+  const b64 = s => { const p = "=".repeat((4 - (s.length % 4)) % 4), r = atob((s + p).replace(/-/g, "+").replace(/_/g, "/")); return Uint8Array.from([...r].map(c => c.charCodeAt(0))); };
+  async function pushOn(t) {
+    if (!pushOK() || Notification.permission !== "granted") return false;
+    try {
+      const reg = await navigator.serviceWorker.ready, k = await U.json("/api/push?key=1"); if (!k || !k.key) return false;
+      let sub = await reg.pushManager.getSubscription(); if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64(k.key) });
+      const r = await U.json("/api/push", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sub: sub.toJSON(), u: window.VU || "", lang: window.VL || "en", time: t }) });
+      if (r && r.ok) { try { localStorage.setItem("remind:push", "1"); } catch (e) {} return true; }
+    } catch (e) { if (window.U) U.log("push", "订阅失败", String(e && e.message || e)); }
+    return false;
+  }
+  async function pushOff() {
+    try { localStorage.removeItem("remind:push"); } catch (e) {}
+    try { const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription(); if (sub) { await U.json("/api/push", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ endpoint: sub.endpoint, off: 1 }) }); await sub.unsubscribe(); } } catch (e) {}
+  }
+  const pushed = () => { try { return localStorage.getItem("remind:push") === "1"; } catch (e) { return false; } };
   function remindOn() {
     const t = (root.querySelector("#st-rm-time") || {}).value || "20:00";
     if (typeof Notification === "undefined") { try { localStorage.setItem("remind:time", t); } catch (e) {} say(isIOS() ? "iPhone 要先「添加到主屏幕」，从桌面打开才能开通知；先用「添加到日历」吧" : "这个浏览器不支持网页通知，用「添加到日历」吧"); draw(); return; }
     Promise.resolve(Notification.permission === "default" ? Notification.requestPermission() : Notification.permission).then(p => {
       try { localStorage.setItem("remind:time", t); if (pad(new Date().getHours()) + ":" + pad(new Date().getMinutes()) >= t) localStorage.setItem("remind:last", dayKey(Date.now())); } catch (e) {} // 今天已经过了这个点：从明天开始提醒
-      say(p === "granted" ? "⏰ 每天 " + t + " 提醒" : "没有允许通知，提醒不会响；可以用「添加到日历」"); draw();
+      if (p !== "granted") { say("没有允许通知，提醒不会响；可以用「添加到日历」"); draw(); return; }
+      pushOn(t).then(ok => { say(ok ? "🔔 每天 " + t + " 推送到这台设备（不开网页也会弹）" : "⏰ 每天 " + t + " 提醒（网页开着时；这个浏览器不支持推送" + (isIOS() && !standalone() ? "，iPhone 要先「添加到主屏幕」" : "") + "）"); draw(); });
     });
   }
   // .ics：每天重复的日历事件，开始时间 = 提醒时间（本地时间，不带时区，跟着手机所在时区走），开始时提醒
@@ -543,7 +562,7 @@
       else if (id === "st-vt-close") { vt = null; drawVt(); }
       else if (id === "st-rm-on") remindOn();
       else if (id === "st-ms-vt") { const v = document.getElementById("st-vt"); if (v) v.scrollIntoView({ behavior: "smooth", block: "start" }); }
-      else if (id === "st-rm-off") { try { localStorage.removeItem("remind:time"); } catch (x) {} say("提醒已关闭"); draw(); }
+      else if (id === "st-rm-off") { try { localStorage.removeItem("remind:time"); } catch (x) {} pushOff(); say("提醒已关闭"); draw(); }
       else if (id === "st-rm-test") { e.preventDefault(); notify(dueToday(), true); }
       else if (id === "st-rm-ics") icsDownload();
       else if (id === "st-inst" && installEv) { const ev = installEv; ev.prompt(); (ev.userChoice || Promise.resolve({})).then(c => { if (c.outcome === "accepted") { installEv = null; say("📲 已装到桌面"); } draw(); }); }
