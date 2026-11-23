@@ -81,6 +81,8 @@ jobs:
             curl -fsS --retry 3 "https://ruilearning-my.pages.dev/api/cap?v=$v" -o /tmp/cap.json && jq -e '.ok == true' /tmp/cap.json > /dev/null && jq 'del(.ok)' /tmp/cap.json > "$f"
           done
           # 网站上删掉的视频，备份里保留（Git 历史里也有），不在这里删
+      - name: 更新「🔎 真人例句」的例句库（视频字幕 + BBC 最近几期文稿 → web/corpus.json；没变化不改文件）
+        run: node tools/build-corpus.mjs || echo "例句库没更新（不影响备份）"
       - name: 有变化就提交
         run: |
           git config user.name "github-actions[bot]"
@@ -89,6 +91,7 @@ jobs:
           [ -d data/users ] && git add data/users
           [ -d data/lang ] && git add data/lang
           [ -d data/mine ] && git add data/mine
+          [ -f web/corpus.json ] && git add web/corpus.json
           if git diff --cached --quiet; then echo "没有变化"; exit 0; fi
           git commit -m "备份生词本、插件数据、原声截图和字幕 $(TZ=Asia/Shanghai date '+%F %H:%M')"
           git push

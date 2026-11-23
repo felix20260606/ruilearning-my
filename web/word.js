@@ -118,6 +118,7 @@
     document.body.append(mask, pop);
     pop.addEventListener("click", e => {
       const b = e.target.closest("[data-a]"); if (!b) return; const a = b.dataset.a;
+      if (a === "pcorp") { const w = pWord; close(); if (window.corpusShow) window.corpusShow(w); return; } // 🔎 真人例句（corpus.js，按需加载）
       if (a === "px") close(); else if (a === "psay") say(b.dataset.t || pWord); else if (a === "padd") addWord(b);
       else if (a === "mk") { const m = b.dataset.m; b.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b && !!m)); mark(pWord, m); }
     });
@@ -156,7 +157,7 @@
       const extra = vsOk() && V().sheetExtra ? V().sheetExtra(word, pEl) : ""; // 语法、单词注释、📌 将要学习 / ✅ 已掌握 / 不学习（同插件）
       if (extra) h += extra; else if (g.length) h += '<div class="gm">这里的语法：' + esc(g.join(" · ")) + "</div>";
     }
-    return h + '<div class="act">' + (loading ? "" : addBtn(word)) + '<a href="' + cam + '" target="_blank" rel="noopener">Cambridge 词典 ↗</a></div>';
+    return h + '<div class="act">' + (loading ? "" : addBtn(word)) + (window.VL && window.VL !== "en" ? "" : '<button class="ui-btn" data-a="pcorp" title="看这个词在真人视频、BBC 节目里怎么说">🔎 真人例句</button>') + '<a href="' + cam + '" target="_blank" rel="noopener">Cambridge 词典 ↗</a></div>';
   }
   async function open(w, el, opt) { // opt：{ sent 例句, zh 例句的中文, quiet 不自动读, onAdd(词), showCtx 卡片里显示这句 }
     build(); w = String(w || "").replace(/’/g, "'").trim(); if (!w) return;

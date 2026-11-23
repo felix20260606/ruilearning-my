@@ -744,6 +744,7 @@
     if (view !== "home") { view = "home"; loadList(ser); draw(); } else { loadList(ser); draw(); }
   });
   window.smeShow = () => { init(); if (!root) return; pull(); loadList(ser); draw(); };
+  window.smeOpen = id => { init(); if (!root) return; const s = serOf(id); if (s) { ser = s; LS("sme:s", s); loadList(s); } openEp(id); }; // 直接打开某一期（🔎 真人例句里点「打开这一期」）
   window.smeDoneToday = () => { const D = done(), t = U.day(); return Object.keys(D).filter(id => U.day(D[id]) === t); }; // 「📅 每日」的「听」用
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
