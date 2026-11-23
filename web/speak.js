@@ -136,14 +136,29 @@
   // key：这条的编号；target：要读的句子（话题卡没有目标句，只录音、转文字）；max：最长秒数；after：录完以后要做的事
   function recStart(key, target, max, after) {
     const x = () => (RES[key] = RES[key] || {}); myRec = key;
+    // 每次录都换一个号：放弃 / 重录以后，上一次晚到的识别结果不会再盖上来
+    const cur = x(), tok = REC.cur() === key ? cur.tok : (cur.tok = (cur.tok || 0) + 1), mine = () => x().tok === tok;
+    if (REC.cur() !== key) { cur.err = ""; cur.busy = false; }
     REC.toggle(key, { lang: "en", max: max || 20, before: hush,
-      start: () => { x().on = true; paintRec(key); },
-      cancel: () => { x().on = false; paintRec(key); },
-      busy: () => { x().on = false; x().busy = true; paintRec(key); },
-      done: y => recDone({ key, target, after }, y) });
+      start: () => { if (!mine()) return; x().on = true; x().err = ""; paintRec(key); },
+      cancel: () => { if (!mine()) return; x().on = false; x().busy = false; paintRec(key); },
+      fail: m => { if (!mine()) return; x().on = false; x().busy = false; x().err = m; paintRec(key); },
+      busy: () => { if (!mine()) return; x().on = false; x().busy = true; paintRec(key); },
+      done: y => { if (mine()) recDone({ key, target, after }, y); } });
   }
+  // 放弃这一次（正在录 / 正在识别都行）：不打分、不存；again = 马上再录一次
+  function recAbort(key, again) {
+    const x = RES[key] = RES[key] || {};
+    if (REC.cur() === key) REC.stop(true);
+    x.tok = (x.tok || 0) + 1; x.on = false; x.busy = false; x.err = ""; paintRec(key);
+    if (again) setTimeout(() => { const b = root && root.querySelector('[data-rec="' + (window.CSS && CSS.escape ? CSS.escape(key) : key) + '"]'); if (b) b.click(); }, 400); // 等上一次的麦克风关掉
+  }
+  // 没识别出来的原因 → 给人看的话
+  const recErrText = e => !e ? "" : e === "empty" ? "没录到声音：靠近一点、说大声一点再试；还不行就刷新页面（麦克风可能被别的程序占着）"
+    : e === "timeout" ? "识别太慢没等到结果（网络慢？），点「🎙 再读」再试一次" : e === "net" ? "网络断了，识别没发出去：连上网再试"
+    : /neuron|quota|limit|4006|exceeded/i.test(e) ? "今天的 AI 识别额度用完了（北京时间早上 8 点恢复）；录音还能回放" : "识别出错：" + e;
   function recDone(r, y) {
-    const x = RES[r.key] = RES[r.key] || {}, blob = y.blob, text = y.text; x.on = false;
+    const x = RES[r.key] = RES[r.key] || {}, blob = y.blob, text = y.text; x.on = false; x.err = text ? "" : y.err || "";
     if (y.url) { try { if (x.url) URL.revokeObjectURL(x.url); } catch (e) {} x.url = y.url; }
     if (y.noai) x.noai = true;
     x.busy = false; x.said = text;
@@ -163,12 +178,14 @@
   function recBtn(key, target, max, label) { const x = RES[key] || {}; return '<button class="sk-ib rec' + (x.on ? " on" : "") + '" data-rec="' + esc(key) + '" data-t="' + esc(target || "") + '" data-max="' + (max || 20) + '">' + (x.on ? "⏹ 停止" : "🎙 " + (label || (x.url ? "再读" : "跟读"))) + "</button>"; }
   function resHtml(key) {
     const x = RES[key]; if (!x) return "";
-    if (x.on) return '<div class="sk-res"><span class="said">正在录音……说完点「⏹ 停止」</span></div>';
-    if (x.busy) return '<div class="sk-res"><span class="said">正在识别……</span></div>';
+    const k = esc(key);
+    if (x.on) return '<div class="sk-res"><span class="said">正在录音……说完点「⏹ 停止」</span> <button class="sk-ib" data-rec-x="' + k + '">✕ 放弃</button> <button class="sk-ib" data-rec-re="' + k + '">↺ 重录</button></div>';
+    if (x.busy) return '<div class="sk-res"><span class="said">正在识别……</span> <button class="sk-ib" data-rec-x="' + k + '">✕ 不等了</button></div>';
     let h = "";
+    if (x.err && !x.said) h += '<div class="said" style="color:var(--ui-orange,#FFB86B)">⚠️ ' + esc(recErrText(x.err)) + "</div>";
     if (x.res) h += '<div><span class="sc" style="color:' + (x.res.score >= .85 ? "var(--ui-green,#7CE3B8)" : x.res.score >= .6 ? "var(--ui-orange,#FFB86B)" : "var(--ui-red,#ff8080)") + '">读对 ' + pct(x.res.score) + "%" + (x.best > x.res.score ? "（最好 " + pct(x.best) + "%）" : "") + "</span>" + x.res.a.map((w, i) => '<span class="' + (x.res.hit[i] ? "ok" : "no") + '">' + esc(w) + "</span>").join(" ") + (x.res.extra.length ? '<div class="x">多说了：' + x.res.extra.map(esc).join(" ") + "</div>" : "") + "</div>";
     else if (x.said) h += '<div class="said">识别到：' + esc(x.said) + "</div>";
-    else if (x.url) h += '<div class="said">' + (SR || !x.noai ? "没识别出文字，可以回放听听自己读得怎么样" : "这个浏览器转不了文字（Brave 不行；换 Chrome / Safari，或在 Cloudflare 打开 Workers AI），可以回放和原声对比") + "</div>";
+    else if (x.url && !x.err) h += '<div class="said">' + (SR || !x.noai ? "没识别出文字，可以回放听听自己读得怎么样" : "这个浏览器转不了文字（Brave 不行；换 Chrome / Safari，或在 Cloudflare 打开 Workers AI），可以回放和原声对比") + "</div>";
     if (x.url) h += '<div style="margin-top:6px"><audio controls src="' + x.url + '"></audio></div>';
     return '<div class="sk-res">' + h + "</div>";
   }
@@ -826,6 +843,7 @@
       const ar = t.closest("[data-arch]"); if (ar) { playArchived(ar.dataset.arch); return; }
       const wd = t.closest("[data-word]"); if (wd) { sayWord(wd.dataset.word); return; }
       const sy = t.closest("[data-say]"); if (sy) { if (RP || SH) { RP = null; SH = null; } say(sy.dataset.say, { slow: !!sy.dataset.slow, who: sy.dataset.who || "" }); return; }
+      const rx = t.closest("[data-rec-x],[data-rec-re]"); if (rx) { recAbort(rx.dataset.recX || rx.dataset.recRe, !!rx.dataset.recRe); return; }
       const rb = t.closest("[data-rec]"); if (rb) {
         const key = rb.dataset.rec, tgt = rb.dataset.t, max = +rb.dataset.max || 20;
         recStart(key, tgt, max, x => {

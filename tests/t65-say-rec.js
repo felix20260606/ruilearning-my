@@ -84,7 +84,7 @@ function ttsEnv(o) {
     const calls = [], tracks = { stopped: 0 };
     function MR() { this.state = "inactive"; }
     MR.prototype.start = function () { this.state = "recording"; };
-    MR.prototype.stop = function () { this.state = "inactive"; this.ondataavailable({ data: { size: 5, type: "audio/webm" } }); this.onstop(); };
+    MR.prototype.stop = function () { this.state = "inactive"; this.ondataavailable({ data: { size: 5000, type: "audio/webm" } }); this.onstop(); };
     const env = {
       window: {}, console, Promise, setTimeout, clearTimeout, String, Array, Math, Uint16Array, JSON,
       Blob: function (c, o) { this.type = o.type; }, URL: { createObjectURL: () => "blob:1" }, MediaRecorder: MR,

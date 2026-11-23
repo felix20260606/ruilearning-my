@@ -2,7 +2,8 @@
    录音：MediaRecorder 录下来 → 后台 /api/stt（Workers AI 的 Whisper）转文字；后台没开 AI / 失败时，用浏览器自带的语音识别（Chrome / Edge / Safari；Brave 不行）同时听到的文字
    REC.toggle(key, o)：没在录 → 开始录 key；正在录 key → 停下并识别；正在录别的 → 先把那条停下识别，再开始录 key
      o.lang 语言（默认当前学习语言）；o.max 最长秒数（默认 20）；o.before() 开始前（停掉页面自己的播放器）；o.start() 已经在录了（画「⏹ 停止」）
-     o.done(x) 录完、识别完：x = { key, blob, url（能回放的地址）, text（识别到的话）, noai（后台没开 AI）}；o.cancel() 被取消（不识别）
+     o.done(x) 录完、识别完：x = { key, blob, url（能回放的地址）, text（识别到的话）, noai（后台没开 AI）, err（没识别出来的原因："empty" 没录到声音、"timeout"、"net"、后台的错误）}；o.cancel() 被取消（不识别）
+     o.fail(提示) 没开始录（没麦克风权限、麦克风被占用…）
    REC.stop(cancel)：停下（cancel = true 不识别、不调 done）；REC.cur() 正在录的 key（没在录 = null）；REC.SR 浏览器能不能自己识别
    打分：REC.score(原句, 说的 / 打的, {lang, near}) → { a: 原句的词, hit: 每个词对上没有, extra: 多出来的词, score: 0–1 }
      near（默认 true）长词只差一个字母也算对（语音识别常把词尾听错）；听写打字传 near:false
@@ -18,39 +19,75 @@
   const tip = m => { try { if (typeof window.toast === "function") window.toast(m); else if (typeof toast === "function") toast(m); } catch (e) {} };
   let rec = null;
 
+  // 手机上：浏览器自带的语音识别和录音同时用麦克风会互相抢（iPhone 尤其明显：录不到声音、之后几次都录不了），只在电脑上一起开；手机上靠后台识别
+  const MOBILE = typeof navigator !== "undefined" && (/Android|iP(hone|ad|od)/.test(navigator.userAgent || "") || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
+  const endTracks = r => { try { if (r.stream) r.stream.getTracks().forEach(t => t.stop()); } catch (e) {} };
   function stop(cancel) {
-    const r = rec; if (!r) return; rec = null; if (r.pending) return; // 还在等麦克风：start 拿到以后看到被取消，会自己关掉
+    const r = rec; if (!r) return; rec = null; if (r.pending) { r.cancelled = true; return; } // 还在等麦克风：start 拿到以后看到被取消，会自己关掉
     clearTimeout(r.t); r.cancel = !!cancel;
-    try { if (r.sr) r.sr.stop(); } catch (e) {}
-    try { if (r.mr && r.mr.state !== "inactive") r.mr.stop(); else { r.stream.getTracks().forEach(t => t.stop()); finish(r); } } catch (e) { finish(r); }
+    try { if (r.sr) { if (cancel && r.sr.abort) r.sr.abort(); else r.sr.stop(); } } catch (e) {}
+    try { if (r.mr && r.mr.state !== "inactive") r.mr.stop(); else { endTracks(r); finish(r); } } catch (e) { endTracks(r); finish(r); }
+    // 有的手机（iPhone Safari）停下后不一定触发 onstop：最多等 2 秒，麦克风一定关掉、结果一定交回去（以前会一直卡在「正在录音」，麦克风也不放，后面几次都录不了）
+    setTimeout(() => { endTracks(r); finish(r); }, 2000);
+  }
+  // 拿麦克风：最多等 10 秒；失败时说清楚是哪种（没给权限 / 被别的程序占着 / 没反应），并告诉页面（o.fail）
+  function micErr(e) {
+    const n = (e && (e.name || e.message)) || "";
+    return /NotAllowed|Security|Permission/i.test(n) ? "没有麦克风权限：在浏览器（或手机设置）里允许这个网站用麦克风"
+      : /NotReadable|Abort|TrackStart|InUse/i.test(n) ? "麦克风被别的程序占着（通话、录音、别的网页）：关掉它们再试"
+      : /NotFound|DevicesNotFound/i.test(n) ? "没找到麦克风"
+      : /timeout/i.test(n) ? "麦克风没反应：等几秒再试；还不行就刷新页面" : "没拿到麦克风（" + n + "）";
   }
   async function start(key, o) {
     if (o.before) try { o.before(); } catch (e) {}
     if (window.TTS) TTS.hush();
     // 等麦克风（第一次会弹权限框）期间先占个位：这时再点录音、翻卡、停止，都能取消这一次（以前会同时开两个，旧的那个麦克风一直不关）
     const ph = rec = { key, o, pending: true };
-    let stream;
-    try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { if (rec === ph) rec = null; tip("没拿到麦克风：请在浏览器地址栏允许使用麦克风"); return false; }
+    let stream, late = false;
+    const fail = m => { if (rec === ph) rec = null; tip(m); if (o.fail) try { o.fail(m); } catch (e) {} return false; };
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("NotFound");
+      const gum = navigator.mediaDevices.getUserMedia({ audio: true });
+      gum.then(st => { if (late) st.getTracks().forEach(t => t.stop()); }, () => {}); // 超时以后才拿到的：马上关掉，不让麦克风一直开着
+      stream = await Promise.race([gum, new Promise((_, rj) => setTimeout(() => rj(new Error("timeout")), 10000))]);
+    } catch (e) { late = true; return ph.cancelled ? false : fail(micErr(e)); }
     if (rec !== ph) { stream.getTracks().forEach(t => t.stop()); return false; }
     const lang = curLang(o), r = rec = { key, o, lang, stream, chunks: [], srText: "", fin: false };
-    try { r.mr = new MediaRecorder(stream); r.mr.ondataavailable = e => { if (e.data && e.data.size) r.chunks.push(e.data); }; r.mr.onstop = () => { stream.getTracks().forEach(t => t.stop()); finish(r); }; r.mr.start(); } catch (e) { r.mr = null; }
-    if (SR) try { const sr = r.sr = new SR(); sr.lang = bcp(lang); sr.interimResults = false; sr.continuous = true; sr.onresult = e => { r.srText = [...e.results].map(y => y[0].transcript).join(" "); }; sr.onerror = () => {}; sr.start(); } catch (e) { r.sr = null; }
-    if (!r.mr && !r.sr) { stream.getTracks().forEach(t => t.stop()); rec = null; tip("这个浏览器不能录音"); return false; }
-    r.t = setTimeout(() => { if (rec === r) stop(false); }, Math.min(60, o.max || 20) * 1000);
+    try {
+      r.mr = new MediaRecorder(stream); r.mr.ondataavailable = e => { if (e.data && e.data.size) r.chunks.push(e.data); };
+      r.mr.onstop = () => { endTracks(r); finish(r); };
+      r.mr.onerror = () => { endTracks(r); if (rec === r) rec = null; clearTimeout(r.t); finish(r); };
+      r.mr.start();
+    } catch (e) { r.mr = null; }
+    if (SR && (!MOBILE || !r.mr)) try { const sr = r.sr = new SR(); sr.lang = bcp(lang); sr.interimResults = false; sr.continuous = true; sr.onresult = e => { r.srText = [...e.results].map(y => y[0].transcript).join(" "); }; sr.onerror = () => {}; sr.start(); } catch (e) { r.sr = null; }
+    if (!r.mr && !r.sr) { endTracks(r); rec = null; return fail("这个浏览器不能录音"); }
+    r.t = setTimeout(() => { if (rec === r) stop(false); }, Math.min(130, o.max || 20) * 1000);
     if (o.start) try { o.start(); } catch (e) {}
     return true;
   }
+  // 录完：交后台识别（最多等 25 秒），后台不行用浏览器自己听到的；不管哪一步出错，done 一定会调（以前出错会一直卡在「正在识别」）
+  //   x.err：没录到声音 "empty" / 后台识别失败的原因（"timeout"、"net"、后台的错误信息）
   async function finish(r) {
     if (r.fin) return; r.fin = true;
-    if (r.cancel) { if (r.o.cancel) r.o.cancel(); return; }
-    const blob = r.chunks.length ? new Blob(r.chunks, { type: r.chunks[0].type || "audio/webm" }) : null, x = { key: r.key, blob, url: "", text: "", noai: false };
-    if (r.o.busy) try { r.o.busy(); } catch (e) {}
-    if (blob) {
-      try { x.url = URL.createObjectURL(blob); } catch (e) {}
-      try { const j = await (await fetch("/api/stt" + (r.lang !== "en" ? "?lang=" + r.lang : ""), { method: "POST", headers: { "Content-Type": blob.type }, body: blob })).json(); if (j && j.ok) x.text = j.text || ""; else if (j && j.error === "noai") x.noai = true; } catch (e) {}
-    }
-    if (!x.text) { await new Promise(res => setTimeout(res, 600)); x.text = r.srText || ""; } // 浏览器语音识别的结果稍晚一点才到
-    if (r.o.done) r.o.done(x);
+    if (r.cancel) { if (r.o.cancel) try { r.o.cancel(); } catch (e) {} return; }
+    const size = r.chunks.reduce((a, c) => a + (c.size || 0), 0);
+    const blob = size > 600 ? new Blob(r.chunks, { type: r.chunks[0].type || "audio/webm" }) : null, x = { key: r.key, blob, url: "", text: "", noai: false, err: "" };
+    try {
+      if (r.o.busy) try { r.o.busy(); } catch (e) {}
+      if (blob) {
+        try { x.url = URL.createObjectURL(blob); } catch (e) {}
+        const ac = typeof AbortController === "function" ? new AbortController() : null, tm = setTimeout(() => { if (ac) ac.abort(); }, 25000);
+        try {
+          const resp = await fetch("/api/stt" + (r.lang !== "en" ? "?lang=" + r.lang : ""), { method: "POST", headers: { "Content-Type": blob.type }, body: blob, signal: ac ? ac.signal : undefined });
+          const j = await resp.json().catch(() => null);
+          if (j && j.ok) x.text = j.text || ""; else if (j && j.error === "noai") x.noai = true; else x.err = (j && j.error) || "http " + resp.status;
+        } catch (e) { x.err = e && e.name === "AbortError" ? "timeout" : "net"; }
+        finally { clearTimeout(tm); }
+      } else x.err = "empty";
+      if (!x.text && r.sr) { await new Promise(res => setTimeout(res, 600)); x.text = r.srText || ""; } // 浏览器语音识别的结果稍晚一点才到
+      if (x.text) x.err = "";
+    } catch (e) { x.err = x.err || "err"; }
+    finally { if (r.o.done) try { r.o.done(x); } catch (e) { if (window.U) U.log("rec", "录完后处理出错", String(e && e.message || e)); } }
   }
   function toggle(key, o) {
     o = o || {};
