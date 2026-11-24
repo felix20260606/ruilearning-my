@@ -47,6 +47,8 @@
     ".cm-bar{height:5px;border-radius:3px;background:rgba(255,255,255,.08);display:flex;overflow:hidden;margin:6px 0 2px}.cm-bar span{display:block;height:100%}" +
     ".cm-bot{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;padding:9px 16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--soft)}.cm-bot label{cursor:pointer}.cm-bot button{font:inherit;font-size:12.5px;font-weight:700;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:4px 12px;cursor:pointer;margin-left:auto}" +
     ".cm-rec{padding:0 16px 13px;font-size:12.5px;color:var(--soft)}.cm-rec a{color:var(--ink);text-decoration:none;cursor:pointer;margin-right:10px;white-space:nowrap}.cm-rec a:hover{color:#c59bef}" +
+    ".cm-shot{position:absolute;inset:0;z-index:5;display:none;align-items:center;justify-content:center;background:rgba(8,9,12,.82);backdrop-filter:blur(4px);padding:14px}.cm-shot.on{display:flex}.cm-sh{max-width:100%;max-height:100%;text-align:center;color:#fff;font-size:13px}" +
+    ".cm-sh img{display:block;max-width:100%;max-height:calc(72vh - 110px);margin:0 auto;border-radius:12px;border:1px solid rgba(255,255,255,.15);-webkit-touch-callout:default;user-select:auto}.cm-sht{color:#a8afbf;font-size:12px;margin:8px 0 2px}" +
     "@media(max-width:640px){.cm-pn{position:static;width:auto;max-height:none;border-radius:0;border-left:0;border-right:0;box-shadow:none;background:var(--paper);backdrop-filter:none}.cm-st{margin-left:0;width:100%;display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:6px}.cm-n{min-width:0;padding:5px 8px 6px}.cm-n b{font-size:17px;white-space:nowrap}.cm-n b small{font-size:10.5px}.cm-n span{font-size:10.5px;white-space:nowrap}.cm-lg{font-size:10.5px;gap:7px}}" +
 ".ct-h{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:22px 2px 4px}.ct-h h2{font-family:var(--display);font-size:16px;font-weight:900;margin:0 auto 0 0;letter-spacing:.02em}" +
     ".ct-q{font:inherit;font-size:13.5px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:7px 14px;min-width:0;flex:0 1 220px;outline:none}.ct-q:focus{border-color:rgba(197,155,239,.6)}" +
@@ -243,9 +245,24 @@
         img.onload = function () { var x = cv.getContext("2d"), g = x.createRadialGradient(W / 2, H / 2, 50, W / 2, H / 2, W * 0.7); g.addColorStop(0, "#1b1f2b"); g.addColorStop(1, "#0e1015"); x.fillStyle = g; x.fillRect(0, 0, cv.width, cv.height); x.drawImage(img, 0, 150, W, H);
           x.fillStyle = "#fff"; x.font = "bold 46px sans-serif"; x.fillText("🗺 我的中国足迹", 44, 76); x.font = "26px sans-serif"; x.fillStyle = "#c8ccd6";
           x.fillText([].map.call($("cm-st").querySelectorAll(".cm-n"), function (n) { return n.textContent.replace(/\s+/g, ""); }).join(" · "), 44, 120);
-          var UU = window.U || (function () { try { return parent.U; } catch (e) { return null; } })(); // 存文件用全站共用的 U.download（在网站里是外面页面的）
-          cv.toBlob(function (b) { if (UU && UU.download) UU.download("我的中国足迹.png", b, "png"); else window.open(URL.createObjectURL(b), "_blank"); }, "image/png"); };
-        img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(txt);
+          cv.toBlob(function (b) { URL.revokeObjectURL(su); if (!b) return shot(null, "图片生成失败"); shot(b); }, "image/png"); };
+        img.onerror = function () { URL.revokeObjectURL(su); shot(null, "地图转成图片失败"); };
+        var su = URL.createObjectURL(new Blob([txt], { type: "image/svg+xml;charset=utf-8" })); img.src = su; shot(null, "");
+      }
+      // 导出结果：弹一层预览（手机上长按图片就能存）+「下载」（全站共用的 U.download）+「分享 / 存到相册」（系统分享，手机上最好用）
+      function shot(b, err) {
+        var ov = $("cm-shot"); if (!ov) { ov = document.createElement("div"); ov.id = "cm-shot"; ov.className = "cm-shot"; $("cm-box").appendChild(ov); }
+        if (!b) { ov.innerHTML = '<div class="cm-sh">' + (err ? "⚠️ " + esc(err) + '，再试一次？<div class="cm-acts" style="justify-content:center"><button type="button" data-shot="close">关闭</button></div>' : "📷 正在生成图片…") + "</div>"; ov.className = "cm-shot on"; return; }
+        var u = URL.createObjectURL(b), f = null; try { f = new File([b], "我的中国足迹.png", { type: "image/png" }); } catch (e) {}
+        var share = f && navigator.canShare && navigator.canShare({ files: [f] });
+        ov.innerHTML = '<div class="cm-sh"><img alt="我的中国足迹" src="' + u + '"><div class="cm-sht">手机上长按图片也能保存</div><div class="cm-acts" style="justify-content:center">' +
+          (share ? '<button type="button" class="pri" data-shot="share">📤 分享 / 存到相册</button>' : "") + '<button type="button"' + (share ? "" : ' class="pri"') + ' data-shot="dl">💾 下载</button><button type="button" data-shot="close">关闭</button></div></div>';
+        ov.className = "cm-shot on";
+        ov.onclick = function (e) { var t = e.target.closest && e.target.closest("[data-shot]"); if (!t && e.target !== ov) return; var k = t ? t.dataset.shot : "close";
+          if (k === "share") navigator.share({ files: [f], title: "我的中国足迹" }).catch(function () {});
+          else if (k === "dl") { var UU = window.U || (function () { try { return parent.U; } catch (er) { return null; } })(); // 全站共用的 U.download（在网站里是外面页面的）
+            if (UU && UU.download) UU.download("我的中国足迹.png", b, "png"); else window.open(u, "_blank"); }
+          else { ov.className = "cm-shot"; URL.revokeObjectURL(u); } };
       }
       // ---- 📂 全国目录：地区 → 省（封面照片卡）→ 城市（全部平铺），颜色跟地图一样；点照片进省页，点城市进城市页 ----
       var q = "";
