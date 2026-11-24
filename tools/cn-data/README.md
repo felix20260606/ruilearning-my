@@ -28,7 +28,7 @@
 
 ## 🗺 中国足迹地图（web/cn/map.json）
 
-「🇨🇳 中国」最上面那张地图（`web/cn-map.js`）读 `web/cn/map.json`：省界简化成 SVG 路径 + 496 个城市点 + 景点前缀对应的城市（勾了杭州景点大全里任何一个景点，杭州就算去过）。
+「🇨🇳 中国」最上面那张地图（`web/cn-map.js`）读 `web/cn/map.json`：省界 + 市 / 区县边界（`raw/datav/<省代码>.json`，去过哪个市就点亮哪一块）简化成 SVG 路径 + 496 个城市点 + 景点前缀对应的城市（勾了杭州景点大全里任何一个景点，杭州就算去过）。
 
 ```bash
 curl -s -o 100000_full.json https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json   # 阿里云 DataV 标准中国地图边界（含港澳台、南海诸岛九段线）

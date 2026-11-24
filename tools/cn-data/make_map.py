@@ -3,6 +3,7 @@
 #   省界来自 https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json（含港澳台、南海诸岛九段线）
 #   南海诸岛（北纬 17.5° 以南的岛和九段线）按标准地图画法放在右下角的小框里
 import json,math,os,sys,glob
+HERE=os.path.dirname(os.path.abspath(__file__));CEPS=0.45  # 市界简化的容差（地图单位，1° ≈ 20）
 src,web=sys.argv[1],sys.argv[2]
 G=json.load(open(src,encoding='utf-8'))
 S=20.0;K=math.cos(math.radians(36));LNG0,LAT0=73.0,54.0;CUT=17.5
@@ -23,11 +24,11 @@ def dp(pts,eps):
         if d>dm: i,dm=k,d
     if dm>eps: return dp(pts[:i+1],eps)[:-1]+dp(pts[i:],eps)
     return [a,b]
-def ring(r,small):
+def ring(r,small,ep=None):
     south=all(lat<CUT for lng,lat in r)
     proj=PI if south else P
     pts=[proj(lng,lat) for lng,lat in r]
-    eps=0.25 if small or south else 0.9
+    eps=ep if ep else (0.25 if small or south else 0.9)
     if len(pts)>3 and pts[0]==pts[-1]: pts=pts[:-1]
     m=len(pts)//2  # 闭合的一圈：首尾是同一个点，直接简化会整圈删光，从中间切成两段分别简化
     pts=dp(pts[:m+1],eps)[:-1]+dp(pts[m:]+[pts[0]],eps)[:-1]
@@ -52,9 +53,26 @@ for f in G['features']:
     if not key: print('?',nm);continue
     j=NAME[key[0]];cx,cy=P(*p['center']) if p.get('center') else (0,0)
     out['prov'].append(dict(slug=j['slug'],zh=j['zh'],short=j['short'],d=d,cx=round(cx,1),cy=round(cy,1)))
+    # 市 / 区县边界（raw/datav/<省代码>.json）：地图上去过哪个市就点亮哪一块；没有边界的（台湾）只画点
+    CG={}
+    gf=os.path.join(HERE,'raw','datav','%s.json'%p.get('adcode'))
+    if os.path.exists(gf) and os.path.getsize(gf)>1000:
+        for ft in json.load(open(gf,encoding='utf-8'))['features']:
+            cn=ft['properties'].get('name','');cg=ft.get('geometry')
+            if not cn or not cg: continue
+            m=next((c for c in j['cities'] if c['zh']==cn),None) or next((c for c in j['cities'] if c['zh'][:2]==cn[:2]),None)
+            if not m: continue
+            dd=''
+            for poly in (cg['coordinates'] if cg['type']=='MultiPolygon' else [cg['coordinates']]):
+                r=poly[0]
+                if all(lat<CUT for lng,lat in r): continue  # 南海诸岛的岛礁不画市界（小框里有省界）
+                s_,_=ring(r,True,CEPS);dd+=s_
+            CG[m['id']]=CG.get(m['id'],'')+dd
     for c in j['cities']:
         x,y=(PI if c['lat']<CUT else P)(c['lng'],c['lat'])
-        out['cities'].append(dict(id=c['id'],zh=c['zh'],p=j['slug'],x=round(x,1),y=round(y,1),cap=c.get('cap',False),go=c.get('go','')))
+        cc=dict(id=c['id'],zh=c['zh'],p=j['slug'],x=round(x,1),y=round(y,1),cap=c.get('cap',False),go=c.get('go',''))
+        if CG.get(c['id']): cc['d']=CG[c['id']]
+        out['cities'].append(cc)
 # 景点大全 / 城市页的景点 id 前缀 → 算到哪个城市（勾了任何一个景点，这个城市就算去过）
 def cid(prov,zh):
     for c in NAME.get(prov,{}).get('cities',[]):
