@@ -1,0 +1,1 @@
+SELECT ?x ?coord WHERE { ?x wdt:P1435 wd:Q1188574 . ?x wdt:P625 ?coord . }
