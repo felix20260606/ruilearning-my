@@ -13,7 +13,7 @@
   const MODS = {
     speak: { src: "speak.js?v=7e1e841d", fns: ["speakShow"], el: { speakShow: "#view-speak" }, quiet: ["speakHide"] },
     basic: { src: "basic.js?v=6f44a263", deps: ["speak"], fns: ["basicShow"], el: { basicShow: "#view-basic" } },
-    read: { src: "read.js?v=47cda2c8", fns: ["readingShow", "readingNews", "readingOpen", "readTextDiff"], el: { readingShow: "#reading" }, quiet: ["readingRefresh"] },
+    read: { src: "read.js?v=be99582a", fns: ["readingShow", "readingNews", "readingOpen", "readTextDiff"], el: { readingShow: "#reading" }, quiet: ["readingRefresh"] },
     listen: { src: "listen.js?v=c20e7005", fns: ["smeShow", "smeOpen"], el: { smeShow: "#sme" }, quiet: ["smePause"] },
     drill: { src: "drill.js?v=f24f138e", deps: ["listen"], fns: ["drillShow", "drillReview"], el: { drillShow: "#drill" }, quiet: ["drillHide"] },
     exam: { src: "exam.js?v=ce143ebf", fns: ["examShow"], el: { examShow: 0 } },

@@ -317,7 +317,13 @@ function renderList(){
   if(filter!=="all"){const S=state.srs||{},st=w=>masteryOf(w)>=1?"known":S[w.id]?"practicing":"fresh";arr=arr.filter(w=>(w.type||"word")!=="pattern"&&(filter==="learning"?st(w)!=="known":st(w)===filter));} // 学习中 / 没练过 / 已掌握：和上面的数字同一个算法（vocabStats），三个加起来 = 生词（规律不算）；learning = 旧的「未掌握」
   if(query){const q=query.toLowerCase();arr=arr.filter(w=>w.word.toLowerCase().includes(q)||w.zh.includes(query));}
   if(!arr.length){box.innerHTML='<div class="empty">这个分类还没有内容。<br>问我新词/短语/台词，或用“添加”自己加进来。</div>';return;}
-  box.innerHTML=arr.map(w=>`
+  LIST_ARR=arr;const key=[cat,ptag,filter,query,sortBy].join("|"),keep=key===listKey?Math.max(LIST_PAGE,listShown):LIST_PAGE;listKey=key;listShown=0; // 同样的筛选再画（标了已掌握、同步回来）：画到原来那么多，不跳位置
+  box.innerHTML="";appendCards(keep);
+}
+// 📱 卡片按需画：一次画 40 张，滚到底附近再画下一批（以前 500 多个词一次全画，四万多个元素，手机上切到「📖 词汇」、改一个词都要卡一下）；
+//   卡片里的中文、词形、例句（点开才看得到的部分）也是点开时才画
+let LIST_ARR=[],listShown=0,listKey="",listIO=null;const LIST_PAGE=40;
+function cardHtml(w){return `
    <div class="card card--${w.type} ${w.status==="known"?"known":""}" data-id="${w.id}">
      <div class="stamp">已掌握</div>
      <div class="card-head">
@@ -332,7 +338,9 @@ function renderList(){
        </div>
        ${w.type==="sentence"||w.type==="pattern"?`<svg class="chev go" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg>`:`<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>`}
      </div>
-     <div class="body">
+     <div class="body"></div>
+   </div>`;}
+function cardBodyHtml(w){return `
        ${w.type==="pattern"&&!w.wiki?"":`<div class="bigvisual" style="display:none"><div class="gallery" data-wgallery="${w.id}"></div></div>`}<!-- 规律类标题是中文，按标题搜到的图不相干：只有手动指定了维基条目（wiki 字段）的才显示封面，其余只用对照表每行自己的小图 -->
        <div class="sec-label">中文意思</div><div class="zh-full">${w.zh}</div>
        ${w.forms&&w.forms.length?`<div class="sec-label">${w.type==="sentence"?"常用句":(w.type==="pattern"?"对照表":"词形变化")}</div><div class="forms">${w.forms.map(f=>`<div>${f[3]?(String(f[3]).charAt(0)==="#"?`<span class="rowswatch" style="background:${eAttr(f[3])}"></span>`:`<img class="rowthumb" data-rowimg="${eAttr(f[3])}" alt="" loading="lazy">`):""}<span class="f">${f[0]}</span><span class="p">${f[1]}</span><span class="m">${f[2]}</span></div>`).join("")}</div>`:""}
@@ -343,9 +351,16 @@ function renderList(){
          <button class="mark ${w.status==="known"?"on":""}" data-act="mark">${w.status==="known"?"已掌握 ✓":"标记已掌握"}</button>
          <button class="del" data-act="del">删除</button>
        </div>
-     </div>
-   </div>`).join("");
+     `;}
+function appendCards(n){
+  const box=document.getElementById("list");if(!box)return;
+  const old=document.getElementById("list-more");if(old)old.remove();
+  const next=LIST_ARR.slice(listShown,listShown+(n||LIST_PAGE));listShown+=next.length;
+  const left=LIST_ARR.length-listShown;
+  box.insertAdjacentHTML("beforeend",next.map(cardHtml).join("")+(left>0?`<div id="list-more" class="list-more"><button type="button" data-more="1">显示更多（还有 ${left} 个）</button></div>`:""));
   populateImgs();
+  const more=document.getElementById("list-more");
+  if(more&&"IntersectionObserver" in window){if(!listIO)listIO=new IntersectionObserver(es=>{if(es.some(x=>x.isIntersecting)){listIO.disconnect();appendCards();}},{rootMargin:"800px 0px"});listIO.disconnect();listIO.observe(more);}
 }
 
 /* ===== export ===== */
@@ -433,6 +448,7 @@ document.querySelectorAll(".modes button").forEach(b=>b.onclick=()=>{
 });
 
 document.getElementById("list").addEventListener("click",async e=>{
+  if(e.target.closest("[data-more]")){appendCards();return;}
   const sb=e.target.closest(".say");if(sb){e.stopPropagation();speak(sb.dataset.say);return;}
   const rc=e.target.closest(".relchip");if(rc){e.stopPropagation();speak(rc.dataset.say);return;}
   const card=e.target.closest(".card");if(!card)return;
@@ -449,9 +465,10 @@ document.getElementById("list").addEventListener("click",async e=>{
   }
   const w0=words.find(x=>x.id===id);
   if(w0&&(w0.type==="sentence"||w0.type==="pattern")&&window.openReader){ // 句子、规律：点开进全屏查看页（reader.js），可以上一条 / 下一条翻
-    const L=[...document.querySelectorAll("#list .card--sentence,#list .card--pattern")].map(c=>words.find(x=>x.id===c.dataset.id)).filter(Boolean);
+    const L=LIST_ARR.filter(w=>w.type==="sentence"||w.type==="pattern"); // 按当前筛选的整个列表（卡片是分批画的，不能从页面上数）
     openReader(L.map(readerFromWord),L.indexOf(w0));return;
   }
+  const body=card.querySelector(".body");if(body&&!body.childElementCount&&w0){body.innerHTML=cardBodyHtml(w0);populateImgs();} // 第一次点开才画详情
   card.classList.toggle("open");
 });
 // 全屏查看页顶栏的「标记已掌握 / 删除」：不带 act 时只返回当前状态

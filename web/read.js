@@ -37,7 +37,8 @@
   // 分词：[{ w 词, i 位置, first 是否句首（判断大写是不是专有名词用，规则同 vlevel.js 的 vsMark） }]
   function tokens(s) {
     s = String(s == null ? "" : s); const out = []; let m; WORD_RE.lastIndex = 0;
-    while ((m = WORD_RE.exec(s))) { const prev = s.slice(0, m.index).replace(/\s+$/, ""); out.push({ w: m[0], i: m.index, first: !prev || /[.?!…“‘"'(\[:;—–\-]$/.test(prev) }); }
+    // 句首判断：往前跳过空白看前一个字（以前每个词都把前面整段复制一遍再去空白，长文章是平方级的慢，打开「📰 读」要卡）
+    while ((m = WORD_RE.exec(s))) { let j = m.index - 1; while (j >= 0 && /\s/.test(s[j])) j--; out.push({ w: m[0], i: m.index, first: j < 0 || /[.?!…“‘"'(\[:;—–\-]/.test(s[j]) }); }
     return out;
   }
   const isWord = w => /[A-Za-zÀ-ɏ]/.test(w);
