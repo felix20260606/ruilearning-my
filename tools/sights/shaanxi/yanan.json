@@ -61,9 +61,10 @@
    "desc": "中共七大召开的中央大礼堂、毛泽东等领导人住过的窑洞都在这里，毛泽东在这里写了《在延安文艺座谈会上的讲话》等文章。",
    "tips": "和枣园排在同一个半天。",
    "rate": 2,
-   "photo": "",
+   "photo": "宝塔 杨家岭革命旧址 05.jpg",
    "q": "杨家岭革命旧址",
-   "src": "https://gs.ctrip.com/html5/you/sight/423.html"
+   "src": "https://gs.ctrip.com/html5/you/sight/423.html",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-yanan-zaoyuan",
@@ -79,9 +80,10 @@
    "desc": "1944–1947 年中共中央书记处所在地，园子里绿树成荫，有毛泽东、朱德、周恩来、刘少奇、张闻天等人的旧居窑洞，张思德追悼会旧址也在附近。",
    "tips": "园子大、环境好，适合慢慢走。",
    "rate": 2,
-   "photo": "",
+   "photo": "枣园革命旧址 1.jpg",
    "q": "枣园革命旧址",
-   "src": "https://gs.ctrip.com/html5/you/sight/423.html"
+   "src": "https://gs.ctrip.com/html5/you/sight/423.html",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-yanan-luyi",
@@ -153,9 +155,10 @@
    "desc": "习近平当年插队 7 年的陕北村庄，保留了知青窑洞、淤地坝、沼气池等，村里有展览馆介绍知青岁月和陕北农村变化。",
    "tips": "和乾坤湾排在同一天，一东一西不远。",
    "rate": 2,
-   "photo": "",
+   "photo": "梁家河红色教育 02.jpg",
    "q": "梁家河",
-   "src": "https://zh.wikipedia.org/zh-cn/梁家河村"
+   "src": "https://zh.wikipedia.org/zh-cn/梁家河村",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-yanan-qiankunwan",
@@ -171,9 +174,10 @@
    "desc": "黄河在晋陕峡谷里拐出一个近 320 度的大弯，从观景台看像太极图，是黄河蛇曲国家地质公园的核心。附近有古村落碾畔村和小程村。",
    "tips": "日出、日落时光线最好；冬天风大，注意保暖。",
    "rate": 2,
-   "photo": "",
+   "photo": "黄河乾坤湾 1.jpg",
    "q": "黄河乾坤湾",
-   "src": "https://zh.wikipedia.org/zh-cn/乾坤湾"
+   "src": "https://zh.wikipedia.org/zh-cn/乾坤湾",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-yanan-nanniwan",
@@ -189,9 +193,10 @@
    "desc": "抗战时三五九旅在这里开荒屯田，歌曲《南泥湾》唱的「陕北好江南」。现在有大片稻田、湿地和革命旧址，夏秋稻田、荷塘很好看。",
    "tips": "机场叫「南泥湾机场」，但在另一个方向，不在南泥湾镇。",
    "rate": 1,
-   "photo": "",
+   "photo": "南泥湾稻香门 1.jpg",
    "q": "南泥湾",
-   "src": "https://zh.wikipedia.org/zh-cn/南泥湾"
+   "src": "https://zh.wikipedia.org/zh-cn/南泥湾",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-yanan-yuchadaxiagu",
@@ -209,7 +214,8 @@
    "rate": 1,
    "photo": "",
    "q": "雨岔大峡谷",
-   "src": "https://zh.wikipedia.org/zh-cn/甘泉县"
+   "src": "https://zh.wikipedia.org/zh-cn/甘泉县",
+   "photo_checked": "自动找到的不对，留空（人工看过）"
   }
  ]
 }

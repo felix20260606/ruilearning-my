@@ -44,7 +44,8 @@
    "rate": 2,
    "photo": "",
    "q": "红石峡",
-   "src": "https://gs.ctrip.com/html5/you/sight/1453650.html"
+   "src": "https://gs.ctrip.com/html5/you/sight/1453650.html",
+   "photo_checked": "自动找到的不对，留空（人工看过）"
   },
   {
    "id": "shaanxi-yulin-gucheng",
@@ -60,9 +61,10 @@
    "desc": "明代「九边重镇」榆林卫城，一条南北大街上有六座跨街的楼阁（钟楼、凯歌楼、新明楼等，号称「六楼骑街」），两边老字号和四合院，还有一段明代城墙。",
    "tips": "晚上楼阁亮灯后逛街吃小吃最好。",
    "rate": 2,
-   "photo": "",
+   "photo": "榆林古城.JPG",
    "q": "榆林古城",
-   "src": "https://zh.wikipedia.org/zh-cn/榆林卫城"
+   "src": "https://zh.wikipedia.org/zh-cn/榆林卫城",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-yulin-shimao",
@@ -115,9 +117,10 @@
    "desc": "中国最大的沙漠淡水湖，周围是沙丘和草地，夏天可以玩沙、骑骆驼、坐船，也是珍稀候鸟遗鸥最大的繁殖地。",
    "tips": "夏天（6–9 月）最好玩；冬天湖面结冰、风大，项目大多停。",
    "rate": 2,
-   "photo": "",
+   "photo": "Hong Jian Nao (4644571858).jpg",
    "q": "红碱淖",
-   "src": "https://zh.wikipedia.org/zh-cn/红碱淖"
+   "src": "https://zh.wikipedia.org/zh-cn/红碱淖",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-yulin-tongwancheng",
@@ -152,9 +155,10 @@
    "desc": "黄土高原下的红砂岩丹霞地貌，岩层像波浪一样一圈圈起伏，颜色红白相间，拍照很出片。",
    "tips": "下午斜光时颜色最好看；岩石易损，不要踩踏边缘。",
    "rate": 2,
-   "photo": "",
+   "photo": "靖边 波浪谷景区之火焰丹霞 05.jpg",
    "q": "靖边波浪谷",
-   "src": "https://zh.wikipedia.org/zh-cn/靖边县"
+   "src": "https://zh.wikipedia.org/zh-cn/靖边县",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-yulin-baiyunshan",
@@ -170,9 +174,10 @@
    "desc": "西北最大的明清道教古建筑群，五十多座殿宇沿山坡层层而上，下临黄河，庙里明清壁画精美。每年农历四月初八前后有大庙会。",
    "tips": "佳县县城本身建在黄河边的石山上，可以顺便看「黄河古城」和香炉寺。",
    "rate": 2,
-   "photo": "",
+   "photo": "佳县白云山庙超然亭.jpg",
    "q": "佳县白云山",
-   "src": "https://zh.wikipedia.org/zh-cn/白云山_(佳县)"
+   "src": "https://zh.wikipedia.org/zh-cn/白云山_(佳县)",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-yulin-jiangshi",
@@ -188,9 +193,10 @@
    "desc": "清末陕北首富姜耀祖修建的窑洞庄园，建在山坡上，下中上三层院落，城堡一样的寨墙、石砌窑洞非常壮观，是陕北窑洞建筑的代表。",
    "tips": "米脂县城还有李自成行宫和米脂古城，可以一起看。",
    "rate": 2,
-   "photo": "",
+   "photo": "姜氏庄园下院 - panoramio.jpg",
    "q": "姜氏庄园",
-   "src": "https://zh.wikipedia.org/zh-cn/姜氏庄园"
+   "src": "https://zh.wikipedia.org/zh-cn/姜氏庄园",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-yulin-mizhi",
@@ -208,7 +214,8 @@
    "rate": 1,
    "photo": "",
    "q": "米脂古城",
-   "src": "https://zh.wikipedia.org/zh-cn/米脂县"
+   "src": "https://zh.wikipedia.org/zh-cn/米脂县",
+   "photo_checked": "自动找到的不对，留空（人工看过）"
   },
   {
    "id": "shaanxi-yulin-yangjiagou",

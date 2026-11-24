@@ -61,9 +61,10 @@
    "desc": "宝鸡号称「青铜器之乡」，这里藏有何尊（铭文里最早出现「中国」二字）、逨盘等周代国宝青铜器，建筑造型本身像一座青铜高台。",
    "tips": "何尊是镇馆之宝，有时外借展出，去之前可查一下。出门就是渭河边的石鼓园。",
    "rate": 3,
-   "photo": "",
+   "photo": "Baoji Bronze Ware Museum.jpg",
    "q": "宝鸡青铜器博物院",
-   "src": "https://gs.ctrip.com/html5/you/sight/baoji422/52660.html"
+   "src": "https://gs.ctrip.com/html5/you/sight/baoji422/52660.html",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-baoji-zhouyuan",
@@ -79,9 +80,10 @@
    "desc": "周人发祥地周原遗址上的博物馆，西周宫殿、宗庙遗址和大量窖藏青铜器都出自这一带。",
    "tips": "适合和法门寺排在同一天；喜欢先秦历史的再来。",
    "rate": 1,
-   "photo": "",
+   "photo": "陕西宝鸡扶风县庄白村-史墙盘-西周-宝鸡周原博物院 01.jpg",
    "q": "周原博物院",
-   "src": "https://zh.wikipedia.org/zh-cn/周原遗址"
+   "src": "https://zh.wikipedia.org/zh-cn/周原遗址",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-baoji-zhougongmiao",
@@ -99,7 +101,8 @@
    "rate": 1,
    "photo": "",
    "q": "岐山周公庙",
-   "src": "https://zh.wikipedia.org/zh-cn/周公庙_(岐山)"
+   "src": "https://zh.wikipedia.org/zh-cn/周公庙_(岐山)",
+   "photo_checked": "自动找到的不对，留空（人工看过）"
   },
   {
    "id": "shaanxi-baoji-guanshan",
@@ -154,7 +157,8 @@
    "rate": 1,
    "photo": "",
    "q": "宝鸡炎帝陵",
-   "src": "https://zh.wikipedia.org/zh-cn/炎帝陵_(宝鸡)"
+   "src": "https://zh.wikipedia.org/zh-cn/炎帝陵_(宝鸡)",
+   "photo_checked": "自动找到的不对，留空（人工看过）"
   },
   {
    "id": "shaanxi-baoji-diaoyutai",
