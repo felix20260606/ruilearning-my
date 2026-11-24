@@ -25,5 +25,10 @@ ok(/html\.vs-sz-mini #movie_player\.vs-pl video\.html5-main-video\{left:0!import
 ok(/#vs-wk-cover\{position:absolute!important;inset:0!important;z-index:55!important;pointer-events:none/.test(W) && /html\.vs-bili #vs-wk-cover\{z-index:110/.test(W), "cover sits under the subtitles (YouTube 60 / Bili 120) and lets clicks through");
 ok(/html\.vs-peek \.vs-pl:hover video\{filter:none!important;opacity:1!important\}/.test(W) && /clip-path:inset\(0\)/.test(W), "peek on hover; blur clipped");
 ok(/requestPictureInPicture/.test(W) && /COVER_CSS = BOSS_CSS\.replace/.test(W) && /applyLook\(on\)/.test(W), "video PiP, cover reuses boss skins, looks applied on every watch page");
+ok(/pip\.clearInterval\(pipT\)/.test(W) && !/[^.]clearInterval\(pipT\)/.test(W), "PiP timer cleared in the PiP window, never with the main window's clearInterval (ids collide)");
+ok(/exitPictureInPicture/.test(W.slice(W.indexOf("function bossToggle"))) && /exitFullscreen/.test(W) && /st\.guard = setInterval/.test(W) && /st\.noPlay/.test(W), "boss: closes video PiP, leaves fullscreen, keeps fake title, blocks play");
+ok(/composedPath/.test(W) && /e\.isComposing/.test(W) && !/if \(!alive\(\)\) return;\n    const t = /.test(W), "boss key: shadow-DOM typing check, IME, works after extension reload");
+ok(/applyLook\(show\)/.test(W) && /if \(!on\) \{ if \(rd\) readClose\(\); if \(pip\) pipClose\(\); \}/.test(W) && /menu\.dataset\.h !== html/.test(W) && /asked\[i\] = Date\.now\(\)/.test(W), "look off with 🙈 hidden; close on leaving watch page; menu redraw only on change; translation asks throttled");
+ok(/document\.fullscreenElement\) return; \/\* 全屏/.test(P) && /type: "wordLite", word: w, tl: S\.target \|\| "zh-CN", sl: "en" \}\)\.then\(r => \{ const g/.test(P), "review card: not in fullscreen, light lookup");
 ok(!/\/\/[^\n]*document\.documentElement\.append\(wcHost\)/.test(P), "card append not swallowed by a // comment");
 console.log(fail ? fail + " FAILED" : "t88 work mode: all ok"); process.exit(fail ? 1 : 0);

@@ -23,10 +23,11 @@
   load(); try { chrome.storage.onChanged.addListener((c, a) => { if (a !== "sync") return; for (const k in c) if (k in W) W[k] = c[k].newValue; paintBtn(); }); } catch (e) {}
 
   // ---------- 字幕：当前是哪一句（直接按视频时间算，后台标签页定时器变慢也准） ----------
+  let asked = {}, askedVid = null;
   function curCue() {
-    const A = API(); if (!A) return null; const cues = A.cues(), v = A.video(); if (!cues || !cues.length || !v) return null;
+    const A = API(); if (!A) return null; const cues = A.cues(), v = A.video(); if (!cues || !cues.length || !v) return null; if (askedVid !== cues) { askedVid = cues; asked = {}; }
     const i = A.find(v.currentTime); if (i < 0) return { i: -1, c: null, zh: "" };
-    const tr = A.trans(); if (tr[i] === undefined) A.fetchTrans(i, 6);
+    const tr = A.trans(); if (tr[i] === undefined && Date.now() - (asked[i] || 0) > 15e3) { asked[i] = Date.now(); A.fetchTrans(i, 6); } /* 翻译失败时别每 250 毫秒重问一次 */
     return { i, c: cues[i], zh: tr[i] || "" };
   }
   const playPause = () => { const v = API() && API().video(); if (!v) return; if (v.paused) v.play(); else v.pause(); };
@@ -63,11 +64,11 @@
       else if (a === "skin") { const ks = Object.keys(PIP_SKINS), nx = ks[(ks.indexOf(W.workPip) + 1) % ks.length]; setW("workPip", nx); st.textContent = PIP_CSS[nx]; pipLast = ""; }
     });
     d.addEventListener("keydown", onKey, true); // 小窗在前台时也能按老板键
-    pip.addEventListener("pagehide", () => { pip = null; clearInterval(pipT); paintBtn(); });
+    pip.addEventListener("pagehide", () => { pip = null; pipT = 0; paintBtn(); }); /* 小窗的定时器跟着小窗一起没了；别用主窗口的 clearInterval，编号会撞上别的定时器 */
     const draw = () => { if (!pip) return; const x = curCue(), h = pipHtml(W.workPip, x); if (h !== pipLast) { pipLast = h; const c = d.getElementById("c"); if (c) c.innerHTML = h; } };
     pipT = pip.setInterval(draw, 250); draw(); paintBtn();
   }
-  function pipClose() { if (pip) try { pip.close(); } catch (e) {} pip = null; clearInterval(pipT); paintBtn(); }
+  function pipClose() { if (pip) { try { pip.clearInterval(pipT); } catch (e) {} try { pip.close(); } catch (e) {} } pip = null; pipT = 0; paintBtn(); }
 
   // ---------- ② 伪装阅读 ----------
   const READ_SKINS = { code: "💻 代码", doc: "📄 文档", sheet: "📊 表格" };
@@ -98,6 +99,7 @@
   function readOpen() {
     if (rd) { readClose(); return; }
     const A = API(); if (!(A && A.cues().length)) { toast("这个视频还没有字幕"); return; }
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); // 全屏时盖层在全屏画面下面看不到
     if (!document.getElementById("vs-wk-read-css")) { const s = document.createElement("style"); s.id = "vs-wk-read-css"; s.textContent = READ_CSS; document.documentElement.append(s); }
     rd = document.createElement("div"); rd.id = "vs-wk-read"; document.documentElement.append(rd);
     rd.addEventListener("click", e => {
@@ -197,31 +199,40 @@
     if (!document.pictureInPictureEnabled || !v.requestPictureInPicture) { toast("这个浏览器不支持视频小窗"); return; }
     v.requestPictureInPicture().catch(e => toast("视频小窗没打开：" + (e && e.message || e)));
   }
-  function setFav(href) { let l = document.querySelector('link[rel~="icon"]'); const old = l ? l.href : ""; if (!l) { l = document.createElement("link"); l.rel = "icon"; document.head.append(l); } l.href = href; return old; }
+  function setFav(href) { // YouTube 有好几个 icon，全部换掉；还原时放回原来的、删掉自己加的
+    const ls = [...document.querySelectorAll('link[rel~="icon"]')], old = ls.map(l => [l, l.href]);
+    const mine = document.createElement("link"); mine.rel = "icon"; mine.href = href; mine.dataset.vsWk = "1"; document.head.append(mine);
+    ls.forEach(l => { l.href = href; });
+    return () => { old.forEach(([l, h]) => { l.href = h; }); mine.remove(); };
+  }
   function bossToggle() {
     if (boss) { // 回到原样
-      boss.el.remove(); document.title = boss.title; if (boss.fav) setFav(boss.fav);
-      const v = API() && API().video(); if (v) { v.muted = boss.muted; if (boss.playing) v.play(); }
+      clearInterval(boss.guard); boss.el.remove(); document.title = boss.title; if (boss.fav) boss.fav();
+      const v = API() && API().video(); if (v) { v.removeEventListener("play", boss.noPlay); v.muted = boss.muted; if (boss.playing) v.play(); }
       if (boss.read) readOpen();
       boss = null; return;
     }
     const v = API() && API().video(); const st = { title: document.title, muted: v ? v.muted : false, playing: v ? !v.paused : false, read: !!rd };
     if (v) { v.pause(); v.muted = true; } pipClose(); if (rd) readClose(); hideMenu();
+    if (document.pictureInPictureElement) document.exitPictureInPicture().catch(() => {}); // 浮在外面的视频小窗也收起来
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
     ensureCss();
     const skin = W.workBoss in BOSS_SKINS ? W.workBoss : "code", el = document.createElement("div"); el.id = "vs-wk-boss"; el.className = skin; el.innerHTML = bossHtml(skin);
     document.documentElement.append(el);
     document.title = { code: "orders.ts — backend — Visual Studio Code", sheet: "项目进度 - 表格", doc: "项目周会纪要 - 文档" }[skin];
     st.fav = setFav("data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect width="16" height="16" rx="3" fill="' + ICON[skin] + '"/></svg>'));
+    const fake = document.title; st.guard = setInterval(() => { if (document.title !== fake) document.title = fake; }, 300); // YouTube 会改标题（通知数等），盖着的时候改回去
+    st.noPlay = () => { if (boss && v) v.pause(); }; if (v) v.addEventListener("play", st.noPlay); // 盖着的时候按空格 / k 也别在后面偷偷放
     st.el = el; boss = st;
   }
   const KEYS = { "`": e => e.key === "`" && !e.ctrlKey && !e.metaKey && !e.altKey, F2: e => e.key === "F2", "Esc×2": null };
   let escAt = 0;
   function onKey(e) {
-    if (!alive()) return;
-    const t = e.target, typing = t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
+    if (e.isComposing) return; // 扩展重新加载后也要能把盖层取下来，所以这里不看 alive()
+    const t = (e.composedPath && e.composedPath()[0]) || e.target, typing = !!(t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName || ""))); // B 站评论在 shadow DOM 里
     const k = W.workKey in KEYS ? W.workKey : "`";
     let hit = false;
-    if (k === "Esc×2") { if (e.key === "Escape") { const now = Date.now(); hit = now - escAt < 450; escAt = hit ? 0 : now; } }
+    if (k === "Esc×2") { if (e.key === "Escape" && (!typing || boss)) { const now = Date.now(); hit = now - escAt < 450; escAt = hit ? 0 : now; } }
     else hit = !typing && KEYS[k](e);
     if (!hit) return;
     e.preventDefault(); e.stopPropagation(); bossToggle();
@@ -234,7 +245,8 @@
   function hideMenu() { if (menu) menu.style.display = "none"; }
   function paintBtn() {
     const A = API(), on = !!(A && A.enabled() && A.isWatch()), show = on && W.workBtn !== false;
-    document.documentElement.classList.toggle("vs-wk-on", show); applyLook(on);
+    document.documentElement.classList.toggle("vs-wk-on", show); applyLook(show); // 把 🙈 关掉 = 画面 / 小框也一起恢复
+    if (!on) { if (rd) readClose(); if (pip) pipClose(); } // 离开视频页（YouTube 站内跳转）时收起
     if (!show) { hideMenu(); return; }
     if (menu && menu.style.display !== "none") drawMenu();
   }
@@ -248,7 +260,7 @@
     const hd = t => '<div style="margin-top:10px;color:#9aa0a6;font-size:12px">' + t + "</div>";
     const act = (a, t, on) => '<button data-a="' + a + '" style="border:1px solid ' + (on ? "#9c6ade" : "#454950") + ";background:" + (on ? "rgba(156,106,222,.3)" : "#2d2f34") + ';color:#eee;border-radius:9px;padding:5px 10px;margin:5px 5px 0 0;font:inherit;font-size:13px;cursor:pointer">' + t + "</button>";
     const lk = W.workLook in LOOKS ? W.workLook : "clear", mini = W.workSize === "mini";
-    menu.innerHTML = '<b style="font-size:14.5px">🙈 上班模式</b><span style="color:#9aa0a6;font-size:12px">　选好后每个视频都这样</span>' +
+    const html = '<b style="font-size:14.5px">🙈 上班模式</b><span style="color:#9aa0a6;font-size:12px">　选好后每个视频都这样</span>' +
       hd("画面（字幕照常显示）") + chips("workLook", LOOKS) +
       (lk === "cover" ? hd("遮罩的样子") + chips("workCover", COVER_SKINS) : "") +
       (lk !== "clear" ? '<label style="display:block;margin-top:6px;font-size:12.5px;cursor:pointer"><input type="checkbox" data-set="workPeek"' + (W.workPeek ? " checked" : "") + ' style="vertical-align:-2px"> 鼠标停在画面上时看清</label>' : "") +
@@ -259,6 +271,7 @@
       hd("伪装阅读样子") + chips("workRead", READ_SKINS) +
       hd("老板键样子 · 快捷键") + chips("workBoss", BOSS_SKINS) + '<div>' + Object.keys(KEYS).map(k => chip("workKey", k, esc(k), W.workKey === k)).join("") + "</div>" +
       '<div style="margin-top:8px;color:#9aa0a6;font-size:12px">任意网页定时弹生词卡：在插件设置「🙈 上班模式」里打开</div>';
+    if (menu.dataset.h !== html) { menu.dataset.h = html; menu.innerHTML = html; } // 内容没变就不重画，免得点到一半按钮被换掉
   }
   function onMenu(e) {
     const b = e.target.closest("button,input[data-set]"); if (!b) return; e.stopPropagation();

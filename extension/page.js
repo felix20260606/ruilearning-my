@@ -189,7 +189,7 @@
       <div class="c"><div class="h">🃏 复习一个词<span class="sp"></span><button class="x" data-a="x" title="关掉">✕</button></div><div class="w" data-a="say" title="点一下朗读">${esc(w)}</div><div class="zh hid" data-a="show">点这里看意思</div>
       <div class="b"><button data-a="no">没记住</button><button class="ok" data-a="yes">记得</button></div><div class="off"><a data-a="off">今天别弹了</a></div></div>`;
     let zh = "";
-    send({ type: "word", word: w, tl: S.target || "zh-CN", sl: "en" }).then(r => { const g = r && r.g; zh = g ? [g.t].concat(...(g.zh || []).map(z => (z.words || []).slice(0, 2))).filter((x, i, a) => x && a.indexOf(x) === i).slice(0, 4).join("；") : ""; });
+    send({ type: "wordLite", word: w, tl: S.target || "zh-CN", sl: "en" }).then(r => { const g = r && r.g; zh = g ? [g.t].concat(...(g.zh || []).map(z => (z.words || []).slice(0, 2))).filter((x, i, a) => x && a.indexOf(x) === i).slice(0, 4).join("；") : ""; });
     wcSh.addEventListener("click", e => {
       if (!e.isTrusted) return; const el = e.target.closest("[data-a]"); if (!el) return; const a = el.dataset.a;
       if (a === "show") { el.classList.remove("hid"); el.textContent = zh || "（没查到，点单词听一下）"; return; }
@@ -202,7 +202,7 @@
   function wcTick() {
     if (!alive()) return;
     try {
-      chrome.storage.sync.get({ workCard: 0 }, o => { const min = +o.workCard || 0; if (!min || wcHost || document.visibilityState !== "visible") return;
+      chrome.storage.sync.get({ workCard: 0 }, o => { const min = +o.workCard || 0; if (!min || wcHost || document.visibilityState !== "visible" || document.fullscreenElement) return; /* 全屏（演示、看片）时不弹 */
         chrome.storage.local.get({ workCardAt: 0, workCardOff: "" }, v => {
           if (v.workCardOff === new Date().toDateString()) return;
           if (Date.now() - (+v.workCardAt || 0) < min * 60e3) return;
