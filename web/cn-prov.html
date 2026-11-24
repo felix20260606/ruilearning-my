@@ -25,7 +25,7 @@
   .stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
   .stat{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:8px 15px;min-width:88px}
   .stat b{display:block;font-family:var(--display);font-size:20px;font-weight:900}.stat span{font-size:12px;opacity:.92}
-  .bar{height:8px;border-radius:99px;background:rgba(255,255,255,.14);max-width:420px;margin:14px auto 0;overflow:hidden}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7ce3b8,#c59bef);transition:width .3s}
+  .hbar{max-width:460px;margin:14px auto 0}
   .links{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
   .lk{display:inline-flex;align-items:center;font-size:12.5px;font-weight:700;color:var(--jade-deep,#c59bef);background:var(--ui-pur-soft,rgba(197,155,239,.12));border:1px solid rgba(197,155,239,.3);border-radius:999px;padding:5px 12px;text-decoration:none;line-height:1.5;cursor:pointer}
   .lk.s{color:var(--soft);background:transparent;border-color:var(--line)}.hero .lk{color:#fff;background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.25)}
@@ -66,11 +66,12 @@
     <div class="stat"><b id="n-want">0</b><span>⭐ 想去</span></div>
     <div class="stat"><b id="n-cap">—</b><span>省会</span></div>
   </div>
-  <div class="bar"><i id="bar"></i></div>
+  <div class="hbar" id="bar"></div>
   <div class="links" id="hl"></div>
 </div></div>
 <div class="wrap">
   <div class="tools">
+    <div class="row"><div class="ts-sticky" id="pbar"></div></div>
     <div class="row"><input class="q" id="q" type="search" placeholder="🔍 搜城市名……" autocomplete="off">
       <select class="so" id="so"><option value="km">离省会由近到远</option><option value="name">按名字</option></select></div>
     <div class="row" id="st"></div>
@@ -114,7 +115,7 @@ function match(x){var s=st(x);if(!TRIPST.S.match(s,F.st,""))return false;
   if(F.q){var h=(x.zh+" "+x.en+" "+x.desc).toLowerCase();if(h.indexOf(F.q.toLowerCase())<0)return false;}return true;}
 function order(a,b){if(F.so==="name")return a.zh.localeCompare(b.zh,"zh");return (b.cap-a.cap)||((a.km==null?9e9:a.km)-(b.km==null?9e9:b.km));}
 function stats(){var b=0,w=0,C=D.cities;C.forEach(function(x){var s=st(x);if(s.been)b++;else if(s.want||s.plan)w++;});
-  $("n-been").textContent=b;$("n-want").textContent=w;$("bar").style.width=(C.length?Math.round(b*100/C.length):0)+"%";
+  $("n-been").textContent=b;$("n-want").textContent=w;$("bar").innerHTML=$("pbar").innerHTML=TRIPST.S.bar(C,st); /* 分段进度条：去过 / 路过 / 想去 / 不想去 */
   $("st").innerHTML='<span class="lbl">状态</span>'+TRIPST.S.chips(C,st,null,F.st);}
 function render(){var L=D.cities.filter(match).sort(order);$("grid").innerHTML=L.map(card).join("");$("empty").style.display=L.length?"none":"";stats();}
 function toggle(id,k){var x=BY[id];if(!x)return;var v=TRIPST.S.toggle(st(x),k);mine=true;TRIPST.set(id,v);mine=false;

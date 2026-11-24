@@ -1,7 +1,7 @@
 /* 🗺 中国足迹地图（window.CNMAP）：旅游中心「🇨🇳 中国」最上面那张，trip-nav.html?r=cn 时自动画
    数据：cn/map.json（省界 SVG 路径 + 496 个城市点，tools/cn-data/make_map.py 生成）+ cn/visited.json（默认足迹：用户告诉 Claude 去过哪，写在这里）
    状态：trip-state.js（TRIPST）——省页 / 城市页勾的「去过 / 想去 / 计划（算想去）/ 不想去（不上色）/ 评价 / 再去」（id = cn-<维基数据编号>），景点大全里勾了某个城市的任何景点也算去过这个城市（map.json 的 alias：hz- → 杭州 …）
-   省：有去过的城市 = 绿；只有想去 = 金；都没有 = 灰。点省 / 点城市弹出小卡片：改去过 / 想去、打开省页 / 城市页
+   省：有去过的城市 = 绿；只有路过 = 青；只有想去 = 金；都没有 = 灰。点省 / 点城市弹出小卡片：改去过 / 想去、打开省页 / 城市页
    操作：拖动、滚轮 / 双指缩放、＋ − ⟲；只看去过；城市点开关；最近标记；导出图片（PNG） */
 (function () {
   "use strict";
@@ -15,9 +15,9 @@
     ".cm-top{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:12px 14px 8px}.cm-top h2{font-size:16px;font-weight:900;margin-right:auto}" +
     ".cm-st{display:flex;flex-wrap:wrap;gap:6px}.cm-st span{font-size:12px;color:var(--soft);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:3px 10px}.cm-st b{color:var(--ink);font-size:14px;margin-right:2px}" +
     ".cm-box{position:relative;background:#14161b;touch-action:none;user-select:none;-webkit-user-select:none}.cm-box svg{display:block;width:100%;height:auto;max-height:70vh;cursor:grab}.cm-box svg.drag{cursor:grabbing}" +
-    ".cm-p{fill:#2b2f38;stroke:#5a6070;stroke-width:.7;vector-effect:non-scaling-stroke}.cm-p:hover{stroke:#c59bef;stroke-width:1.6}.cm-p.been{fill:rgba(47,191,113,.62)}.cm-p.want{fill:rgba(255,201,77,.42)}.cm-p.sel{stroke:#c59bef;stroke-width:2.2}" +
+    ".cm-p{fill:#2b2f38;stroke:#5a6070;stroke-width:.7;vector-effect:non-scaling-stroke}.cm-p:hover{stroke:#c59bef;stroke-width:1.6}.cm-p.been{fill:rgba(47,191,113,.62)}.cm-p.pass{fill:rgba(31,160,160,.45)}.cm-p.want{fill:rgba(255,201,77,.42)}.cm-p.sel{stroke:#c59bef;stroke-width:2.2}" +
     ".cm-jd{fill:#7a8090;stroke:#7a8090;stroke-width:.6;vector-effect:non-scaling-stroke}.cm-in{fill:none;stroke:#4a5060;stroke-width:1;vector-effect:non-scaling-stroke}" +
-    ".cm-c{fill:#8b93a7;opacity:.5;cursor:pointer}.cm-c.been{fill:#7ce3b8;opacity:1}.cm-c.want{fill:#ffc94d;opacity:1}.cm-c.cap{opacity:.8}.cm-c.sel{stroke:#fff;stroke-width:1.5;vector-effect:non-scaling-stroke}" +
+    ".cm-c{fill:#8b93a7;opacity:.5;cursor:pointer}.cm-c.been{fill:#7ce3b8;opacity:1}.cm-c.want{fill:#ffc94d;opacity:1}.cm-c.pass{fill:#5fd6d6;opacity:1}.cm-c.cap{opacity:.8}.cm-c.sel{stroke:#fff;stroke-width:1.5;vector-effect:non-scaling-stroke}" +
     ".cm-l{font-family:sans-serif;font-weight:700;fill:#c8ccd6;pointer-events:none;text-anchor:middle;paint-order:stroke;stroke:#14161b}.cm-l.been{fill:#fff}" +
     ".cm-ctl{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:5px}.cm-ctl button{width:32px;height:32px;border-radius:9px;border:1px solid #3a3f4a;background:rgba(20,22,27,.85);color:#fff;font:700 16px sans-serif;cursor:pointer}" +
     ".cm-tip{position:absolute;pointer-events:none;background:rgba(20,22,27,.92);color:#fff;border:1px solid #3a3f4a;border-radius:8px;padding:3px 8px;font-size:12px;white-space:nowrap;display:none}" +
@@ -32,9 +32,9 @@
     var st = document.createElement("style"); st.textContent = CSS; document.head.appendChild(st); if (TRIPST.S) TRIPST.S.css();
     host.innerHTML = '<div class="cm"><div class="cm-top"><h2>🗺 我的中国足迹</h2><div class="cm-st" id="cm-st"></div></div>' +
       '<div class="cm-box" id="cm-box"><div class="cm-ctl"><button type="button" data-z="1.5" title="放大">＋</button><button type="button" data-z="0.667" title="缩小">－</button><button type="button" data-z="0" title="回到全国">⟲</button></div>' +
-      '<div class="cm-tip" id="cm-tip"></div><div class="cm-lg"><span><i style="background:rgba(47,191,113,.8)"></i>去过</span><span><i style="background:rgba(255,201,77,.7)"></i>想去</span><span><i style="background:#2b2f38;border:1px solid #5a6070"></i>还没去</span></div></div>' +
+      '<div class="cm-tip" id="cm-tip"></div><div class="cm-lg"><span><i style="background:rgba(47,191,113,.8)"></i>去过</span><span><i style="background:rgba(31,160,160,.7)"></i>路过</span><span><i style="background:rgba(255,201,77,.7)"></i>想去</span><span><i style="background:#2b2f38;border:1px solid #5a6070"></i>还没去</span></div></div>' +
       '<div class="cm-pn" id="cm-pn"></div>' +
-      '<div class="cm-bot"><label><input type="checkbox" id="cm-dots" checked> 城市点</label><label><input type="checkbox" id="cm-only"> 只看去过的城市</label><label><input type="checkbox" id="cm-lab" checked> 省名</label><span style="margin-left:auto"></span><button type="button" id="cm-png">📷 导出图片</button></div>' +
+      '<div class="cm-bot"><label><input type="checkbox" id="cm-dots" checked> 城市点</label><label><input type="checkbox" id="cm-only"> 只看去过 / 路过的城市</label><label><input type="checkbox" id="cm-lab" checked> 省名</label><span style="margin-left:auto"></span><button type="button" id="cm-png">📷 导出图片</button></div>' +
       '<div class="cm-rec" id="cm-rec"></div></div>';
     var $ = function (id) { return document.getElementById(id); };
     Promise.all([fetch("cn/map.json").then(function (r) { return r.json(); }), fetch("cn/visited.json", { cache: "no-cache" }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; })]).then(function (res) {
@@ -58,7 +58,7 @@
         for (id in defBeen) S[id] = { been: true, at: 0, src: "默认" }; for (id in defWant) if (!S[id]) S[id] = { want: true, at: 0, src: "默认" };
         for (id in A) {
           var v = A[id].v || {};
-          if (BY[id]) { S[id] = { been: !!v.been, want: !!(v.want || v.plan), skip: !!v.skip, rate: v.rate || "", again: !!v.again, raw: v, at: A[id].at, src: "城市" }; continue; } // 计划也算想去（金色）；不想去不上色
+          if (BY[id]) { S[id] = { been: !!v.been, pass: !!v.pass && !v.been, want: !!(v.want || v.plan), skip: !!v.skip, rate: v.rate || "", again: !!v.again, raw: v, at: A[id].at, src: "城市" }; continue; } // 计划也算想去（金色）；不想去不上色
           for (k in M.alias || {}) if (id.indexOf(k) === 0 && M.alias[k] && v.been) { var c = M.alias[k], o = S[c] || {}; if (!o.been || (A[id].at > (o.at || 0) && o.src !== "城市")) S[c] = { been: true, want: false, at: Math.max(A[id].at, o.at || 0), src: o.src === "城市" ? "城市" : "景点" }; }
         }
         return S;
@@ -67,11 +67,11 @@
       function base(id) { var r = TRIPST.get(id); if (r) return r; var s = S[id] || {}; return { been: !!s.been, want: !!s.want }; } // 这个城市现在的记录（没点过就用默认足迹 / 景点算出来的）
       function paint() {
         S = state();
-        var only = $("cm-only").checked, dots = $("cm-dots").checked, nb = 0, nw = 0, pb = {}, pw = {};
-        M.cities.forEach(function (c) { var s = S[c.id] || {}; c.el.setAttribute("class", "cm-c" + (c.cap ? " cap" : "") + (s.been ? " been" : s.want ? " want" : "") + (sel === c.id ? " sel" : ""));
-          c.el.style.display = !dots || (only && !s.been) ? "none" : ""; if (s.been) { nb++; pb[c.p] = (pb[c.p] || 0) + 1; } else if (s.want) { nw++; pw[c.p] = 1; } });
-        var np = 0; M.prov.forEach(function (p) { var b = pb[p.slug]; if (b) np++; p.el.setAttribute("class", "cm-p" + (b ? " been" : pw[p.slug] ? " want" : "") + (sel === p.slug ? " sel" : "")); p.lab.setAttribute("class", "cm-l" + (b ? " been" : "")); p.lab.style.display = $("cm-lab").checked ? "" : "none"; p.nb = b || 0; });
-        $("cm-st").innerHTML = '<span><b>' + np + '</b>/ 34 个省</span><span><b>' + nb + '</b>个城市去过</span><span><b>' + nw + '</b>个想去</span>';
+        var only = $("cm-only").checked, dots = $("cm-dots").checked, nb = 0, nw = 0, nt = 0, pb = {}, pw = {}, pt = {};
+        M.cities.forEach(function (c) { var s = S[c.id] || {}; c.el.setAttribute("class", "cm-c" + (c.cap ? " cap" : "") + (s.been ? " been" : s.pass ? " pass" : s.want ? " want" : "") + (sel === c.id ? " sel" : ""));
+          c.el.style.display = !dots || (only && !s.been && !s.pass) ? "none" : ""; if (s.been) { nb++; pb[c.p] = (pb[c.p] || 0) + 1; } else if (s.pass) { nt++; pt[c.p] = 1; if (s.want) { nw++; pw[c.p] = 1; } } else if (s.want) { nw++; pw[c.p] = 1; } });
+        var np = 0; M.prov.forEach(function (p) { var b = pb[p.slug]; if (b) np++; p.el.setAttribute("class", "cm-p" + (b ? " been" : pt[p.slug] ? " pass" : pw[p.slug] ? " want" : "") + (sel === p.slug ? " sel" : "")); p.lab.setAttribute("class", "cm-l" + (b ? " been" : "")); p.lab.style.display = $("cm-lab").checked ? "" : "none"; p.nb = b || 0; });
+        $("cm-st").innerHTML = '<span><b>' + np + '</b>/ 34 个省</span><span><b>' + nb + '</b>个城市去过</span>' + (nt ? '<span><b>' + nt + '</b>个路过</span>' : '') + '<span><b>' + nw + '</b>个想去</span>';
         var R = Object.keys(S).filter(function (id) { return S[id].been && S[id].at; }).sort(function (a, b) { return S[b].at - S[a].at; }).slice(0, 10);
         $("cm-rec").innerHTML = R.length ? "🕘 最近标记：" + R.map(function (id) { var c = BY[id], d = new Date(S[id].at); return '<a data-c="' + id + '">' + esc(c.zh.replace(/市$/, "")) + ' <small>' + (d.getMonth() + 1) + "/" + d.getDate() + "</small></a>"; }).join("") :
           "还没有标记：点地图上的城市点就能标「去过」，省页、城市页、景点大全里勾的也会自动出现在这里 · 也可以直接告诉 Claude 去过哪";
@@ -81,7 +81,7 @@
         var pn = $("cm-pn"), c = BY[key], p = c ? PV[c.p] : PV[key]; if (!p) { pn.className = "cm-pn"; return; }
         if (c) {
           var s = S[c.id] || {};
-          pn.innerHTML = "<b>" + esc(c.zh) + "</b><small>" + esc(p.zh) + (s.been ? " · ✅ 去过" + (s.rate ? " " + TRIPST.S.RATE[s.rate] : "") + (s.again ? " · 🔁 还想再去" : "") + (s.src === "景点" ? "（景点大全里勾过）" : s.src === "默认" ? "（默认足迹）" : "") : s.want ? " · ⭐ 想去" : s.skip ? " · 🚫 不想去" : "") + "</small>" +
+          pn.innerHTML = "<b>" + esc(c.zh) + "</b><small>" + esc(p.zh) + (s.been ? " · ✅ 去过" + (s.rate ? " " + TRIPST.S.RATE[s.rate] : "") + (s.again ? " · 🔁 还想再去" : "") + (s.src === "景点" ? "（景点大全里勾过）" : s.src === "默认" ? "（默认足迹）" : "") : s.pass ? " · 🚶 路过" + (s.want ? " · ⭐ 想去" : "") : s.want ? " · ⭐ 想去" : s.skip ? " · 🚫 不想去" : "") + "</small>" +
             '<div class="cm-acts">' + TRIPST.S.btns(base(c.id)) +
             (c.go ? '<a class="pri" href="' + esc(cityHref(c)) + '" data-go="' + esc(c.go) + '">🏙 城市页 ›</a>' : "") + '<a href="' + esc(provHref(c.p)) + '" data-go="prov:' + esc(c.p) + '">' + esc(p.zh) + ' ›</a><button type="button" data-zoom="' + esc(c.p) + '">🔍 放大这个省</button></div>';
         } else {
@@ -127,7 +127,7 @@
       // ---- 导出图片：把当前地图（全国）画成 PNG 下载 ----
       function exportPng() {
         var cl = svg.cloneNode(true); cl.setAttribute("viewBox", "0 0 " + M.w + " " + M.h); cl.setAttribute("width", M.w * 2); cl.setAttribute("height", M.h * 2 + 120);
-        var css = document.createElementNS(NS, "style"); css.textContent = ".cm-p{fill:#2b2f38;stroke:#5a6070;stroke-width:.7}.cm-p.been{fill:rgba(47,191,113,.75)}.cm-p.want{fill:rgba(255,201,77,.5)}.cm-jd{fill:#7a8090;stroke:#7a8090}.cm-in{fill:none;stroke:#4a5060}.cm-c{fill:#8b93a7;opacity:.45}.cm-c.been{fill:#7ce3b8;opacity:1}.cm-c.want{fill:#ffc94d;opacity:1}.cm-l{font-family:sans-serif;font-weight:700;fill:#c8ccd6;text-anchor:middle;paint-order:stroke;stroke:#14161b}.cm-l.been{fill:#fff}";
+        var css = document.createElementNS(NS, "style"); css.textContent = ".cm-p{fill:#2b2f38;stroke:#5a6070;stroke-width:.7}.cm-p.been{fill:rgba(47,191,113,.75)}.cm-p.pass{fill:rgba(31,160,160,.5)}.cm-p.want{fill:rgba(255,201,77,.5)}.cm-jd{fill:#7a8090;stroke:#7a8090}.cm-in{fill:none;stroke:#4a5060}.cm-c{fill:#8b93a7;opacity:.45}.cm-c.been{fill:#7ce3b8;opacity:1}.cm-c.want{fill:#ffc94d;opacity:1}.cm-c.pass{fill:#5fd6d6;opacity:1}.cm-l{font-family:sans-serif;font-weight:700;fill:#c8ccd6;text-anchor:middle;paint-order:stroke;stroke:#14161b}.cm-l.been{fill:#fff}";
         cl.insertBefore(css, cl.firstChild); cl.querySelectorAll("circle").forEach(function (e) { e.setAttribute("r", e.classList.contains("cap") ? 3.4 : 2.4); }); cl.querySelectorAll("text").forEach(function (t) { t.setAttribute("font-size", 15); t.setAttribute("stroke-width", 3.5); });
         var txt = new XMLSerializer().serializeToString(cl), img = new Image(), cv = document.createElement("canvas"); cv.width = M.w * 2; cv.height = M.h * 2 + 120;
         img.onload = function () { var x = cv.getContext("2d"); x.fillStyle = "#14161b"; x.fillRect(0, 0, cv.width, cv.height); x.drawImage(img, 0, 120, M.w * 2, M.h * 2);
