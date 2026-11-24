@@ -22,7 +22,7 @@
     return of.call(this,u,o);
   };
   if(navigator.sendBeacon){var ob=navigator.sendBeacon.bind(navigator);navigator.sendBeacon=function(u,d){try{u=fix(u);}catch(e){}return ob(u,d);};}
-  var MINE=/^(vocab_state_v1|pump:opt|pump:heard|pump:day|pump:log|wt:meta|reading:docs|reading:tr|reading:news|reading:newsq|speak:done|speak:log|speak:days|reading:lv|writing:draft|writing:history|writing:lang|vocab:test|vocab:kn|vocab:ms|vocab:frz|remind:time|remind:push|daily:opt|daily:check|daily:days|daily:sat|daily:sent|daily:wkseen|sme:done|sme:pos|sme:stat|sme:lq|sme:diff|err:items|exam:hist|lang|drill:[\w:]+|mine:seen:reading|mine:seen:writing|mine:seen:vtest|speak:howto|speak:coachAns|remind:last)$/,S=Storage.prototype,g=S.getItem,st=S.setItem,rm=S.removeItem;
+  var MINE=/^(vocab_state_v1|pump:opt|pump:heard|pump:day|pump:log|wt:meta|reading:docs|reading:tr|reading:news|reading:newsq|speak:done|speak:log|speak:days|reading:lv|writing:draft|writing:history|writing:lang|vocab:test|vocab:kn|vocab:ms|vocab:frz|vocab:img|vocab:rowimg|remind:time|remind:push|daily:opt|daily:check|daily:days|daily:sat|daily:sent|daily:wkseen|sme:done|sme:pos|sme:stat|sme:lq|sme:diff|err:items|exam:hist|lang|drill:[\w:]+|mine:seen:reading|mine:seen:writing|mine:seen:vtest|speak:howto|speak:coachAns|remind:last)$/,S=Storage.prototype,g=S.getItem,st=S.setItem,rm=S.removeItem;
   var k=function(t,key){var ls=null;try{ls=window.localStorage;}catch(e){}key=String(key);return t===ls&&MINE.test(key)?key+us+(key==="lang"?"":ls2):key;};
   S.getItem=function(key){return g.call(this,k(this,key));};
   S.setItem=function(key,v){return st.call(this,k(this,key),v);};

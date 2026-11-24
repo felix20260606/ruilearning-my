@@ -5,7 +5,7 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
 const V = W("vocab.js");
 ok(/const LIST_PAGE=40;/.test(V) && /function appendCards\(n\)/.test(V) && /IntersectionObserver/.test(V) && /<div class="body"><\/div>/.test(V), "vocab list: paged + lazy card body");
 ok(/body\.innerHTML=cardBodyHtml\(w0\)/.test(V) && /const L=LIST_ARR\.filter\(w=>w\.type==="sentence"\|\|w\.type==="pattern"\)/.test(V), "vocab list: body on first open, reader uses full filtered list");
-ok(/key===listKey\?Math\.max\(LIST_PAGE,listShown\):LIST_PAGE/.test(V), "vocab list: re-render keeps how many were shown");
+ok(/same=key===listKey,keep=same\?Math\.max\(LIST_PAGE,listShown\):LIST_PAGE/.test(V), "vocab list: re-render keeps how many were shown");
 ok(/#list \.card\{content-visibility:auto/.test(W("base.css")), "off-screen cards skip layout");
 global.U = { sents: t => String(t).split(/(?<=[.!?])\s+/) };
 const R = require(path.join(__dirname, "..", "web", "read.js"));
@@ -15,4 +15,6 @@ const tk = R.tokens('Hi there. "Quoted" word; Ärger über Öl? Yes!');
 ok(tk.map(x => x.first ? 1 : 0).join("") === "10111001", "sentence-start flags unchanged: " + tk.map(x => x.w + ":" + x.first).join(" "));
 ok(/const IMG_KEY="vocab:img"/.test(V) && /localStorage\.setItem\(KEY,JSON\.stringify\(noImg\(s\)\)\)/.test(V) && !/state\.imgcache=imgCache;save\(state\)/.test(V) && /NOIMG_TTL=7\*864e5/.test(V), "picture cache stored separately, not-found remembered 7 days");
 ok(/if \(mode === "reading"\) \{ \/\/ 判断题再核对一遍（英语雅思、德语歌德都做）/.test(W("_worker.js")), "IELTS reading also double-checks TRUE/FALSE/NOT GIVEN");
+ok(/let anchor=null;if\(same\)/.test(V) && /function populateImgs\(scope\)/.test(V) && /g\.dataset\.u===arr\.join/.test(V) && /LIST_ARR=\[\];listShown=0;listKey="";if\(listIO\)listIO\.disconnect\(\)/.test(V), "list: scroll anchor, scoped images, no gallery rebuild, empty resets");
+ok(/\["vocab:img", "生词本配图"\]/.test(W("util.js")) && /vocab:img\|vocab:rowimg/.test(W("boot.js")), "picture cache: first to drop when storage is full, per user/lang");
 console.log(fail ? fail + " FAILED" : "t87 perf: all ok"); process.exit(fail ? 1 : 0);

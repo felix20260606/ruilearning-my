@@ -174,7 +174,7 @@
   // 可以丢的缓存（丢了只是要重新下载 / 翻译，不丢数据），按「最不心疼」排在前面
   const CACHES = [];
   const cacheable = (pre, name) => { if (!CACHES.some(c => c.pre === pre)) CACHES.push({ pre, name }); };
-  [["debug:log", "问题记录"], ["wt:doc:", "视频字幕"], ["wt:tr:", "视频字幕译文"], ["wt:recent", "最近看的视频"], ["wt:w:", "视频查过的词"], ["wt:wl", "视频查词列表"], ["wt:list", "视频列表"], ["reader:img", "配图地址"],
+  [["vocab:img", "生词本配图"], ["vocab:rowimg", "规律表配图"], ["debug:log", "问题记录"], ["wt:doc:", "视频字幕"], ["wt:tr:", "视频字幕译文"], ["wt:recent", "最近看的视频"], ["wt:w:", "视频查过的词"], ["wt:wl", "视频查词列表"], ["wt:list", "视频列表"], ["reader:img", "配图地址"],
     ["sme:zhc", "听力节目的中文"], ["sme:diff", "听力节目难度"], ["reading:newsq", "新闻简单版"], ["reading:news", "今天的新闻"], ["reading:tr", "文章译文"]].forEach(c => cacheable(c[0], c[1]));
   const isQuota = e => !!e && (e.name === "QuotaExceededError" || e.name === "NS_ERROR_DOM_QUOTA_REACHED" || e.code === 22 || e.code === 1014);
   // 键名算不算这个缓存：前缀以 ":" 结尾的（wt:doc:）按前缀；其它（reading:tr）只认它本身、带家人 / 语言后缀的（@u2、~de）和 ":" 往下的——
@@ -192,7 +192,7 @@
     SP.setItem = function (k, v) {
       try { return orig.call(this, k, v); } catch (e) {
         if (!isQuota(e) || this !== window.localStorage) throw e;
-        if (k === LKEY) throw e; // 问题记录自己就是缓存：存不下就不存，不为它清别的、也不再记一条
+        if (k === LKEY || k === "vocab:img" || k === "vocab:rowimg") throw e; // 问题记录、配图地址自己就是缓存：存不下就不存，不为它清别的、也不再记一条
         for (const c of CACHES) {
           if (!clearCache(c, k)) continue;
           try { const r = orig.call(this, k, v); log("store", "本机存储满了：清掉「" + c.name + "」缓存后存进去了", k); if (!fullTipped) { fullTipped = true; tip("本机存储快满了，已经清掉一些缓存（字幕、翻译之类，用到时会重新下载）"); } return r; }

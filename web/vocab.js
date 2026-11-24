@@ -22,19 +22,20 @@ async function save(s){
 function def(){return{progress:{},custom:[],deleted:[],pending:[],srs:{}};}
 // 🖼 配图缓存单独存（vocab:img / vocab:rowimg，不跟生词本一起存）：以前在生词本里占 300 KB，练习时每答一张卡都要连它一起重写一遍，手机上每次多几十毫秒；
 //   改了只在 2 秒后写一次。没找到图的也记下（7 天内不再去维基百科找，以前每次打开网页都重新找一遍）
-const IMG_KEY="vocab:img",ROWIMG_KEY="vocab:rowimg",NOIMG_TTL=7*864e5;
+const IMG_KEY="vocab:img",ROWIMG_KEY="vocab:rowimg",NOIMG_TTL=7*864e5; // 两个键按家人、语言分开存（boot.js 的 MINE）
+const imgQ=id=>{const w=words.find(x=>x.id===id);return w?String(w.wiki||w.word||""):"";};
 const noImg=s=>{if(!s||(!("imgcache" in s)&&!("rowimgcache" in s)))return s;const t=Object.assign({},s);delete t.imgcache;delete t.rowimgcache;return t;};
 let imgSaveT=0;
 function imgSave(){clearTimeout(imgSaveT);imgSaveT=setTimeout(()=>{
-  const now=Date.now(),o={};for(const k in imgCache){const v=imgCache[k];if(Array.isArray(v))o[k]=v;else if(v===null)o[k]={none:now};else if(v&&v.none)o[k]=v;}
-  const r={};for(const k in rowImgCache){const v=rowImgCache[k];if(v&&v!=="pending")r[k]=v;}
+  const now=Date.now(),o={};for(const k in imgCache){const v=imgCache[k];if(Array.isArray(v))o[k]=v;else if(v===null)o[k]={none:now,q:imgQ(k)};else if(v&&v.none)o[k]=v;} // 没图的记下当时按什么词找的：词条改了（加了 wiki、大小写变了）就重新找
+  const r={};for(const k in rowImgCache){const v=rowImgCache[k];if(typeof v==="string"&&v!=="pending")r[k]=v;else if(v===null)r[k]={none:now};else if(v&&v.none)r[k]=v;}
   try{localStorage.setItem(IMG_KEY,JSON.stringify(o));localStorage.setItem(ROWIMG_KEY,JSON.stringify(r));}catch(e){} // 存不下就算了（能重新找）
 },2000);}
 function imgLoad(st){ // 读单独存的配图缓存；第一次（以前存在生词本里的）搬过来
   let o=null,r=null;try{o=JSON.parse(localStorage.getItem(IMG_KEY)||"null");r=JSON.parse(localStorage.getItem(ROWIMG_KEY)||"null");}catch(e){}
-  if(!o&&st&&st.imgcache)o=st.imgcache; if(!r&&st&&st.rowimgcache)r=st.rowimgcache;
+  if(st&&st.imgcache)o=Object.assign({},st.imgcache,o||{}); if(st&&st.rowimgcache)r=Object.assign({},st.rowimgcache,r||{}); // 以前存在生词本里的：合并过来（不丢）
   const now=Date.now(),I={};for(const k in o||{}){const v=o[k];if(Array.isArray(v))I[k]=v;else if(v&&v.none&&now-v.none<NOIMG_TTL)I[k]=v;} // 没图的记录 7 天后再找一次
-  const RW={};for(const k in r||{}){const v=r[k];if(v&&v!=="pending")RW[k]=v;}
+  const RW={};for(const k in r||{}){const v=r[k];if(typeof v==="string"&&v&&v!=="pending")RW[k]=v;else if(v&&v.none&&now-v.none<NOIMG_TTL)RW[k]=null;} // 行图：没图在内存里还是 null
   return {I,RW};
 }
 /* 掌握状态、待整理队列：改了的项记下时间（progAt / pendAdd / pendDel），合并时同一项按时间新的为准（后台同样）——
@@ -170,10 +171,11 @@ function applyImg(id){
   document.querySelectorAll('[data-wgallery="'+id+'"]').forEach(g=>{
     const bv=g.closest('.bigvisual');
     if(Array.isArray(arr)&&arr.length){
+      if(g.dataset.u===arr.join("|")){if(bv)bv.style.display="";return;} g.dataset.u=arr.join("|"); // 已经是这几张图：不重建（以前每次加载一批、点开一张都整页重建，图会闪、位置会跳）
       g.innerHTML=arr.map(u=>'<img src="'+u+'" loading="lazy" onerror="this.style.display=\'none\'">').join("");
       if(bv)bv.style.display="";
     }else{
-      g.innerHTML="";
+      g.dataset.u="";g.innerHTML="";
       if(bv)bv.style.display="none";
     }
   });
@@ -220,15 +222,16 @@ async function fetchWiki(id){
   applyImg(id);
   imgSave();
 }
-function populateImgs(){
-  const ids=new Set();
-  document.querySelectorAll("[data-wimg],[data-wgallery]").forEach(im=>ids.add(im.getAttribute("data-wimg")||im.getAttribute("data-wgallery")));
+function populateImgs(scope){ // scope：只处理这一块（新画的一批卡片、刚点开的详情）；不传 = 整页
+  const ids=new Set(),R=scope||document;
+  R.querySelectorAll("[data-wimg],[data-wgallery]").forEach(im=>ids.add(im.getAttribute("data-wimg")||im.getAttribute("data-wgallery")));
   ids.forEach(id=>{
-    const c=imgCache[id];
+    let c=imgCache[id];
+    if(c&&c.none&&c.q!=null&&c.q!==imgQ(id)){delete imgCache[id];c=undefined;} // 记着没图，但词条后来改了：重新找
     if(Array.isArray(c)||(c&&c.none))applyImg(id); // 有图 / 记着没图：直接用
     else if(c===undefined)fetchWiki(id);
   });
-  populateRowImgs();
+  populateRowImgs(R);
 }
 /* ===== per-row thumbnails inside 对照表 (forms[i][3] = wikipedia page title) ===== */
 let rowImgCache={};
@@ -255,9 +258,9 @@ async function fetchRowImg(title){
   applyRowImg(title);
   imgSave();
 }
-function populateRowImgs(){
+function populateRowImgs(R){
   const titles=new Set();
-  document.querySelectorAll("img.rowthumb[data-rowimg]").forEach(im=>titles.add(im.getAttribute("data-rowimg")));
+  (R||document).querySelectorAll("img.rowthumb[data-rowimg]").forEach(im=>titles.add(im.getAttribute("data-rowimg")));
   titles.forEach(t=>{
     const c=rowImgCache[t];
     if(typeof c==="string"&&c!=="pending")applyRowImg(t);
@@ -333,9 +336,12 @@ function renderList(){
   renderPtags();if(cat==="pattern"&&ptag!=="all")arr=arr.filter(w=>(w.tag||"其他")===ptag);
   if(filter!=="all"){const S=state.srs||{},st=w=>masteryOf(w)>=1?"known":S[w.id]?"practicing":"fresh";arr=arr.filter(w=>(w.type||"word")!=="pattern"&&(filter==="learning"?st(w)!=="known":st(w)===filter));} // 学习中 / 没练过 / 已掌握：和上面的数字同一个算法（vocabStats），三个加起来 = 生词（规律不算）；learning = 旧的「未掌握」
   if(query){const q=query.toLowerCase();arr=arr.filter(w=>w.word.toLowerCase().includes(q)||w.zh.includes(query));}
-  if(!arr.length){box.innerHTML='<div class="empty">这个分类还没有内容。<br>问我新词/短语/台词，或用“添加”自己加进来。</div>';return;}
-  LIST_ARR=arr;const key=[cat,ptag,filter,query,sortBy].join("|"),keep=key===listKey?Math.max(LIST_PAGE,listShown):LIST_PAGE;listKey=key;listShown=0; // 同样的筛选再画（标了已掌握、同步回来）：画到原来那么多，不跳位置
+  if(!arr.length){LIST_ARR=[];listShown=0;listKey="";if(listIO)listIO.disconnect();box.innerHTML='<div class="empty">这个分类还没有内容。<br>问我新词/短语/台词，或用“添加”自己加进来。</div>';return;}
+  LIST_ARR=arr;const key=[cat,ptag,filter,query,sortBy].join("|"),same=key===listKey,keep=same?Math.max(LIST_PAGE,listShown):LIST_PAGE;listKey=key;listShown=0; // 同样的筛选再画（标了已掌握、同步回来）：画到原来那么多，不跳位置
+  // 同样的筛选重画（标记已掌握、删除、同步回来）：记下屏幕顶上那张卡的位置，画完把它放回原处（新画的卡片高度是估的，不放回会跳）
+  let anchor=null;if(same){const top=box.getBoundingClientRect().top;if(box.getClientRects().length&&top<0){const c=[...box.children].find(el=>el.classList&&el.classList.contains("card")&&el.getBoundingClientRect().bottom>0);if(c)anchor={id:c.dataset.id,y:c.getBoundingClientRect().top};}}
   box.innerHTML="";appendCards(keep);
+  if(anchor){const c=box.querySelector('.card[data-id="'+(window.CSS&&CSS.escape?CSS.escape(anchor.id):anchor.id)+'"]');if(c){const d=c.getBoundingClientRect().top-anchor.y;if(Math.abs(d)>1)window.scrollBy(0,d);}}
 }
 // 📱 卡片按需画：一次画 40 张，滚到底附近再画下一批（以前 500 多个词一次全画，四万多个元素，手机上切到「📖 词汇」、改一个词都要卡一下）；
 //   卡片里的中文、词形、例句（点开才看得到的部分）也是点开时才画
@@ -374,8 +380,10 @@ function appendCards(n){
   const old=document.getElementById("list-more");if(old)old.remove();
   const next=LIST_ARR.slice(listShown,listShown+(n||LIST_PAGE));listShown+=next.length;
   const left=LIST_ARR.length-listShown;
-  box.insertAdjacentHTML("beforeend",next.map(cardHtml).join("")+(left>0?`<div id="list-more" class="list-more"><button type="button" data-more="1">显示更多（还有 ${left} 个）</button></div>`:""));
-  populateImgs();
+  const tmp=document.createElement("div");tmp.innerHTML=next.map(cardHtml).join("");const batch=[...tmp.children];
+  batch.forEach(c=>box.appendChild(c));
+  if(left>0)box.insertAdjacentHTML("beforeend",`<div id="list-more" class="list-more"><button type="button" data-more="1">显示更多（还有 ${left} 个）</button></div>`);
+  batch.forEach(c=>populateImgs(c)); // 只处理这一批
   const more=document.getElementById("list-more");
   if(more&&"IntersectionObserver" in window){if(!listIO)listIO=new IntersectionObserver(es=>{if(es.some(x=>x.isIntersecting)){listIO.disconnect();appendCards();}},{rootMargin:"800px 0px"});listIO.disconnect();listIO.observe(more);}
 }
@@ -485,7 +493,7 @@ document.getElementById("list").addEventListener("click",async e=>{
     const L=LIST_ARR.filter(w=>w.type==="sentence"||w.type==="pattern"); // 按当前筛选的整个列表（卡片是分批画的，不能从页面上数）
     openReader(L.map(readerFromWord),L.indexOf(w0));return;
   }
-  const body=card.querySelector(".body");if(body&&!body.childElementCount&&w0){body.innerHTML=cardBodyHtml(w0);populateImgs();} // 第一次点开才画详情
+  const body=card.querySelector(".body");if(body&&!body.childElementCount&&w0){body.innerHTML=cardBodyHtml(w0);populateImgs(card);} // 第一次点开才画详情
   card.classList.toggle("open");
 });
 // 全屏查看页顶栏的「标记已掌握 / 删除」：不带 act 时只返回当前状态
