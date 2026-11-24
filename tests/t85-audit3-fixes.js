@@ -42,7 +42,7 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
   // ---- AI 额度面板：同一个重置时间只强制读一次 ----
   const qa = W("web/quota.js");
   const qctx = { console, Date, Math, JSON, String, Array, Object, Promise, setTimeout, clearTimeout, setInterval() {}, document: { addEventListener() {}, getElementById: () => ({ innerHTML: "" }), createElement: () => ({}), head: { append() {} }, documentElement: { classList: { contains: () => false } }, hidden: false } };
-  let calls = 0; qctx.U = { esc: s => s, json: async () => { calls++; return { ok: true, reset: Date.now() - 1000, days: {}, today: "2026-11-23" }; }, day: () => "2026-11-23" };
+  let calls = 0; const RESET = Date.now() - 1000; qctx.U = { esc: s => s, json: async () => { calls++; return { ok: true, reset: RESET, days: {}, today: "2026-11-23" }; }, day: () => "2026-11-23" };
   qctx.window = qctx; vm.createContext(qctx);
   try { vm.runInContext(qa, qctx); for (let i = 0; i < 5; i++) { try { qctx.quotaHtml(); } catch (e) {} await new Promise(res => setTimeout(res, 5)); } ok(calls <= 2, "quota: past-reset data doesn't refetch on every paint (" + calls + " fetches)"); }
   catch (e) { ok(/forcedFor !== J\.reset/.test(qa), "quota guard (static): " + e.message); }

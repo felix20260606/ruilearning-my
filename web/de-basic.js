@@ -33,7 +33,7 @@
   #view-basic .db .ib{border:1px solid var(--ui-line-2);background:var(--ui-surface-2);color:var(--ui-ink);border-radius:9px;min-width:36px;min-height:34px;padding:0 8px;font:inherit;font-size:14px;cursor:pointer}
   #view-basic .db .ib.on{background:var(--ui-red,#e5484d);color:#fff;border-color:transparent}
   #view-basic .db .res{grid-column:1/-1;font-size:13.5px;line-height:1.6}#view-basic .db .res .ok{color:var(--ui-green)}#view-basic .db .res .no{color:var(--ui-red,#ff8080);text-decoration:underline wavy}
-  #view-basic .db table{border-collapse:collapse;width:100%;font-size:14px;margin:6px 0 4px}#view-basic .db td,#view-basic .db th{border-bottom:1px solid var(--ui-line);padding:6px 8px;text-align:left;vertical-align:top}
+  #view-basic .db table{border-collapse:collapse;width:100%;font-size:14px;margin:6px 0 4px}@media(max-width:700px){.db table{display:block;overflow-x:auto;max-width:100%}} /* 手机上宽表（形容词词尾、情态动词）在表里横着滑，不撑宽整页 */#view-basic .db td,#view-basic .db th{border-bottom:1px solid var(--ui-line);padding:6px 8px;text-align:left;vertical-align:top}
   #view-basic .db th{color:var(--ui-muted);font-weight:700;font-size:12.5px}#view-basic .db td .s{cursor:pointer;border-bottom:1px dashed var(--ui-line-2)}
   #view-basic .db .tip{background:color-mix(in srgb,var(--ui-pur) 10%,transparent);border:1px solid var(--ui-pur-line,var(--ui-line));border-radius:12px;padding:10px 12px;margin:8px 0;font-size:13.5px;line-height:1.7;color:var(--ui-ink-2)}
   #view-basic .db .tip b{color:var(--ui-ink)}#view-basic .db .slow{display:flex;align-items:center;gap:6px;color:var(--ui-muted);font-size:13px;margin:0 0 10px}
@@ -192,12 +192,34 @@
       sec("zahl:months", 3, "月份", "「在五月」说 im Mai。", '<div class="abc">' + MONTHS.map((m, j) => '<button data-say="' + esc(m) + '"><b>' + (j + 1) + "</b><small>" + esc(m) + "</small></button>").join("") + "</div>") +
       sec("zahl:time", 4, "几点了", "halb 是「差半小时到下一个整点」：halb vier = 3:30，不是 4:30。", TIME.map((t, j) => row("zahl:t:" + j, t[0], t[1])).join("")) + "</div>";
   }
-  const VIEWS = { start, laut, satz, gram, zahl };
+  // 📚 语法速查（内容在 de-grammar-data.js 的 window.DE_GRAM_REF，第一次打开才加载）：格变化、形容词词尾、动词变位、介词……表格查
+  let refP = null, refQ = "";
+  function refLoad() { if (window.DE_GRAM_REF) return Promise.resolve(); return refP || (refP = new Promise(res => { const s = document.createElement("script"); s.src = "de-grammar-data.js?v=6e8bb232"; s.onload = s.onerror = res; document.head.append(s); }).then(() => { if (cur === "ref") draw(); })); }
+  // 搜索：格的几种叫法都算（Dativ = 三格 = Dat、Akkusativ = 四格 = Akk…）
+  const REF_ALIAS = [["dativ", "三格", "dat"], ["akkusativ", "四格", "akk"], ["nominativ", "一格", "nom"], ["genitiv", "二格", "gen"], ["perfekt", "完成时"], ["präteritum", "过去时"], ["konjunktiv", "虚拟"], ["passiv", "被动"], ["adjektiv", "形容词"], ["präposition", "介词"], ["relativ", "关系"]];
+  function refHit(text, q) {
+    q = String(q || "").trim().toLowerCase(); if (!q) return true; const t = String(text).replace(/<[^>]+>/g, " ").toLowerCase();
+    const alt = REF_ALIAS.find(a => a.some(x => x === q || (q.length >= 3 && x.startsWith(q))));
+    return (alt ? alt : [q]).some(x => t.includes(x));
+  }
+  function ref() {
+    const L = window.DE_GRAM_REF; if (!L) { refLoad(); return '<div class="db"><h1>📚 语法速查</h1><p class="lead">载入中…</p></div>'; }
+    const S = L;
+    return '<div class="db"><h1>📚 语法速查</h1><p class="lead">A1–B1 最常用的语法表：冠词和格、代词、形容词词尾、动词变位、完成时、介词、语序……查的时候直接搜（中文、德语都行），例句点着能听。入门先看「📐 语法入门」。</p>' + slowBar() +
+      '<input class="ref-q" data-refq placeholder="搜：Dativ、形容词词尾、weil、Perfekt…" value="' + esc(refQ) + '" style="width:100%;height:40px;border-radius:10px;border:1px solid var(--ui-line-2);background:var(--ui-surface-2);color:var(--ui-ink);padding:0 12px;font:inherit;font-size:15px;margin:4px 0 12px">' +
+      S.map(g => '<div class="refw"' + (refHit(g[1] + " " + g[2] + " " + g[3], refQ) ? "" : ' style="display:none"') + ">" + sec("ref:" + g[0], L.indexOf(g) + 1, g[1], g[2], g[3]) + "</div>").join("") + '<p class="lead refnone"' + (S.some(g => refHit(g[1] + " " + g[2] + " " + g[3], refQ)) ? ' style="display:none"' : "") + ">没找到，换个词试试（中文、德语都行）</p></div>";
+  }
+  const VIEWS = { start, laut, satz, gram, ref, zahl };
 
   let root = null, cur = "start";
   function init() {
     if (root) return; root = document.getElementById("view-basic"); if (!root) return;
     const st = document.createElement("style"); st.textContent = CSS; document.head.append(st);
+    root.addEventListener("input", e => { // 📚 语法速查的搜索：按文字筛（不重画，输入框不丢焦点）
+      if (!e.target.matches || !e.target.matches("[data-refq]")) return; refQ = e.target.value; let n = 0;
+      root.querySelectorAll(".db .refw").forEach(el => { const on = refHit(el.innerHTML, refQ); el.style.display = on ? "" : "none"; if (on) n++; });
+      const none = root.querySelector(".refnone"); if (none) none.style.display = n ? "none" : "";
+    });
     root.addEventListener("click", e => {
       if (window.VL !== "de") return;
       const t = e.target;

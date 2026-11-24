@@ -95,8 +95,8 @@
   // 🇩🇪 学德语时：英语专用的页面藏起来（英语入门、英语语法速查、插件存的英语词句），各语言完全分开；
   //   说（speak-data-de.js）、读（tagesschau 新闻）、写（歌德写作）、📻 听力节目（DW 慢速新闻）、🎬 视频（只列德语字幕的）、🧩 练习课、🎧 听力练习都是德语版。样式在 index.css 的 html[data-lang="de"]
   var DE=window.VL==='de', DE_OFF={}; // 说、读、写、听力节目、考试（歌德）都有德语版了
-  if(DE)SECS.basic=[['start','🧭 从这开始'],['laut','🔤 字母和发音'],['satz','👋 常用句'],['gram','📐 语法入门'],['zahl','🔢 数字和时间']]; // 🌱 德语入门（de-basic.js）
-  var VOCAB_MODES=DE?/^(err|stats|pump|list)$/:/^(err|stats|pump|saved|list)$/, CUR='', busy=false;
+  if(DE)SECS.basic=[['start','🧭 从这开始'],['laut','🔤 字母和发音'],['satz','👋 常用句'],['gram','📐 语法入门'],['ref','📚 语法速查'],['zahl','🔢 数字和时间']]; // 🌱 德语入门（de-basic.js）
+  var VOCAB_MODES=/^(err|stats|pump|saved|list)$/, CUR='', busy=false;
   try{if(!localStorage.getItem('drill:seen')){localStorage.setItem('drill:seen','1');if(localStorage.getItem('en_sub_listen'))localStorage.setItem('en_sub_listen','drill');}}catch(e){} // 新加的「🧩 练习课」第一次默认选它（新标签排最前、默认选最新）
   function getSub(w){var d=SECS[w][0][0];try{var v=localStorage.getItem('en_sub_'+w);if(SECS[w].some(function(x){return x[0]===v;}))return v;}catch(e){}return d;}
   function clickMode(m){var b=document.querySelector('.modes button[data-mode="'+m+'"]');if(b&&!b.classList.contains('on'))b.click();}
@@ -256,6 +256,7 @@
     if(lBtn)lBtn.classList.toggle('on',which==='lexam');
     if(rBtn)rBtn.classList.toggle('on',which==='rexam');
     basics.style.display=which==='basics'?'block':'none';
+    if(which==='basics'&&window.VL==='de'&&!basics.__de){basics.__de=1;var gs=document.createElement('script');gs.src="goethe-basics.js?v=86e49e03";gs.onload=function(){if(window.goetheBasicsHtml)basics.innerHTML=window.goetheBasicsHtml();};document.head.appendChild(gs);} // 🇩🇪 学德语：常识换成歌德考试常识（goethe-basics.js，第一次打开才加载）
     notesV.style.display=isNotes?'block':'none';
     if(exV){exV.style.display=isEx?'block':'none';if(isEx&&window.examShow)examShow(exV,which==='lexam'?'listening':'reading');}
     if(isNotes&&ifr&&!ifr.getAttribute('src'))ifr.setAttribute('src','ielts-notes.html');
@@ -271,5 +272,5 @@
   if(wBtn)wBtn.onclick=function(){if(window.enShow)enShow('write','writing');}; // 旧的跳转（每日一练「写」）点这个隐藏按钮 → 「✍️ 写 → 📝 写作批改」
   var s='';try{s=localStorage.getItem('ielts_sub')||'';}catch(e){}
   var DEX=window.VL==='de'; if(DEX){var ti=document.getElementById('tab-ielts');if(ti)ti.textContent='🎓 歌德';} // 🇩🇪 学德语：这一页是歌德模考（听力 / 阅读），雅思的笔记和常识藏起来（index.css）
-  sw(DEX?(/^(lexam|rexam)$/.test(s)?s:'lexam'):(/^(basics|notes|lexam|rexam)$/.test(s)?s:'lexam')); // 新加的「听力模考」排最前、第一次打开默认它
+  sw(DEX?(/^(lexam|rexam|basics)$/.test(s)?s:'lexam'):(/^(basics|notes|lexam|rexam)$/.test(s)?s:'lexam')); // 新加的「听力模考」排最前、第一次打开默认它
 })();

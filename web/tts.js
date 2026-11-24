@@ -104,7 +104,11 @@
   function realOf(w) { return (REAL && REAL[String(w || "").toLowerCase().trim()]) || null; }
   function word(w, o) { // 真人录音（upload.wikimedia.org 打不开时 NET 换后台中转）；没有 / 播不了就 say()
     o = o || {}; var x = realOf(w); if (!x) { if (!REAL) realLoad(); say(w, o); return; }
-    hush(); var my = sayId, a = new Audio(window.NET ? NET.src(x.u) : x.u), fell = false; realA = a;
+    url(x.u, w, o);
+  }
+  function url(u, w, o) { // 放一段真人录音（如德语查词的维基共享资源录音）；放不了就用合成声音读 w
+    o = o || {}; if (!u) { say(w, o); return; }
+    hush(); var my = sayId, a = new Audio(window.NET ? NET.src(u) : u), fell = false; realA = a;
     a.playbackRate = Math.max(0.7, Math.min(1, o.rate || 1));
     var fall = function () { if (fell || my !== sayId || realA !== a) return; fell = true; realA = null; say(w, o); };
     a.onended = function () { if (my === sayId && realA === a) { realA = null; if (o.end) o.end(); } };
@@ -113,6 +117,6 @@
     var pr = a.play(); if (pr && pr.catch) pr.catch(function (e) { if (e && e.name === "NotAllowedError") fall(); });
   }
   window.TTS = { play: play, stop: stop, load: load, mode: mode, setMode: setMode, key: key, clean: clean, srcOf: srcOf,
-    say: say, sys: sys, hush: hush, word: word, realLoad: realLoad, realOf: realOf, voiceFor: voiceFor, bcpOf: bcpOf };
+    say: say, sys: sys, hush: hush, word: word, url: url, realLoad: realLoad, realOf: realOf, voiceFor: voiceFor, bcpOf: bcpOf };
   if (mode() === "ai") load();
 })();

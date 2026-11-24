@@ -119,7 +119,7 @@
     pop.addEventListener("click", e => {
       const b = e.target.closest("[data-a]"); if (!b) return; const a = b.dataset.a;
       if (a === "pcorp") { const w = pWord; close(); if (window.corpusShow) window.corpusShow(w); return; } // 🔎 真人例句（corpus.js，按需加载）
-      if (a === "px") close(); else if (a === "psay") say(b.dataset.t || pWord); else if (a === "padd") addWord(b);
+      if (a === "px") close(); else if (a === "psay" && b.dataset.au && window.TTS && TTS.url) TTS.url(b.dataset.au, b.dataset.t || pWord, { lang: "de" }); /* 🇩🇪 有真人录音（维基共享资源）先放录音 */ else if (a === "psay") say(b.dataset.t || pWord); else if (a === "padd") addWord(b);
       else if (a === "mk") { const m = b.dataset.m; b.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b && !!m)); mark(pWord, m); }
     });
     // 点卡片外面关掉（点的是另一个词就换成那个词）；Esc 关；电脑上滚动就关（贴着单词的位置不对了）
@@ -144,7 +144,7 @@
   function html(w, d, loading) {
     const word = (d && d.word) || w, cam = "https://dictionary.cambridge.org/dictionary/english-chinese-simplified/" + encodeURIComponent(word.toLowerCase());
     const g = pEl && typeof VS_GRAM_NAME !== "undefined" ? [...pEl.classList].filter(c => /^g-/.test(c)).map(c => VS_GRAM_NAME[c.slice(2)]).filter(Boolean) : [];
-    let h = '<div class="hd"><b>' + (d && d.gender ? '<span class="gd ' + esc(d.gender) + '">' + esc(d.gender) + "</span> " : "") + esc(word) + "</b>" + (d && d.lemma ? '<span class="ph">← ' + esc(d.lemma) + "</span>" : "") + (d && d.phon ? '<span class="ph">' + esc(d.phon) + "</span>" : "") + '<button data-a="psay" data-t="' + esc(word) + '" title="朗读">🔊</button><button class="x" data-a="px" title="关闭">✕</button></div>';
+    let h = '<div class="hd"><b>' + (d && d.gender ? '<span class="gd ' + esc(d.gender) + '">' + esc(d.gender) + "</span> " : "") + esc(word) + "</b>" + (d && d.lemma ? '<span class="ph">← ' + esc(d.lemma) + "</span>" : "") + (d && d.phon ? '<span class="ph">' + esc(d.phon) + "</span>" : "") + '<button data-a="psay" data-t="' + esc(word) + '"' + (d && d.audio && window.VL === "de" ? ' data-au="' + esc(d.audio) + '" title="真人发音（维基共享资源）">🎙' : ' title="朗读">🔊') + '</button><button class="x" data-a="px" title="关闭">✕</button></div>';
     if (loading) h += '<div class="ld">查询中…</div>';
     else if (d) {
       const zh = (Array.isArray(d.zh) ? d.zh.join("；") : d.zh || "") + (Array.isArray(d.zhs) && d.zhs.length ? "（" + d.zhs.map(x => (x.pos ? x.pos + " " : "") + (x.terms || []).slice(0, 3).join("、")).join("；") + "）" : "");

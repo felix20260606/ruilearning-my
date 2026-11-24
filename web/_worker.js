@@ -468,6 +468,25 @@ async function gtrans(text, tl, bd, sl) {
 //   变形如 ging 会给出原形 lemma）+ Tatoeba 德语例句；存 KV「d/de/词」30 天。结构和英语的一样，多 gender、lemma 两个字段
 const WIKT_UA = { "User-Agent": "ruilearning-my/1.0 (https://ruilearning-my.pages.dev; personal study site)" }; // 维基媒体要求 UA 带联系方式，不然容易被限流
 const stripHtml = h => String(h || "").replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/\s+/g, " ").trim();
+// 维基共享资源的录音地址要用文件名的 MD5 算目录（Workers 的 crypto.subtle 不一定有 MD5，这里自己算）；用转好的 mp3（iPhone Safari 放不了 .ogg）
+function md5(str) {
+  const b = new TextEncoder().encode(str), n = ((b.length + 8) >>> 6) + 1, x = new Uint32Array(n * 16);
+  for (let i = 0; i < b.length; i++) x[i >> 2] |= b[i] << ((i % 4) * 8);
+  x[b.length >> 2] |= 0x80 << ((b.length % 4) * 8); x[n * 16 - 2] = b.length * 8;
+  const K = [], S = [7, 12, 17, 22, 5, 9, 14, 20, 4, 11, 16, 23, 6, 10, 15, 21]; for (let i = 0; i < 64; i++) K[i] = Math.floor(Math.abs(Math.sin(i + 1)) * 4294967296) >>> 0;
+  let a0 = 0x67452301, b0 = 0xefcdab89, c0 = 0x98badcfe, d0 = 0x10325476;
+  for (let o = 0; o < x.length; o += 16) {
+    let A = a0, B = b0, C = c0, D = d0;
+    for (let i = 0; i < 64; i++) {
+      let F, g; const r = i >> 4;
+      if (r === 0) { F = (B & C) | (~B & D); g = i; } else if (r === 1) { F = (D & B) | (~D & C); g = (5 * i + 1) % 16; } else if (r === 2) { F = B ^ C ^ D; g = (3 * i + 5) % 16; } else { F = C ^ (B | ~D); g = (7 * i) % 16; }
+      const t = D; D = C; C = B; const sum = (A + F + K[i] + x[o + g]) >>> 0, sh = S[r * 4 + (i % 4)]; B = (B + ((sum << sh) | (sum >>> (32 - sh)))) >>> 0; A = t;
+    }
+    a0 = (a0 + A) >>> 0; b0 = (b0 + B) >>> 0; c0 = (c0 + C) >>> 0; d0 = (d0 + D) >>> 0;
+  }
+  return [a0, b0, c0, d0].map(v => [0, 8, 16, 24].map(s => ((v >>> s) & 255).toString(16).padStart(2, "0")).join("")).join("");
+}
+const commonsMp3 = f => { const n = String(f).trim().replace(/ /g, "_"), name = n.charAt(0).toUpperCase() + n.slice(1), h = md5(name), e = encodeURIComponent(name); return "https://upload.wikimedia.org/wikipedia/commons/transcoded/" + h[0] + "/" + h.slice(0, 2) + "/" + e + "/" + e + ".mp3"; };
 async function wiktDe(w) {
   const cap = w.charAt(0).toUpperCase() + w.slice(1), tries = [...new Set([w, cap, w.toLowerCase()])];
   for (const t of tries) {
@@ -480,22 +499,23 @@ async function wiktDe(w) {
       if (en.length < 6) en.push({ pos: String(x.partOfSpeech || "").toLowerCase(), def, ex: df.parsedExamples && df.parsedExamples[0] ? stripHtml(df.parsedExamples[0].example) : "" });
     }));
     if (!en.length) continue;
-    let gender = "", phon = "";
+    let gender = "", phon = "", audio = "";
     try { // 名词的性、音标：页面源码里的 {{de-noun|n…}}、{{IPA|de|…}}
       const r = await fetch("https://en.wiktionary.org/w/api.php?action=parse&prop=wikitext&format=json&formatversion=2&page=" + encodeURIComponent(t), { headers: WIKT_UA, cf: { cacheTtl: 86400 } });
       const wt = r.ok ? String(((await r.json()).parse || {}).wikitext || "") : "", i = wt.indexOf("==German==");
       if (i >= 0) { const rest = wt.slice(i + 10), e = rest.search(/\n==[^=]/), sec = e < 0 ? rest : rest.slice(0, e);
         const g = /\{\{de-noun\|([mfn])\b/.exec(sec) || /\{\{de-ndecl\|([mfn])\b/.exec(sec); if (g) gender = { m: "der", f: "die", n: "das" }[g[1]];
-        const ip = /\{\{IPA\|de\|([^}|]+)/.exec(sec); if (ip) phon = ip[1].trim(); }
+        const ip = /\{\{IPA\|de\|([^}|]+)/.exec(sec); if (ip) phon = ip[1].trim();
+        const au = /\{\{audio\|de\|([^}|]+\.(?:ogg|oga|wav|mp3|flac))/i.exec(sec); if (au) audio = commonsMp3(au[1]); } // 🎙 真人录音（维基共享资源）
     } catch (e) {}
-    return { title: t, en, gender, phon, lemma: nDef && nForm === nDef ? lemmas[0] : "" }; // 只有全是「…的变形」才算有原形（Essen 有「Esse 的复数」这一条，但它本身就是原形）
+    return { title: t, en, gender, phon, audio, lemma: nDef && nForm === nDef ? lemmas[0] : "" }; // 只有全是「…的变形」才算有原形（Essen 有「Esse 的复数」这一条，但它本身就是原形）
   }
   return null;
 }
 async function dictDe(req, env, u) {
   const w = String(u.searchParams.get("w") || "").normalize("NFC").trim().replace(/\s+/g, " ");
   if (!w || w.length > 80 || !/^\p{L}[\p{L}0-9' .,?!-]*$/u.test(w)) return json({ ok: false, error: "bad word" }, 400);
-  const kv = env.CAPTIONS, key = "d/de/" + w; // 德语大小写不同是不同的词（arm 穷 / Arm 胳膊、essen / Essen）：按原样存
+  const kv = env.CAPTIONS, key = "d/de2/" + w; // de2：加了真人录音（audio）以后换的键，旧的不用； 德语大小写不同是不同的词（arm 穷 / Arm 胳膊、essen / Essen）：按原样存
   try {
     const hit = kv && (await kv.get(key, "json")); if (hit && !(await freshOf(req, u, kv))) return json(Object.assign({ ok: true, cached: true }, hit));
     const one = w.split(" ").length <= 3, single = !w.includes(" ");
@@ -505,7 +525,7 @@ async function dictDe(req, env, u) {
       w.length <= 40 ? sent(new Request("https://x/"), env, new URL("https://x/api/sent?lang=de&w=" + encodeURIComponent(w.toLowerCase()))).then(r => r.json()).catch(() => null) : null,
     ]);
     const busy = !!(wk0 && wk0.busy), wk = busy ? null : wk0;
-    const out = { word: wk && wk.title || w, phon: wk ? wk.phon : "", audio: "", zh: "", zhs: [], en: wk ? wk.en : [], examples: [], gender: wk ? wk.gender : "", lemma: wk ? wk.lemma : "" };
+    const out = { word: wk && wk.title || w, phon: wk ? wk.phon : "", audio: wk ? wk.audio || "" : "", zh: "", zhs: [], en: wk ? wk.en : [], examples: [], gender: wk ? wk.gender : "", lemma: wk ? wk.lemma : "" };
     if (g) { out.zh = (g.sentences || []).map(x => x.trans || "").join(""); out.zhs = (g.dict || []).slice(0, 4).map(x => ({ pos: x.pos || "", terms: (x.terms || []).slice(0, 6) })); }
     if (ex && ex.ok) out.examples = (ex.items || []).slice(0, 5).map(x => [x.en, x.zh]);
     if (!out.zh && !out.en.length) return json({ ok: false, error: "not found", word: w }, 404);
@@ -1110,7 +1130,7 @@ Someone asked the learner a question in German and they answered quickly in spee
 Reply with ONLY one JSON object, no markdown: {"correct":true,"fb_zh":"简体中文：一两句反馈","fix":null,"better":"a natural German reply a fluent speaker might give, 1-2 sentences"}  — set "fix" to {"bad":"...","good":"...","why_zh":"..."} only for a clear grammar/word mistake.`;
 const COACH_SYS_DE = `You are a warm, practical German speaking coach writing in Simplified Chinese for a beginner who does not know how to start practising speaking German. ${DE_WHO}
 You get their self-assessment and their practice history. Make a concrete plan for the NEXT 7 DAYS using only these sections of the app (use the key in "sec"):
-rescue (救命句：听不懂/想不起时的 40 句), intro (自我介绍), daily (每日一练), dialog (情景对话：听全文、跟读、角色扮演), func (常用表达), drill (句型操练), pron (发音：最小对立词、发音规则、重音、绕口令), shadow (跟读), quick (快问快答), chat (AI 陪练), howto (这句话德语怎么说), topic (话题卡，AI 点评).
+rescue (救命句：听不懂/想不起时的 40 句), intro (自我介绍), daily (每日一练), dialog (情景对话：听全文、跟读、角色扮演), func (常用表达), drill (句型操练), pron (发音：最小对立词、发音规则、重音、绕口令、数字), shadow (跟读), quick (快问快答), chat (AI 陪练), howto (这句话德语怎么说), topic (话题卡，AI 点评), mock (歌德 B1 口语模拟考).
 Reply with ONLY one JSON object, no markdown:
 {"level_zh":"一句话判断他现在的水平","advice_zh":"2-3 句最重要的建议","days":[{"day":1,"title":"今天的主题","steps":[{"do_zh":"具体做什么、做多久","sec":"rescue"}]}],"encourage_zh":"一句鼓励"}
 In "do_zh" write plain Chinese for the learner (never write the section keys like rescue/dialog in the text; the button shows the section). Exactly 7 days, 2-4 steps each, about 15-20 minutes a day, start easy (listen and repeat, Umlaute) and build up to talking with the AI and topics.`;

@@ -318,7 +318,7 @@
       '<div class="sk-sub">连读、弱读、吞音<small>母语者说快了为什么听不懂</small></div><div class="sk-grid">' + card("conn", "all", (DE ? "发音规则和口语缩读 " : "连读和弱读 ") + ((P.connected || []).length) + " 条", DE ? "尾音清化、-er、-ig、st/sp、haste、gibt's……" : "gonna、wanna、didja、pick it up……", "听慢速和正常速度对比，跟读", isDone("p:conn")) +
       card("stress", "all", "重音和语调 " + (D.stress || []).length + " 句", "重读不同的词，意思就变了", ((D.stress || [])[0] || {}).en || "", false) +
       card("twist", "all", "绕口令 " + (D.twisters || []).length + " 条", DE ? "f/pf、z/zw、ch/sch、r/l" : "th、r/l、v/w、s/sh", (((D.twisters || [])[0] || {}).en || "").slice(0, 28) + "…", false) +
-      (DE ? "" : card("num", "all", "数字和价格", "电话、价格、时间、年份、大数、日期", "听写 + 说出来", false)) + "</div>";
+      card("num", "all", "数字和价格", "电话、价格、时间、年份、大数、日期", "听写 + 说出来", false) + "</div>";
   }
   function realNote(p) {
     if (DE) return '<small class="sk-h3n">系统德语语音</small>';
@@ -615,7 +615,7 @@
   }
 
   /* ---------- 🌱 入门：新手从这里开始 ---------- */
-  const SECINFO = { rescue: ["🆘 救命句", "听不懂、想不起词时的 40 句"], intro: ["🙋 自我介绍", "12 句，先把自己介绍顺"], daily: ["📅 每日一练", "每天自动安排，15 分钟"], dialog: ["🎭 情景对话", "听全文 → 跟读 → 角色扮演"], func: ["💬 表达和俚语", "按功能分类的地道说法"], drill: ["🔁 句型操练", "一个句型换着说，练到脱口而出"], pron: ["🔊 发音", DE ? "易混音、发音规则、重音、绕口令" : "易混音、连读、重音、绕口令、数字"], shadow: ["🎯 跟读", "120 句高频句"], clip: ["🎬 原声跟读", DE ? "插件里存的德语视频原声" : "你保存的 YouTube 真人原声"], quick: ["⚡ 快问快答", "听到问题 3 秒内开口，AI 判断"], chat: ["🤖 AI 陪练", "和 AI 用" + LGN + "聊天，顺手纠错"], howto: ["🧰 这句话怎么说", "中文 → 地道" + LGN + "三种说法"], topic: ["🗣 话题", DE ? "说 1–2 分钟，AI 按歌德 / telc 点评" : "说 1–2 分钟，AI 按雅思点评"], mock: ["🎓 模拟考", "雅思口语三部分完整走一遍"], useword: ["📘 用生词说一句", "生词本里的词，开口用一次"] };
+  const SECINFO = { rescue: ["🆘 救命句", "听不懂、想不起词时的 40 句"], intro: ["🙋 自我介绍", "12 句，先把自己介绍顺"], daily: ["📅 每日一练", "每天自动安排，15 分钟"], dialog: ["🎭 情景对话", "听全文 → 跟读 → 角色扮演"], func: ["💬 表达和俚语", "按功能分类的地道说法"], drill: ["🔁 句型操练", "一个句型换着说，练到脱口而出"], pron: ["🔊 发音", DE ? "易混音、发音规则、重音、绕口令" : "易混音、连读、重音、绕口令、数字"], shadow: ["🎯 跟读", "120 句高频句"], clip: ["🎬 原声跟读", DE ? "插件里存的德语视频原声" : "你保存的 YouTube 真人原声"], quick: ["⚡ 快问快答", "听到问题 3 秒内开口，AI 判断"], chat: ["🤖 AI 陪练", "和 AI 用" + LGN + "聊天，顺手纠错"], howto: ["🧰 这句话怎么说", "中文 → 地道" + LGN + "三种说法"], topic: ["🗣 话题", DE ? "说 1–2 分钟，AI 按歌德 / telc 点评" : "说 1–2 分钟，AI 按雅思点评"], mock: ["🎓 模拟考", DE ? "歌德 B1 口试三部分完整走一遍" : "雅思口语三部分完整走一遍"], useword: ["📘 用生词说一句", "生词本里的词，开口用一次"] };
   function goSec(k) { // 入门里的「去练」：有的是一栏，有的是 AI 工具或入门里的小页
     if (k === "rescue" || k === "intro") return open(k, k);
     if (only && k === "pron") { stopAll(); view = null; if (window.enShow) window.enShow("basic", "pron"); return; }
@@ -639,7 +639,7 @@
       '<button class="ui-btn pri" data-act="coach"' + (COACH && COACH.busy ? " disabled" : "") + ">" + (COACH && COACH.busy ? "AI 正在排计划……" : plan ? "重新定计划" : "🤖 生成我的计划") + "</button>" + (COACH && COACH.err ? '<div class="sk-tip">' + esc(COACH.err) + "</div>" : "") + "</div>" +
       (plan ? '<div class="sk-box"><h3>📋 AI 给你的计划</h3><div style="font-size:14.5px;line-height:1.7;color:var(--ui-ink-2)"><b>' + esc(plan.level_zh || "") + "</b><br>" + esc(plan.advice_zh || "") + "</div>" +
         (plan.days || []).map(d => '<div style="margin-top:10px"><b>第 ' + esc(d.day) + " 天 · " + esc(d.title || "") + "</b>" + (d.steps || []).map((s, i) => step("cp:" + d.day + ":" + i, s)).join("") + "</div>").join("") + (plan.encourage_zh ? '<div class="sk-tip">💪 ' + esc(plan.encourage_zh) + "</div>" : "") + "</div>" : "") +
-      '<div class="sk-sub">📚 每一栏是干嘛的</div><div class="sk-grid three">' + Object.keys(SECINFO).filter(k => !(DE && k === "mock")).map(k => '<button class="sk-card" data-go="' + k + '"><div class="t"><b>' + SECINFO[k][0] + "</b><span>" + SECINFO[k][1] + "</span></div><i>›</i></button>").join("") + "</div>";
+      '<div class="sk-sub">📚 每一栏是干嘛的</div><div class="sk-grid three">' + Object.keys(SECINFO).map(k => '<button class="sk-card" data-go="' + k + '"><div class="t"><b>' + SECINFO[k][0] + "</b><span>" + SECINFO[k][1] + "</span></div><i>›</i></button>").join("") + "</div>";
   }
   async function coachRun() {
     if (COACH && COACH.busy) return; COACH = { busy: true }; draw();
@@ -659,8 +659,8 @@
 
   /* ---------- 🧰 AI 工具 ---------- */
   function toolsView() {
-    return '<div class="sk-intro">用 AI 帮你开口：不知道怎么说的先查「这句话怎么说」；背过的生词用「用生词说一句」练会用' + (DE ? "。" : "；想知道自己什么水平就做一次「模拟考」。") + '</div><div class="sk-grid three">' +
-      (DE ? ["howto", "useword"] : ["howto", "useword", "mock"]).map(k => '<button class="sk-card" data-act="' + k + '" data-id="' + k + '"><div class="t"><b>' + SECINFO[k][0] + "</b><span>" + SECINFO[k][1] + "</span></div><i>›</i></button>").join("") + "</div>";
+    return '<div class="sk-intro">用 AI 帮你开口：不知道怎么说的先查「这句话怎么说」；背过的生词用「用生词说一句」练会用；想知道自己什么水平就做一次「模拟考」。</div><div class="sk-grid three">' +
+      ["howto", "useword", "mock"].map(k => '<button class="sk-card" data-act="' + k + '" data-id="' + k + '"><div class="t"><b>' + SECINFO[k][0] + "</b><span>" + SECINFO[k][1] + "</span></div><i>›</i></button>").join("") + "</div>";
   }
   let HOW = { q: "", busy: false, r: null, err: "" }, HOWHIST = LG("speak:howto", []);
   function howtoView() {
@@ -701,7 +701,20 @@
   }
   // 🎓 雅思口语模拟考：Part 1 四题、Part 2 一张卡（准备 1 分钟、说 2 分钟）、Part 3 两题；全部录完一起交给 AI 打分
   let MK = null;
+  // 🇩🇪 学德语：歌德 B1 口试三部分——Teil 1 一起计划（真考是两人对话，这里你一个人说出提议和理由）、Teil 2 话题陈述（看要点，说 3 分钟）、Teil 3 讨论（2 个观点问题）
+  const PLAN_DE = [
+    ["Eine Kollegin hat bald Geburtstag. Planen Sie zusammen ein Geschenk und eine kleine Feier im Büro.", "同事快过生日了：一起计划礼物和办公室里的小庆祝", ["Was schenken?", "Wann und wo feiern?", "Wer bringt was mit?", "Wie viel kostet es?"]],
+    ["Ein Freund aus Deutschland besucht Sie für ein Wochenende in Kuala Lumpur. Planen Sie das Programm.", "德国朋友来吉隆坡玩一个周末：一起安排行程", ["Was ansehen?", "Wo essen?", "Wie fahren?", "Was kostet es?"]],
+    ["Ihr Deutschkurs möchte zum Kursende einen Ausflug machen. Planen Sie den Ausflug.", "德语班结课想一起出去玩：一起计划出游", ["Wohin?", "Wann treffen?", "Wie hinkommen?", "Was mitnehmen?"]],
+    ["Ihr Team möchte zusammen Sport machen, um fit zu bleiben. Planen Sie, was Sie machen.", "团队想一起运动保持健康：一起计划做什么", ["Welcher Sport?", "Wann und wie oft?", "Wo?", "Wer organisiert?"]],
+  ];
+  function mockNewDe() {
+    const T = D.topics || [], sh = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+    const pl = PLAN_DE[Math.floor(Math.random() * PLAN_DE.length)], p2 = sh(T.filter(t => (t.points || []).length >= 3 && t.cat !== "观点"))[0], p3 = sh(T.filter(t => t.cat === "观点")).slice(0, 2);
+    MK = { i: -1, qs: [{ part: 1, q: pl[0], qzh: pl[1], points: pl[2], max: 120, prep: 30 }].concat(p2 ? [{ part: 2, q: p2.q, qzh: p2.qzh, points: p2.points, max: 180, prep: 60 }] : [], p3.map(t => ({ part: 3, q: t.q, qzh: t.qzh, max: 90 }))), ans: [], r: null };
+  }
   function mockNew() {
+    if (DE) return mockNewDe();
     const T = (D.topics || []), sh = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
     const p1 = sh(T.filter(t => t.cat === "日常" || t.cat === "兴趣")).slice(0, 4), p2 = sh(T.filter(t => (t.points || []).length >= 3 && t.cat !== "观点"))[0], p3 = sh(T.filter(t => t.cat === "观点")).slice(0, 2);
     MK = { i: -1, qs: p1.map(t => ({ part: 1, q: t.q, qzh: t.qzh, max: 40 })).concat(p2 ? [{ part: 2, q: p2.q, qzh: p2.qzh, points: p2.points, max: 130, prep: 60 }] : [], p3.map(t => ({ part: 3, q: t.q, qzh: t.qzh, max: 60 }))), ans: [], r: null };
@@ -710,18 +723,19 @@
     if (!MK) mockNew();
     const q = MK.qs[MK.i], x = q ? RES["mock:" + MK.i] || {} : {};
     let body;
-    if (MK.i < 0) body = '<div class="sk-box" style="margin-top:0"><div style="font-size:14.5px;line-height:1.8;color:var(--ui-ink-2)">共 ' + MK.qs.length + " 题、约 11 分钟，和真考一样：<br>• <b>Part 1</b>：4 个日常问题，每题说 2–4 句<br>• <b>Part 2</b>：一张话题卡，准备 1 分钟，说 1–2 分钟<br>• <b>Part 3</b>：2 个讨论问题，说出理由和例子<br>每题考官会读出来，你点 🎙 回答，说完点停止，下一题。全部做完 AI 按雅思标准打分（发音不算）。</div><div class=\"sk-center\"><button class=\"ui-btn pri\" data-act=\"mk-next\">开始考试</button></div></div>";
+    if (MK.i < 0 && DE) body = '<div class="sk-box" style="margin-top:0"><div style="font-size:14.5px;line-height:1.8;color:var(--ui-ink-2)">共 ' + MK.qs.length + " 题、约 10 分钟，仿照歌德 B1 口试：<br>• <b>Teil 1 一起计划</b>：真考是和搭档商量，这里你一个人说出提议、理由，也可以「假设对方说……」<br>• <b>Teil 2 话题陈述</b>：看要点，说 3 分钟左右（介绍话题、自己的经历、在你国家的情况、优缺点和你的看法、结尾）<br>• <b>Teil 3 讨论</b>：2 个观点问题，说出理由和例子<br>每题会先读出来，你点 🎙 回答，说完点停止，下一题。全部做完 AI 按歌德 / telc 标准打分（每项 25 分，总分 100，发音不算）。</div><div class=\"sk-center\"><button class=\"ui-btn pri\" data-act=\"mk-next\">开始考试</button></div></div>";
+    else if (MK.i < 0) body = '<div class="sk-box" style="margin-top:0"><div style="font-size:14.5px;line-height:1.8;color:var(--ui-ink-2)">共 ' + MK.qs.length + " 题、约 11 分钟，和真考一样：<br>• <b>Part 1</b>：4 个日常问题，每题说 2–4 句<br>• <b>Part 2</b>：一张话题卡，准备 1 分钟，说 1–2 分钟<br>• <b>Part 3</b>：2 个讨论问题，说出理由和例子<br>每题考官会读出来，你点 🎙 回答，说完点停止，下一题。全部做完 AI 按雅思标准打分（发音不算）。</div><div class=\"sk-center\"><button class=\"ui-btn pri\" data-act=\"mk-next\">开始考试</button></div></div>";
     else if (MK.i >= MK.qs.length) {
-      body = MK.busy ? '<div class="sk-box"><span class="sk-note">AI 考官在打分……</span></div>' : MK.err ? '<div class="sk-tip">' + esc(MK.err) + ' <button class="sk-ib" data-act="mk-rate">重试</button></div>' : MK.r ? (() => { const r = MK.r, B = r.band || {}; return '<div class="sk-box"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:baseline"><span style="font-size:36px;font-weight:900;color:var(--ui-pur-text)">' + esc(B.overall) + '</span><span class="sk-note" style="margin:0">流利连贯 ' + esc(B.FC) + " · 词汇 " + esc(B.LR) + " · 语法 " + esc(B.GRA) + "（发音没算）</span></div>" + '<div style="margin-top:6px;font-size:14.5px;line-height:1.7;color:var(--ui-ink-2)">' + esc(r.summary_zh || "") + "</div>" + ((r.strengths_zh || []).length ? '<div style="margin-top:6px;color:var(--ui-green,#7CE3B8);font-size:14px">' + r.strengths_zh.map(g => "👍 " + esc(g)).join("<br>") + "</div>" : "") + ((r.fixes || []).length ? '<h3 style="margin-top:12px">✏️ 改一改</h3>' + r.fixes.map(f => '<div class="sk-ph"><div class="t"><div class="z"><span style="color:var(--ui-red,#ff8080)">' + esc(f.bad) + '</span></div><div class="e">' + esc(f.good) + '</div><div class="z">' + esc(f.why_zh || "") + '</div></div><button class="sk-ib" data-say="' + esc(f.good) + '">🔊</button></div>').join("") : "") + "</div>"; })() : "";
-      body += '<div class="sk-box"><h3>你的回答（转成的文字）</h3>' + MK.qs.map((q2, i) => '<div class="sk-ph" style="display:block"><div class="z">Part ' + q2.part + " · " + esc(q2.q) + '</div><div class="e" style="font-weight:500">' + esc(MK.ans[i] || "（没录到）") + "</div></div>").join("") + '</div><div class="sk-center"><button class="ui-btn" data-act="mk-again">再考一次（换题）</button></div>';
-    } else body = '<div class="sk-box" style="margin-top:0"><div class="sk-note" style="margin:0">第 ' + (MK.i + 1) + " / " + MK.qs.length + " 题 · Part " + q.part + '</div><div class="sk-big" style="margin-top:6px">' + esc(q.q) + ' <button class="sk-ib" data-say="' + esc(q.q) + '">🔊</button></div><div class="sk-zh" style="display:block">' + esc(q.qzh || "") + "</div>" + (q.points ? '<div style="margin-top:8px;font-size:14.5px;color:var(--ui-ink-2);line-height:1.7">You should say:<br>' + q.points.map(p => "• " + esc(p)).join("<br>") + "</div>" : "") +
-      '<div class="sk-center" style="margin-top:12px">' + recBtn("mock:" + MK.i, "", q.max, q.part === 2 ? "开始说（最长 2 分钟）" : "回答") + '<button class="ui-btn" data-act="mk-next"' + (x.busy || x.on ? " disabled" : "") + ">" + (MK.i + 1 >= MK.qs.length ? "交卷打分" : "下一题 ▶") + '</button></div><div data-res="mock:' + MK.i + '">' + resHtml("mock:" + MK.i) + "</div></div>";
-    return '<div class="sk-bar">' + back + '</div><h2 class="sk-title">🎓 雅思口语模拟考<small>Part 1 → Part 2 → Part 3，AI 考官打分</small></h2>' + body;
+      body = MK.busy ? '<div class="sk-box"><span class="sk-note">AI 考官在打分……</span></div>' : MK.err ? '<div class="sk-tip">' + esc(MK.err) + ' <button class="sk-ib" data-act="mk-rate">重试</button></div>' : MK.r ? (() => { const r = MK.r, B = r.band || {}; return '<div class="sk-box"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:baseline"><span style="font-size:36px;font-weight:900;color:var(--ui-pur-text)">' + esc(B.overall) + (r.scale === "de" ? '<small style="font-size:14px">/100</small>' : "") + '</span><span class="sk-note" style="margin:0">' + (r.scale === "de" ? (r.cefr ? "约 " + esc(r.cefr) + " · " : "") + "流利连贯 " + esc(B.FC) + "/25 · 词汇 " + esc(B.LR) + "/25 · 语法 " + esc(B.GRA) + "/25" : "流利连贯 " + esc(B.FC) + " · 词汇 " + esc(B.LR) + " · 语法 " + esc(B.GRA)) + "（发音没算）</span></div>" + '<div style="margin-top:6px;font-size:14.5px;line-height:1.7;color:var(--ui-ink-2)">' + esc(r.summary_zh || "") + "</div>" + ((r.strengths_zh || []).length ? '<div style="margin-top:6px;color:var(--ui-green,#7CE3B8);font-size:14px">' + r.strengths_zh.map(g => "👍 " + esc(g)).join("<br>") + "</div>" : "") + ((r.fixes || []).length ? '<h3 style="margin-top:12px">✏️ 改一改</h3>' + r.fixes.map(f => '<div class="sk-ph"><div class="t"><div class="z"><span style="color:var(--ui-red,#ff8080)">' + esc(f.bad) + '</span></div><div class="e">' + esc(f.good) + '</div><div class="z">' + esc(f.why_zh || "") + '</div></div><button class="sk-ib" data-say="' + esc(f.good) + '">🔊</button></div>').join("") : "") + "</div>"; })() : "";
+      body += '<div class="sk-box"><h3>你的回答（转成的文字）</h3>' + MK.qs.map((q2, i) => '<div class="sk-ph" style="display:block"><div class="z">' + (DE ? "Teil " : "Part ") + q2.part + " · " + esc(q2.q) + '</div><div class="e" style="font-weight:500">' + esc(MK.ans[i] || "（没录到）") + "</div></div>").join("") + '</div><div class="sk-center"><button class="ui-btn" data-act="mk-again">再考一次（换题）</button></div>';
+    } else body = '<div class="sk-box" style="margin-top:0"><div class="sk-note" style="margin:0">第 ' + (MK.i + 1) + " / " + MK.qs.length + " 题 · " + (DE ? "Teil " : "Part ") + q.part + '</div><div class="sk-big" style="margin-top:6px">' + esc(q.q) + ' <button class="sk-ib" data-say="' + esc(q.q) + '">🔊</button></div><div class="sk-zh" style="display:block">' + esc(q.qzh || "") + "</div>" + (q.points ? '<div style="margin-top:8px;font-size:14.5px;color:var(--ui-ink-2);line-height:1.7">You should say:<br>' + q.points.map(p => "• " + esc(p)).join("<br>") + "</div>" : "") +
+      '<div class="sk-center" style="margin-top:12px">' + recBtn("mock:" + MK.i, "", q.max, q.part === 2 ? (DE ? "开始说（最长 3 分钟）" : "开始说（最长 2 分钟）") : DE && q.part === 1 ? "开始说（最长 2 分钟）" : "回答") + '<button class="ui-btn" data-act="mk-next"' + (x.busy || x.on ? " disabled" : "") + ">" + (MK.i + 1 >= MK.qs.length ? "交卷打分" : "下一题 ▶") + '</button></div><div data-res="mock:' + MK.i + '">' + resHtml("mock:" + MK.i) + "</div></div>";
+    return '<div class="sk-bar">' + back + '</div><h2 class="sk-title">' + (DE ? "🎓 歌德口语模拟考（B1）<small>Teil 1 → Teil 2 → Teil 3，AI 考官打分</small>" : "🎓 雅思口语模拟考<small>Part 1 → Part 2 → Part 3，AI 考官打分</small>") + "</h2>" + body;
   }
   async function mockRate() {
     MK.busy = true; MK.err = ""; draw();
-    const text = MK.qs.map((q, i) => "[Part " + q.part + "] Q: " + q.q + "\nA: " + (MK.ans[i] || "(no answer)")).join("\n\n");
-    try { const j = await AI.ask("speak", { prompt: "IELTS Speaking mock test, Parts 1-3 (judge all answers together)", text }); MK.busy = false; if (j.ok) { MK.r = j; markDone("mk:" + today()); fixesToErr(j.fixes, "雅思口语模拟考"); } else MK.err = j.error === "too short" ? "说得太少了，没法打分" : AI.msg(j, "AI 没打出分，点重试"); }
+    const text = MK.qs.map((q, i) => "[" + (DE ? "Teil " : "Part ") + q.part + "] Q: " + q.q + "\nA: " + (MK.ans[i] || "(no answer)")).join("\n\n");
+    try { const j = await AI.ask("speak", { lang: LC, prompt: DE ? "Goethe-Zertifikat B1 Sprechen mock test, Teil 1 (gemeinsam etwas planen, here as a monologue), Teil 2 (ein Thema präsentieren), Teil 3 (über ein Thema sprechen); judge all answers together" : "IELTS Speaking mock test, Parts 1-3 (judge all answers together)", text }); MK.busy = false; if (j.ok) { MK.r = j; markDone("mk:" + today()); fixesToErr(j.fixes, DE ? "歌德口语模拟考" : "雅思口语模拟考"); } else MK.err = j.error === "too short" ? "说得太少了，没法打分" : AI.msg(j, "AI 没打出分，点重试"); }
     catch (e) { MK.busy = false; MK.err = "网络问题"; }
     draw();
   }
@@ -762,7 +776,30 @@
   const MON = "January February March April May June July August September October November December".split(" ");
   const ordw = n => { const W = { 1: "first", 2: "second", 3: "third", 5: "fifth", 8: "eighth", 9: "ninth", 12: "twelfth", 20: "twentieth", 30: "thirtieth" }; if (W[n]) return W[n]; if (n > 20 && n % 10) return TENS[Math.floor(n / 10)] + "-" + (W[n % 10] || ONES[n % 10] + "th"); return w99(n) + "th"; };
   const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  // 🇩🇪 德语数字：21 = einundzwanzig（个位在前），1999 = neunzehnhundertneunundneunzig，3,50 € = drei Euro fünfzig，14:30 = vierzehn Uhr dreißig，der dritte März
+  const DONES = "null eins zwei drei vier fünf sechs sieben acht neun zehn elf zwölf dreizehn vierzehn fünfzehn sechzehn siebzehn achtzehn neunzehn".split(" "), DTENS = "_ _ zwanzig dreißig vierzig fünfzig sechzig siebzig achtzig neunzig".split(" ");
+  const dw99 = n => (n < 20 ? DONES[n] : (n % 10 ? (n % 10 === 1 ? "ein" : DONES[n % 10]) + "und" : "") + DTENS[Math.floor(n / 10)]);
+  const dw999 = n => { const h = Math.floor(n / 100), r = n % 100; return (h ? (h === 1 ? "ein" : DONES[h]) + "hundert" : "") + (r ? (r === 1 && h ? "eins" : dw99(r)) : h ? "" : "null"); };
+  function dWords(n) {
+    if (n === 0) return "null"; let out = "";
+    const mio = Math.floor(n / 1e6); if (mio) { out += (mio === 1 ? "eine Million" : dw999(mio) + " Millionen"); n %= 1e6; if (n) out += " "; }
+    const t = Math.floor(n / 1000), r = n % 1000; if (t) out += (t === 1 ? "ein" : dw999(t)) + "tausend"; if (r) out += r === 1 && t ? "eins" : dw999(r);
+    return out;
+  }
+  const DMON = "Januar Februar März April Mai Juni Juli August September Oktober November Dezember".split(" ");
+  const dOrd = n => (n === 1 ? "erste" : n === 3 ? "dritte" : n === 7 ? "siebte" : n === 8 ? "achte" : n < 20 ? DONES[n] + "te" : dw99(n) + "ste");
+  function numItemDe() {
+    const t = ["phone", "price", "time", "year", "big", "date"][rnd(0, 5)];
+    if (t === "phone") { const d = "01" + rnd(5, 7) + rnd(0, 9) + String(rnd(1000000, 9999999)); return { t: "电话", show: d.slice(0, 4) + " " + d.slice(4), ans: d, say: d.split("").map(c => DONES[+c]).join(" ") }; }
+    if (t === "price") { const a = rnd(1, 999), c = [0, 50, 90, 25, 99][rnd(0, 4)]; return { t: "价格", show: a + (c ? "," + String(c).padStart(2, "0") : "") + " €", ans: String(a) + (c ? String(c).padStart(2, "0") : ""), say: dWords(a) + " Euro" + (c ? " " + dWords(c) : "") }; }
+    if (t === "time") { const h = rnd(0, 23), m = [0, 5, 15, 30, 45, 20, 50][rnd(0, 6)]; return { t: "时间", show: h + ":" + String(m).padStart(2, "0"), ans: String(h) + String(m).padStart(2, "0"), say: (h === 1 ? "ein" : dWords(h)) + " Uhr" + (m ? " " + dWords(m) : "") }; }
+    if (t === "year") { const y = [rnd(1950, 1999), rnd(2001, 2035)][rnd(0, 1)]; return { t: "年份", show: String(y), ans: String(y), say: y < 2000 ? "neunzehnhundert" + (y % 100 ? dw99(y % 100) : "") : dWords(y) }; }
+    if (t === "big") { const n = [rnd(1100, 9900), rnd(12000, 99000), rnd(120000, 990000), rnd(1, 9) * 1e6 + rnd(1, 9) * 1e5][rnd(0, 3)], r = Math.round(n / 100) * 100; return { t: "大数", show: r.toLocaleString("de-DE"), ans: String(r), say: dWords(r) }; }
+    const m = rnd(0, 11), d = rnd(1, 28); return { t: "日期", show: d + ". " + DMON[m], ans: DMON[m].toLowerCase() + d, say: "der " + dOrd(d) + " " + DMON[m] };
+  }
+  window.SPEAK_DE_NUM = { dWords, dOrd }; // 测试用
   function numItem() {
+    if (DE) return numItemDe();
     const t = ["phone", "price", "time", "year", "big", "date"][rnd(0, 5)];
     if (t === "phone") { const d = "01" + rnd(0, 9) + String(rnd(1000000, 9999999)); return { t: "电话", show: d.slice(0, 3) + "-" + d.slice(3, 6) + " " + d.slice(6), ans: d, say: d.split("").map(c => (c === "0" ? "oh" : ONES[+c])).join(" ") }; }
     if (t === "price") { const a = rnd(1, 999), c = [0, 50, 90, 25, 99][rnd(0, 4)]; return { t: "价格", show: "RM" + a + (c ? "." + String(c).padStart(2, "0") : ""), ans: String(a) + (c ? String(c).padStart(2, "0") : ""), say: nWords(a) + " ringgit" + (c ? " " + nWords(c) : "") }; }
@@ -777,13 +814,13 @@
     const it = NM.it, key = "nm:" + NM.n;
     let body = "";
     if (!it) body = '<div class="sk-center"><button class="ui-btn pri" data-act="nm-go" data-m="listen">🎧 听写数字</button><button class="ui-btn" data-act="nm-go" data-m="say">🗣 看数字说出来</button></div>';
-    else if (NM.mode === "listen") body = '<div class="sk-note" style="text-align:center">' + esc(it.t) + '：听到的是什么？只填数字（日期填月份英文 + 日，比如 march3）</div><div class="sk-center"><button class="sk-ib" data-act="nm-play">🔊 再听</button><button class="sk-ib" data-act="nm-play" data-slow="1">🐢 慢速</button><input id="sk-num" placeholder="输入后回车" style="height:38px;border-radius:10px;border:1px solid var(--ui-line-2);background:var(--ui-surface-2);color:var(--ui-ink);padding:0 12px;font:inherit;font-size:17px;width:200px"></div>' +
+    else if (NM.mode === "listen") body = '<div class="sk-note" style="text-align:center">' + esc(it.t) + '：听到的是什么？只填数字（' + (DE ? "日期填德语月份 + 日，比如 märz3" : "日期填月份英文 + 日，比如 march3") + '）</div><div class="sk-center"><button class="sk-ib" data-act="nm-play">🔊 再听</button><button class="sk-ib" data-act="nm-play" data-slow="1">🐢 慢速</button><input id="sk-num" placeholder="输入后回车" style="height:38px;border-radius:10px;border:1px solid var(--ui-line-2);background:var(--ui-surface-2);color:var(--ui-ink);padding:0 12px;font:inherit;font-size:17px;width:200px"></div>' +
       (NM.ok != null ? '<div class="sk-center" style="font-size:17px">' + (NM.ok ? "✅ 对了：" : "❌ 正确答案：") + "<b>" + esc(it.show) + '</b>　<span class="sk-note">读作 ' + esc(it.say) + '</span></div><div class="sk-center"><button class="ui-btn pri" data-act="nm-go" data-m="listen">下一个 ▶</button></div>' : "");
-    else body = '<div class="sk-center"><div class="sk-timer" style="font-size:44px">' + esc(it.show) + '</div></div><div class="sk-note" style="text-align:center">' + esc(it.t) + "：用英语读出来</div><div class=\"sk-center\">" + recBtn(key, it.say, 10, "读") + '<button class="sk-ib" data-act="nm-play">听标准读法</button><button class="ui-btn" data-act="nm-go" data-m="say">下一个 ▶</button></div><div data-res="' + esc(key) + '">' + resHtml(key) + "</div>";
+    else body = '<div class="sk-center"><div class="sk-timer" style="font-size:44px">' + esc(it.show) + '</div></div><div class="sk-note" style="text-align:center">' + esc(it.t) + "：用" + LGN + "读出来</div><div class=\"sk-center\">" + recBtn(key, it.say, 10, "读") + '<button class="sk-ib" data-act="nm-play">听标准读法</button><button class="ui-btn" data-act="nm-go" data-m="say">下一个 ▶</button></div><div data-res="' + esc(key) + '">' + resHtml(key) + "</div>";
     return '<div class="sk-bar">' + back + '</div><h2 class="sk-title">数字和价格<small>电话、价格、时间、年份、大数、日期：一听就懵的最常见原因</small></h2><div class="sk-box" style="margin-top:0">' + body + '<div class="sk-note" style="text-align:center">' + (NM.n ? "听写对 " + NM.right + " / " + NM.n : "") + "</div></div>" +
-      '<div class="sk-box"><h3>读法要点</h3><div style="font-size:14px;line-height:1.8;color:var(--ui-ink-2)">• 电话一位一位读，0 读 oh：012-345 6789 → oh one two, three four five…<br>• 价格：RM12.50 → twelve ringgit fifty（口语常说 twelve fifty）<br>• 时间：7:45 → seven forty-five；7:05 → seven oh five<br>• 年份两位两位读：1998 → nineteen ninety-eight；2024 → twenty twenty-four；2005 → two thousand five<br>• 大数三位一组：15,300 → fifteen thousand three hundred；1,200,000 → one point two million<br>• 日期用序数：March 3 → March third</div></div>';
+      (DE ? '<div class="sk-box"><h3>读法要点</h3><div style="font-size:14px;line-height:1.8;color:var(--ui-ink-2)">• 21–99 个位在前：21 → einundzwanzig（一和二十），47 → siebenundvierzig；1 单独说 eins，在前面说 ein（einundzwanzig、einhundert）<br>• 整个数连成一个词：3456 → dreitausendvierhundertsechsundfünfzig；百万以上分开：zwei Millionen<br>• 年份：1999 → neunzehnhundertneunundneunzig；2024 → zweitausendvierundzwanzig<br>• 价格：3,50 € → drei Euro fünfzig（德语用逗号当小数点，用点当千位：12.000）<br>• 时间：14:30 → vierzehn Uhr dreißig（正式）；口语常说 halb drei（两点半！halb = 差半小时到下一个整点）、Viertel nach / vor drei<br>• 日期用序数：am dritten März、der 1. Mai = der erste Mai；7 → siebte、8 → achte，20 以上加 -ste（zwanzigste）<br>• 电话号码可以一位一位读（0176 → null eins sieben sechs），德国人也常两位一读：12 34 56 → zwölf vierunddreißig sechsundfünfzig</div></div>' : '<div class="sk-box"><h3>读法要点</h3><div style="font-size:14px;line-height:1.8;color:var(--ui-ink-2)">• 电话一位一位读，0 读 oh：012-345 6789 → oh one two, three four five…<br>• 价格：RM12.50 → twelve ringgit fifty（口语常说 twelve fifty）<br>• 时间：7:45 → seven forty-five；7:05 → seven oh five<br>• 年份两位两位读：1998 → nineteen ninety-eight；2024 → twenty twenty-four；2005 → two thousand five<br>• 大数三位一组：15,300 → fifteen thousand three hundred；1,200,000 → one point two million<br>• 日期用序数：March 3 → March third</div></div>');
   }
-  function numCheck(v) { if (!NM || !NM.it || NM.ok != null) return; const n = String(v || "").toLowerCase().replace(/[^a-z0-9]/g, ""); NM.ok = n === NM.it.ans || n === NM.it.ans.replace(/^0+/, ""); NM.n++; if (NM.ok) NM.right++; if (NM.n % 5 === 0) markDone("nm:" + today()); draw(); }
+  function numCheck(v) { if (!NM || !NM.it || NM.ok != null) return; const n = String(v || "").toLowerCase().replace(DE ? /[^\p{L}0-9]/gu : /[^a-z0-9]/g, ""); NM.ok = n === NM.it.ans || n === NM.it.ans.replace(/^0+/, ""); NM.n++; if (NM.ok) NM.right++; if (NM.n % 5 === 0) markDone("nm:" + today()); draw(); }
 
   /* ---------- ⚡ 快问快答：听问题，3 秒内开口，AI 判断答得通不通 ---------- */
   let QK = null; // {lv, list, i, phase:"ask"|"count"|"rec"|"judge"|"done", left, r, err}
@@ -933,7 +970,7 @@
   }
   // 🔙 页面历史：口语在哪一栏、打开了哪个条目（看不到口语页时不记）
   if (window.NAV) NAV.reg("speak", () => document.documentElement.classList.contains("show-speak") ? { sec, v: view ? { t: view.t, id: view.id } : null } : undefined, x => {
-    if (!x) return; const v = x.v && x.v.t && !(DE && (x.v.t === "mock" || x.v.t === "num")) ? { t: x.v.t, id: x.v.id } : null; // 德语没有雅思模拟考、英语数字
+    if (!x) return; const v = x.v && x.v.t ? { t: x.v.t, id: x.v.id } : null; // 德语没有雅思模拟考、英语数字
     if (x.sec === sec && JSON.stringify(v) === JSON.stringify(view && { t: view.t, id: view.id })) return;
     stopAll(); if (x.sec && SECS.some(s2 => s2[0] === x.sec) && !MOVED.includes(x.sec)) { sec = x.sec; LS("speak:sec", sec); } view = v; QZ = null; draw(); window.scrollTo(0, 0);
   });

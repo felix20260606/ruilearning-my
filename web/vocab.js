@@ -398,7 +398,7 @@ function refresh(){build();prunePending();counts();renderList();renderPending();
 // ⭐ 已保存：装了插件嵌插件页面（能编辑），没装显示网站只读版；插件晚一点连上会自动换过来
 // 插件同步的是插件设置里选的那个人（data-ban-user，旧版插件没有 = 主人）：和网站当前用户不是同一个人时不嵌插件页面，显示网站版
 function savedShow(){
-  const box=document.getElementById("savedbox"),ext=document.documentElement.getAttribute("data-ban-ext")||"",id=ext&&(document.documentElement.getAttribute("data-ban-user")||"")===(window.VU||"")?ext:"",web=!id&&!!window.savedWeb;
+  const box=document.getElementById("savedbox"),ext=document.documentElement.getAttribute("data-ban-ext")||"",id=ext&&window.VL!=="de"&&(document.documentElement.getAttribute("data-ban-user")||"")===(window.VU||"")?ext:"",web=!id&&!!window.savedWeb;
   box.classList.toggle("web",!id);
   if(id){const u="chrome-extension://"+id+"/saved.html",xf=document.getElementById("extframe");if(xf.getAttribute("src")!==u)xf.setAttribute("src",u);document.getElementById("ext-open").href=u;}
   else if(web)window.savedWeb.render(document.getElementById("ext-web"));
@@ -452,7 +452,7 @@ window.openVocabSettings=function(){const p=document.getElementById("export-pane
 function closeVocabSettings(){document.getElementById("export-panel").classList.remove("pop");document.getElementById("sp-mask").classList.remove("on");}
 document.getElementById("sp-close").onclick=closeVocabSettings;document.getElementById("sp-mask").onclick=closeVocabSettings;
 document.querySelectorAll(".modes button").forEach(b=>b.onclick=()=>{
-  if(window.VL==="de"&&/^(saved|grammar)$/.test(b.dataset.mode)){const l=document.querySelector('.modes button[data-mode="list"]');if(l&&l!==b)return l.click();} // 🇩🇪 英语专用的模式：学德语时不进（按钮也藏起来了）
+  if(window.VL==="de"&&/^(grammar)$/.test(b.dataset.mode)){const l=document.querySelector('.modes button[data-mode="list"]');if(l&&l!==b)return l.click();} // 🇩🇪 英语专用的模式：学德语时不进（按钮也藏起来了）
   document.querySelectorAll(".modes button").forEach(x=>x.classList.remove("on"));b.classList.add("on");
   const m=b.dataset.mode;
   document.documentElement.setAttribute("data-mode",m);

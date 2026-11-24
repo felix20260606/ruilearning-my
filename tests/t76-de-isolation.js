@@ -6,9 +6,9 @@ const tabs = W("tabs.js"), css = W("index.css"), vocab = W("vocab.js"), pump = W
 // 2026-11-23 起：说、读、写、📻 听力节目都有德语版（对齐英语）；只藏没有德语内容的雅思、插件存的英语词句、英语语法速查
 ok(/DE_OFF=\{\}/.test(tabs) && /ti\.textContent='🎓 歌德'/.test(tabs), "tabs: exam tab becomes 🎓 歌德 in German");
 ok(!/if\(DE\)SECS\.listen=/.test(tabs), "tabs: listen has all four in German (video list is filtered to German in watch.js)");
-for (const sel of ["#ielts-t-notes", "#ielts-t-basics", '[data-mode="saved"]', '[data-mode="grammar"]'])
+for (const sel of ["#ielts-t-notes", '[data-mode="grammar"]'])
   ok(css.includes('html[data-lang="de"] ' + (sel[0] === "#" ? sel : ".modes button" + sel)), "css hides " + sel);
-for (const sel of ["#tab-speak", "#tab-read", "#tab-write", "#tab-ielts", '[data-mode="reading"]', '[data-mode="writing"]', '[data-mode="sme"]'])
+for (const sel of ["#tab-speak", "#tab-read", "#tab-write", "#tab-ielts", "#ielts-t-basics", '[data-mode="saved"]', '[data-mode="reading"]', '[data-mode="writing"]', '[data-mode="sme"]'])
   ok(!css.includes('html[data-lang="de"] ' + (sel[0] === "#" ? sel : ".modes button" + sel)), "css shows " + sel + " in German");
 ok(/fetch\("\/api\/dict\?"\+\(window\.VL==="de"\?"lang=de&":""\)/.test(vocab), "dictGet: German dictionary (lang=de)");
 ok(/langpair="\+sl\+"\|zh-CN"/.test(vocab), "enrich: translation from German");

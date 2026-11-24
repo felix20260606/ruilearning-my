@@ -54,7 +54,7 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
   [st, j] = await call("/api/sme?ep=dw/80017572"); ok(j.ok && j.s === "dw" && j.mp3.includes("langsamenachrichten") && j.lines[0].t === "Die Regierung macht etwas.", "sme?ep=dw/… opens DW episode");
   [st, j] = await call("/api/sme?zh=1&co=1&ep=dw/80017572"); ok(j.ok === false && j.error === "not cached", "DW translation cache-only");
   [st, j] = await call("/api/sent?lang=de&w=haus"); ok(j.ok && j.items.length === 1 && j.items[0].en === "Das Haus ist groß." && kv.has("s/de/haus"), "sent?lang=de: German, filtered, own cache key");
-  [st, j] = await call("/api/dict?lang=de&w=Haus"); ok(j.ok && j.gender === "das" && j.phon === "[haʊ̯s]" && j.en[0].def === "house" && kv.has("d/de/Haus"), "dict?lang=de: gender, IPA, definition (cache key keeps case)");
+  [st, j] = await call("/api/dict?lang=de&w=Haus"); ok(j.ok && j.gender === "das" && j.phon === "[haʊ̯s]" && j.en[0].def === "house" && kv.has("d/de2/Haus"), "dict?lang=de: gender, IPA, definition (cache key keeps case)");
   [st, j] = await call("/api/dict?lang=de&w=" + encodeURIComponent("schön")); ok(st !== 400, "dict?lang=de accepts umlauts");
   globalThis.fetch = of;
   const src = W("web/_worker.js");
@@ -76,5 +76,17 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
   ok(/async function mount\(\) \{ if \(window\.VL === "de"\) return true;/.test(W("web/channels.js")), "no English channel map in German");
   ok(/speak:sec\|sme:s\|/.test(W("web/boot.js")) && /langOk = n => !n \|\| !n\.lang \|\| n\.lang === LANG_NOW\(\)/.test(W("web/nav.js")), "speak/listen position per language; history of the other language not restored");
   ok(/\(\^\|\[\^\\\\p\{L\}\]\)\(" \+ String\(v\.stress/.test(W("web/speak.js")), "stress highlight works with umlaut / é words");
+  // 能做的都做（2026-11-24）：德语语法速查、歌德考试常识、德语口语模拟考、德语数字、德语「已保存」、查词真人录音
+  { const c = { window: {} }; vm.createContext(c); vm.runInContext(W("web/de-grammar-data.js"), c); const L = c.window.DE_GRAM_REF;
+    ok(Array.isArray(L) && L.length >= 20 && L.every(x => x.length === 4 && (x[3].match(/<table/g) || []).length === (x[3].match(/<\/table>/g) || []).length && (x[3].match(/<td/g) || []).length === (x[3].match(/<\/td>/g) || []).length), "German grammar reference: entries + balanced tables"); }
+  { const c = { window: {} }; vm.createContext(c); vm.runInContext(W("web/goethe-basics.js"), c); const h = c.window.goetheBasicsHtml(); ok(h.length > 5000 && (h.match(/<div/g) || []).length === (h.match(/<\/div>/g) || []).length && /Goethe/.test(h), "Goethe basics page"); }
+  ok(/\['ref','📚 语法速查'\]/.test(W("web/tabs.js")) && /goethe-basics\.js\?v=[0-9a-f]{8}/.test(W("web/tabs.js")) && /de-grammar-data\.js\?v=[0-9a-f]{8}/.test(W("web/de-basic.js")), "grammar ref + Goethe basics wired");
+  { const sp = W("web/speak.js"); ok(/function mockNewDe\(\)/.test(sp) && /Goethe-Zertifikat B1 Sprechen mock test/.test(sp) && /function numItemDe\(\)/.test(sp), "German speaking mock + numbers");
+    const i = sp.indexOf("const DONES"), j = sp.indexOf("function numItemDe"); const f = new Function(sp.slice(i, j) + "; return { dWords, dOrd };")();
+    ok(f.dWords(21) === "einundzwanzig" && f.dWords(101) === "einhunderteins" && f.dWords(3456) === "dreitausendvierhundertsechsundfünfzig" && f.dWords(2100000) === "zwei Millionen einhunderttausend" && f.dOrd(3) === "dritte" && f.dOrd(7) === "siebte" && f.dOrd(21) === "einundzwanzigste", "German number words"); }
+  ok(/id=ext&&window\.VL!=="de"&&/.test(W("web/vocab.js")) && /var VOCAB_MODES=\/\^\(err\|stats\|pump\|saved\|list\)\$\//.test(W("web/tabs.js")), "German saved page uses web version");
+  { const src = W("web/_worker.js"), i = src.indexOf("function md5("), j = src.indexOf("async function wiktDe"); const f = new Function(src.slice(i, j) + "; return { md5, commonsMp3 };")();
+    ok(f.md5("De-Haus.ogg") === "7ea458e184f7b952001e7e58039b7374" && /\/transcoded\/7\/7e\/De-Haus\.ogg\/De-Haus\.ogg\.mp3$/.test(f.commonsMp3("De-Haus.ogg")), "Commons audio URL (md5 path)");
+    ok(/data-au="' \+ esc\(d\.audio\)/.test(W("web/word.js")) && /function url\(u, w, o\)/.test(W("web/tts.js")), "word card plays German recording"); }
   console.log(fail ? fail + " FAILED" : "t86 de align: all ok"); process.exit(fail ? 1 : 0);
 })();
