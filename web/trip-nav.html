@@ -58,14 +58,14 @@ footer{text-align:center;color:var(--soft);font-size:11px;margin-top:24px;line-h
     <p>所有行程一览 · 点卡片直达</p>
   </div>
 
-  <div class="sec">▍🗺 我的足迹</div>
-  <div class="grid">
+  <div class="sec" data-r="my">▍🗺 我的足迹</div>
+  <div class="grid" data-r="my">
     <div class="nc" data-go="sights"><span class="em">📍</span><b>吉隆坡景点大全 · 去过的打勾</b><p>市区和周边能当天来回的景点全列出来：照片、地址、怎么坐车、开放时间、门票、待多久；去过的打 ✅、想去的标 ⭐，换设备也在</p><span class="tag g">新</span></div>
     <div class="nc" data-go="foot"><span class="em">🗺</span><b>我的足迹 · 吉隆坡这一趟</b><p>去过的地方汇总成一篇：黑风洞、布城、马六甲、槟城（兰卡威、新加坡还没去），加上走之前还能去哪</p><span class="tag">新</span></div>
   </div>
 
-  <div class="sec">▍马来西亚周边</div>
-  <div class="grid">
+  <div class="sec" data-r="my">▍马来西亚周边</div>
+  <div class="grid" data-r="my">
     <div class="nc" data-go="ks"><span class="em">🐒</span><b>瓜拉雪兰莪 · 猴子 + 蓝眼泪 + 萤火虫</b><p>从 The Tropika 出发，TBS 快线巴士：皇家山银叶猴、渔村海鲜、红树林，晚上坐船看蓝眼泪和萤火虫，住渔村一晚，第二天早上回，约 RM 400</p><span class="tag g">新 · 照着走</span></div>
     <div class="nc" data-go="genting"><span class="em">🚡</span><b>云顶高原 1 日游</b><p>从 The Tropika 出发：LRT 到 TBS 坐巴士上山，Awana 缆车中途下清水岩庙，山顶午饭，奥特莱斯，约 RM 75</p><span class="tag g">新 · 照着走</span></div>
     <div class="nc" data-go="last6"><span class="em">🧭</span><b>吉隆坡周边 · 挑一天去</b><p>一个人 · 公共交通：老城、双子塔、湖滨公园三个市区一日，云顶一日，瓜雪过一夜，哪天想去挑哪个；回国那晚的航班和重庆中转也在里面</p></div>
@@ -75,14 +75,14 @@ footer{text-align:center;color:var(--soft);font-size:11px;margin-top:24px;line-h
     <div class="nc done" data-go="mel"><span class="been">✅ 去过</span><span class="em">🌙</span><b>马六甲 2天1晚</b><p>慢节奏版：加夜游鸡场街夜市 + 河畔日落 + 更多景点</p></div>
   </div>
 
-  <div class="sec">▍跨国行程</div>
-  <div class="grid">
+  <div class="sec" data-r="my">▍跨国行程（从吉隆坡出发）</div>
+  <div class="grid" data-r="my">
     <div class="nc" data-go="sg2"><span class="em">🇸🇬</span><b>新加坡 2天1夜</b><p>8/19–21 定制版：大巴去 + 凌晨机回中国 · 含存包攻略</p><span class="tag g">按你时间表</span></div>
     <div class="nc" data-go="sg"><span class="em">🌃</span><b>新加坡 3天2夜</b><p>完整版：入境必办清单 + TBS 过关流程 + 16 站景点大图</p></div>
   </div>
 
-  <div class="sec">▍中国</div>
-  <div class="grid">
+  <div class="sec" data-r="cn">▍中国</div>
+  <div class="grid" data-r="cn">
     <div class="nc" data-go="hzsights"><span class="em">🍵</span><b>杭州景点大全 · 去过的打勾</b><p>西湖十景、灵隐、龙井九溪、运河、西溪、良渚，加上乌镇、千岛湖这些周边一日：照片、地址、坐几号线、开放时间、门票；去过的打 ✅、想去的标 ⭐</p><span class="tag g">新</span></div>
     <div class="nc" data-go="cqsights"><span class="em">🌶</span><b>重庆景点大全 · 去过的打勾</b><p>洪崖洞、索道、李子坝、十八梯、磁器口、三峡博物馆，加上大足石刻、武隆这些周边一日：照片、地址、坐几号线、开放时间、门票；去过的打 ✅、想去的标 ⭐</p><span class="tag g">新</span></div>
     <div class="nc" data-go="cq"><span class="em">🌶</span><b>重庆中转 · 半天暴走（11/30）</b><p>05:15 落地 → 地铁进城：小面、长江索道、洪崖洞、李子坝轻轨穿楼、火锅 → 15:55 飞杭州</p><span class="tag g">新 · 按你航班</span></div>
@@ -98,6 +98,12 @@ document.querySelectorAll('.nc').forEach(function(c){
     if(go){try{parent.postMessage({tripGo:go},'*');}catch(e){}}
   });
 });
+// 🇨🇳 / 🇲🇾 标签：网址带 ?r=cn 或 ?r=my 时只显示那几栏（tabs.js 打开），不带就是全部
+(function(){var r=new URLSearchParams(location.search).get("r");if(!r)return;
+  document.querySelectorAll("[data-r]").forEach(function(e){if(e.getAttribute("data-r")!==r)e.style.display="none";});
+  var H={cn:["China","🇨🇳 中国","重庆、杭州景点大全 · 重庆中转 · 东北自驾"],my:["Malaysia","🇲🇾 马来西亚","我的足迹 · 吉隆坡景点大全 · 周边一日游 · 从吉隆坡出发去新加坡"]}[r];
+  if(H){var h=document.querySelector(".head");h.querySelector(".k").textContent=H[0];h.querySelector("h1").textContent=H[1];h.querySelector("p").textContent=H[2];}
+})();
 // ✅ 去过的卡片：看「我的足迹」里点的记录（trip-state.js，id = "foot:<地方>"）；没点过就用页面上写的默认
 var FOOT={lk:"langkawi",pg:"penang",mel1:"melaka",mel:"melaka",sg2:"sg",sg:"sg"},DEF={};
 document.querySelectorAll(".nc[data-go]").forEach(function(c){var g=c.getAttribute("data-go");if(FOOT[g])DEF[g]=c.classList.contains("done");});
