@@ -60,6 +60,7 @@ footer{text-align:center;color:var(--soft);font-size:11px;margin-top:24px;line-h
 }
 </style><link rel="stylesheet" href="theme.css">
 <script src="trip-state.js"></script>
+<script src="cn-map.js"></script>
 </head><body>
 <div class="wrap">
   <div class="head">
@@ -88,6 +89,7 @@ footer{text-align:center;color:var(--soft);font-size:11px;margin-top:24px;line-h
     <div class="nc" data-go="sg2"><span class="em">🇸🇬</span><b>新加坡</b><p>TBS 大巴过关去：2 天版按你的时间表（凌晨机回中国、存包攻略）；3 天版有入境清单、过关流程和 16 站景点大图</p><div class="vers"><a data-go2="sg2">2天1夜</a><a data-go2="sg">3天2夜</a></div><span class="tag t3">📖 攻略</span></div>
   </div>
 
+  <div id="cnmap" data-r="cn"></div>
   <div class="sec" data-r="cn">▍🇨🇳 中国 · 已经做好的</div>
   <div class="grid" data-r="cn">
     <div class="nc" data-go="hzsights"><span class="em">🍵</span><b>杭州景点大全</b><p>西湖十景、灵隐、龙井九溪、运河、西溪、良渚，加上乌镇、千岛湖这些周边一日：照片、地址、坐几号线、开放时间、门票；去过的打 ✅、想去的标 ⭐</p><span class="tag t1">📍 景点大全</span></div>
@@ -166,6 +168,8 @@ document.querySelectorAll('.nc,.pc').forEach(function(c){
     if(go){try{parent.postMessage({tripGo:go},'*');}catch(e){}}
   });
 });
+// 🗺 「🇨🇳 中国」最上面画足迹地图（cn-map.js）
+if(new URLSearchParams(location.search).get("r")==="cn"&&window.CNMAP)CNMAP.init(document.getElementById("cnmap"));
 // 🇨🇳 / 🇲🇾 标签：网址带 ?r=cn 或 ?r=my 时只显示那几栏（tabs.js 打开），不带就是全部
 (function(){var r=new URLSearchParams(location.search).get("r");if(!r)return;
   document.querySelectorAll("[data-r]").forEach(function(e){if(e.getAttribute("data-r")!==r)e.style.display="none";});
