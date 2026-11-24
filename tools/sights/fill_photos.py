@@ -12,7 +12,7 @@ def api(params):
 for f in sys.argv[1:]:
     j=json.load(open(f,encoding='utf-8'));city=j['city']['zh'];n=0
     for x in j['sights']:
-        if x.get('photo'): continue
+        if x.get('photo') or x.get('photo_checked'): continue  # photo_checked：人工看过（不对的留空），不再自动填
         name=re.sub(r'（.*?）|\(.*?\)','',x['zh']).split('·')[0].split(' / ')[0].strip()
         r=api({'action':'query','format':'json','generator':'search','gsrsearch':'%s %s'%(name,city),'gsrlimit':'3','prop':'pageimages','piprop':'name','variant':'zh-cn'})
         pages=sorted((r.get('query') or {}).get('pages',{}).values(),key=lambda p:p.get('index',9))

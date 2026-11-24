@@ -79,5 +79,12 @@ def cid(prov,zh):
         if c['zh'].rstrip('市')==zh: return c['id']
 out['alias']={k:cid(p,z) for k,(p,z) in {'hz-':('浙江省','杭州'),'cq-':('重庆市','渝中区'),'nb-':('浙江省','宁波'),'zs-':('浙江省','舟山'),'wz-':('浙江省','温州'),'ls-':('浙江省','丽水'),
   'sx-':('浙江省','绍兴'),'jh-':('浙江省','金华'),'hu-':('浙江省','湖州'),'jx-':('浙江省','嘉兴'),'tz-':('浙江省','台州'),'qz-':('浙江省','衢州')}.items()}
+# 详细版城市页（web/cn/city/*.json 里没有 "auto" 的）：每个景点 id 都对到这个城市（地图按最长前缀匹配，所以重庆景点大全的 cq-ciqikou 会算沙坪坝而不是渝中）
+SL={c['slug']:c['id'] for j in NAME.values() for c in j['cities']}
+for f in glob.glob(os.path.join(web,'cn','city','*.json')):
+    j=json.load(open(f,encoding='utf-8'))
+    if j.get('auto') or j['slug'] not in SL: continue
+    for x in j['sights']:
+        if not x['id'].startswith('w-'): out['alias'][x['id']]=SL[j['slug']]
 json.dump(out,open(os.path.join(web,'cn','map.json'),'w',encoding='utf-8'),ensure_ascii=False,separators=(',',':'))
 print('w',out['w'],'h',out['h'],'prov',len(out['prov']),'cities',len(out['cities']),'size',os.path.getsize(os.path.join(web,'cn','map.json')),'alias',out['alias'])
