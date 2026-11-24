@@ -45,7 +45,8 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
   r = await call("/api/push", { send: 1 }); ok(!Object.values(subs()).some(x => x.ep === EP("deny")), "403 three times → removed");
   r = await call("/api/push?peek=" + eA); ok(/Rui/.test(r.j.title) && /英语/.test(r.j.title), "peek picks most recently sent combo: " + r.j.title);
   // 练够了不打扰
-  kv.set("ext", JSON.stringify({ ver: 1, items: { ["stat|" + day]: { v: { n: 25 }, at: 1 } } }));
+  const yday = new Date(bj.getTime() - 864e5).toISOString().slice(0, 10); // 零点刚过时，10 分钟前的提醒算前一天：两天都记上，测试不会在零点附近时好时坏
+  kv.set("ext", JSON.stringify({ ver: 1, items: { ["stat|" + day]: { v: { n: 25 }, at: 1 }, ["stat|" + yday]: { v: { n: 25 }, at: 1 } } }));
   await call("/api/push", { sub: { endpoint: EP("ccc") }, u: "", time: hm(-1) });
   r = await call("/api/push", { send: 1 }); ok(r.j.skip === 1 && r.j.sent === 0, "practiced enough today → skip");
   r = await call("/api/push?peek=" + eA); ok(/练了 25 张/.test(r.j.title), "peek after practising: " + r.j.title);
