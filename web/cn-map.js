@@ -131,7 +131,8 @@
         var txt = new XMLSerializer().serializeToString(cl), img = new Image(), cv = document.createElement("canvas"); cv.width = M.w * 2; cv.height = M.h * 2 + 120;
         img.onload = function () { var x = cv.getContext("2d"); x.fillStyle = "#14161b"; x.fillRect(0, 0, cv.width, cv.height); x.drawImage(img, 0, 120, M.w * 2, M.h * 2);
           x.fillStyle = "#fff"; x.font = "bold 44px sans-serif"; x.fillText("🗺 我的中国足迹", 40, 70); x.font = "26px sans-serif"; x.fillStyle = "#c8ccd6"; x.fillText($("cm-st").textContent.replace(/\s+/g, " "), 40, 108);
-          var a = document.createElement("a"); a.download = "我的中国足迹.png"; a.href = cv.toDataURL("image/png"); document.body.appendChild(a); a.click(); a.remove(); };
+          var UU = window.U || (function () { try { return parent.U; } catch (e) { return null; } })(); // 存文件用全站共用的 U.download（在网站里是外面页面的）
+          cv.toBlob(function (b) { if (UU && UU.download) UU.download("我的中国足迹.png", b, "png"); else window.open(URL.createObjectURL(b), "_blank"); }, "image/png"); };
         img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(txt);
       }
       paint(); TRIPST.on(paint); TRIPST.sync();
