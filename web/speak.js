@@ -714,6 +714,7 @@
     MK = { i: -1, qs: [{ part: 1, q: pl[0], qzh: pl[1], points: pl[2], max: 120, prep: 30 }].concat(p2 ? [{ part: 2, q: p2.q, qzh: p2.qzh, points: p2.points, max: 180, prep: 60 }] : [], p3.map(t => ({ part: 3, q: t.q, qzh: t.qzh, max: 90 }))), ans: [], r: null };
   }
   function mockNew() {
+    for (const k in RES) if (k.indexOf("mock:") === 0) delete RES[k]; // 换一套题：上一次的录音、转写、分数别留在新题下面
     if (DE) return mockNewDe();
     const T = (D.topics || []), sh = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
     const p1 = sh(T.filter(t => t.cat === "日常" || t.cat === "兴趣")).slice(0, 4), p2 = sh(T.filter(t => (t.points || []).length >= 3 && t.cat !== "观点"))[0], p3 = sh(T.filter(t => t.cat === "观点")).slice(0, 2);
@@ -791,7 +792,7 @@
   function numItemDe() {
     const t = ["phone", "price", "time", "year", "big", "date"][rnd(0, 5)];
     if (t === "phone") { const d = "01" + rnd(5, 7) + rnd(0, 9) + String(rnd(1000000, 9999999)); return { t: "电话", show: d.slice(0, 4) + " " + d.slice(4), ans: d, say: d.split("").map(c => DONES[+c]).join(" ") }; }
-    if (t === "price") { const a = rnd(1, 999), c = [0, 50, 90, 25, 99][rnd(0, 4)]; return { t: "价格", show: a + (c ? "," + String(c).padStart(2, "0") : "") + " €", ans: String(a) + (c ? String(c).padStart(2, "0") : ""), say: dWords(a) + " Euro" + (c ? " " + dWords(c) : "") }; }
+    if (t === "price") { const a = rnd(1, 999), c = [0, 50, 90, 25, 99][rnd(0, 4)]; return { t: "价格", show: a + (c ? "," + String(c).padStart(2, "0") : "") + " €", ans: String(a) + (c ? String(c).padStart(2, "0") : ""), say: dWords(a).replace(/eins$/, "ein") + " Euro" + (c ? " " + dWords(c) : "") }; }
     if (t === "time") { const h = rnd(0, 23), m = [0, 5, 15, 30, 45, 20, 50][rnd(0, 6)]; return { t: "时间", show: h + ":" + String(m).padStart(2, "0"), ans: String(h) + String(m).padStart(2, "0"), say: (h === 1 ? "ein" : dWords(h)) + " Uhr" + (m ? " " + dWords(m) : "") }; }
     if (t === "year") { const y = [rnd(1950, 1999), rnd(2001, 2035)][rnd(0, 1)]; return { t: "年份", show: String(y), ans: String(y), say: y < 2000 ? "neunzehnhundert" + (y % 100 ? dw99(y % 100) : "") : dWords(y) }; }
     if (t === "big") { const n = [rnd(1100, 9900), rnd(12000, 99000), rnd(120000, 990000), rnd(1, 9) * 1e6 + rnd(1, 9) * 1e5][rnd(0, 3)], r = Math.round(n / 100) * 100; return { t: "大数", show: r.toLocaleString("de-DE"), ans: String(r), say: dWords(r) }; }

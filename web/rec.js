@@ -67,7 +67,7 @@
     } catch (e) { r.mr = null; }
     if (SR && (!MOBILE || !r.mr || srOnly)) try { const sr = r.sr = new SR(); sr.lang = bcp(lang); sr.interimResults = false; sr.continuous = true; sr.onresult = e => { r.srText = [...e.results].map(y => y[0].transcript).join(" "); }; sr.onerror = () => {}; sr.start(); } catch (e) { r.sr = null; }
     if (!r.mr && !r.sr) { endTracks(r); rec = null; return fail("这个浏览器不能录音"); }
-    r.t = setTimeout(() => { if (rec === r) stop(false); }, Math.min(130, o.max || 20) * 1000);
+    r.t = setTimeout(() => { if (rec === r) stop(false); }, Math.min(185, o.max || 20) * 1000);
     if (o.start) try { o.start(); } catch (e) {}
     return true;
   }

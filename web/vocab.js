@@ -26,16 +26,17 @@ const IMG_KEY="vocab:img",ROWIMG_KEY="vocab:rowimg",NOIMG_TTL=7*864e5; // 两个
 const imgQ=id=>{const w=words.find(x=>x.id===id);return w?String(w.wiki||w.word||""):"";};
 const noImg=s=>{if(!s||(!("imgcache" in s)&&!("rowimgcache" in s)))return s;const t=Object.assign({},s);delete t.imgcache;delete t.rowimgcache;return t;};
 let imgSaveT=0;
+const ROW_NONE_AT={};
 function imgSave(){clearTimeout(imgSaveT);imgSaveT=setTimeout(()=>{
   const now=Date.now(),o={};for(const k in imgCache){const v=imgCache[k];if(Array.isArray(v))o[k]=v;else if(v===null)o[k]={none:now,q:imgQ(k)};else if(v&&v.none)o[k]=v;} // 没图的记下当时按什么词找的：词条改了（加了 wiki、大小写变了）就重新找
-  const r={};for(const k in rowImgCache){const v=rowImgCache[k];if(typeof v==="string"&&v!=="pending")r[k]=v;else if(v===null)r[k]={none:now};else if(v&&v.none)r[k]=v;}
+  const r={};for(const k in rowImgCache){const v=rowImgCache[k];if(typeof v==="string"&&v!=="pending")r[k]=v;else if(v===null)r[k]={none:ROW_NONE_AT[k]||(ROW_NONE_AT[k]=now)};else if(v&&v.none)r[k]=v;}
   try{localStorage.setItem(IMG_KEY,JSON.stringify(o));localStorage.setItem(ROWIMG_KEY,JSON.stringify(r));}catch(e){} // 存不下就算了（能重新找）
 },2000);}
 function imgLoad(st){ // 读单独存的配图缓存；第一次（以前存在生词本里的）搬过来
   let o=null,r=null;try{o=JSON.parse(localStorage.getItem(IMG_KEY)||"null");r=JSON.parse(localStorage.getItem(ROWIMG_KEY)||"null");}catch(e){}
   if(st&&st.imgcache)o=Object.assign({},st.imgcache,o||{}); if(st&&st.rowimgcache)r=Object.assign({},st.rowimgcache,r||{}); // 以前存在生词本里的：合并过来（不丢）
   const now=Date.now(),I={};for(const k in o||{}){const v=o[k];if(Array.isArray(v))I[k]=v;else if(v&&v.none&&now-v.none<NOIMG_TTL)I[k]=v;} // 没图的记录 7 天后再找一次
-  const RW={};for(const k in r||{}){const v=r[k];if(typeof v==="string"&&v&&v!=="pending")RW[k]=v;else if(v&&v.none&&now-v.none<NOIMG_TTL)RW[k]=null;} // 行图：没图在内存里还是 null
+  const RW={};for(const k in r||{}){const v=r[k];if(typeof v==="string"&&v&&v!=="pending")RW[k]=v;else if(v&&v.none&&now-v.none<NOIMG_TTL){RW[k]=null;ROW_NONE_AT[k]=v.none;}} // 行图：没图在内存里还是 null（记下当时的时间，存的时候别刷新，7 天后才会再找）
   return {I,RW};
 }
 /* 掌握状态、待整理队列：改了的项记下时间（progAt / pendAdd / pendDel），合并时同一项按时间新的为准（后台同样）——
@@ -157,7 +158,8 @@ function counts(){
   const rp=document.getElementById("ring-pct");if(rp)rp.textContent=pct+"%";
   const rg=document.getElementById("mastery-ring");if(rg)rg.style.setProperty("--p",pct);
 }
-function hl(t){return t.replace(/\{([^}]+)\}/g,'<b>$1</b>');}
+function hl(t){return H(t).replace(/\{([^}]+)\}/g,'<b>$1</b>');} /* 先转义：词条内容来自维基词典 / Tatoeba / 翻译，不能当 HTML 用 */
+function H(t){return t==null?"":escHtml(t);}
 const CATNAME={word:"单词",phrase:"短语",sentence:"句子",pattern:"规律"};
 
 /* ===== unique real photos via Wikipedia (one per word, no duplicates) ===== */
@@ -335,7 +337,7 @@ function renderList(){
   if(cat!=="all")arr=arr.filter(w=>w.type===cat);
   renderPtags();if(cat==="pattern"&&ptag!=="all")arr=arr.filter(w=>(w.tag||"其他")===ptag);
   if(filter!=="all"){const S=state.srs||{},st=w=>masteryOf(w)>=1?"known":S[w.id]?"practicing":"fresh";arr=arr.filter(w=>(w.type||"word")!=="pattern"&&(filter==="learning"?st(w)!=="known":st(w)===filter));} // 学习中 / 没练过 / 已掌握：和上面的数字同一个算法（vocabStats），三个加起来 = 生词（规律不算）；learning = 旧的「未掌握」
-  if(query){const q=query.toLowerCase();arr=arr.filter(w=>w.word.toLowerCase().includes(q)||w.zh.includes(query));}
+  if(query){const q=query.toLowerCase();arr=arr.filter(w=>String(w.word||"").toLowerCase().includes(q)||String(w.zh||"").includes(query));}
   if(!arr.length){LIST_ARR=[];listShown=0;listKey="";if(listIO)listIO.disconnect();box.innerHTML='<div class="empty">这个分类还没有内容。<br>问我新词/短语/台词，或用“添加”自己加进来。</div>';return;}
   LIST_ARR=arr;const key=[cat,ptag,filter,query,sortBy].join("|"),same=key===listKey,keep=same?Math.max(LIST_PAGE,listShown):LIST_PAGE;listKey=key;listShown=0; // 同样的筛选再画（标了已掌握、同步回来）：画到原来那么多，不跳位置
   // 同样的筛选重画（标记已掌握、删除、同步回来）：记下屏幕顶上那张卡的位置，画完把它放回原处（新画的卡片高度是估的，不放回会跳）
@@ -352,11 +354,11 @@ function cardHtml(w){return `
      <div class="card-head">
        <div>
          ${w.type!=="word"?`<span class="typebadge ${w.type}">${CATNAME[w.type]}</span>`:""}
-         <div class="word-row">${w.type==="pattern"&&!w.wiki?"":`<img class="thumb-sm" data-wimg="${w.id}" alt="" loading="lazy">`}<span class="word">${w.word}</span><button class="say" data-say="${eAttr(noBrace(w.word))}" title="朗读">🔊</button></div>
-         ${w.phon?`<div class="phon">${w.phon}</div>`:""}
-         ${w.en?`<div class="endef">${w.en}</div>`:""}
-         ${w.type==="sentence"||w.type==="pattern"?`<div class="rdpv">${w.zh?`<div class="z">${w.zh}</div>`:""}${w.forms&&w.forms.length?`<div class="r">${w.forms.slice(0,4).map(f=>noBrace(String(f[0]))).join(" · ")}</div>`:""}</div>`:""}
-         <div class="tagrow">${w.tag?`<span class="tag">${w.tag}</span>`:""}<span class="tag">${w.date||""}</span>${w.type==="sentence"||w.type==="pattern"?`<span class="tag">${[(w.forms||[]).length?(w.forms.length+" 行"):"",(w.examples||[]).length?(w.examples.length+" 例句"):""].filter(Boolean).join(" · ")}</span>`:""}</div>
+         <div class="word-row">${w.type==="pattern"&&!w.wiki?"":`<img class="thumb-sm" data-wimg="${w.id}" alt="" loading="lazy">`}<span class="word">${H(w.word)}</span><button class="say" data-say="${eAttr(noBrace(w.word))}" title="朗读">🔊</button></div>
+         ${w.phon?`<div class="phon">${H(w.phon)}</div>`:""}
+         ${w.en?`<div class="endef">${H(w.en)}</div>`:""}
+         ${w.type==="sentence"||w.type==="pattern"?`<div class="rdpv">${w.zh?`<div class="z">${H(w.zh)}</div>`:""}${w.forms&&w.forms.length?`<div class="r">${w.forms.slice(0,4).map(f=>H(noBrace(String(f[0])))).join(" · ")}</div>`:""}</div>`:""}
+         <div class="tagrow">${w.tag?`<span class="tag">${H(w.tag)}</span>`:""}<span class="tag">${w.date||""}</span>${w.type==="sentence"||w.type==="pattern"?`<span class="tag">${[(w.forms||[]).length?(w.forms.length+" 行"):"",(w.examples||[]).length?(w.examples.length+" 例句"):""].filter(Boolean).join(" · ")}</span>`:""}</div>
          ${masteryHtml(w)}
        </div>
        ${w.type==="sentence"||w.type==="pattern"?`<svg class="chev go" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg>`:`<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>`}
@@ -365,11 +367,11 @@ function cardHtml(w){return `
    </div>`;}
 function cardBodyHtml(w){return `
        ${w.type==="pattern"&&!w.wiki?"":`<div class="bigvisual" style="display:none"><div class="gallery" data-wgallery="${w.id}"></div></div>`}<!-- 规律类标题是中文，按标题搜到的图不相干：只有手动指定了维基条目（wiki 字段）的才显示封面，其余只用对照表每行自己的小图 -->
-       <div class="sec-label">中文意思</div><div class="zh-full">${w.zh}</div>
-       ${w.forms&&w.forms.length?`<div class="sec-label">${w.type==="sentence"?"常用句":(w.type==="pattern"?"对照表":"词形变化")}</div><div class="forms">${w.forms.map(f=>`<div>${f[3]?(String(f[3]).charAt(0)==="#"?`<span class="rowswatch" style="background:${eAttr(f[3])}"></span>`:`<img class="rowthumb" data-rowimg="${eAttr(f[3])}" alt="" loading="lazy">`):""}<span class="f">${f[0]}</span><span class="p">${f[1]}</span><span class="m">${f[2]}</span></div>`).join("")}</div>`:""}
-       ${w.examples&&w.examples.length?`<div class="sec-label">例句</div>${w.examples.map(e=>`<div class="ex"><div class="en"><button class="say say-sm" data-say="${eAttr(noBrace(e[0]))}" title="朗读">🔊</button>${hl(e[0])}</div><div class="t">${e[1]}</div></div>`).join("")}`:""}
-       ${w.tip?`<div class="sec-label">${w.type==="sentence"?"用法提示":"记忆法"}</div><div class="tip">${w.type==="sentence"?"💬":"🧠"} ${w.tip}</div>`:""}
-       ${w.related&&w.related.length?`<div class="sec-label">近义 / 相关词</div><div class="related">${w.related.map(r=>`<span class="relchip" data-say="${eAttr(r[0])}" title="朗读"><b>${r[0]}</b>${r[1]?` ${r[1]}`:""}</span>`).join("")}</div>`:""}
+       <div class="sec-label">中文意思</div><div class="zh-full">${H(w.zh)}</div>
+       ${w.forms&&w.forms.length?`<div class="sec-label">${w.type==="sentence"?"常用句":(w.type==="pattern"?"对照表":"词形变化")}</div><div class="forms">${w.forms.map(f=>`<div>${f[3]?(String(f[3]).charAt(0)==="#"?`<span class="rowswatch" style="background:${eAttr(f[3])}"></span>`:`<img class="rowthumb" data-rowimg="${eAttr(f[3])}" alt="" loading="lazy">`):""}<span class="f">${H(f[0])}</span><span class="p">${H(f[1])}</span><span class="m">${H(f[2])}</span></div>`).join("")}</div>`:""}
+       ${w.examples&&w.examples.length?`<div class="sec-label">例句</div>${w.examples.map(e=>`<div class="ex"><div class="en"><button class="say say-sm" data-say="${eAttr(noBrace(e[0]))}" title="朗读">🔊</button>${hl(e[0])}</div><div class="t">${H(e[1])}</div></div>`).join("")}`:""}
+       ${w.tip?`<div class="sec-label">${w.type==="sentence"?"用法提示":"记忆法"}</div><div class="tip">${w.type==="sentence"?"💬":"🧠"} ${H(w.tip)}</div>`:""}
+       ${w.related&&w.related.length?`<div class="sec-label">近义 / 相关词</div><div class="related">${w.related.map(r=>`<span class="relchip" data-say="${eAttr(r[0])}" title="朗读"><b>${H(r[0])}</b>${r[1]?` ${H(r[1])}`:""}</span>`).join("")}</div>`:""}
        <div class="actions">
          <button class="mark ${w.status==="known"?"on":""}" data-act="mark">${w.status==="known"?"已掌握 ✓":"标记已掌握"}</button>
          <button class="del" data-act="del">删除</button>
@@ -579,7 +581,7 @@ async function enrich(entry){ // 后台 /api/dict 一次拿齐：中文（谷歌
 async function quickAdd(word,sentence){
   word=(word||"").trim().normalize("NFC").replace(/[’‘]/g,"'").replace(/[^\p{L}' -]/gu,"").replace(/\s+/g," "); // 字母包括 ä ö ü ß é（以前只认 A–Z，德语 Mädchen 会存成 Mdchen）
   if(!word)return false;
-  if(words.some(w=>w.word.toLowerCase()===word.toLowerCase())){return false;}
+  if(words.some(w=>window.VL==="de"?String(w.word).normalize("NFC")===word:w.word.toLowerCase()===word.toLowerCase())){return false;} /* 德语大小写不同是不同的词（Morgen / morgen） */
   const re=new RegExp("(?<![\\p{L}])("+word.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\p{L}*)","iu"),own=sentence&&re.test(sentence)?[[String(sentence).trim().replace(re,"{$1}"),""]]:[];
   const entry={id:"u_"+Date.now()+"_"+Math.random().toString(36).slice(2,6),type:/\s/.test(word)?"phrase":"word",word:word,
     phon:"",en:"(查询中…)",zh:"(翻译中…)",tag:"收集",date:ymdLocal(),forms:[],examples:own,tip:"",auto:1}; // auto：自动生成的词条（想要多义项、记忆法时再发给 Claude 补）

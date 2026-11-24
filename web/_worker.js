@@ -343,7 +343,7 @@ async function ext(req, env) {
       const x = b.changes[k]; if (!isObj(x) || typeof k !== "string" || k.length > 600 || !k.includes("|")) continue;
       const at = atOk(x.at), old = doc.items[k];
       if (old && atOk(old.at) > at) continue;
-      if (x.del) { if (!old || !old.del) { doc.items[k] = { del: 1, at }; changed = true; } if (k.startsWith("med|")) gone.push(k.slice(4)); }
+      if (x.del) { if (!old || !old.del) { doc.items[k] = { del: 1, at }; changed = true; if (k.startsWith("med|")) gone.push(k.slice(4)); } } /* 重发的删除不再删一遍（每天只有 1000 次删除额度） */
       else if (!old || old.del || JSON.stringify(old.v) !== JSON.stringify(x.v)) { doc.items[k] = { v: x.v, at }; changed = true; }
     }
     if (changed && A === "bad") { // 写入保护：一次删太多、当天累计删太多 → 要口令
@@ -431,8 +431,10 @@ async function mine(req, env, u) {
     const b = JSON.parse(raw || "{}"); if (!MINE_K.test(b.k || "") || !isObj(b.changes)) return json({ ok: false, error: "bad body" }, 400);
     const key = pre + "mine:" + b.k, raw0 = await kv.get(key), cur = ((raw0 && JSON.parse(raw0)) || {}).items || {}, now = Date.now(); let changed = false;
     // 写入保护（同 /api/ext）：一次删 > 30 项、当天不带口令累计删 > 80 项 → 要口令
-    const rm = Object.keys(b.changes).filter(id => isObj(b.changes[id]) && b.changes[id].del && cur[id] && !cur[id].del).length;
-    if (rm && (await authOf(req, kv)) === "bad") { if (rm > 30) return needKey("big"); if (!(await guardDay(kv, pre + "mine", { rm }, { rm: 80 }))) return needKey("day"); }
+    const live0 = id => isObj(b.changes[id]) && cur[id] && !cur[id].del, ids = Object.keys(b.changes);
+    const rm = ids.filter(id => live0(id) && (b.changes[id].del || b.changes[id].v == null)).length; // 写成空值 = 变相删除
+    const rw = ids.filter(id => live0(id) && !b.changes[id].del && b.changes[id].v != null && JSON.stringify(cur[id].v) !== JSON.stringify(b.changes[id].v)).length; // 一次改写很多已有的项也要口令（同 /api/ext）
+    if ((rm || rw > 300) && (await authOf(req, kv)) === "bad") { if (rm > 30 || rw > 300) return needKey("big"); if (!(await guardDay(kv, pre + "mine", { rm }, { rm: 80 }))) return needKey("day"); }
     for (const id in b.changes) { const x = b.changes[id]; if (!isObj(x) || !(+x.at) || String(id).length > 200) continue; const at = atOk(x.at); if (x.del && now - at > 60 * 86400e3) continue; /* 过期的删除记号（后台已经清掉了）不再收 */ if (!cur[id] || at > atOk(cur[id].at)) { const nx = x.del ? { del: 1, at } : { v: x.v, at }; if (!cur[id] || JSON.stringify(cur[id]) !== JSON.stringify(nx)) changed = true; cur[id] = nx; } }
     for (const id in cur) if (cur[id].del && now - cur[id].at > 60 * 86400e3) { delete cur[id]; changed = true; }
     if (changed) {
@@ -467,7 +469,7 @@ async function gtrans(text, tl, bd, sl) {
 // 🇩🇪 德语查词（/api/dict?lang=de&w=…）：中文（谷歌，按德语翻）+ 维基词典英文版的德语词条（词性、英文释义、德语例句、名词的性 der/die/das、音标；
 //   变形如 ging 会给出原形 lemma）+ Tatoeba 德语例句；存 KV「d/de/词」30 天。结构和英语的一样，多 gender、lemma 两个字段
 const WIKT_UA = { "User-Agent": "ruilearning-my/1.0 (https://ruilearning-my.pages.dev; personal study site)" }; // 维基媒体要求 UA 带联系方式，不然容易被限流
-const stripHtml = h => String(h || "").replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/\s+/g, " ").trim();
+const stripHtml = h => String(h || "").replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim(); // 解码出来的 <…> 再去一遍（不然 &lt;img onerror&gt; 会变成真标签）；&amp; 最后解，免得 &amp;lt; 被解两次
 // 维基共享资源的录音地址要用文件名的 MD5 算目录（Workers 的 crypto.subtle 不一定有 MD5，这里自己算）；用转好的 mp3（iPhone Safari 放不了 .ogg）
 function md5(str) {
   const b = new TextEncoder().encode(str), n = ((b.length + 8) >>> 6) + 1, x = new Uint32Array(n * 16);
@@ -486,7 +488,7 @@ function md5(str) {
   }
   return [a0, b0, c0, d0].map(v => [0, 8, 16, 24].map(s => ((v >>> s) & 255).toString(16).padStart(2, "0")).join("")).join("");
 }
-const commonsMp3 = f => { const n = String(f).trim().replace(/ /g, "_"), name = n.charAt(0).toUpperCase() + n.slice(1), h = md5(name), e = encodeURIComponent(name); return "https://upload.wikimedia.org/wikipedia/commons/transcoded/" + h[0] + "/" + h.slice(0, 2) + "/" + e + "/" + e + ".mp3"; };
+const commonsMp3 = f => { const n = String(f).trim().replace(/ /g, "_"), name = n.charAt(0).toUpperCase() + n.slice(1), h = md5(name), e = encodeURIComponent(name); return "https://upload.wikimedia.org/wikipedia/commons/" + (/\.mp3$/i.test(name) ? "" : "transcoded/") + h[0] + "/" + h.slice(0, 2) + "/" + e + (/\.mp3$/i.test(name) ? "" : "/" + e + ".mp3"); }; // 原文件就是 mp3 的没有转码版
 async function wiktDe(w) {
   const cap = w.charAt(0).toUpperCase() + w.slice(1), tries = [...new Set([w, cap, w.toLowerCase()])];
   for (const t of tries) {
@@ -1279,10 +1281,11 @@ function ieltsClean(o, sec) {
   const words = lines.reduce((n, l) => n + l.t.split(" ").length, 0);
   return lines.length >= (mono ? 6 : 12) && words >= (mono ? 350 : 250) && words <= 1000 ? { title: clip(o.title || "IELTS Listening", 120), scene_zh: clip(o.scene_zh, 120), lines } : null;
 }
+const IX_LIST = {};
 async function ieltsScript(env, b) {
   const sec = [2, 3, 4].includes(+b.sec) ? +b.sec : 1, kv = env.CAPTIONS, pre = "ix/" + sec + "/";
   if (kv && !b.fresh) {
-    const done = new Set((Array.isArray(b.done) ? b.done : []).map(String)), L = (await kv.list({ prefix: pre })).keys.map(k => k.name.slice(pre.length)).filter(id => !done.has(id));
+    const done = new Set((Array.isArray(b.done) ? b.done : []).map(String)), c = IX_LIST[pre], all = c && Date.now() - c.at < 6 * 3600e3 ? c.ids : (IX_LIST[pre] = { at: Date.now(), ids: (await kv.list({ prefix: pre })).keys.map(k => k.name.slice(pre.length)) }).ids, L = all.filter(id => !done.has(id)); // 题库清单在内存里留 6 小时（每天只有 1000 次 list 额度）
     if (L.length) { const x = await kv.get(pre + L[0], "json"); if (x) return json(Object.assign({ ok: true, cached: true, left: L.length - 1 }, x)); }
   }
   const T = IELTS_TOPICS[sec], topic = T[Math.floor(Math.random() * T.length)];
@@ -1290,7 +1293,7 @@ async function ieltsScript(env, b) {
   const r = await aiJson(env, [{ role: "system", content: ieltsSys(sec) }, { role: "user", content: "Topic: " + topic }], o => !!(got = ieltsClean(o, sec)), 2400);
   if (!r.ok || !got) return json({ ok: false, error: r.error || "bad output" }, 502);
   const x = Object.assign({ id: Date.now().toString(36), sec, topic, at: Date.now() }, got);
-  if (kv) await cput(kv, pre + x.id, JSON.stringify(x));
+  if (kv) { await cput(kv, pre + x.id, JSON.stringify(x)); if (IX_LIST[pre]) IX_LIST[pre].ids.push(x.id); }
   return json(Object.assign({ ok: true, left: 0 }, x));
 }
 async function examGen(env, b) {
@@ -1308,10 +1311,10 @@ async function examGen(env, b) {
     const nz = de ? exNormDe : exNorm, n = k => Array.isArray(last && last[k]) ? last[k].length : 0, T = " " + nz(text) + " ", miss = ((last && (last.notes || last.gaps)) || []).filter(x => x && x.a && !T.includes(" " + nz(x.a) + " ")).map(x => x.a).slice(0, 4);
     return json({ ok: false, error: r.error || "bad output", detail: last ? Object.keys(last).map(k => k + ":" + n(k)).join(" ") + (miss.length ? " | 答案不在原文：" + miss.join(", ") : "") : "" }, 502);
   }
-  if (mode === "reading") { // 判断题再核对一遍（英语雅思、德语歌德都做）；核对后少于 2 道，就算这次没出好（再点一次重出）
+  if (mode === "reading") { // 判断题再核对一遍（英语雅思、德语歌德都做）
     got.tfng = await examTfCheck(env, text, got.tfng, de); // 核对不一致的判断题去掉（一道都不剩也照样出卷：段落、填空、选择题还在，不浪费这次出题）
   }
-  got.model = r.model; if (kv) await cput(kv, ck, JSON.stringify(got), { expirationTtl: 60 * 86400 });
+  got.model = r.model; if (kv) await cput(kv, ck, JSON.stringify(got), { expirationTtl: (mode === "reading" && (got.tfng || []).length < 2 ? 1 : 60) * 86400 }); // 判断题核对后剩不到 2 道：只存 1 天，明天同一篇会重新出完整的
   return json(Object.assign({ ok: true }, got));
 }
 async function ai(req, env) {

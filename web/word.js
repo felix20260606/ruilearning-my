@@ -138,7 +138,9 @@
     pop.style.left = left + "px"; pop.style.top = Math.max(8, Math.min(top, innerHeight - h - 8)) + "px";
   }
   function addBtn(w) {
-    const st = status(w);
+    let st = status(w);
+    if (st && window.VL === "de") { const n = x => String(x || "").normalize("NFC").replace(/[{}]/g, "").trim(), W0 = n(w), L = typeof words !== "undefined" ? words : []; // 德语：收了 Morgen（早晨）不等于收了 morgen（明天）
+      if (!L.some(x => n(x.word) === W0) && L.some(x => n(x.word).toLowerCase() === W0.toLowerCase())) st = ""; }
     return st ? '<button class="ui-btn in" disabled>' + (st === "kn" ? "已在生词本（已掌握）" : "已在生词本") + "</button>" : '<button class="ui-btn pri" data-a="padd">＋ 加入生词本</button>';
   }
   function html(w, d, loading) {

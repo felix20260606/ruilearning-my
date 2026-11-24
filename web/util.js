@@ -134,7 +134,7 @@
   const ABBR = new Set("mr mrs ms dr prof st jr sr mt vs fig gen col lt sgt capt rev hon inc ltd co corp dept approx jan feb mar apr jun jul aug sep sept oct nov dec al".split(" "));
   // 🇩🇪 学德语时另外不断的：缩写（z. B.、ca.、bzw.、Nr.…）和序数（am 23. Februar、im 19. Jahrhundert、zum 3. Mal）
   const ABBR_DE = new Set("z b u a d h o s bzw ca usw ggf inkl vgl evtl sog nr mio mrd jh jhd str bspw tel abs ff dt engl max min ehem gegr hrsg zb".split(" "));
-  const ORD_PREV = /(^|\s)(der|die|das|den|dem|des|am|im|vom|zum|zur|beim|ab|bis|seit|ihr|sein|seinem|ihrem|seines|ihres|unser|jeder)\s+\d{1,4}$/i; // 「der 30.」「am Dienstag den 6.」：冠词 / 介词后面的数字带点 = 序数
+  const ORD_PREV = /(^|\s)((der|die|das|den|dem|des|am|im|vom|zum|zur|beim|ihr|sein|seinem|ihrem|seines|ihres|unser|jeder)\s+\d{1,4}|(ab|bis|seit)\s+\d{1,2})$/i; // ab / bis / seit 后面只认 1–2 位：「seit 2019.」是年份、句子到这结束 // 「der 30.」「am Dienstag den 6.」：冠词 / 介词后面的数字带点 = 序数
 const ORD_NEXT = /^(Januar|Jänner|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember|Jahrhundert|Jahrhunderts|Jahrestag|Mal|Stock|Platz|Klasse|Runde|Spieltag|Geburtstag|Lebensjahr|Kapitel|Etage|Woche|Tag|Bundestag|Parteitag|Amendment)\b/;
   const isDeSents = () => typeof window !== "undefined" && window.VL === "de";
   // 分句：. ! ? … 后面跟空格、下一个字不是小写时断开；缩写（Mr.）、人名首字母（J. K.）、e.g. / U.S.、No. 5、小数都不断

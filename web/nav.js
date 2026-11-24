@@ -47,7 +47,7 @@
       if (isNew && cur) {
         try {
           if (cur.s[k] !== undefined && langOk(cur)) { if (!same(get(), cur.s[k])) { restoring++; try { set(cur.s[k]); } finally { setTimeout(() => { restoring--; }, DELAY + 50); } } return; }
-          const v = get(); if (v !== undefined) history.replaceState(Object.assign({}, history.state || {}, { nav: { id: cur.id, s: Object.assign({}, cur.s, { [k]: v }) } }), "", location.href);
+          const v = get(); if (v !== undefined) history.replaceState(Object.assign({}, history.state || {}, { nav: { id: cur.id, s: Object.assign({}, cur.s, { [k]: v }), lang: cur.lang || LANG_NOW() } }), "", location.href);
         } catch (e) {}
         return;
       }
