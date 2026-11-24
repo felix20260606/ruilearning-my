@@ -49,83 +49,66 @@
   .gmap.g{color:var(--soft);background:transparent;border-color:var(--line)}.gmap:hover{border-color:var(--ui-pur-line,#6d3a8f)}
   .places{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}.places li{background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-size:13.5px}.places small{display:block;color:var(--soft);font-size:12px;line-height:1.5;margin:2px 0 6px}
   @media (max-width:520px){.hero h1{font-size:27px}.sh{flex-wrap:wrap}.pics img{height:200px}.pics.two img{height:150px}}
+  /* 机票卡片 / 选路线 / 线路规划 */
+  .tk{border:1px solid var(--line);border-radius:14px;background:var(--paper-2);padding:10px 14px;margin:10px 0}
+  .tk-h{display:flex;gap:10px;align-items:baseline}.tk-h b{font-family:var(--display);font-size:18px;font-weight:900}.tk-h span{font-size:12.5px;color:var(--soft)}
+  .tk-b{display:flex;align-items:center;gap:10px;margin:6px 0}.tk-b>div:not(.tk-m){flex:0 0 auto}.tk-b>div>b{display:block;font-family:var(--display);font-size:26px;font-weight:900;line-height:1.1}.tk-b>div>span{font-size:12.5px;color:var(--soft)}
+  .tk-m{flex:1;text-align:center;font-size:12px;color:var(--soft);border-bottom:1px dashed var(--line);padding-bottom:3px}
+  .tk-f{font-size:12.5px;color:var(--soft)}.tk-f b{color:var(--ink)}
+  table.tl2{margin-top:10px}
+  .shared{font-size:13px;color:var(--soft);margin:22px 4px 0}
+  .pk{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .pk button{font:inherit;text-align:left;cursor:pointer;border:2px solid var(--line);background:var(--paper-2);color:var(--ink);border-radius:14px;padding:12px 14px}
+  .pk button b{display:block;font-size:17px;font-weight:900}.pk button span{display:block;font-size:12.5px;color:var(--soft);margin-top:3px;line-height:1.55}
+  .pk button.on{border-color:var(--ui-pur,#8b5cf6);background:var(--ui-pur-soft,rgba(139,92,246,.14))}
+  .route{display:none}.route.on{display:block}
+  .legs{list-style:none;counter-reset:lg}.legs li{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}.legs li:last-child{border-bottom:0}
+  .legs .ic{font-size:20px;flex:0 0 26px;text-align:center}.legs b{font-size:14.5px}.legs small{display:block;font-size:13px;color:var(--soft);margin:2px 0 6px}.legs small b{color:var(--ink);font-size:13px}
+  .legs .lk{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.legs .tm{font-size:12px;color:var(--soft)}
+  .gmap.nav2{color:#fff;background:var(--ui-pur,#8b5cf6);border-color:var(--ui-pur,#8b5cf6)}
+  @media (max-width:520px){.pk{grid-template-columns:1fr}.tk-b>div>b{font-size:22px}}
 </style><link rel="stylesheet" href="theme.css">
 </head><body>
 <div class="hero"><div class="hin">
   <div class="k">Chongqing · 10h Transit · No Sleep</div>
   <h1>🌶 重庆中转 · 半天暴走</h1>
-  <div class="sub">11/30（周一）· 05:15 落地江北 T3 → 15:55 飞杭州 · 地铁进城，照着走</div>
+  <div class="sub">11/30（周一）· 05:15 落地江北 T3 → 15:55 飞杭州 · 两条路线任选一条，照着走</div>
   <div class="stats">
-    <div class="stat"><b>~6h</b><span>在城里</span></div>
-    <div class="stat"><b>5</b><span>个打卡点</span></div>
+    <div class="stat"><b>05:15</b><span>落地 T3</span></div>
     <div class="stat"><b>12:40</b><span>最晚往回走</span></div>
-    <div class="stat"><b>≈¥150</b><span>全部花费</span></div>
+    <div class="stat"><b>13:55</b><span>前到 T3</span></div>
+    <div class="stat"><b>15:55</b><span>飞杭州</span></div>
   </div>
-  <div class="rl">✈️ 落地 → 🚇 10 号线进城 → 🍜 小面 → 🚡 长江索道 → 🏮 洪崖洞 + 千厮门大桥 → 🚝 李子坝轻轨穿楼 → 🍲 火锅 → 🚇 回 T3 → ✈️ 杭州</div>
+  <div class="rl">✈️ 落地 · 存包（两版一样）→ 🅰 经典版 <b>或</b> 🅱 全都要版 → 🚇 回 T3 → ✈️ 杭州</div>
 </div></div>
 <div class="wrap">
+
+  <section class="box" id="ticket">
+    <h2>✈️ 我的机票 · 11/30（周一）</h2>
+    <div class="tk"><div class="tk-h"><b>3U8196</b><span>四川航空 · 吉隆坡 → 重庆</span></div>
+      <div class="tk-b"><div><b>00:45</b><span>吉隆坡 KLIA <b>T1</b></span></div><div class="tk-m">✈ 4 小时 30 分</div><div><b>05:15</b><span>重庆江北 <b>T3</b></span></div></div>
+      <div class="tk-f">11/29 晚 <b>21:45 前</b>到 KLIA T1 值机（国际航班提前 3 小时）· 吉隆坡和北京没有时差</div></div>
+    <div class="tk"><div class="tk-h"><b>3U8081</b><span>四川航空 · 重庆 → 杭州</span></div>
+      <div class="tk-b"><div><b>15:55</b><span>重庆江北 <b>T3</b></span></div><div class="tk-m">✈ 2 小时 15 分</div><div><b>18:10</b><span>杭州萧山 <b>T4</b></span></div></div>
+      <div class="tk-f"><b>13:55 前</b>回到 T3（国内提前 2 小时）· 值机截止一般是起飞前 45 分钟（约 <b>15:10</b>，以航司为准）· 两张票分开买的</div></div>
+    <table class="tl2"><tr><th>时间</th><th>要做的事</th></tr>
+      <tr><td>05:15</td><td>落地 → 入境 → 4 楼存包（约 06:20 出来）</td></tr>
+      <tr><td>06:35</td><td>10 号线首班进城（A / B 两版从这里分开）</td></tr>
+      <tr><td><b>12:40</b></td><td><b>不管玩到哪都往机场走</b>（12:50 以后只能打车）</td></tr>
+      <tr><td><b>13:55</b></td><td>到 T3 4 楼 → 取包 → 值机 → 安检</td></tr>
+      <tr><td>15:55</td><td>起飞，飞机上睡 1.5–2 小时 → 18:10 杭州</td></tr></table>
+  </section>
 
   <div class="box warn">
     <h2>⚠️ 三条铁律</h2>
     <ul>
-      <li><b>12:40 必须往机场走</b>（不管玩到哪）；<b>13:55 前</b>到 T3 国内出发。托运截止一般是起飞前 45 分钟，安检排队也要时间</li>
+      <li><b>12:40 必须往机场走</b>（不管玩到哪）；<b>13:55 前</b>到 T3 国内出发</li>
       <li><b>今天是周一</b>：三峡博物馆等博物馆周一闭馆，别去</li>
-      <li><b>两种走法</b>：下面 1–8 段是 <b>A 版（经典版）</b>，有缓冲；想把十八梯、山城步道、罗汉寺、下浩里都走到就看 <a href="#all" style="color:inherit;font-weight:800">B 版（全都要版）</a>，前面落地和最后回机场两版一样</li>
       <li><b>重庆 10 度左右、常有雾、地面湿</b>：外套穿上，鞋要防滑；全程上坡下坎，比看地图累</li>
     </ul>
   </div>
 
-  <nav class="box" id="toc">
-    <h2>📍 时间线 · 点哪段跳到哪段</h2>
-    <ol class="toc">
-      <li><a href="#all"><span class="d">B 版</span><span><b>🔥 全都要版</b><small>李子坝 → 十八梯 → 山城步道 → 解放碑 → 罗汉寺 → 龙门浩 → 下浩里 → 洪崖洞 + 小面 + 火锅</small></span></a></li>
-      <li><a href="#s1"><span class="d">05:15</span><span><b>落地、入境</b><small>行李怎么办</small></span></a></li>
-      <li><a href="#s2"><span class="d">06:35</span><span><b>地铁进城</b><small>10 号线 → 6 号线 → 小什字</small></span></a></li>
-      <li><a href="#s3"><span class="d">07:45</span><span><b>吃小面</b><small>小什字 / 解放碑</small></span></a></li>
-      <li><a href="#s4"><span class="d">08:00</span><span><b>长江索道</b><small>过江看山城</small></span></a></li>
-      <li><a href="#s5"><span class="d">09:30</span><span><b>洪崖洞 + 千厮门大桥</b><small>白天人少</small></span></a></li>
-      <li><a href="#s6"><span class="d">10:45</span><span><b>李子坝轻轨穿楼</b><small>2 号线</small></span></a></li>
-      <li><a href="#s7"><span class="d">11:30</span><span><b>火锅午饭</b><small>一个人怎么吃</small></span></a></li>
-      <li><a href="#s8"><span class="d">12:40</span><span><b>回机场</b><small>地铁 / 打车</small></span></a></li>
-      <li><a href="#places"><span class="d">🗺</span><span><b>地址汇总</b><small>每个地点的高德链接</small></span></a></li>
-      <li><a href="#prep"><span class="d">🎒</span><span><b>出发前准备 + 花费</b><small>手机、App、不睡觉怎么撑</small></span></a></li>
-    </ol>
-  </nav>
-
-  <section class="st see" id="all">
-    <div class="sh"><span class="t">B 版</span><span class="em">🔥</span><div><h3>全都要版：9 个地方 + 一顿小面 + 一顿火锅</h3><p>按地图顺路排：先西（李子坝）→ 南（十八梯）→ 中（解放碑）→ 过江（龙门浩）→ 北（洪崖洞）→ 小什字坐车回机场</p></div><span class="c">一路小跑</span></div>
-    <div class="pics two"><a href="https://commons.wikimedia.org/wiki/File:Liziba_Station_with_02031_%2820191224152311%29.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Liziba%20Station%20with%2002031%20%2820191224152311%29.jpg?width=760" alt="李子坝轻轨穿楼"><span class="cap">早上先去李子坝</span></a><a href="https://commons.wikimedia.org/wiki/File:Hongya_Cave_20180520.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Hongya%20Cave%2020180520.jpg?width=760" alt="洪崖洞"><span class="cap">最后一站洪崖洞</span></a></div>
-    <div class="sb">
-      <div class="addr"><span class="a">📍 能去 9 个里的 8 个：<b>三峡博物馆 11/30 是周一，闭馆</b>，去不了</span><a class="gmap" href="https://uri.amap.com/search?keyword=%E6%9D%8E%E5%AD%90%E5%9D%9D%E8%BD%BB%E8%BD%A8%E7%A9%BF%E6%A5%BC%E8%A7%82%E6%99%AF%E5%B9%B3%E5%8F%B0&amp;city=%E9%87%8D%E5%BA%86&amp;callnative=1" target="_blank" rel="noopener">📍 李子坝</a><a class="gmap" href="https://uri.amap.com/search?keyword=%E5%8D%81%E5%85%AB%E6%A2%AF%E4%BC%A0%E7%BB%9F%E9%A3%8E%E8%B2%8C%E5%8C%BA&amp;city=%E9%87%8D%E5%BA%86&amp;callnative=1" target="_blank" rel="noopener">📍 十八梯</a><a class="gmap" href="https://uri.amap.com/search?keyword=%E5%B1%B1%E5%9F%8E%E6%AD%A5%E9%81%93&amp;city=%E9%87%8D%E5%BA%86&amp;callnative=1" target="_blank" rel="noopener">📍 山城步道</a><a class="gmap" href="https://uri.amap.com/search?keyword=%E7%BD%97%E6%B1%89%E5%AF%BA&amp;city=%E9%87%8D%E5%BA%86&amp;callnative=1" target="_blank" rel="noopener">📍 罗汉寺</a><a class="gmap" href="https://uri.amap.com/search?keyword=%E4%B8%8B%E6%B5%A9%E9%87%8C&amp;city=%E9%87%8D%E5%BA%86&amp;callnative=1" target="_blank" rel="noopener">📍 下浩里</a></div>
-      <table>
-        <tr><th>几点</th><th>去哪 · 怎么走</th><th>停多久</th></tr>
-        <tr><td><b>06:35</b></td><td>🚇 T3 坐 10 号线进城<small style="display:block;color:var(--soft)">高德导航到「<b>李子坝站</b>」，中间换 1–2 次线</small></td><td>约 1 小时</td></tr>
-        <tr><td><b>07:40</b></td><td>🚝 <b>李子坝</b>轻轨穿楼<small style="display:block;color:var(--soft)">出站过马路上观景平台（免费），看两三趟车从楼里穿出来；早高峰车多</small></td><td>15 分钟</td></tr>
-        <tr><td><b>08:00</b></td><td>🚇 2 号线 李子坝 → <b>较场口</b><small style="display:block;color:var(--soft)">约 15 分钟</small></td><td>—</td></tr>
-        <tr><td><b>08:15</b></td><td>🍜 <b>小面</b>早饭<small style="display:block;color:var(--soft)">较场口 / 十八梯口找一家人多的，二两小面 + 豌杂，说「微辣」</small></td><td>20 分钟</td></tr>
-        <tr><td><b>08:40</b></td><td>🪜 <b>十八梯传统风貌区</b><small style="display:block;color:var(--soft)">从较场口（上面）往下走，石阶老街、吊脚楼，早上没人好拍</small></td><td>25 分钟</td></tr>
-        <tr><td><b>09:05</b></td><td>🌿 <b>山城步道</b><small style="display:block;color:var(--soft)">高德导航「山城步道」，走一段崖边步道看长江和老房子，不用走完</small></td><td>30 分钟</td></tr>
-        <tr><td><b>09:40</b></td><td>🛍 <b>解放碑步行街</b><small style="display:block;color:var(--soft)">走 10–15 分钟过去，穿过去就行（商场 10 点才开）</small></td><td>10 分钟</td></tr>
-        <tr><td><b>10:00</b></td><td>🙏 <b>罗汉寺</b><small style="display:block;color:var(--soft)">解放碑走约 15 分钟；500 尊罗汉，门票约 ¥20（含香），开门时间没查到</small></td><td>20 分钟</td></tr>
-        <tr><td><b>10:30</b></td><td>🚡 <b>长江索道</b>北站（新华路）<small style="display:block;color:var(--soft)">罗汉寺走 5–10 分钟；买<b>往返 ¥50</b>，过江 3 分钟</small></td><td>15 分钟</td></tr>
-        <tr><td><b>10:45</b></td><td>🏚 <b>龙门浩老街</b> → <b>下浩里</b><small style="display:block;color:var(--soft)">索道南站出来就是龙门浩；往东走约 13 分钟到下浩里（老街区、江景），再走回南站</small></td><td>40 分钟</td></tr>
-        <tr><td><b>11:30</b></td><td>🚡 索道回北岸 → 🏮 <b>洪崖洞</b><small style="display:block;color:var(--soft)">北站走约 15 分钟到洪崖洞，从顶层沧白路进、往下看一眼 + 千厮门大桥</small></td><td>25 分钟</td></tr>
-        <tr><td><b>12:00</b></td><td>🍲 <b>火锅</b><small style="display:block;color:var(--soft)">洪崖洞 / 小什字附近，「一人食小火锅」或鸳鸯锅点三四样（毛肚、鸭肠、黄喉），<b>40 分钟内吃完</b></small></td><td>40 分钟</td></tr>
-        <tr><td><b>12:40</b></td><td>🏃 <b>回机场</b><small style="display:block;color:var(--soft)">走到小什字坐 6 号线 → 红土地换 10 号线 → T3，约 1 小时；<b>12:50 以后只能打车</b>（40–50 分钟，¥80–100）</small></td><td>—</td></tr>
-      </table>
-      <div class="tip"><b>⚠️ 来得及，但没有一分钟休息</b>：前一晚飞机上只睡了 3 小时，还要走 5 小时坡和台阶。所以定好<b>落后就砍</b>的顺序，看表照做：
-        <ul style="padding-left:20px;margin-top:4px">
-          <li><b>09:40</b> 还没离开十八梯 → 砍<b>山城步道</b></li>
-          <li><b>10:30</b> 还没到索道北站 → 砍<b>罗汉寺</b>（离索道不远，路过看一眼门口就行）</li>
-          <li><b>10:50</b> 还没到南岸 → 砍<b>下浩里</b>，只逛龙门浩老街</li>
-          <li><b>12:00</b> 还没坐下吃火锅 → 改成洪崖洞附近一碗<b>酸辣粉 / 小面</b>，火锅下次</li>
-          <li><b>12:40</b> 不管玩到哪都往回走；<b>13:55 前</b>必须到 T3</li>
-        </ul>
-      </div>
-      <div class="tip"><b>想轻松一点：</b>直接按上面的 A 版（经典版）走——索道、洪崖洞、李子坝、小面、火锅都有，还留了缓冲；再从 B 版里挑一两个顺路的加进去（十八梯离解放碑最近）。</div>
-      <div class="nav"><a href="#toc">↑ 时间线</a><a href="#s1">A 版从头看 ›</a></div>
-    </div>
-  </section>
+  <div class="shared">📌 下面这段（落地、入境、存包）A / B 两版一样</div>
 
   <section class="st" id="s1">
     <div class="sh"><span class="t">05:15</span><span class="em">✈️</span><div><h3>落地江北 T3 · 入境</h3><p>3U8196 · 约 1 小时出来</p></div></div>
@@ -148,8 +131,44 @@
         </li>
         <li>洗把脸、上个厕所、买瓶水，<b>06:30 去地铁站</b>（T3 航站楼直接连着地铁站，跟着「地铁 / 轨道交通」的牌子走）</li>
       </ol>
-      <div class="nav"><a href="#toc">↑ 时间线</a><a href="#s2">下一段 ›</a></div>
+      <div class="nav"><a href="#ticket">↑ 机票</a><a href="#pick">下一步：选 A / B 路线 ›</a></div>
     </div>
+  </section>
+
+  <section class="box" id="pick">
+    <h2>🔀 选一条路线（点一下切换，另一条就藏起来）</h2>
+    <div class="pk">
+      <button type="button" data-r="A"><b>🅰 经典版</b><span>小面 · 长江索道 · 洪崖洞 · 李子坝 · 火锅<br>5 个地方，有缓冲，<b>推荐</b></span></button>
+      <button type="button" data-r="B"><b>🅱 全都要版</b><span>李子坝 · 十八梯 · 山城步道 · 解放碑 · 罗汉寺 · 索道 · 龙门浩 · 下浩里 · 洪崖洞 + 小面 + 火锅<br>8 个地方，一路小跑</span></button>
+    </div>
+  </section>
+
+  <div class="route" id="routeA">
+  <nav class="box" id="tocA">
+    <h2>🅰 经典版 · 时间线（点哪段跳到哪段）</h2>
+    <ol class="toc">
+      <li><a href="#s2"><span class="d">06:35</span><span><b>地铁进城</b><small>10 号线 → 6 号线 → 小什字</small></span></a></li>
+      <li><a href="#s3"><span class="d">07:45</span><span><b>吃小面</b><small>小什字 / 解放碑</small></span></a></li>
+      <li><a href="#s4"><span class="d">08:00</span><span><b>长江索道</b><small>过江看山城</small></span></a></li>
+      <li><a href="#s5"><span class="d">09:30</span><span><b>洪崖洞 + 千厮门大桥</b><small>白天人少</small></span></a></li>
+      <li><a href="#s6"><span class="d">10:45</span><span><b>李子坝轻轨穿楼</b><small>2 号线</small></span></a></li>
+      <li><a href="#s7"><span class="d">11:30</span><span><b>火锅午饭</b><small>一个人怎么吃</small></span></a></li>
+      <li><a href="#s8"><span class="d">12:40</span><span><b>回机场</b><small>2 号线 → 10 号线</small></span></a></li>
+      <li><a href="#routeA-legs"><span class="d">🧭</span><span><b>线路规划 + 导航</b><small>每一段坐哪条线、几站</small></span></a></li>
+    </ol>
+  </nav>
+  <section class="box" id="routeA-legs">
+    <h2>🧭 A 版线路规划（每段点「路线」直接导航）</h2>
+    <ol class="legs">
+      <li><span class="ic">🚇</span><div><b>T3 → 小什字</b><small>10 号线<b>往兰花路方向</b>坐 <b>9 站</b>到<b>红土地</b> → 换 <b>6 号线往重庆东（茶园）方向</b>坐 <b>4 站</b>到<b>小什字</b></small><div class="lk"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E6%B1%9F%E5%8C%97%E5%9B%BD%E9%99%85%E6%9C%BA%E5%9C%BAT3%E8%88%AA%E7%AB%99%E6%A5%BC&amp;destination=name:%E5%B0%8F%E4%BB%80%E5%AD%97%E7%AB%99&amp;mode=transit&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 公交 / 地铁路线</a><span class="tm">约 55 分钟 · ¥5–7</span></div></div></li>
+      <li><span class="ic">🚶</span><div><b>小什字站 → 长江索道北站（新华路）</b><small>出站走路，路上吃小面</small><div class="lk"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E5%B0%8F%E4%BB%80%E5%AD%97%E7%AB%99&amp;destination=name:%E9%95%BF%E6%B1%9F%E7%B4%A2%E9%81%93%E5%8C%97%E7%AB%99&amp;mode=walking&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 步行路线</a><span class="tm">约 5–8 分钟</span></div></div></li>
+      <li><span class="ic">🚡</span><div><b>长江索道 北站 ⇄ 南站（龙门浩）</b><small>买往返 ¥50，过江 3 分钟，南岸逛 15 分钟再坐回来</small><div class="lk"><a class="gmap" href="https://uri.amap.com/search?keyword=%E9%95%BF%E6%B1%9F%E7%B4%A2%E9%81%93%E5%8C%97%E7%AB%99&amp;city=%E9%87%8D%E5%BA%86&amp;callnative=1" target="_blank" rel="noopener">📍 索道北站</a><span class="tm">约 40 分钟</span></div></div></li>
+      <li><span class="ic">🚶</span><div><b>长江索道北站 → 洪崖洞</b><small>沿新华路 / 沧白路走，从洪崖洞顶层进</small><div class="lk"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E9%95%BF%E6%B1%9F%E7%B4%A2%E9%81%93%E5%8C%97%E7%AB%99&amp;destination=name:%E6%B4%AA%E5%B4%96%E6%B4%9E&amp;mode=walking&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 步行路线</a><span class="tm">约 15 分钟</span></div></div></li>
+      <li><span class="ic">🚇</span><div><b>洪崖洞 → 李子坝</b><small>走 10 分钟到 <b>2 号线临江门站</b> → <b>往鱼洞方向 5 站</b>到<b>李子坝</b></small><div class="lk"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E6%B4%AA%E5%B4%96%E6%B4%9E&amp;destination=name:%E6%9D%8E%E5%AD%90%E5%9D%9D%E7%AB%99&amp;mode=transit&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 公交 / 地铁路线</a><span class="tm">约 25 分钟</span></div></div></li>
+      <li><span class="ic">🍲</span><div><b>李子坝附近吃火锅</b><small>李子坝 / 鹅岭一带「一人食火锅」</small><div class="lk"><a class="gmap" href="https://uri.amap.com/search?keyword=%E4%B8%80%E4%BA%BA%E9%A3%9F%E7%81%AB%E9%94%85&amp;city=%E9%87%8D%E5%BA%86&amp;callnative=1" target="_blank" rel="noopener">📍 搜火锅</a><span class="tm">40–50 分钟</span></div></div></li>
+      <li><span class="ic">🚇</span><div><b>李子坝 → 江北机场 T3</b><small><b>2 号线往较场口方向 2 站</b>到<b>曾家岩</b> → 换 <b>10 号线往王家庄方向 11 站</b>到 T3（12:50 以后改打车 40–50 分钟）</small><div class="lk"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E6%9D%8E%E5%AD%90%E5%9D%9D%E7%AB%99&amp;destination=name:%E6%B1%9F%E5%8C%97%E5%9B%BD%E9%99%85%E6%9C%BA%E5%9C%BAT3%E8%88%AA%E7%AB%99%E6%A5%BC&amp;mode=transit&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 公交 / 地铁路线</a><span class="tm">约 50 分钟 · ¥6</span></div></div></li>
+    </ol>
+    <div class="tip"><b>导航按钮</b>打开的是百度地图的公交 / 步行路线（不用装 App，网页也能看）；习惯用高德就点各段里的「📍」搜地点，再点「路线」。</div>
   </section>
 
   <section class="st go" id="s2">
@@ -159,11 +178,11 @@
       <div class="addr"><span class="a">📍 10 号线 江北机场T3航站楼站 → 红土地站（换 6 号线）→ 小什字站 · 渝中区</span><a class="gmap" href="https://uri.amap.com/search?keyword=%E6%B1%9F%E5%8C%97%E6%9C%BA%E5%9C%BAT3%E8%88%AA%E7%AB%99%E6%A5%BC%E5%9C%B0%E9%93%81%E7%AB%99&amp;city=%E9%87%8D%E5%BA%86&amp;callnative=1" target="_blank" rel="noopener">🚇 T3 地铁站</a><a class="gmap" href="https://uri.amap.com/search?keyword=%E5%B0%8F%E4%BB%80%E5%AD%97%E5%9C%B0%E9%93%81%E7%AB%99&amp;city=%E9%87%8D%E5%BA%86&amp;callnative=1" target="_blank" rel="noopener">🚇 小什字站</a></div>
       <ol>
         <li>支付宝打开<b>「乘车码」</b>（搜「重庆轨道」或直接用支付宝乘车码，第一次要开通）刷码进站</li>
-        <li>坐 <b>10 号线</b>（江北机场 T3 航站楼站，首班约 06:35）→ <b>红土地</b>站下，换 <b>6 号线</b> → <b>小什字</b>站下<small style="display:block;color:var(--soft)">7:40 左右到；以高德地图实时导航为准，换乘按地图来</small></li>
+        <li><b>10 号线</b>（江北机场 T3 航站楼站，首班约 06:35）坐<b>往兰花路方向</b> <b>9 站</b>到<b>红土地</b> → 换 <b>6 号线</b>坐<b>往重庆东（茶园）方向</b> <b>4 站</b>到<b>小什字</b><small style="display:block;color:var(--soft)">7:40 左右到；以高德地图实时导航为准，换乘按地图来</small></li>
         <li>出站走路就是江边、解放碑一带</li>
       </ol>
       <div class="tip"><b>不想换乘 / 赶时间：</b>出口打网约车（滴滴 / 高德打车）到「长江索道（新华路站）」，约 40 分钟、七八十元。</div>
-      <div class="nav"><a href="#toc">↑ 时间线</a><a href="#s1">‹ 上一段</a><a href="#s3">下一段 ›</a></div>
+      <div class="nav"><a href="#tocA">↑ A 版目录</a><a href="#s1">‹ 落地存包</a><a href="#s3">下一段 ›</a></div>
     </div>
   </section>
 
@@ -177,7 +196,7 @@
         <li>挑本地人排队、门口一排小凳子的那种；高德 / 大众点评搜「小面」看附近评分</li>
         <li>没睡觉：这时候来一杯咖啡（解放碑一带瑞幸、Manner 都有）</li>
       </ul>
-      <div class="nav"><a href="#toc">↑ 时间线</a><a href="#s2">‹ 上一段</a><a href="#s4">下一段 ›</a></div>
+      <div class="nav"><a href="#tocA">↑ A 版目录</a><a href="#s2">‹ 上一段</a><a href="#s4">下一段 ›</a></div>
     </div>
   </section>
 
@@ -192,7 +211,7 @@
         <li>到了南岸可以在<b>龙门浩老街</b>走 15 分钟（老建筑、江景），再坐回北岸</li>
         <li>大雾天看不远，但雾里坐索道也很有感觉；只坐一程也行</li>
       </ul>
-      <div class="nav"><a href="#toc">↑ 时间线</a><a href="#s3">‹ 上一段</a><a href="#s5">下一段 ›</a></div>
+      <div class="nav"><a href="#tocA">↑ A 版目录</a><a href="#s3">‹ 上一段</a><a href="#s5">下一段 ›</a></div>
     </div>
   </section>
 
@@ -206,7 +225,7 @@
         <li>走上 <b>千厮门大桥</b>人行道，回头拍洪崖洞全景 + 嘉陵江、长江交汇</li>
         <li>店铺 10 点以后陆续开门，可以买点手信（麻花、牛肉干、火锅底料——<b>火锅底料别放随身包</b>，过安检会被扣）</li>
       </ul>
-      <div class="nav"><a href="#toc">↑ 时间线</a><a href="#s4">‹ 上一段</a><a href="#s6">下一段 ›</a></div>
+      <div class="nav"><a href="#tocA">↑ A 版目录</a><a href="#s4">‹ 上一段</a><a href="#s6">下一段 ›</a></div>
     </div>
   </section>
 
@@ -216,12 +235,12 @@
     <div class="sb">
       <div class="addr"><span class="a">📍 李子坝站：渝中区李子坝正街（2 号线）· 观景平台在站下马路边</span><a class="gmap" href="https://uri.amap.com/search?keyword=%E6%9D%8E%E5%AD%90%E5%9D%9D%E8%BD%BB%E8%BD%A8%E7%A9%BF%E6%A5%BC%E8%A7%82%E6%99%AF%E5%B9%B3%E5%8F%B0&amp;city=%E9%87%8D%E5%BA%86&amp;callnative=1" target="_blank" rel="noopener">📍 观景平台</a><a class="gmap" href="https://uri.amap.com/search?keyword=%E6%9D%8E%E5%AD%90%E5%9D%9D%E6%8A%97%E6%88%98%E9%81%97%E5%9D%80%E5%85%AC%E5%9B%AD&amp;city=%E9%87%8D%E5%BA%86&amp;callnative=1" target="_blank" rel="noopener">📍 李子坝公园</a><a class="gmap g" href="https://www.google.com/maps/search/?api=1&amp;query=Liziba%20Station%20Chongqing" target="_blank" rel="noopener">Google</a></div>
       <ol>
-        <li>从洪崖洞走到最近的 <b>2 号线</b>车站（临江门 / 较场口，高德导航，10–15 分钟）</li>
-        <li>坐 2 号线到 <b>李子坝</b>站，约 15 分钟；出站过马路就是<b>观景平台</b>（免费，别理路边收费带路的）</li>
+        <li>从洪崖洞走约 10 分钟到 <b>2 号线临江门站</b></li>
+        <li>坐 2 号线<b>往鱼洞方向 5 站</b>到 <b>李子坝</b>站，约 15 分钟；出站过马路就是<b>观景平台</b>（免费，别理路边收费带路的）</li>
         <li>列车几分钟一趟，看两三趟从楼里穿出来；拍照站平台中间偏左</li>
         <li>旁边 <b>李子坝公园</b>（抗战遗址，免费）可以走走</li>
       </ol>
-      <div class="nav"><a href="#toc">↑ 时间线</a><a href="#s5">‹ 上一段</a><a href="#s7">下一段 ›</a></div>
+      <div class="nav"><a href="#tocA">↑ A 版目录</a><a href="#s5">‹ 上一段</a><a href="#s7">下一段 ›</a></div>
     </div>
   </section>
 
@@ -236,7 +255,7 @@
         <li><b>微辣</b>就够辣了；下午还要坐飞机，别吃太撑、别喝冰的太多</li>
         <li>不想吃火锅：再来一碗小面 + 酸辣粉，二十块搞定</li>
       </ul>
-      <div class="nav"><a href="#toc">↑ 时间线</a><a href="#s6">‹ 上一段</a><a href="#s8">下一段 ›</a></div>
+      <div class="nav"><a href="#tocA">↑ A 版目录</a><a href="#s6">‹ 上一段</a><a href="#s8">下一段 ›</a></div>
     </div>
   </section>
 
@@ -246,14 +265,166 @@
     <div class="sb">
       <div class="addr"><span class="a">📍 江北国际机场 T3 航站楼 4 楼出发层 · 四川航空值机柜台</span><a class="gmap" href="https://uri.amap.com/search?keyword=%E6%B1%9F%E5%8C%97%E5%9B%BD%E9%99%85%E6%9C%BA%E5%9C%BAT3%E8%88%AA%E7%AB%99%E6%A5%BC&amp;city=%E9%87%8D%E5%BA%86&amp;callnative=1" target="_blank" rel="noopener">📍 高德地图</a><a class="gmap g" href="https://www.google.com/maps/search/?api=1&amp;query=Chongqing%20Jiangbei%20International%20Airport%20Terminal%203" target="_blank" rel="noopener">Google</a></div>
       <ul>
-        <li><b>地铁（便宜）</b>：高德导航到「江北机场 T3 航站楼」，大约要 1 小时 10 分钟、换乘一两次（李子坝出发一般是 2 号线 → 3 号线 / 10 号线）</li>
+        <li><b>地铁（便宜）</b>：李子坝坐 <b>2 号线往较场口方向 2 站</b>到<b>曾家岩</b> → 换 <b>10 号线往王家庄方向 11 站</b>到<b>江北机场 T3 航站楼</b>，约 50 分钟、¥6 左右</li>
         <li><b>打车（稳）</b>：滴滴 / 高德打车，约 40–50 分钟、七八十到一百元；中午不太堵，累了就直接打车</li>
         <li>到了 T3：<b>4 楼出发大厅</b> → 先去 3H 值机岛北侧<b>取寄存的包</b>（凭条 / 照片）→ 四川航空柜台或自助机值机（3U8081，两个包都随身，不用托运）→ 安检 → 登机口</li>
         <li>15:55 起飞，<b>飞机上睡 1.5–2 小时</b>；18:10 到杭州萧山 T4</li>
       </ul>
-      <div class="nav"><a href="#toc">↑ 时间线</a><a href="#s7">‹ 上一段</a><a href="#places">地址汇总 ›</a></div>
+      <div class="nav"><a href="#tocA">↑ A 版目录</a><a href="#s7">‹ 上一段</a><a href="#pick">换 B 版看看</a></div>
     </div>
   </section>
+  </div>
+
+  <div class="route" id="routeB">
+  <nav class="box" id="tocB">
+    <h2>🅱 全都要版 · 时间线（点哪段跳到哪段）</h2>
+    <ol class="toc">
+      <li><a href="#b1"><span class="d">06:35</span><span><b>🚇 地铁去李子坝</b><small>10 号线 → 曾家岩换 2 号线</small></span></a></li>
+      <li><a href="#b2"><span class="d">07:40</span><span><b>🚝 李子坝轻轨穿楼</b><small>出站过马路上观景平台</small></span></a></li>
+      <li><a href="#b3"><span class="d">08:00</span><span><b>🍜 2 号线到较场口 → 吃小面</b><small>2 号线往较场口方向 6 站</small></span></a></li>
+      <li><a href="#b4"><span class="d">08:40</span><span><b>🪜 十八梯传统风貌区</b><small>从上（较场口）往下走</small></span></a></li>
+      <li><a href="#b5"><span class="d">09:05</span><span><b>🌿 山城步道</b><small>十八梯往西走 10 分钟</small></span></a></li>
+      <li><a href="#b6"><span class="d">09:40</span><span><b>🛍 解放碑步行街</b><small>走 15 分钟过去</small></span></a></li>
+      <li><a href="#b7"><span class="d">10:00</span><span><b>🙏 罗汉寺</b><small>解放碑走约 8 分钟</small></span></a></li>
+      <li><a href="#b8"><span class="d">10:30</span><span><b>🚡 长江索道 → 龙门浩老街 → 下浩里</b><small>罗汉寺走约 10 分钟到北站</small></span></a></li>
+      <li><a href="#b9"><span class="d">11:30</span><span><b>🏮 洪崖洞 + 千厮门大桥</b><small>坐索道回北岸，走 15 分钟</small></span></a></li>
+      <li><a href="#b10"><span class="d">12:00</span><span><b>🍲 火锅</b><small>洪崖洞 / 小什字附近</small></span></a></li>
+      <li><a href="#b11"><span class="d">12:40</span><span><b>🏃 回机场</b><small>小什字 6 号线 → 红土地换 10 号线</small></span></a></li>
+      <li><a href="#routeB-legs"><span class="d">🧭</span><span><b>线路规划 + 导航</b><small>每一段坐哪条线、几站</small></span></a></li>
+    </ol>
+    <div class="tip"><b>⚠️ 来得及，但没有一分钟休息</b>（前一晚只睡 3 小时，还要走 5 小时坡和台阶）。<b>落后就砍</b>：09:40 砍山城步道 → 10:30 砍罗汉寺 → 10:50 砍下浩里 → 12:00 火锅改酸辣粉 → <b>12:40 不管到哪都回机场</b>。三峡博物馆周一闭馆，去不了。</div>
+  </nav>
+  <section class="box" id="routeB-legs">
+    <h2>🧭 B 版线路规划（每段点「路线」直接导航）</h2>
+    <ol class="legs">
+      <li><span class="ic">🚇</span><div><b>T3 → 李子坝</b><small>10 号线<b>往兰花路方向</b>坐 <b>11 站</b>到<b>曾家岩</b> → 换 <b>2 号线往鱼洞方向</b>坐 <b>2 站</b>到<b>李子坝</b></small><div class="lk"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E6%B1%9F%E5%8C%97%E5%9B%BD%E9%99%85%E6%9C%BA%E5%9C%BAT3%E8%88%AA%E7%AB%99%E6%A5%BC&amp;destination=name:%E6%9D%8E%E5%AD%90%E5%9D%9D%E7%AB%99&amp;mode=transit&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 公交 / 地铁路线</a><span class="tm">约 45 分钟 · ¥5–7</span></div></div></li>
+      <li><span class="ic">🚇</span><div><b>李子坝 → 较场口</b><small><b>2 号线往较场口方向</b>坐 <b>6 站</b>到终点<b>较场口</b></small><div class="lk"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E6%9D%8E%E5%AD%90%E5%9D%9D%E7%AB%99&amp;destination=name:%E8%BE%83%E5%9C%BA%E5%8F%A3%E7%AB%99&amp;mode=transit&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 公交 / 地铁路线</a><span class="tm">约 15 分钟</span></div></div></li>
+      <li><span class="ic">🚶</span><div><b>较场口 → 十八梯（顺路吃小面）</b><small>出站沿中兴路走，十八梯从上往下走</small><div class="lk"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E8%BE%83%E5%9C%BA%E5%8F%A3%E7%AB%99&amp;destination=name:%E5%8D%81%E5%85%AB%E6%A2%AF%E4%BC%A0%E7%BB%9F%E9%A3%8E%E8%B2%8C%E5%8C%BA&amp;mode=walking&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 步行路线</a><span class="tm">约 5 分钟</span></div></div></li>
+      <li><span class="ic">🚶</span><div><b>十八梯 → 山城步道（山城巷起点）</b><small>往西走</small><div class="lk"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E5%8D%81%E5%85%AB%E6%A2%AF%E4%BC%A0%E7%BB%9F%E9%A3%8E%E8%B2%8C%E5%8C%BA&amp;destination=name:%E5%B1%B1%E5%9F%8E%E6%AD%A5%E9%81%93&amp;mode=walking&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 步行路线</a><span class="tm">约 10 分钟</span></div></div></li>
+      <li><span class="ic">🚶</span><div><b>山城步道 → 解放碑</b><small>走一段步道后往解放碑方向走</small><div class="lk"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E5%B1%B1%E5%9F%8E%E6%AD%A5%E9%81%93&amp;destination=name:%E8%A7%A3%E6%94%BE%E7%A2%91&amp;mode=walking&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 步行路线</a><span class="tm">约 15 分钟</span></div></div></li>
+      <li><span class="ic">🚶</span><div><b>解放碑 → 罗汉寺</b><small>穿过步行街往东北走</small><div class="lk"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E8%A7%A3%E6%94%BE%E7%A2%91&amp;destination=name:%E7%BD%97%E6%B1%89%E5%AF%BA&amp;mode=walking&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 步行路线</a><span class="tm">约 8 分钟</span></div></div></li>
+      <li><span class="ic">🚶</span><div><b>罗汉寺 → 长江索道北站（新华路）</b><small>往东南走</small><div class="lk"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E7%BD%97%E6%B1%89%E5%AF%BA&amp;destination=name:%E9%95%BF%E6%B1%9F%E7%B4%A2%E9%81%93%E5%8C%97%E7%AB%99&amp;mode=walking&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 步行路线</a><span class="tm">约 10 分钟</span></div></div></li>
+      <li><span class="ic">🚡</span><div><b>索道过江 → 龙门浩老街 → 下浩里</b><small>买往返 ¥50；南站出来就是龙门浩，下浩里就在隔壁走 5 分钟。<b>索道排长队</b>：改坐 <b>6 号线小什字 ⇄ 上新街</b>（1 站过江，上新街 2 号口就是龙门浩）</small><div class="lk"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E9%95%BF%E6%B1%9F%E7%B4%A2%E9%81%93%E5%8D%97%E7%AB%99&amp;destination=name:%E4%B8%8B%E6%B5%A9%E9%87%8C&amp;mode=walking&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 步行路线</a><span class="tm">约 45 分钟</span></div></div></li>
+      <li><span class="ic">🚶</span><div><b>长江索道北站 → 洪崖洞</b><small>从顶层沧白路进</small><div class="lk"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E9%95%BF%E6%B1%9F%E7%B4%A2%E9%81%93%E5%8C%97%E7%AB%99&amp;destination=name:%E6%B4%AA%E5%B4%96%E6%B4%9E&amp;mode=walking&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 步行路线</a><span class="tm">约 15 分钟</span></div></div></li>
+      <li><span class="ic">🍲</span><div><b>洪崖洞 / 小什字附近吃火锅</b><small>40 分钟内吃完</small><div class="lk"><a class="gmap" href="https://uri.amap.com/search?keyword=%E4%B8%80%E4%BA%BA%E9%A3%9F%E7%81%AB%E9%94%85&amp;city=%E9%87%8D%E5%BA%86&amp;callnative=1" target="_blank" rel="noopener">📍 搜火锅</a><span class="tm">40 分钟</span></div></div></li>
+      <li><span class="ic">🚇</span><div><b>小什字 → 江北机场 T3</b><small>走 10 分钟到<b>小什字站</b> → <b>6 号线往北碚（沙河坝）方向 4 站</b>到<b>红土地</b> → 换 <b>10 号线往王家庄方向 9 站</b>到 T3（12:50 以后改打车）</small><div class="lk"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E5%B0%8F%E4%BB%80%E5%AD%97%E7%AB%99&amp;destination=name:%E6%B1%9F%E5%8C%97%E5%9B%BD%E9%99%85%E6%9C%BA%E5%9C%BAT3%E8%88%AA%E7%AB%99%E6%A5%BC&amp;mode=transit&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 公交 / 地铁路线</a><span class="tm">约 55 分钟 · ¥6</span></div></div></li>
+    </ol>
+    <div class="tip"><b>导航按钮</b>打开的是百度地图的公交 / 步行路线（不用装 App，网页也能看）；习惯用高德就搜地点名，再点「路线」。</div>
+  </section>
+
+  <section class="st go" id="b1">
+    <div class="sh"><span class="t">06:35</span><span class="em">🚇</span><div><h3>地铁去李子坝</h3><p>10 号线 → 曾家岩换 2 号线 · 约 45 分钟</p></div><span class="c">¥5–7</span></div>
+    <div class="pics"><a href="https://commons.wikimedia.org/wiki/File:Terminal_3_of_Jiangbei_Airport_Station_Line_10.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Terminal%203%20of%20Jiangbei%20Airport%20Station%20Line%2010.jpg?width=760" alt="10 号线 T3 站"><span class="cap">10 号线 T3 站</span></a></div>
+    <div class="sb">
+      <ul><li>支付宝「乘车码」刷码进站（第一次要开通）</li><li>10 号线<b>往兰花路方向 11 站</b>到<b>曾家岩</b>，换 <b>2 号线往鱼洞方向 2 站</b>到<b>李子坝</b></li></ul>
+      <div class="addr"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E6%B1%9F%E5%8C%97%E5%9B%BD%E9%99%85%E6%9C%BA%E5%9C%BAT3%E8%88%AA%E7%AB%99%E6%A5%BC&amp;destination=name:%E6%9D%8E%E5%AD%90%E5%9D%9D%E7%AB%99&amp;mode=transit&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 公交 / 地铁路线</a></div>
+      <div class="nav"><a href="#tocB">↑ B 版目录</a><a href="#b2">下一段 ›</a></div>
+    </div>
+  </section>
+
+  <section class="st go" id="b2">
+    <div class="sh"><span class="t">07:40</span><span class="em">🚝</span><div><h3>李子坝轻轨穿楼</h3><p>出站过马路上观景平台 · 免费</p></div><span class="c">免费</span></div>
+    <div class="pics"><a href="https://commons.wikimedia.org/wiki/File:Liziba_Station_with_02031_%2820191224152311%29.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Liziba%20Station%20with%2002031%20%2820191224152311%29.jpg?width=760" alt="李子坝轻轨穿楼"><span class="cap">李子坝轻轨穿楼</span></a></div>
+    <div class="sb">
+      <ul><li>看两三趟车从楼里穿出来就走；早高峰车多</li><li>别理路边收费带路的</li></ul>
+      <div class="addr"><a class="gmap" href="https://uri.amap.com/search?keyword=%E6%9D%8E%E5%AD%90%E5%9D%9D%E8%BD%BB%E8%BD%A8%E7%A9%BF%E6%A5%BC%E8%A7%82%E6%99%AF%E5%B9%B3%E5%8F%B0&amp;city=%E9%87%8D%E5%BA%86&amp;callnative=1" target="_blank" rel="noopener">📍 观景平台</a></div>
+      <div class="nav"><a href="#tocB">↑ B 版目录</a><a href="#b1">‹ 上一段</a><a href="#b3">下一段 ›</a></div>
+    </div>
+  </section>
+
+  <section class="st eat" id="b3">
+    <div class="sh"><span class="t">08:00</span><span class="em">🍜</span><div><h3>2 号线到较场口 → 吃小面</h3><p>2 号线往较场口方向 6 站 · 约 15 分钟</p></div><span class="c">¥10–20</span></div>
+    <div class="pics"><a href="https://commons.wikimedia.org/wiki/File:%E9%87%8D%E5%BA%86%E5%B0%8F%E9%9D%A2_-_2024-05-25.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/%E9%87%8D%E5%BA%86%E5%B0%8F%E9%9D%A2%20-%202024-05-25.jpg?width=760" alt="重庆小面"><span class="cap">重庆小面</span></a></div>
+    <div class="sb">
+      <ul><li>较场口 / 十八梯口找一家人多的</li><li>二两小面 + 豌杂，说「微辣」</li></ul>
+      <div class="addr"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E6%9D%8E%E5%AD%90%E5%9D%9D%E7%AB%99&amp;destination=name:%E8%BE%83%E5%9C%BA%E5%8F%A3%E7%AB%99&amp;mode=transit&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 公交 / 地铁路线</a></div>
+      <div class="nav"><a href="#tocB">↑ B 版目录</a><a href="#b2">‹ 上一段</a><a href="#b4">下一段 ›</a></div>
+    </div>
+  </section>
+
+  <section class="st see" id="b4">
+    <div class="sh"><span class="t">08:40</span><span class="em">🪜</span><div><h3>十八梯传统风貌区</h3><p>从上（较场口）往下走 · 石阶老街 · 免费</p></div><span class="c">免费</span></div>
+    
+    <div class="sb">
+      <ul><li>早上没人，好拍</li><li>台阶湿滑，慢慢走</li></ul>
+      <div class="addr"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E8%BE%83%E5%9C%BA%E5%8F%A3%E7%AB%99&amp;destination=name:%E5%8D%81%E5%85%AB%E6%A2%AF%E4%BC%A0%E7%BB%9F%E9%A3%8E%E8%B2%8C%E5%8C%BA&amp;mode=walking&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 步行路线</a></div>
+      <div class="nav"><a href="#tocB">↑ B 版目录</a><a href="#b3">‹ 上一段</a><a href="#b5">下一段 ›</a></div>
+    </div>
+  </section>
+
+  <section class="st see" id="b5">
+    <div class="sh"><span class="t">09:05</span><span class="em">🌿</span><div><h3>山城步道</h3><p>十八梯往西走 10 分钟 · 崖边步道 · 免费</p></div><span class="c">免费</span></div>
+    
+    <div class="sb">
+      <ul><li>走一段看长江和老房子就行，不用走完</li><li><b>09:40 还没走</b> → 这站砍掉</li></ul>
+      <div class="addr"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E5%8D%81%E5%85%AB%E6%A2%AF%E4%BC%A0%E7%BB%9F%E9%A3%8E%E8%B2%8C%E5%8C%BA&amp;destination=name:%E5%B1%B1%E5%9F%8E%E6%AD%A5%E9%81%93&amp;mode=walking&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 步行路线</a></div>
+      <div class="nav"><a href="#tocB">↑ B 版目录</a><a href="#b4">‹ 上一段</a><a href="#b6">下一段 ›</a></div>
+    </div>
+  </section>
+
+  <section class="st see" id="b6">
+    <div class="sh"><span class="t">09:40</span><span class="em">🛍</span><div><h3>解放碑步行街</h3><p>走 15 分钟过去 · 穿过去就行</p></div><span class="c">免费</span></div>
+    
+    <div class="sb">
+      <ul><li>商场 10 点才开，路过拍个碑</li></ul>
+      <div class="addr"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E5%B1%B1%E5%9F%8E%E6%AD%A5%E9%81%93&amp;destination=name:%E8%A7%A3%E6%94%BE%E7%A2%91&amp;mode=walking&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 步行路线</a></div>
+      <div class="nav"><a href="#tocB">↑ B 版目录</a><a href="#b5">‹ 上一段</a><a href="#b7">下一段 ›</a></div>
+    </div>
+  </section>
+
+  <section class="st see" id="b7">
+    <div class="sh"><span class="t">10:00</span><span class="em">🙏</span><div><h3>罗汉寺</h3><p>解放碑走约 8 分钟 · 500 尊罗汉</p></div><span class="c">约 ¥20</span></div>
+    
+    <div class="sb">
+      <ul><li>门票约 ¥20（含香），开门时间没查到，以现场为准</li><li><b>10:30 还没到索道</b> → 这站砍掉</li></ul>
+      <div class="addr"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E8%A7%A3%E6%94%BE%E7%A2%91&amp;destination=name:%E7%BD%97%E6%B1%89%E5%AF%BA&amp;mode=walking&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 步行路线</a></div>
+      <div class="nav"><a href="#tocB">↑ B 版目录</a><a href="#b6">‹ 上一段</a><a href="#b8">下一段 ›</a></div>
+    </div>
+  </section>
+
+  <section class="st see" id="b8">
+    <div class="sh"><span class="t">10:30</span><span class="em">🚡</span><div><h3>长江索道 → 龙门浩老街 → 下浩里</h3><p>罗汉寺走约 10 分钟到北站 · 往返 ¥50</p></div><span class="c">¥50</span></div>
+    <div class="pics"><a href="https://commons.wikimedia.org/wiki/File:%E9%87%8D%E5%BA%86_%E9%95%BF%E6%B1%9F%E4%B8%8A%E7%9A%84%E6%B8%A1%E6%B1%9F%E7%B4%A2%E9%81%931_-_panoramio.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/%E9%87%8D%E5%BA%86%20%E9%95%BF%E6%B1%9F%E4%B8%8A%E7%9A%84%E6%B8%A1%E6%B1%9F%E7%B4%A2%E9%81%931%20-%20panoramio.jpg?width=760" alt="长江索道"><span class="cap">长江索道</span></a></div>
+    <div class="sb">
+      <ul><li>北站（新华路）买往返，过江 3 分钟</li><li>南站出来就是龙门浩老街，下浩里在隔壁走 5 分钟</li><li><b>索道排长队</b>：改坐 6 号线小什字 ⇄ 上新街（1 站过江）</li><li><b>10:50 还没过江</b> → 砍下浩里</li></ul>
+      <div class="addr"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E9%95%BF%E6%B1%9F%E7%B4%A2%E9%81%93%E5%8C%97%E7%AB%99&amp;destination=name:%E9%BE%99%E9%97%A8%E6%B5%A9%E8%80%81%E8%A1%97&amp;mode=transit&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 公交 / 地铁路线</a></div>
+      <div class="nav"><a href="#tocB">↑ B 版目录</a><a href="#b7">‹ 上一段</a><a href="#b9">下一段 ›</a></div>
+    </div>
+  </section>
+
+  <section class="st see" id="b9">
+    <div class="sh"><span class="t">11:30</span><span class="em">🏮</span><div><h3>洪崖洞 + 千厮门大桥</h3><p>坐索道回北岸，走 15 分钟</p></div><span class="c">免费</span></div>
+    <div class="pics"><a href="https://commons.wikimedia.org/wiki/File:Hongya_Cave_20180520.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Hongya%20Cave%2020180520.jpg?width=760" alt="洪崖洞"><span class="cap">洪崖洞</span></a></div>
+    <div class="sb">
+      <ul><li>从顶层沧白路进、往下看</li><li>千厮门大桥人行道回头拍全景</li></ul>
+      <div class="addr"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E9%95%BF%E6%B1%9F%E7%B4%A2%E9%81%93%E5%8C%97%E7%AB%99&amp;destination=name:%E6%B4%AA%E5%B4%96%E6%B4%9E&amp;mode=walking&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 步行路线</a></div>
+      <div class="nav"><a href="#tocB">↑ B 版目录</a><a href="#b8">‹ 上一段</a><a href="#b10">下一段 ›</a></div>
+    </div>
+  </section>
+
+  <section class="st eat" id="b10">
+    <div class="sh"><span class="t">12:00</span><span class="em">🍲</span><div><h3>火锅</h3><p>洪崖洞 / 小什字附近 · 40 分钟内吃完</p></div><span class="c">¥60–100</span></div>
+    <div class="pics"><a href="https://commons.wikimedia.org/wiki/File:Chongqing_hotpot_2.jpg" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Chongqing%20hotpot%202.jpg?width=760" alt="重庆火锅"><span class="cap">重庆火锅</span></a></div>
+    <div class="sb">
+      <ul><li>「一人食小火锅」或鸳鸯锅点三四样（毛肚、鸭肠、黄喉）</li><li><b>12:00 还没坐下</b> → 改一碗酸辣粉</li></ul>
+      <div class="addr"><a class="gmap" href="https://uri.amap.com/search?keyword=%E4%B8%80%E4%BA%BA%E9%A3%9F%E7%81%AB%E9%94%85&amp;city=%E9%87%8D%E5%BA%86&amp;callnative=1" target="_blank" rel="noopener">📍 搜火锅</a></div>
+      <div class="nav"><a href="#tocB">↑ B 版目录</a><a href="#b9">‹ 上一段</a><a href="#b11">下一段 ›</a></div>
+    </div>
+  </section>
+
+  <section class="st back" id="b11">
+    <div class="sh"><span class="t">12:40</span><span class="em">🏃</span><div><h3>回机场</h3><p>小什字 6 号线 → 红土地换 10 号线 · 约 55 分钟</p></div><span class="c">¥6</span></div>
+    <div class="pics"><a href="https://commons.wikimedia.org/wiki/File:Panorama_of_Chongqing_Jiangbei_Airport_Terminal_3.JPG" target="_blank" rel="noopener"><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Panorama%20of%20Chongqing%20Jiangbei%20Airport%20Terminal%203.JPG?width=760" alt="江北机场 T3"><span class="cap">T3 航站楼</span></a></div>
+    <div class="sb">
+      <ul><li>走 10 分钟到小什字站 → 6 号线往北碚方向 4 站到红土地 → 10 号线往王家庄方向 9 站到 T3</li><li><b>12:50 以后</b>只能打车（40–50 分钟，¥80–100）</li><li>到 T3 4 楼 → 3H 值机岛北侧取包 → 值机 → 安检</li></ul>
+      <div class="addr"><a class="gmap nav2" href="https://api.map.baidu.com/direction?origin=name:%E5%B0%8F%E4%BB%80%E5%AD%97%E7%AB%99&amp;destination=name:%E6%B1%9F%E5%8C%97%E5%9B%BD%E9%99%85%E6%9C%BA%E5%9C%BAT3%E8%88%AA%E7%AB%99%E6%A5%BC&amp;mode=transit&amp;region=%E9%87%8D%E5%BA%86&amp;output=html&amp;src=webapp.banlife.trip" target="_blank" rel="noopener">🧭 公交 / 地铁路线</a></div>
+      <div class="nav"><a href="#tocB">↑ B 版目录</a><a href="#b10">‹ 上一段</a><a href="#pick">换 A 版看看</a></div>
+    </div>
+  </section>
+
+  </div>
+
+  <div class="shared">📌 下面是两版共用的：地址汇总、出发前准备</div>
 
   <section class="box" id="places">
     <h2>🗺 地址汇总 · 点开用高德导航</h2>
@@ -274,7 +445,7 @@
       <li><b>🏚 龙门浩老街</b><small>索道南站出来就是</small><a class="gmap" href="https://uri.amap.com/search?keyword=%E9%BE%99%E9%97%A8%E6%B5%A9%E8%80%81%E8%A1%97&amp;city=%E9%87%8D%E5%BA%86&amp;callnative=1" target="_blank" rel="noopener">📍 高德</a></li>
       <li><b>🏚 下浩里</b><small>龙门浩往东走 13 分钟</small><a class="gmap" href="https://uri.amap.com/search?keyword=%E4%B8%8B%E6%B5%A9%E9%87%8C&amp;city=%E9%87%8D%E5%BA%86&amp;callnative=1" target="_blank" rel="noopener">📍 高德</a></li>
     </ul>
-    <div class="nav"><a href="#toc">↑ 时间线</a></div>
+    <div class="nav"><a href="#ticket">↑ 回到顶部</a></div>
   </section>
 
   <section class="box" id="prep">
@@ -296,9 +467,24 @@
       <tr><td><b>合计</b></td><td><b>约 ¥150–200</b>（打车回机场约 ¥250）</td></tr>
     </table>
     <div class="tip"><b>说明：</b>地铁首班、索道时间票价、寄存位置是 2026 年 11 月网上查到的，出门前用高德看一眼实时路线，索道票价以现场为准。</div>
-    <div class="nav"><a href="#toc">↑ 时间线</a></div>
+    <div class="nav"><a href="#ticket">↑ 回到顶部</a></div>
   </section>
 
   <footer>想改路线跟 Claude 说一声 · 前一天怎么安排在「吉隆坡周边 · 挑一天去」</footer>
 </div>
+<script>
+// 🔀 A / B 两条路线分开显示：点按钮切换（记住上次选的）；网址带 #b / #b1… 就打开 B 版
+(function(){
+  var K="cq:route",bt=document.querySelectorAll(".pk button");
+  function show(r,go){document.getElementById("routeA").classList.toggle("on",r==="A");document.getElementById("routeB").classList.toggle("on",r==="B");
+    bt.forEach(function(b){b.classList.toggle("on",b.dataset.r===r);});try{localStorage.setItem(K,r);}catch(e){}
+    if(go){var t=document.getElementById(r==="A"?"tocA":"tocB");if(t)t.scrollIntoView({behavior:"smooth"});}}
+  function fromHash(){var h=(location.hash||"").slice(1);if(/^(b|routeB|b\d+|tocB|routeB-legs)$/.test(h))return "B";if(/^(a|routeA|s[2-8]|tocA|routeA-legs)$/.test(h))return "A";return null;}
+  var r0=fromHash();if(!r0){try{r0=localStorage.getItem(K);}catch(e){}}show(r0==="B"?"B":"A");
+  bt.forEach(function(b){b.addEventListener("click",function(){show(b.dataset.r,true);});});
+  window.addEventListener("hashchange",function(){var r=fromHash();if(r)show(r);});
+  // 页内链接指向另一版里的段落：先切过去再跳
+  document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest('a[href^="#"]');if(!a)return;var id=a.getAttribute("href").slice(1),el=document.getElementById(id);if(!el)return;var rt=el.closest(".route");if(rt&&!rt.classList.contains("on")){show(rt.id==="routeA"?"A":"B");}});
+})();
+</script>
 </body></html>
