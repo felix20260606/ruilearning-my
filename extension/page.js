@@ -169,4 +169,47 @@
     });
   }
   if (document.readyState === "complete") setTimeout(boot, 800); else addEventListener("load", () => setTimeout(boot, 800));
+
+  // ---------- 🙈 上班模式：任意网页角落定时弹一张生词卡（插件设置里选每 10 / 20 / 30 / 60 分钟，默认关） ----------
+  //   从插件里「正在学」的词（saved）随机挑一个；所有标签页共用一个计时（chrome.storage.local 的 workCardAt），只在你正看着的网页弹，一次一张
+  //   先只显示单词，点一下看中文；「记得 / 没记住」记在本机 workCardLog，「✕」关掉，「今天别弹了」到明天再弹
+  let wcHost = null, wcSh = null, wcWord = "";
+  function wcClose() { if (wcHost) wcHost.remove(); wcHost = wcSh = null; wcWord = ""; }
+  async function wcShow() {
+    if (wcHost || document.visibilityState !== "visible" || !alive()) return;
+    await loadState(); const L = [...(typeof VS_SAVED !== "undefined" ? VS_SAVED : [])].filter(w => /[a-z]/i.test(w) && !/\s.*\s/.test(w)); if (!L.length) return;
+    const w = L[Math.floor(Math.random() * L.length)]; wcWord = w;
+    wcHost = document.createElement("vs-card"); wcHost.style.cssText = "all:initial;position:fixed;right:14px;bottom:60px;z-index:2147483645"; /* 右下角「📖 学习模式」按钮的上面 */ document.documentElement.append(wcHost);
+    wcSh = wcHost.attachShadow({ mode: "closed" });
+    wcSh.innerHTML = `<style>.c{width:230px;background:#26282c;color:#eee;border:1px solid #454950;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35);padding:10px 12px;font:13.5px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;opacity:.94}
+      .h{display:flex;align-items:center;gap:6px;color:#9aa0a6;font-size:11.5px}.h .sp{flex:1}.x{cursor:pointer;border:0;background:none;color:#9aa0a6;font-size:14px}
+      .w{font-size:19px;font-weight:800;margin:4px 0 2px;cursor:pointer}.zh{color:#cfd3d8;min-height:1.4em}.zh.hid{color:#6b7078}
+      .b{display:flex;gap:6px;margin-top:8px}.b button{flex:1;border:1px solid #454950;background:#2d2f34;color:#eee;border-radius:8px;min-height:28px;font:inherit;font-size:12.5px;cursor:pointer}.b button.ok{background:#2f7d5d;border-color:#2f7d5d}
+      .off{margin-top:6px;text-align:right}.off a{color:#6b7078;font-size:11px;cursor:pointer}</style>
+      <div class="c"><div class="h">🃏 复习一个词<span class="sp"></span><button class="x" data-a="x" title="关掉">✕</button></div><div class="w" data-a="say" title="点一下朗读">${esc(w)}</div><div class="zh hid" data-a="show">点这里看意思</div>
+      <div class="b"><button data-a="no">没记住</button><button class="ok" data-a="yes">记得</button></div><div class="off"><a data-a="off">今天别弹了</a></div></div>`;
+    let zh = "";
+    send({ type: "word", word: w, tl: S.target || "zh-CN", sl: "en" }).then(r => { const g = r && r.g; zh = g ? [g.t].concat(...(g.zh || []).map(z => (z.words || []).slice(0, 2))).filter((x, i, a) => x && a.indexOf(x) === i).slice(0, 4).join("；") : ""; });
+    wcSh.addEventListener("click", e => {
+      if (!e.isTrusted) return; const el = e.target.closest("[data-a]"); if (!el) return; const a = el.dataset.a;
+      if (a === "show") { el.classList.remove("hid"); el.textContent = zh || "（没查到，点单词听一下）"; return; }
+      if (a === "say") { send({ type: "tts", text: w, lang: "en" }).then(r => { if (r && r.a) new Audio(r.a).play().catch(() => {}); else try { const u = new SpeechSynthesisUtterance(w); u.lang = "en-US"; speechSynthesis.speak(u); } catch (er) {} }); return; }
+      if (a === "yes" || a === "no") { try { chrome.storage.local.get({ workCardLog: {} }, v => { const g = v.workCardLog || {}, k = w.toLowerCase(), x = g[k] || { y: 0, n: 0 }; x[a === "yes" ? "y" : "n"]++; x.at = Date.now(); g[k] = x; chrome.storage.local.set({ workCardLog: g }); }); } catch (er) {} }
+      if (a === "off") { try { chrome.storage.local.set({ workCardOff: new Date().toDateString() }); } catch (er) {} }
+      wcClose();
+    });
+  }
+  function wcTick() {
+    if (!alive()) return;
+    try {
+      chrome.storage.sync.get({ workCard: 0 }, o => { const min = +o.workCard || 0; if (!min || wcHost || document.visibilityState !== "visible") return;
+        chrome.storage.local.get({ workCardAt: 0, workCardOff: "" }, v => {
+          if (v.workCardOff === new Date().toDateString()) return;
+          if (Date.now() - (+v.workCardAt || 0) < min * 60e3) return;
+          chrome.storage.local.set({ workCardAt: Date.now() }, () => wcShow());
+        });
+      });
+    } catch (e) {}
+  }
+  setInterval(wcTick, 60e3); setTimeout(wcTick, 20e3);
 })();

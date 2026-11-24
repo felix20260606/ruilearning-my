@@ -577,6 +577,8 @@
   }
   let apT = null;
   setInterval(tick, 100);
+  // 🙈 上班模式（work.js）用的小接口：字幕、译文、当前句、跳句（同一个插件的脚本共用一个隔离环境，网页本身拿不到）
+  window.VS_WORK = { cues: () => cues, trans: () => trans, cur: () => cur, video: () => video(), find: t => findCue(t), jump: d => jump(d), replay: () => replay(), fetchTrans: (i, n) => { try { fetchTrans(i, n || 6); } catch (e) {} }, isWatch: () => SITE.isWatch(), enabled: () => !!S.enabled };
 
   // ---------- 悬停 / 查词卡片 ----------
   let hoverTimer = null, tk = 0, mini = null, tipData = null;
