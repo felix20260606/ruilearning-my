@@ -30,6 +30,13 @@ body{font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1
 .nc .been{cursor:pointer;border:0;font-family:inherit}.nc .been.no{background:var(--paper);color:var(--soft);box-shadow:none;border:1px dashed var(--line)}
 .nc .tag.t1{background:rgba(255,184,107,.14);color:var(--ui-orange)}.nc .tag.t2{background:var(--ui-pur-soft);color:var(--jade-deep)}.nc .tag.t3{background:rgba(124,227,184,.14);color:var(--ui-green,#7CE3B8)}
 .vers{display:flex;flex-wrap:wrap;gap:6px}.vers a{font-size:12px;font-weight:800;border:1px solid var(--line);border-radius:999px;padding:3px 11px;color:var(--ink);background:var(--bg);cursor:pointer}.vers a:hover{border-color:rgba(197,155,239,.5)}
+.sub{font-size:12.5px;font-weight:800;color:var(--soft);margin:14px 2px 7px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
+.pc{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer;transition:.15s;display:flex;flex-direction:column}
+.pc:hover{transform:translateY(-2px);border-color:rgba(197,155,239,.4)}
+.pc .pi{height:78px;background:var(--bg) center/cover no-repeat}
+.pc b{font-size:14px;font-weight:800;padding:7px 10px 0;display:flex;align-items:center;gap:6px}.pc b i{font-style:normal;font-size:11px;color:var(--soft);border:1px solid var(--line);border-radius:6px;padding:0 5px}
+.pc small{font-size:11.5px;color:var(--soft);padding:1px 10px 9px}
 .sec{font-family:var(--display);font-weight:900;font-size:14px;color:var(--soft);letter-spacing:.06em;margin:20px 2px 9px}
 footer{text-align:center;color:var(--soft);font-size:11px;margin-top:24px;line-height:1.7}
 .nc.static{cursor:default}.nc.static:hover{transform:none;box-shadow:0 1px 2px rgba(0,0,0,.36);border-color:var(--line)}
@@ -81,7 +88,7 @@ footer{text-align:center;color:var(--soft);font-size:11px;margin-top:24px;line-h
     <div class="nc" data-go="sg2"><span class="em">🇸🇬</span><b>新加坡</b><p>TBS 大巴过关去：2 天版按你的时间表（凌晨机回中国、存包攻略）；3 天版有入境清单、过关流程和 16 站景点大图</p><div class="vers"><a data-go2="sg2">2天1夜</a><a data-go2="sg">3天2夜</a></div><span class="tag t3">📖 攻略</span></div>
   </div>
 
-  <div class="sec" data-r="cn">▍🇨🇳 中国</div>
+  <div class="sec" data-r="cn">▍🇨🇳 中国 · 已经做好的</div>
   <div class="grid" data-r="cn">
     <div class="nc" data-go="hzsights"><span class="em">🍵</span><b>杭州景点大全</b><p>西湖十景、灵隐、龙井九溪、运河、西溪、良渚，加上乌镇、千岛湖这些周边一日：照片、地址、坐几号线、开放时间、门票；去过的打 ✅、想去的标 ⭐</p><span class="tag t1">📍 景点大全</span></div>
     <div class="nc" data-go="cqsights"><span class="em">🌶</span><b>重庆景点大全</b><p>洪崖洞、索道、李子坝、十八梯、磁器口、三峡博物馆，加上大足石刻、武隆这些周边一日：照片、地址、坐几号线、开放时间、门票；去过的打 ✅、想去的标 ⭐</p><span class="tag t1">📍 景点大全</span></div>
@@ -89,10 +96,71 @@ footer{text-align:center;color:var(--soft);font-size:11px;margin-top:24px;line-h
     <div class="nc" data-go="db"><span class="em">🚗</span><b>东北三省自驾</b><p>自驾路线手册：行程 + 路书 + 攻略（含可下载 PDF/Word 版）</p><span class="tag t3">📖 攻略</span></div>
   </div>
 
+
+  <div class="sec" data-r="cn">▍🗺 全国 34 个省级行政区（点省份看下面所有城市）</div>
+  <div class="sub" data-r="cn">华北</div>
+  <div class="pgrid" data-r="cn">
+    <div class="pc" data-go="prov:beijing"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Skyline%20of%20Beijing%20CBD%20with%20B-5906%20approaching%20%2820211016171955%29.jpg?width=360')"></div><b>北京市<i>京</i></b><small>16 个区县</small></div>
+    <div class="pc" data-go="prov:tianjin"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Tianjin%2C%20China%20ESA15420167.jpeg?width=360')"></div><b>天津市<i>津</i></b><small>16 个区县</small></div>
+    <div class="pc" data-go="prov:hebei"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Snow%20in%20China.jpg?width=360')"></div><b>河北省<i>冀</i></b><small>省会 石家庄 · 11 个城市</small></div>
+    <div class="pc" data-go="prov:shanxi"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Great%20Wall%20of%20China%2C%20Satellite%20image.jpeg?width=360')"></div><b>山西省<i>晋</i></b><small>省会 太原 · 11 个城市</small></div>
+    <div class="pc" data-go="prov:neimenggu"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Dust%20storm%20in%20the%20Gobi%20Desert%2C%20China%20%288568589729%29.jpg?width=360')"></div><b>内蒙古自治区<i>蒙</i></b><small>省会 呼和浩特 · 12 个城市</small></div>
+  </div>
+  <div class="sub" data-r="cn">东北</div>
+  <div class="pgrid" data-r="cn">
+    <div class="pc" data-go="prov:liaoning"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/ISS059-E-75503%20-%20View%20of%20China.jpg?width=360')"></div><b>辽宁省<i>辽</i></b><small>省会 沈阳 · 14 个城市</small></div>
+    <div class="pc" data-go="prov:jilin"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Jilin%2C%20China.jpg?width=360')"></div><b>吉林省<i>吉</i></b><small>省会 长春 · 9 个城市</small></div>
+    <div class="pc" data-go="prov:heilongjiang"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/SonghuaRiver%20ASTER%2020020401.jpg?width=360')"></div><b>黑龙江省<i>黑</i></b><small>省会 哈尔滨 · 13 个城市</small></div>
+  </div>
+  <div class="sub" data-r="cn">华东</div>
+  <div class="pgrid" data-r="cn">
+    <div class="pc" data-go="prov:shanghai"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/%E4%B8%8A%E6%B5%B7%C2%B7%E4%B8%8A%E6%B5%B7%E5%B8%82%C2%B7%EF%BC%88%E4%BF%AF%E6%8B%8D%EF%BC%89.jpg?width=360')"></div><b>上海市<i>沪</i></b><small>16 个区县</small></div>
+    <div class="pc" data-go="prov:jiangsu"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Suzhou%2C%20Jingsu%2C%20China%20%28ASTER%29.jpg?width=360')"></div><b>江苏省<i>苏</i></b><small>省会 南京 · 13 个城市</small></div>
+    <div class="pc" data-go="prov:zhejiang"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Wuyi%2C%20Zhejiang%20in%201968%20by%20CORONA%20satellite.jpg?width=360')"></div><b>浙江省<i>浙</i></b><small>省会 杭州 · 11 个城市</small></div>
+    <div class="pc" data-go="prov:anhui"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Chao%20Lake%20NASA.jpg?width=360')"></div><b>安徽省<i>皖</i></b><small>省会 合肥 · 16 个城市</small></div>
+    <div class="pc" data-go="prov:fujian"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/ISS060-E-60237.jpg?width=360')"></div><b>福建省<i>闽</i></b><small>省会 福州 · 9 个城市</small></div>
+    <div class="pc" data-go="prov:jiangxi"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Satellite%20Image%20of%20Tahihe.png?width=360')"></div><b>江西省<i>赣</i></b><small>省会 南昌 · 11 个城市</small></div>
+    <div class="pc" data-go="prov:shandong"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Tai%202.jpg?width=360')"></div><b>山东省<i>鲁</i></b><small>省会 济南 · 16 个城市</small></div>
+  </div>
+  <div class="sub" data-r="cn">华中</div>
+  <div class="pgrid" data-r="cn">
+    <div class="pc" data-go="prov:henan"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Henan%20floods%20July%2026%2C%202020.jpg?width=360')"></div><b>河南省<i>豫</i></b><small>省会 郑州 · 18 个城市</small></div>
+    <div class="pc" data-go="prov:hubei"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Yangtze%20Dams%20Spill%20Water.jpg?width=360')"></div><b>湖北省<i>鄂</i></b><small>省会 武汉 · 17 个城市</small></div>
+    <div class="pc" data-go="prov:hunan"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Waters%20of%20central%20China.jpg?width=360')"></div><b>湖南省<i>湘</i></b><small>省会 长沙 · 14 个城市</small></div>
+  </div>
+  <div class="sub" data-r="cn">华南</div>
+  <div class="pgrid" data-r="cn">
+    <div class="pc" data-go="prov:guangdong"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Leizhou%20peninsula.jpg?width=360')"></div><b>广东省<i>粤</i></b><small>省会 广州 · 21 个城市</small></div>
+    <div class="pc" data-go="prov:guangxi"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/1%20li%20jiang%20guilin%20yangshuo%202011.jpg?width=360')"></div><b>广西壮族自治区<i>桂</i></b><small>省会 南宁 · 14 个城市</small></div>
+    <div class="pc" data-go="prov:hainan"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Hainan%20NASA%20Terra%20MODIS%202020-11-13.jpg?width=360')"></div><b>海南省<i>琼</i></b><small>省会 海口 · 19 个城市</small></div>
+  </div>
+  <div class="sub" data-r="cn">西南</div>
+  <div class="pgrid" data-r="cn">
+    <div class="pc" data-go="prov:chongqing"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Chongqing%2C%20China%20ESA23338300.jpeg?width=360')"></div><b>重庆市<i>渝</i></b><small>38 个区县</small></div>
+    <div class="pc" data-go="prov:sichuan"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Larix%20potaninii%20trees%20Huluhai.jpg?width=360')"></div><b>四川省<i>川</i></b><small>省会 成都 · 21 个城市</small></div>
+    <div class="pc" data-go="prov:guizhou"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Five%20hundred%20meter%20Aperture%20Spherical%20Telescope%2C%20China%20%28ASTER%29.jpg?width=360')"></div><b>贵州省<i>黔</i></b><small>省会 贵阳 · 9 个城市</small></div>
+    <div class="pc" data-go="prov:yunnan"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Iss068e023350.jpeg?width=360')"></div><b>云南省<i>滇</i></b><small>省会 昆明 · 16 个城市</small></div>
+    <div class="pc" data-go="prov:xizang"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/ISS041-E-81025%20-%20View%20of%20China.jpg?width=360')"></div><b>西藏自治区<i>藏</i></b><small>省会 拉萨 · 7 个城市</small></div>
+  </div>
+  <div class="sub" data-r="cn">西北</div>
+  <div class="pgrid" data-r="cn">
+    <div class="pc" data-go="prov:shaanxi"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/ISS016-E-9096%20-%20View%20of%20China.jpg?width=360')"></div><b>陕西省<i>陕</i></b><small>省会 西安 · 10 个城市</small></div>
+    <div class="pc" data-go="prov:gansu"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Gobi%20Desert%20-%20Envisat.jpg?width=360')"></div><b>甘肃省<i>甘</i></b><small>省会 兰州 · 14 个城市</small></div>
+    <div class="pc" data-go="prov:qinghai"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Qinghai%20Cross%20Section.jpg?width=360')"></div><b>青海省<i>青</i></b><small>省会 西宁 · 8 个城市</small></div>
+    <div class="pc" data-go="prov:ningxia"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Xixia.jpg?width=360')"></div><b>宁夏回族自治区<i>宁</i></b><small>省会 银川 · 5 个城市</small></div>
+    <div class="pc" data-go="prov:xinjiang"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Xinjiang%20Space%20View.jpg?width=360')"></div><b>新疆维吾尔自治区<i>新</i></b><small>省会 乌鲁木齐 · 27 个城市</small></div>
+  </div>
+  <div class="sub" data-r="cn">港澳台</div>
+  <div class="pgrid" data-r="cn">
+    <div class="pc" data-go="prov:hongkong"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Hong%20Kong%20from%20Victoria%20Peak1.jpg?width=360')"></div><b>香港<i>港</i></b><small>18 个区</small></div>
+    <div class="pc" data-go="prov:macau"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Panorama%20of%20Macau%20Peninsula2021.jpg?width=360')"></div><b>澳门<i>澳</i></b><small>4 个城市</small></div>
+    <div class="pc" data-go="prov:taiwan"><div class="pi" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/20260204%20Taipei%2C%20Taiwan%20Skyline.jpg?width=360')"></div><b>台湾<i>台</i></b><small>22 个城市</small></div>
+  </div>
+
   <footer>📍 景点大全：去过的打勾 · 🧭 照着走：按时间线一步步走 · 📖 攻略：行程手册<br>点卡片直接打开；有版本的点卡片里的按钮选版本；马来西亚卡片右上角点一下改「去过 / 还没去」</footer>
 </div>
 <script>
-document.querySelectorAll('.nc').forEach(function(c){
+document.querySelectorAll('.nc,.pc').forEach(function(c){
   c.addEventListener('click',function(e){
     var v=e.target.closest&&e.target.closest('[data-go2]'),go=v?v.getAttribute('data-go2'):c.getAttribute('data-go'); // 有版本的卡片（马六甲、新加坡）：点里面的按钮选版本，点别处打开第一个
     if(go){try{parent.postMessage({tripGo:go},'*');}catch(e){}}
@@ -101,7 +169,7 @@ document.querySelectorAll('.nc').forEach(function(c){
 // 🇨🇳 / 🇲🇾 标签：网址带 ?r=cn 或 ?r=my 时只显示那几栏（tabs.js 打开），不带就是全部
 (function(){var r=new URLSearchParams(location.search).get("r");if(!r)return;
   document.querySelectorAll("[data-r]").forEach(function(e){if(e.getAttribute("data-r")!==r)e.style.display="none";});
-  var H={cn:["China","🇨🇳 中国","重庆、杭州景点大全 · 重庆中转 · 东北自驾"],my:["Malaysia","🇲🇾 马来西亚","吉隆坡景点大全 · 周边一日游 · 从吉隆坡出发去新加坡 · 卡片右上角点一下改「去过 / 还没去」"]}[r];
+  var H={cn:["China","🇨🇳 中国","已经做好的攻略 · 全国 34 个省级行政区，点省份看下面所有城市"],my:["Malaysia","🇲🇾 马来西亚","吉隆坡景点大全 · 周边一日游 · 从吉隆坡出发去新加坡 · 卡片右上角点一下改「去过 / 还没去」"]}[r];
   if(H){var h=document.querySelector(".head");h.querySelector(".k").textContent=H[0];h.querySelector("h1").textContent=H[1];h.querySelector("p").textContent=H[2];}
 })();
 // ✅ 去过 / 还没去：马来西亚这几张卡片右上角的标记点一下就能改（记在 trip-state.js，换设备也在）；没点过就用页面上写的默认

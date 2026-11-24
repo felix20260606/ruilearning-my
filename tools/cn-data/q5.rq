@@ -1,0 +1,10 @@
+SELECT ?p ?pl ?plz ?pen ?coord ?img ?zhw ?cap ?capl ?capcoord WHERE {
+  VALUES ?p { wd:Q8646 wd:Q14773 wd:Q15175 wd:Q15176 wd:Q16963 wd:Q16967 wd:Q17269 wd:Q19770 wd:Q19206 wd:Q21208 wd:Q34800 wd:Q40956 wd:Q41079 wd:Q41705 wd:Q42200 wd:Q42392 wd:Q43194 wd:Q43407 wd:Q43684 wd:Q43934 wd:Q45208 wd:Q45761 wd:Q45833 wd:Q46862 wd:Q46913 wd:Q47097 wd:Q47974 wd:Q57052 wd:Q57251 wd:Q57448 wd:Q956 wd:Q8686 wd:Q11736 wd:Q11725 }
+  OPTIONAL { ?p rdfs:label ?pl FILTER(lang(?pl)="zh-cn") }
+  OPTIONAL { ?p rdfs:label ?plz FILTER(lang(?plz)="zh") }
+  OPTIONAL { ?p rdfs:label ?pen FILTER(lang(?pen)="en") }
+  OPTIONAL { ?p wdt:P625 ?coord }
+  OPTIONAL { ?p wdt:P18 ?img }
+  OPTIONAL { ?zhw schema:about ?p ; schema:isPartOf <https://zh.wikipedia.org/> }
+  OPTIONAL { ?p wdt:P36 ?cap . OPTIONAL { ?cap rdfs:label ?capl FILTER(lang(?capl)="zh-cn") } OPTIONAL { ?cap wdt:P625 ?capcoord } }
+}
