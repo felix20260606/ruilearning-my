@@ -102,7 +102,7 @@
   /* ---------- 查词（/api/dict 或 index.html 的 dictGet；变形查不到用原形再查） ---------- */
   const DC = new Map();
   async function dict(w) {
-    const k = w.toLowerCase(); if (DC.has(k)) return DC.get(k);
+    const k = window.VL === "de" ? String(w).normalize("NFC") : w.toLowerCase(); if (DC.has(k)) return DC.get(k); // 德语：大小写不同是不同的词（Morgen 早晨 / morgen 明天、Essen / essen），按原样查
     const get = async q => { try { if (window.dictGet) return await window.dictGet(q); const r = await fetch("/api/dict?w=" + encodeURIComponent(q)); if (!r.ok) return null; const j = await r.json(); return j && j.ok ? j : null; } catch (e) { return null; } };
     let j = await get(k); const l = DE() ? (j && j.lemma) || "" : lemma(k); if (!j && l && l !== k) j = await get(l); // 德语：变形查不到时用后台给的原形（ging → gehen）
     if (j) DC.set(k, j); return j;
@@ -178,12 +178,12 @@
     let ok; try { ok = await qa(w, o.sent || ""); } catch (e) { U.log("word", "加词失败：" + w, String(e && e.message || e)); if (!o.silent) tip("加入失败，请再试一次"); return null; }
     U.log("word", (ok ? "加入生词本 " : "已在生词本 ") + w, o.from || "");
     if (!o.silent) tip(ok ? "已加入生词本：" + w : "已在生词本里");
-    if (o.learn !== false && (ok === true || status(lw) !== "kn") && vsOk() && V().markOf(lw) !== "learn") { V().setMark(lw, "learn"); const lb = pop && pWord.toLowerCase() === lw && pop.querySelector("[data-m=learn]"); if (lb) lb.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === lb)); } // 加进生词本 = 将要学习
+    if (o.learn !== false && window.VL !== "de" && (ok === true || status(lw) !== "kn") && vsOk() && V().markOf(lw) !== "learn") { /* 插件的「将要学习」标记只有英语 */ V().setMark(lw, "learn"); const lb = pop && pWord.toLowerCase() === lw && pop.querySelector("[data-m=learn]"); if (lb) lb.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === lb)); } // 加进生词本 = 将要学习
     setTimeout(() => { loadBook(); if (book.size && !status(lw)) book.set(lw, "lr"); bookK = null; changed(lw, "learn"); }, 300);
     return ok;
   }
   function addWord(b) { // 查词卡片上的「＋ 加入生词本」
-    const d = DC.get(pWord.toLowerCase()), w = String((d && d.word) || pWord).toLowerCase(), cb = pOpt && pOpt.onAdd;
+    const de = window.VL === "de", d = DC.get(de ? String(pWord).normalize("NFC") : pWord.toLowerCase()), w = de ? String((d && d.word) || pWord) : String((d && d.word) || pWord).toLowerCase(), cb = pOpt && pOpt.onAdd; // 德语：名词保留大写（词典给的写法，如 Haus）
     b.disabled = true; b.textContent = "加入中…";
     add(w, { sent: pSent, from: "查词卡片" }).then(res => {
       if (res == null) { b.disabled = false; b.textContent = "＋ 加入生词本"; return; }
@@ -216,8 +216,9 @@
     if (style === "rl") return showRl(el);
     const w = el.dataset.w, lw = String(w).toLowerCase().replace(/’/g, "'");
     const g = typeof VS_GRAM_NAME !== "undefined" ? [...el.classList].filter(c => /^g-/.test(c)).map(c => VS_GRAM_NAME[c.slice(2)] && VS_GRAM_NAME[c.slice(2)] + (typeof VS_GRAM_ABBR !== "undefined" && VS_GRAM_ABBR[c.slice(2)] ? " " + VS_GRAM_ABBR[c.slice(2)] : "")).filter(Boolean) : [];
-    let notes = ""; try { const S = V() && V().settings ? V().settings() : null; if ((!S || S.n_word !== false) && typeof vsWordNotesHtml === "function" && !/\s/.test(w)) notes = vsWordNotesHtml(w, true) || ""; } catch (e) {}
-    let fb = ""; try { if (typeof vsRank === "function") { const r = vsRank(lw), f = r === Infinity ? 1 : Math.max(0.16, Math.min(1, r / 6000)); fb = '<span class="fb" title="词频（越长越少见）"><i style="width:' + Math.round(f * 100) + '%"></i></span>'; } } catch (e) {}
+    const EN = window.VL !== "de"; // 单词注释、词频条、不规则变化都是英语的数据：学德语时不显示（以前德语 am / was 会冒出「be：是」）
+    let notes = ""; try { const S = V() && V().settings ? V().settings() : null; if (EN && (!S || S.n_word !== false) && typeof vsWordNotesHtml === "function" && !/\s/.test(w)) notes = vsWordNotesHtml(w, true) || ""; } catch (e) {}
+    let fb = ""; try { if (EN && typeof vsRank === "function") { const r = vsRank(lw), f = r === Infinity ? 1 : Math.max(0.16, Math.min(1, r / 6000)); fb = '<span class="fb" title="词频（越长越少见）"><i style="width:' + Math.round(f * 100) + '%"></i></span>'; } } catch (e) {}
     const my = mini = document.createElement("div"); my.id = "wd-mini"; my._el = el;
     my.innerHTML = '<div class="ms">…</div>' + (g.length ? '<div class="gm">语法：' + esc(g.join(" · ")) + "</div>" : "") + notes + fb;
     document.body.append(my);
@@ -229,7 +230,7 @@
       const up = r.top - 10 - H >= 6; my.classList.toggle("dn", !up); my.style.top = (up ? r.top - 10 : r.bottom + 10) + "px";
     };
     fix();
-    const lem = typeof VS_IRR !== "undefined" && VS_IRR[lw]; // 不规则变化：went → go 的意思也给
+    const lem = EN && typeof VS_IRR !== "undefined" && VS_IRR[lw]; // 不规则变化：went → go 的意思也给
     if (lem && window.TR) TR.word(lem).then(r => { if (mini !== my || !r.zh.length) return; const d = document.createElement("div"); d.className = "lm"; d.textContent = lem + "：" + r.zh[0]; my.insertBefore(d, my.querySelector(".gm") || my.querySelector(".fb")); fix(); });
     (window.TR ? TR.word(w) : Promise.resolve({ zh: [] })).then(r => {
       if (mini !== my) return; const m = (r.zh || []).slice(0, 3);

@@ -132,6 +132,11 @@
   }
   // 不算句末的缩写（后面跟大写也不断句）："Mr. Lee"、"Dr. Tan"、"St. Paul"
   const ABBR = new Set("mr mrs ms dr prof st jr sr mt vs fig gen col lt sgt capt rev hon inc ltd co corp dept approx jan feb mar apr jun jul aug sep sept oct nov dec al".split(" "));
+  // 🇩🇪 学德语时另外不断的：缩写（z. B.、ca.、bzw.、Nr.…）和序数（am 23. Februar、im 19. Jahrhundert、zum 3. Mal）
+  const ABBR_DE = new Set("z b u a d h o s bzw ca usw ggf inkl vgl evtl sog nr mio mrd jh jhd str bspw tel abs ff dt engl max min ehem gegr hrsg zb".split(" "));
+  const ORD_PREV = /(^|\s)(der|die|das|den|dem|des|am|im|vom|zum|zur|beim|ab|bis|seit|ihr|sein|seinem|ihrem|seines|ihres|unser|jeder)\s+\d{1,4}$/i; // 「der 30.」「am Dienstag den 6.」：冠词 / 介词后面的数字带点 = 序数
+const ORD_NEXT = /^(Januar|Jänner|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember|Jahrhundert|Jahrhunderts|Jahrestag|Mal|Stock|Platz|Klasse|Runde|Spieltag|Geburtstag|Lebensjahr|Kapitel|Etage|Woche|Tag|Bundestag|Parteitag|Amendment)\b/;
+  const isDeSents = () => typeof window !== "undefined" && window.VL === "de";
   // 分句：. ! ? … 后面跟空格、下一个字不是小写时断开；缩写（Mr.）、人名首字母（J. K.）、e.g. / U.S.、No. 5、小数都不断
   function sentsOf(p) {
     p = String(p == null ? "" : p).replace(/\s+/g, " ").trim(); if (!p) return [];
@@ -139,13 +144,14 @@
     while ((m = re.exec(p))) {
       const end = m.index + m[0].length, rest = p.slice(end).replace(/^\s+/, "");
       if (!rest) break;
-      if (/^[a-z]/.test(rest)) continue; // 下一个字小写：多半不是句末（"Really?" she asked. / Hmm... maybe）
+      if (/^\p{Ll}/u.test(rest)) continue; // 下一个字小写（含 ä ö ü）：多半不是句末（"Really?" she asked. / Hmm... maybe）
       if (/^\.["'”’)\]]*$/.test(m[0])) { // 只有一个句点：看前面那个词是不是缩写
         const lw = (p.slice(start, m.index).match(/([A-Za-z][A-Za-z.]*)$/) || [])[1] || "";
         if (ABBR.has(lw.toLowerCase())) continue;
         if (/^[A-Z]$/.test(lw)) continue; // 人名首字母 J. K. Rowling
         if (/^([A-Za-z]\.)+[A-Za-z]$/.test(lw)) continue; // e.g. / i.e. / U.S.
         if (/^no$/i.test(lw) && /^\d/.test(rest)) continue; // No. 5
+        if (isDeSents()) { const lw2 = (p.slice(start, m.index).match(/([\p{L}\d]+)$/u) || [])[1] || ""; if (ABBR_DE.has(lw2.toLowerCase()) || (/^\d{1,4}$/.test(lw2) && (ORD_NEXT.test(rest) || ORD_PREV.test(p.slice(start, m.index))))) continue; } // 德语缩写、序数
       }
       out.push(p.slice(start, end).trim()); start = end;
     }

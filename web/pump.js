@@ -443,7 +443,7 @@
       zh0.onclick = zh0.onmouseenter = () => { if (c.rev < 2) { c.rev = 2; show(); } };
       colorEn(c);
     } else if (c.k === "sugg") { // 🌱 建议的单词：你想学这个新词吗？已知 / 学习 / 跳过（同 PhrasePump）
-      const w = c.w, rk = window.VS_RANK && (window.VS_RANK[w.word] || (typeof vsLemma === "function" && window.VS_RANK[vsLemma(w.word)]));
+      const w = c.w, rk = window.VL !== "de" && window.VS_RANK && (window.VS_RANK[w.word] || (typeof vsLemma === "function" && window.VS_RANK[vsLemma(w.word)]));
       if (!(w.word in SUGZH)) { SUGZH[w.word] = null; TR.word(w.word).then(r => { SUGZH[w.word] = r.zh.slice(0, 4).join("；"); if (cards[at] === c) show(); }); } // 全站共用的翻译（tr.js）
       const lab = { known: "已知", learn: "学习", skip: "跳过" };
       if (!w.stage) { w.stage = "learn"; addSugg(c, true); } // 一显示就自动标成「学习」（同 PhrasePump）；要不学就点已知 / 跳过改掉

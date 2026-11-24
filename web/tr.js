@@ -60,7 +60,7 @@
   // 鼠标停在词上就会查：同一个词正在查的只发一次；查不到的 1 分钟内不再查；不请后台 AI 代翻（每个新词都会让后台写一次缓存）
   //   原文语言默认跟着现在学的语言（德语时按德语查）
   function word(w, o) {
-    o = o || {}; const k0 = String(w || "").trim().toLowerCase(), tl = o.tl || "zh-CN", sl = o.sl || (window.VL && window.VL !== "en" ? window.VL : "en"), key = sl + ">" + tl + "|" + k0;
+    o = o || {}; const sl0 = o.sl || (window.VL && window.VL !== "en" ? window.VL : "en"), k0 = sl0 === "de" ? String(w || "").trim().normalize("NFC") : String(w || "").trim().toLowerCase(), tl = o.tl || "zh-CN", sl = sl0, key = sl + ">" + tl + "|" + k0; // 德语保留大小写（名词 / 动词不同义）
     if (!k0) return Promise.resolve({ zh: [], pos: [] }); if (WM.has(key)) return Promise.resolve(WM.get(key));
     if (WP.has(key)) return WP.get(key);
     if (Date.now() - (WMISS.get(key) || 0) < 60e3) return Promise.resolve({ zh: [], pos: [] });

@@ -62,7 +62,7 @@
     const list = all.filter(c => inLv(c) && inTy(c));
     root.querySelector(".ch-list").innerHTML = list.length ? list.map(card).join("") : '<div class="ch-empty">这个难度下没有这类频道</div>';
   }
-  async function mount() {
+  async function mount() { if (window.VL === "de") return true; /* 🇩🇪 频道地图是英语频道：学德语时不显示 */
     const home = document.querySelector("#watch .wt-home"), hint = home && home.querySelector(".wt-hint");
     if (!home || !hint || document.getElementById("ch-map")) return !!home;
     try { const r = await fetch("yt-channels.json?v=ef879b89"); data = await r.json(); } catch (e) { return true; }

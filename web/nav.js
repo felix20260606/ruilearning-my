@@ -13,15 +13,17 @@
   const mods = [], DELAY = 300;
   let T = 0, restoring = 0, booted = false, depth = 0, pos = 0, seq = 0;
   const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  // 切换学习语言会刷新网页，但浏览器历史还在：另一种语言时记的那几条不恢复（以前学德语时按后退会打开英语的雅思模拟考、英语的听力那期）
+  const LANG_NOW = () => window.VL || "en", langOk = n => !n || !n.lang || n.lang === LANG_NOW();
   function snap() { const s = {}; for (const m of mods) { try { const v = m.get(); if (v !== undefined) s[m.k] = v; } catch (e) {} } return s; }
   const st = () => (history.state && history.state.nav) || null;
   function commit() {
     T = 0; if (restoring) return;
     const s = snap(), cur = st();
-    if (!booted || !cur) { booted = true; pos = cur ? cur.id : ++seq; seq = Math.max(seq, pos); try { history.replaceState(Object.assign({}, history.state || {}, { nav: { id: pos, s } }), "", location.href); } catch (e) {} return; }
+    if (!booted || !cur) { booted = true; pos = cur ? cur.id : ++seq; seq = Math.max(seq, pos); try { history.replaceState(Object.assign({}, history.state || {}, { nav: { id: pos, s, lang: LANG_NOW() } }), "", location.href); } catch (e) {} return; }
     if (same(cur.s, s)) return;
     pos = ++seq; depth++;
-    try { history.pushState({ nav: { id: pos, s } }, "", location.href.replace(/#(read|article)\/.*$/, "")); } catch (e) {} // 新的一页先不带直达地址（#read/ 单词阅读器、#article/ 文章）：显示那一页的模块自己再加，免得离开文章后一刷新又跳回去
+    try { history.pushState({ nav: { id: pos, s, lang: LANG_NOW() } }, "", location.href.replace(/#(read|article)\/.*$/, "")); } catch (e) {} // 新的一页先不带直达地址（#read/ 单词阅读器、#article/ 文章）：显示那一页的模块自己再加，免得离开文章后一刷新又跳回去
   }
   function mark() { if (restoring) return; clearTimeout(T); T = setTimeout(commit, booted ? DELAY : 0); }
   function apply(s) {
@@ -31,6 +33,7 @@
   }
   window.addEventListener("popstate", e => {
     const n = e.state && e.state.nav; if (!n) return; // 不是我们记的（#read/ 之类）：各自的代码处理
+    if (!langOk(n)) { pos = n.id; return; } // 另一种语言时的页面：不恢复
     depth = Math.max(0, depth + (n.id < pos ? -1 : 1)); pos = n.id; seq = Math.max(seq, n.id);
     if (!same(snap(), n.s)) apply(n.s);
   });
@@ -43,7 +46,7 @@
       const cur = booted && st();
       if (isNew && cur) {
         try {
-          if (cur.s[k] !== undefined) { if (!same(get(), cur.s[k])) { restoring++; try { set(cur.s[k]); } finally { setTimeout(() => { restoring--; }, DELAY + 50); } } return; }
+          if (cur.s[k] !== undefined && langOk(cur)) { if (!same(get(), cur.s[k])) { restoring++; try { set(cur.s[k]); } finally { setTimeout(() => { restoring--; }, DELAY + 50); } } return; }
           const v = get(); if (v !== undefined) history.replaceState(Object.assign({}, history.state || {}, { nav: { id: cur.id, s: Object.assign({}, cur.s, { [k]: v }) } }), "", location.href);
         } catch (e) {}
         return;

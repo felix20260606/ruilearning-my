@@ -11,12 +11,12 @@
   "use strict";
   if (window.LAZY) return;
   const MODS = {
-    speak: { src: "speak.js?v=7e1e841d", fns: ["speakShow"], el: { speakShow: "#view-speak" }, quiet: ["speakHide"] },
+    speak: { src: "speak.js?v=49916c4e", fns: ["speakShow"], el: { speakShow: "#view-speak" }, quiet: ["speakHide"] },
     basic: { src: "basic.js?v=6f44a263", deps: ["speak"], fns: ["basicShow"], el: { basicShow: "#view-basic" } },
     read: { src: "read.js?v=be99582a", fns: ["readingShow", "readingNews", "readingOpen", "readTextDiff"], el: { readingShow: "#reading" }, quiet: ["readingRefresh"] },
-    listen: { src: "listen.js?v=c20e7005", fns: ["smeShow", "smeOpen"], el: { smeShow: "#sme" }, quiet: ["smePause"] },
+    listen: { src: "listen.js?v=7999f7c8", fns: ["smeShow", "smeOpen"], el: { smeShow: "#sme" }, quiet: ["smePause"] },
     drill: { src: "drill.js?v=f24f138e", deps: ["listen"], fns: ["drillShow", "drillReview"], el: { drillShow: "#drill" }, quiet: ["drillHide"] },
-    exam: { src: "exam.js?v=ce143ebf", fns: ["examShow"], el: { examShow: 0 } },
+    exam: { src: "exam.js?v=e6ea56d0", fns: ["examShow"], el: { examShow: 0 } },
     write: { src: "write.js?v=a6b7c11f", fns: ["writingShow"], el: { writingShow: 0 } },
     pitch: { src: "pitch.js?v=79ce25d1" }, // 🎵 跟读语调对比（口语页跟读后点「和原声比语调」才加载）
     corpus: { src: "corpus.js?v=1693fdfa", fns: ["corpusShow"] }, // 🔎 真人例句（查词卡片上的按钮）

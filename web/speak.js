@@ -745,7 +745,7 @@
   function stressView() {
     const L = D.stress || [];
     return '<div class="sk-bar">' + back + '</div><h2 class="sk-title">重音和语调<small>同一句话，重读的词不同、句尾升降不同，意思就不一样。读的时候把<b style="color:var(--ui-pur-text)">紫色</b>的词读得更重、更长、更高</small></h2>' +
-      L.map((x, i) => '<div class="sk-box"><div class="sk-en">' + esc(x.en) + ' <button class="sk-ib" data-say="' + esc(x.en) + '" style="height:26px">🔊</button></div>' + (x.variants || []).map((v, j) => { const key = "st:" + i + ":" + j, re = new RegExp("\\b(" + String(v.stress || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")\\b", "i"); const hl = /↗|↘|rising|falling/i.test(v.stress) ? esc(x.en) + " <b style=\"color:var(--ui-pur-text)\">" + esc(v.stress) + "</b>" : esc(x.en).replace(re, '<b style="color:var(--ui-pur-text);text-transform:uppercase">$1</b>');
+      L.map((x, i) => '<div class="sk-box"><div class="sk-en">' + esc(x.en) + ' <button class="sk-ib" data-say="' + esc(x.en) + '" style="height:26px">🔊</button></div>' + (x.variants || []).map((v, j) => { const key = "st:" + i + ":" + j, re = new RegExp("(^|[^\\p{L}])(" + String(v.stress || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")(?![\\p{L}])", "iu"); const hl = /↗|↘|rising|falling/i.test(v.stress) ? esc(x.en) + " <b style=\"color:var(--ui-pur-text)\">" + esc(v.stress) + "</b>" : esc(x.en).replace(re, '$1<b style="color:var(--ui-pur-text);text-transform:uppercase">$2</b>'); /* \\b 认不出 ä ö ü ß é */
         return '<div class="sk-ph" style="display:block"><div class="e" style="font-weight:500">' + hl + '</div><div class="z">' + esc(v.meaning_zh) + '</div><div class="sk-ops">' + recBtn(key, x.en, 10, "读") + '</div><div data-res="' + esc(key) + '">' + resHtml(key) + "</div></div>"; }).join("") + (x.tip_zh ? '<div class="sk-note">💡 ' + esc(x.tip_zh) + "</div>" : "") + "</div>").join("") +
       '<div class="sk-note">提示：浏览器朗读不会按重音变化，🔊 只是正常读法；重音靠你自己读、录下来回放听。</div>';
   }
@@ -933,7 +933,7 @@
   }
   // 🔙 页面历史：口语在哪一栏、打开了哪个条目（看不到口语页时不记）
   if (window.NAV) NAV.reg("speak", () => document.documentElement.classList.contains("show-speak") ? { sec, v: view ? { t: view.t, id: view.id } : null } : undefined, x => {
-    if (!x) return; const v = x.v && x.v.t ? { t: x.v.t, id: x.v.id } : null;
+    if (!x) return; const v = x.v && x.v.t && !(DE && (x.v.t === "mock" || x.v.t === "num")) ? { t: x.v.t, id: x.v.id } : null; // 德语没有雅思模拟考、英语数字
     if (x.sec === sec && JSON.stringify(v) === JSON.stringify(view && { t: view.t, id: view.id })) return;
     stopAll(); if (x.sec && SECS.some(s2 => s2[0] === x.sec) && !MOVED.includes(x.sec)) { sec = x.sec; LS("speak:sec", sec); } view = v; QZ = null; draw(); window.scrollTo(0, 0);
   });

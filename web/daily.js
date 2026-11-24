@@ -255,7 +255,7 @@
     root.innerHTML = '<div class="dy">' +
       '<div id="dy-quota">' + (window.quotaHtml ? window.quotaHtml() : "") + "</div>" + // 🔋 AI 额度（quota.js）
       boardHtml() + // 🏆 家庭排行
-      '<div class="dy-hd"><h1>📅 每日一练</h1><p>每天按顺序做完这几项：' + (DE ? "词 → 听（德语）" : "词 → 听 → 说 → 读 → 写") + '。点「去练」直接跳过去，做完回来会自动打勾。</p><button class="ui-btn" data-act="wk">📊 本周小结</button><button class="ui-btn" data-act="set">⚙ 设置</button></div>' + set +
+      '<div class="dy-hd"><h1>📅 每日一练</h1><p>每天按顺序做完这几项：' + (DE ? "词 → 听 → 说 → 读 → 写（德语）" : "词 → 听 → 说 → 读 → 写") + '。点「去练」直接跳过去，做完回来会自动打勾。</p><button class="ui-btn" data-act="wk">📊 本周小结</button><button class="ui-btn" data-act="set">⚙ 设置</button></div>' + set +
       (showWk ? weekHtml() : weekBrief()) +
       '<div class="dy-top"><div class="dy-ring" style="--p:' + (L.length ? Math.round(n / L.length * 100) : 0) + '"><div><div><b>' + n + "/" + L.length + '</b><span>今天</span></div></div></div>' +
       '<div class="dy-meta"><b>' + (!L.length ? "在 ⚙ 设置里选几项开始" : n >= L.length ? "🎉 今天全部完成" : "还剩 " + (L.length - n) + " 项，约 " + left + " 分钟") + "</b><div>" + exTxt + '<span data-to="notebook/stats" title="看热力日历和统计">🔥 连续全勤 ' + st + " 天" + (Object.keys(D).length ? " · 共练了 " + Object.keys(D).filter(k => D[k][0] > 0).length + " 天" : "") + "</span>" + (!o.exam ? ' · <a href="javascript:void 0" data-act="set" style="color:var(--ui-muted)">设考试日期</a>' : "") + "</div></div>" +

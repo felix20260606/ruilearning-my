@@ -18,7 +18,7 @@
   // 🇩🇪 学德语（window.VL === "de"）：这一页是「🎓 歌德」模考——听力材料 DW 慢速新闻、阅读材料 tagesschau 今日新闻，AI 用德语按歌德题型出题
   //   （判断题 Richtig / Falsch / Steht nicht im Text、段落信息、填空、选择）；按答对比例打分，60% 及格（同歌德证书）；雅思的 AI 对话 / 独白（英语 AI 声）不出现
   const DE = window.VL === "de", LGC = DE ? "de" : "en";
-  const norm = DE ? s => String(s || "").normalize("NFC").toLowerCase().replace(/[’']/g, "'").replace(/[^\p{L}0-9' ]+/gu, " ").replace(/\s+/g, " ").trim() : s => String(s || "").toLowerCase().replace(/[’']/g, "'").replace(/[^a-z0-9' ]+/g, " ").replace(/\s+/g, " ").trim();
+  const norm = DE ? s => String(s || "").normalize("NFC").replace(/(\d)\.(?=\d{3}(\D|$))/g, "$1").toLowerCase().replace(/ß/g, "ss").replace(/[’']/g, "'").replace(/[^\p{L}0-9' ]+/gu, " ").replace(/\s+/g, " ").trim() : s => String(s || "").toLowerCase().replace(/[’']/g, "'").replace(/[^a-z0-9' ]+/g, " ").replace(/\s+/g, " ").trim();
   const noArt = s => norm(s).replace(DE ? /^(der|die|das|den|dem|des|ein|eine|einen|einem|einer|eines) / : /^(the|a|an) /, "");
   const words = s => (String(s).match(DE ? /[\p{L}0-9'’-]+/gu : /[A-Za-z0-9'’-]+/g) || []).length;
   const TFL = DE ? { TRUE: "Richtig", FALSE: "Falsch", "NOT GIVEN": "Steht nicht im Text" } : { TRUE: "TRUE", FALSE: "FALSE", "NOT GIVEN": "NOT GIVEN" }; // 判断题按钮上显示的字（存的还是 TRUE / FALSE / NOT GIVEN）

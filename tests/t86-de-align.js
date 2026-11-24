@@ -65,5 +65,16 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
     ok(V && V.pool.length === 9 && V.pool.every((b, i) => b.length >= 25 && b.every(([w, r]) => r >= St.VT_BANDS[i][0] && r <= St.VT_BANDS[i][1] && /^\p{L}+$/u.test(w))) && V.fake.length >= 40, "vt-de pool valid");
     const qs = St.vtBuildPool(Math.random, V.pool, V.fake); ok(qs.length === 53 && qs.filter(q => q.b < 0).length === 8, "German test: 53 questions incl. 8 fakes");
     ok(St.vtLevel(3000, true).cefr === "B1" && St.vtLevel(3000, true).ielts === "" && St.vtLevel(3000).ielts !== "", "German level without IELTS"); }
+  // 全局检查（2026-11-24）修的德语问题
+  { const mk = VL => { const ctx = { window: { VL }, console, setTimeout, clearTimeout, localStorage: { getItem: () => null, setItem() {}, removeItem() {}, length: 0, key: () => null }, Storage: function () {}, document: { addEventListener() {}, readyState: "complete" }, navigator: {}, location: { search: "" }, URLSearchParams }; ctx.Storage.prototype = { setItem() {} }; ctx.window.localStorage = ctx.localStorage; vm.createContext(ctx); vm.runInContext(W("web/util.js"), ctx); return ctx.window.U; };
+    const D = mk("de"), E = mk("en"), t = "Die Wahl findet am 23. Februar statt. Es gibt ca. 20 Parteien, z. B. die SPD. Zverev ist erst der 30. Spieler. Über alles.";
+    ok(D.sents(t).length === 4, "German sentence split keeps ordinals / abbreviations: " + JSON.stringify(D.sents(t)));
+    ok(E.sents("Mr. Lee arrived. It was 5 p.m. Then he left! Plan B. Next.").length === 3, "English split unchanged"); }
+  ok(/window\.VL === "de" \? String\(w\)\.normalize\("NFC"\) : w\.toLowerCase\(\)/.test(W("web/word.js")) && /sl0 === "de" \? String\(w \|\| ""\)\.trim\(\)\.normalize/.test(W("web/tr.js")), "German lookups keep case (Morgen ≠ morgen)");
+  ok(/const EN = window\.VL !== "de"/.test(W("web/word.js")) && /rk = window\.VL !== "de" && window\.VS_RANK/.test(W("web/pump.js")), "no English frequency/notes on German words");
+  ok(/replace\(\/\(\\d\)\\\.\(\?=\\d\{3\}/.test(W("web/exam.js")) && /replace\(\/ß\/g, "ss"\)/.test(W("web/exam.js")), "Goethe gaps: 15.000 = 15000, ß = ss");
+  ok(/async function mount\(\) \{ if \(window\.VL === "de"\) return true;/.test(W("web/channels.js")), "no English channel map in German");
+  ok(/speak:sec\|sme:s\|/.test(W("web/boot.js")) && /langOk = n => !n \|\| !n\.lang \|\| n\.lang === LANG_NOW\(\)/.test(W("web/nav.js")), "speak/listen position per language; history of the other language not restored");
+  ok(/\(\^\|\[\^\\\\p\{L\}\]\)\(" \+ String\(v\.stress/.test(W("web/speak.js")), "stress highlight works with umlaut / é words");
   console.log(fail ? fail + " FAILED" : "t86 de align: all ok"); process.exit(fail ? 1 : 0);
 })();

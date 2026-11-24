@@ -49,6 +49,20 @@ async function fromBBC(docs, s, old) {
     }
   }
 }
+// 德语分句（同 web/util.js 的 U.sents 学德语时的规则）：缩写（z. B.、ca.、Nr.）、序数（am 23. Februar、im 19. Jahrhundert）、下一个字小写都不断
+const ABBR_DE = new Set("z b u a d h o s bzw ca usw ggf inkl vgl evtl sog nr mio mrd jh jhd str bspw tel abs ff dt engl max min ehem gegr hrsg zb".split(" "));
+const ORD_PREV = /(^|\s)(der|die|das|den|dem|des|am|im|vom|zum|zur|beim|ab|bis|seit|ihr|sein|seinem|ihrem|seines|ihres|unser|jeder)\s+\d{1,4}$/i; // 「der 30.」「am Dienstag den 6.」：冠词 / 介词后面的数字带点 = 序数
+const ORD_NEXT = /^(Januar|Jänner|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember|Jahrhundert|Jahrhunderts|Jahrestag|Mal|Stock|Platz|Klasse|Runde|Spieltag|Geburtstag|Lebensjahr|Kapitel|Etage|Woche|Tag|Bundestag|Parteitag)\b/;
+export function splitDe(p) {
+  p = String(p || "").replace(/\s+/g, " ").trim(); const out = [], re = /[.!?…]+["'”’“)\]]*(?=\s|$)/g; let m, start = 0;
+  while ((m = re.exec(p))) {
+    const end = m.index + m[0].length, rest = p.slice(end).replace(/^\s+/, ""); if (!rest) break;
+    if (/^\p{Ll}/u.test(rest)) continue;
+    if (/^\.["'”’“)\]]*$/.test(m[0])) { const lw = (p.slice(start, m.index).match(/([\p{L}\d]+)$/u) || [])[1] || ""; if (ABBR_DE.has(lw.toLowerCase()) || /^\p{Lu}$/u.test(lw) || (/^\d{1,4}$/.test(lw) && (ORD_NEXT.test(rest) || ORD_PREV.test(p.slice(start, m.index))))) continue; }
+    out.push(p.slice(start, end).trim()); start = end;
+  }
+  const last = p.slice(start).trim(); if (last) out.push(last); return out;
+}
 // DW 慢速新闻：/api/dw 的最近 PER 期（每期几条新闻，每条一段：按句切开）；取不到的期沿用旧文件
 async function fromDW(docs, s, old) {
   const L = await getJson(SITE + "/api/dw?list=1"), oldDw = id => { if (!old || !Array.isArray(old.docs)) return null; const i = old.docs.findIndex(d => d[0] === "b" && d[1] === id); return i < 0 ? null : { d: old.docs[i], s: old.s.filter(r => r[0] === i) }; };
@@ -58,7 +72,7 @@ async function fromDW(docs, s, old) {
     const id = "dw/" + it.id, ep = await getJson(SITE + "/api/dw?ep=" + encodeURIComponent(it.id));
     if (!ep || !ep.ok || !Array.isArray(ep.lines)) { const o = oldDw(id); if (o) keep(o); continue; }
     const di = docs.push(["b", id, clean(ep.title || it.t || it.id)]) - 1;
-    ep.lines.forEach((l, i) => String(l.t || "").split(/(?<=[.!?])\s+(?=[A-ZÄÖÜ„"])/).forEach(x => { const t = clean(x); if (ok(t)) s.push([di, i, 0, t, ""]); }));
+    ep.lines.forEach((l, i) => splitDe(l.t).forEach(x => { const t = clean(x); if (ok(t)) s.push([di, i, 0, t, ""]); }));
   }
 }
 async function main() {

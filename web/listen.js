@@ -209,7 +209,7 @@
     U.json("/api/sme?s=" + s).then(j => fin(j.ok ? j.list : []));
   }
   let openId = null; // 正在打开的那一期（加载完之前 EP 还是空的，页面历史要用）
-  const ok = id => !!SM[serOf(String(id || ""))]; // 这一期属于这种语言的栏目吗（英语的期号在学德语时打不开，反过来也一样）
+  const ok = id => { id = String(id || ""); const m = /^([a-z0-9]{2,6})\//.exec(id); if (m && !SM[m[1]]) return false; return !!SM[serOf(id)]; }; // 带栏目前缀的（dw/、vst/…）栏目必须是这种语言的；BBC 的期号按名字认 // 这一期属于这种语言的栏目吗（英语的期号在学德语时打不开，反过来也一样）
   function openEp(id) {
     if (!ok(id)) { openId = null; view = "home"; loadList(ser); draw(); return; } // 上次在另一种语言里打开的那期（页面历史 / 下载记录）：回到列表
     openId = id;
