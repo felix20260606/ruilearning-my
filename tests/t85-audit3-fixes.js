@@ -40,12 +40,22 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
   for (const [d, w] of [["2026-11-23", 0], ["2026-11-29", 6], ["2026-11-25", 2]]) ok((new Date(d + "T12:00:00Z").getUTCDay() + 6) % 7 === w, d + " → weekday " + w);
   ok(/LAZY\.need\("drill", true\)/.test(DY) && /Date\.now\(\) - drillTry > 60e3/.test(DY), "daily: drill preload quiet + cooldown");
   // ---- AI 额度面板：同一个重置时间只强制读一次 ----
+  // 固定时钟：以前假接口每次返回 reset: Date.now() - 1000，CI 慢时两次读跨了毫秒，reset 变了就又强制读一次（时好时坏）。
+  //   现在时间用假的 Date（Date.now() 固定），reset 是固定的「上一个北京 8 点」，几个时刻都试（刚过 8 点、中午、快到第二天 8 点）
   const qa = W("web/quota.js");
-  const qctx = { console, Date, Math, JSON, String, Array, Object, Promise, setTimeout, clearTimeout, setInterval() {}, document: { addEventListener() {}, getElementById: () => ({ innerHTML: "" }), createElement: () => ({}), head: { append() {} }, documentElement: { classList: { contains: () => false } }, hidden: false } };
-  let calls = 0; const RESET = Date.now() - 1000; qctx.U = { esc: s => s, json: async () => { calls++; return { ok: true, reset: RESET, days: {}, today: "2026-11-23" }; }, day: () => "2026-11-23" };
-  qctx.window = qctx; vm.createContext(qctx);
-  try { vm.runInContext(qa, qctx); for (let i = 0; i < 5; i++) { try { qctx.quotaHtml(); } catch (e) {} await new Promise(res => setTimeout(res, 5)); } ok(calls <= 2, "quota: past-reset data doesn't refetch on every paint (" + calls + " fetches)"); }
-  catch (e) { ok(/forcedFor !== J\.reset/.test(qa), "quota guard (static): " + e.message); }
+  for (const nowIso of ["2026-11-24T00:00:00.500Z", "2026-11-24T04:30:00Z", "2026-11-24T23:59:59.900Z"]) {
+    const NOW = Date.parse(nowIso), RESET = Date.UTC(2026, 10, 24); // 后台算法一样：UTC 0 点；读回来的是缓存里「已经过了」的那个
+    class FakeDate extends Date { constructor(...a) { super(...(a.length ? a : [NOW])); } static now() { return NOW; } }
+    const qctx = { console, Date: FakeDate, Math, JSON, String, Array, Object, Promise, setTimeout, clearTimeout, setInterval() {}, document: { addEventListener() {}, getElementById: () => ({ innerHTML: "" }), createElement: () => ({}), head: { append() {} }, documentElement: { classList: { contains: () => false } }, hidden: false } };
+    let calls = 0; qctx.U = { esc: s => s, json: async () => { calls++; return { ok: true, reset: RESET, days: {}, today: "2026-11-23" }; }, day: () => "2026-11-23" };
+    qctx.window = qctx; vm.createContext(qctx);
+    try {
+      vm.runInContext(qa, qctx);
+      // 每次画完等假接口的 promise 全部走完（微任务），不靠 setTimeout 的毫秒数
+      for (let i = 0; i < 5; i++) { try { qctx.quotaHtml(); } catch (e) {} for (let k = 0; k < 10; k++) await Promise.resolve(); }
+      ok(calls === 2, "quota @" + nowIso + ": past-reset data forces exactly one refetch, not one per paint (" + calls + " fetches)");
+    } catch (e) { ok(/forcedFor !== J\.reset/.test(qa), "quota guard (static): " + e.message); }
+  }
   // ---- 录音地址放掉 ----
   ok(/else if \(y && y\.url\) try \{ URL\.revokeObjectURL\(y\.url\)/.test(W("web/speak.js")) && /done: x => \{ if \(x && x\.url\) try \{ URL\.revokeObjectURL/.test(W("web/de-basic.js")), "object URLs revoked");
   ok(/dict\.cc/.test(W("web/word.js")), "German word card links a German dictionary");
