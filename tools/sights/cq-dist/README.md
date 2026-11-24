@@ -1,0 +1,44 @@
+# 重庆各区县景点详细版（数据源）
+
+每个区县一个 `<网址名后缀>.json`（如 `wulong.json` → 城市页 `cn-city.html?c=chongqing-wulong`），跑
+`python3 tools/cn-data/make_city.py web chongqing tools/sights/cq-dist` 生成 `web/cn/city/chongqing-*.json`（会覆盖自动版）。
+渝中区不在这里：它挂的是「重庆景点大全」（`tools/sights/cq/`）。
+
+## 文件格式（和浙江 `tools/sights/zj/*.json` 一样）
+
+```json
+{
+  "city": {
+    "slug": "wulong", "zh": "武隆区", "en": "Wulong",
+    "from_t": "从解放碑去",
+    "from_hz": "从重庆主城（解放碑）怎么去：高铁 / 动车、长途大巴、自驾，写时间和大概票价",
+    "local": "到了以后区内怎么走：公交 / 景区直通车 / 打车 / 包车",
+    "tips": "季节、怎么安排（一日 / 两日）、避坑"
+  },
+  "sights": [ {
+    "id": "cqd-wulong-tiansheng",
+    "zh": "天生三桥", "en": "Three Natural Bridges",
+    "cat": "公园自然",
+    "area": "武隆 · 仙女山镇",
+    "addr": "详细地址",
+    "transit": "公共交通怎么到（从区里 / 从主城）",
+    "hours": "开放时间（以官方为准）",
+    "price": "门票（以官方为准）",
+    "dur": "2–3 小时",
+    "desc": "两三句介绍：是什么、看点",
+    "tips": "一两句实用建议",
+    "rate": 3,
+    "photo": "",
+    "q": "高德搜索关键词（景点全名）",
+    "src": "查到信息的来源网址"
+  } ]
+}
+```
+
+- `id`：`cqd-<区县后缀>-<景点拼音>`（不要用 `cq-` 开头的新 id，那是重庆景点大全的）。
+  例外：景点已经在 `tools/sights/cq/core.json` / `outer.json` 里，**原样复制那条（保留原 id）**，这样两个页面勾的状态是同一条。
+- `cat` 只用：地标、街区、博物馆、公园自然、宗教建筑、美食夜市、徒步、周边一日、亲子游乐、温泉。
+- `rate`：3 = 必去，2 = 值得，1 = 有空再去。
+- `photo`：维基共享资源（Commons）的文件名（不带 `File:`），**只填确认存在且拍的就是这个景点的**；拿不准留空，之后用 `tools/sights/fill_photos.py` 补、再人工看缩略图。
+- 每个区县 6–15 个景点（有名的多写，小县城写够主要的）；必须是真实存在、现在还开放的景点；开放时间 / 票价查不到写「以现场为准」，不要编。
+- 参考候选：`web/cn/city/chongqing-<后缀>.json` 里的自动版（维基数据的国保 / 5A）。

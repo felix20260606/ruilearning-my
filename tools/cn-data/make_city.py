@@ -23,7 +23,7 @@ for f in sorted(glob.glob(os.path.join(src,'*.json'))):
         seen.add(x['id']);ph=(x.get('photo') or '');ph=ph[5:] if ph.startswith('File:') else ph
         d={k:x.get(k,'') for k in KEYS};d.update(rate=int(x.get('rate') or 1),photo=ph);S.append(d)
     doc=dict(slug=slug,zh=base.get('zh',c['zh']),en=c.get('en') or base.get('en',''),prov=P['slug'],provZh=P['zh'],desc=base.get('desc',''),img=base.get('img',''),
-             wiki=base.get('wiki',''),lat=base.get('lat'),lng=base.get('lng'),from_hz=c.get('from_hz',''),local=c.get('local',''),tips=c.get('tips',''),sights=S)
+             wiki=base.get('wiki',''),lat=base.get('lat'),lng=base.get('lng'),from_hz=c.get('from_hz',''),from_t=c.get('from_t',''),local=c.get('local',''),tips=c.get('tips',''),sights=S)
     json.dump(doc,open(os.path.join(web,'cn','city',slug+'.json'),'w',encoding='utf-8'),ensure_ascii=False,separators=(',',':'))
     if base and not base.get('go'):
         base['go']='city:'+slug;base['goT']='🏙 %s景点大全'%zh

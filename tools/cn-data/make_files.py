@@ -1,4 +1,4 @@
-import json,os,sys,re,unicodedata
+import json,os,sys,re,unicodedata,hashlib,urllib.parse
 RAW=os.path.join(os.path.dirname(os.path.abspath(__file__)),'raw')  # 查回来的原始数据留底在 tools/cn-data/raw/
 P=json.load(open(os.path.join(RAW,'data_all.json'),encoding='utf-8'))
 # 每个省的封面图：手挑一个代表景点（covers.json：省名 → [景点, Commons 文件名]），省页大图和中国页目录卡片都用它
@@ -53,11 +53,16 @@ TREE=[]
 for reg,names in REG:
     for zh in names:
         d=json.load(open(os.path.join(out,SLUG[zh]+'.json'),encoding='utf-8'))
-        def nsight(c):  # 城市页里有几个景点（杭州、渝中挂的是景点大全，数那边的）
+        def th(f):  # 维基共享资源缩略图的直接路径（a/ab/文件名），页面拼成 upload.wikimedia.org/…/thumb/<th>/<宽>px-文件名，省掉一次跳转
+            if not f or not re.search(r'\.(jpe?g|png|webp)$',f,re.I): return ''
+            n=f.replace(' ','_');h=hashlib.md5(n.encode('utf-8')).hexdigest();return h[0]+'/'+h[:2]+'/'+urllib.parse.quote(n)
+        def cinfo(c):  # 城市页里有几个景点 + 缩略图（城市页里最好的那个有照片的景点；没有就用城市自己的照片）
             f=os.path.join(out,'city',c['slug']+'.json')
-            return len(json.load(open(f,encoding='utf-8'))['sights']) if os.path.exists(f) else 0
-        TREE.append(dict(slug=d['slug'],zh=d['zh'],short=d['short'],region=reg,img=d['img'],cover=COV.get(zh,['',''])[0],cap=d['cap'],
-                         cities=[dict(id=c['id'],zh=c['zh'],slug=c['slug'],go=c.get('go',''),n=nsight(c)) for c in d['cities']]))
+            if not os.path.exists(f): return 0,c.get('img','')
+            S=json.load(open(f,encoding='utf-8'))['sights'];ph=sorted([x for x in S if x.get('photo')],key=lambda x:-int(x.get('rate') or 1))
+            return len(S),(ph[0]['photo'] if ph else c.get('img',''))
+        TREE.append(dict(slug=d['slug'],zh=d['zh'],short=d['short'],region=reg,img=d['img'],th=th(d['img']),cover=COV.get(zh,['',''])[0],cap=d['cap'],
+                         cities=[dict(id=c['id'],zh=c['zh'],slug=c['slug'],go=c.get('go',''),n=cinfo(c)[0],img=cinfo(c)[1],th=th(cinfo(c)[1])) for c in d['cities']]))
 json.dump(TREE,open(os.path.join(out,'index.json'),'w',encoding='utf-8'),ensure_ascii=False,separators=(',',':'))  # 中国页三级目录：地区 → 省 → 市
 print(len(idx),'provinces',sum(i['n'] for i in idx),'cities')
 for i in idx: print(i['region'],i['zh'],i['n'],bool(i['img']))

@@ -30,16 +30,18 @@
     ".ct-q{font:inherit;font-size:13.5px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:7px 14px;min-width:0;flex:0 1 220px;outline:none}.ct-q:focus{border-color:rgba(197,155,239,.6)}" +
     ".ct-sum{font-size:12.5px;color:var(--soft);margin:0 2px 2px;display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center}.ct-sum i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}" +
     ".ct-rh{display:flex;align-items:baseline;gap:8px;margin:20px 2px 10px;font-family:var(--display);font-weight:900;font-size:14px;color:var(--ink)}.ct-rh:before{content:\"\";width:4px;height:15px;border-radius:2px;background:#c59bef;align-self:center}.ct-rh small{font-family:inherit;font-weight:700;font-size:12px;color:var(--soft)}" +
-    ".ct-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}" +
+    ".ct-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}" +
     ".ct-k{background:var(--paper);border:1px solid var(--line);border-radius:16px;overflow:hidden;transition:border-color .15s,box-shadow .15s}.ct-k:hover{border-color:rgba(197,155,239,.45);box-shadow:0 6px 22px rgba(0,0,0,.28)}.ct-k.been{border-color:rgba(47,191,113,.5)}" +
     ".ct-ph{position:relative;display:block;height:124px;overflow:hidden;background:#20232b;text-decoration:none;color:#fff}.ct-ph img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s}.ct-k:hover .ct-ph img{transform:scale(1.05)}" +
     ".ct-ph:after{content:\"\";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05) 30%,rgba(0,0,0,.78))}" +
     ".ct-nm{position:absolute;left:13px;bottom:11px;z-index:1;display:flex;align-items:center;gap:7px;font-size:18px;font-weight:900;text-shadow:0 1px 8px rgba(0,0,0,.6)}.ct-nm i{font-style:normal;font-size:11px;font-weight:800;border:1px solid rgba(255,255,255,.55);border-radius:6px;padding:0 5px;text-shadow:none}" +
     ".ct-pr{position:absolute;right:12px;bottom:12px;z-index:1;font-size:12px;font-weight:800;text-shadow:0 1px 6px rgba(0,0,0,.6)}.ct-pr b{color:#7ce3b8}.ct-cv{position:absolute;right:9px;top:8px;z-index:1;font-size:10.5px;background:rgba(0,0,0,.45);border-radius:999px;padding:2px 8px;opacity:.85}" +
     ".ct-bar{position:absolute;left:0;right:0;bottom:0;height:3px;z-index:1;background:rgba(255,255,255,.12);display:flex}.ct-bar span{display:block;height:100%}" +
-    ".ct-cs{display:flex;flex-wrap:wrap;gap:6px;padding:11px 12px 13px}" +
-    ".ct-c{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--ink);background:var(--bg);text-decoration:none;transition:border-color .12s}.ct-c:hover{border-color:#c59bef}.ct-c small{font-size:10.5px;font-weight:600;color:var(--soft)}.ct-c.cap{border-color:rgba(197,155,239,.5)}" +
-    ".ct-c.been{background:rgba(47,191,113,.22);border-color:rgba(47,191,113,.7)}.ct-c.pass{background:rgba(31,160,160,.2);border-color:rgba(31,160,160,.7)}.ct-c.want{background:rgba(255,201,77,.17);border-color:rgba(255,201,77,.7)}.ct-c.skip{opacity:.45}.ct-none{color:var(--soft);font-size:13px;padding:14px 2px}" +
+    ".ct-cs{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:7px;padding:11px 11px 13px}" +
+    ".ct-c{display:flex;align-items:center;gap:8px;min-width:0;padding:4px 8px 4px 4px;border:1px solid var(--line);border-radius:12px;color:var(--ink);background:var(--bg);text-decoration:none;transition:border-color .12s,transform .12s}.ct-c:hover{border-color:#c59bef;transform:translateY(-1px)}" +
+    ".ct-c img,.ct-c .ni{flex:none;width:40px;height:40px;border-radius:9px;object-fit:cover;background:#2a2e38;display:flex;align-items:center;justify-content:center;font-size:17px}.ct-c span{min-width:0;display:flex;flex-direction:column;line-height:1.25}" +
+    ".ct-c b{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ct-c small{font-size:10.5px;font-weight:600;color:var(--soft);white-space:nowrap}.ct-c.cap{border-color:rgba(197,155,239,.55)}" +
+    ".ct-c.been{background:rgba(47,191,113,.16);border-color:rgba(47,191,113,.7)}.ct-c.been small{color:#7ce3b8}.ct-c.pass{background:rgba(31,160,160,.15);border-color:rgba(31,160,160,.7)}.ct-c.want{background:rgba(255,201,77,.12);border-color:rgba(255,201,77,.7)}.ct-c.skip{opacity:.45}.ct-none{color:var(--soft);font-size:13px;padding:14px 2px}" +
     "@media(max-width:520px){.ct-g{grid-template-columns:1fr}.ct-ph{height:112px}.ct-q{flex:1 1 100%}}" +
     ".cm-rec{padding:0 14px 12px;font-size:12.5px;color:var(--soft)}.cm-rec a{color:var(--ink);text-decoration:none;cursor:pointer;margin-right:10px;white-space:nowrap}.cm-rec a:hover{color:#c59bef}";
 
@@ -78,7 +80,8 @@
         for (id in A) {
           var v = A[id].v || {};
           if (BY[id]) { S[id] = { been: !!v.been, pass: !!v.pass && !v.been, want: !!(v.want || v.plan), skip: !!v.skip, rate: v.rate || "", again: !!v.again, raw: v, at: A[id].at, src: "城市" }; continue; } // 计划也算想去（金色）；不想去不上色
-          for (k in M.alias || {}) if (id.indexOf(k) === 0 && M.alias[k] && v.been) { var c = M.alias[k], o = S[c] || {}; if (!o.been || (A[id].at > (o.at || 0) && o.src !== "城市")) S[c] = { been: true, want: false, at: Math.max(A[id].at, o.at || 0), src: o.src === "城市" ? "城市" : "景点" }; }
+          var best = ""; for (k in M.alias || {}) if (id.indexOf(k) === 0 && M.alias[k] && k.length > best.length) best = k; // 最长的前缀：cq- 是渝中，cq-ciqikou 这种单独对到沙坪坝
+          if (best && v.been) { var c = M.alias[best], o = S[c] || {}; if (!o.been || (A[id].at > (o.at || 0) && o.src !== "城市")) S[c] = { been: true, want: false, at: Math.max(A[id].at, o.at || 0), src: o.src === "城市" ? "城市" : "景点" }; }
         }
         return S;
       }
@@ -159,12 +162,12 @@
       var q = "";
       function cityGo(c, p) { return c.go || "prov:" + p.slug; }  // 还没有城市页的 → 省页
       function cHref(c, p) { var g = cityGo(c, p); return /^city:/.test(g) ? "cn-city.html?c=" + g.slice(5) : g === "hzsights" ? "hz-sights.html" : g === "cqsights" ? "cq-sights.html" : provHref(p.slug); }
-      function img(f) { return "https://commons.wikimedia.org/wiki/Special:FilePath/" + encodeURIComponent(f) + "?width=560"; }
+      function cw(x, w) { return x.th ? "https://upload.wikimedia.org/wikipedia/commons/thumb/" + x.th + "/" + w + "px-" + x.th.split("/").pop() : "https://commons.wikimedia.org/wiki/Special:FilePath/" + encodeURIComponent(x.img) + "?width=" + w; }
       function tree() {
         var body = $("ct-body"); if (!body) return; var regs = [], byR = {}, ql = q.toLowerCase(), all = 0, nb = 0, np = 0, nw = 0;
         TREE.forEach(function (p) { if (!byR[p.region]) { byR[p.region] = []; regs.push(p.region); } byR[p.region].push(p);
           p.cities.forEach(function (c) { var s = S[c.id] || {}; all++; if (s.been) nb++; else if (s.pass) np++; else if (s.want || s.plan) nw++; }); });
-        $("ct-sum").innerHTML = '<span>' + TREE.length + ' 个省级 · ' + all + ' 个城市</span><span><i style="background:#2fbf71"></i>去过 ' + nb + '</span><span><i style="background:#1fa0a0"></i>路过 ' + np + '</span><span><i style="background:#ffc94d"></i>想去 ' + nw + '</span><span style="opacity:.8">点照片进省页 · 点城市进城市页（小数字 = 景点数）</span>';
+        $("ct-sum").innerHTML = '<span>' + TREE.length + ' 个省级 · ' + all + ' 个城市</span><span><i style="background:#2fbf71"></i>去过 ' + nb + '</span><span><i style="background:#1fa0a0"></i>路过 ' + np + '</span><span><i style="background:#ffc94d"></i>想去 ' + nw + '</span><span style="opacity:.8">点大图进省页 · 点城市进城市页</span>';
         body.innerHTML = regs.map(function (r) {
           var cards = byR[r].map(function (p) {
             var hitP = !ql || p.zh.indexOf(q) >= 0 || p.slug.indexOf(ql) >= 0;
@@ -172,16 +175,28 @@
             var b = 0, ps = 0, w = 0, n = p.cities.length; p.cities.forEach(function (c) { var s = S[c.id] || {}; if (s.been) b++; else if (s.pass) ps++; else if (s.want || s.plan) w++; });
             var pct = function (x) { return (x / n * 100).toFixed(1) + "%"; };
             return '<div class="ct-k' + (b ? " been" : "") + '"><a class="ct-ph" href="' + provHref(p.slug) + '" data-go="prov:' + p.slug + '" title="打开' + esc(p.zh) + '省页">' +
-              (p.img ? '<img loading="lazy" alt="" src="' + esc(img(p.img)) + '">' : "") + (p.cover ? '<span class="ct-cv">📷 ' + esc(p.cover) + "</span>" : "") +
+              (p.img ? '<img alt="" data-src="' + esc(cw(p, 500)) + '">' : "") + (p.cover ? '<span class="ct-cv">📷 ' + esc(p.cover) + "</span>" : "") +
               '<span class="ct-nm">' + esc(p.zh) + "<i>" + esc(p.short) + '</i></span><span class="ct-pr">' + (b ? "去过 <b>" + b + "</b> / " + n : n + " 个城市") + " ›</span>" +
               '<span class="ct-bar"><span style="width:' + pct(b) + ';background:#2fbf71"></span><span style="width:' + pct(ps) + ';background:#1fa0a0"></span><span style="width:' + pct(w) + ';background:#ffc94d"></span></span></a>' +
               '<div class="ct-cs">' + cs.map(function (c) { var s = S[c.id] || {};
-                return '<a class="ct-c' + (s.been ? " been" : s.pass ? " pass" : s.want || s.plan ? " want" : s.skip ? " skip" : "") + (c.zh === p.cap ? " cap" : "") + '" href="' + esc(cHref(c, p)) + '" data-go="' + esc(cityGo(c, p)) + '"' + (c.zh === p.cap ? ' title="省会"' : "") + ">" +
-                  (c.zh === p.cap ? "★ " : "") + esc(c.zh.replace(/(市|地区)$/, "")) + (c.n ? "<small>" + c.n + "</small>" : "") + "</a>"; }).join("") + "</div></div>";
+                var st = s.been ? "去过" : s.pass ? "路过" : s.want || s.plan ? "想去" : "";
+                return '<a class="ct-c' + (s.been ? " been" : s.pass ? " pass" : s.want || s.plan ? " want" : s.skip ? " skip" : "") + (c.zh === p.cap ? " cap" : "") + '" href="' + esc(cHref(c, p)) + '" data-go="' + esc(cityGo(c, p)) + '" title="' + esc(c.zh) + '">' +
+                  (c.img ? '<img alt="" data-src="' + esc(cw(c, 120)) + '">' : '<i class="ni">🏙</i>') + "<span><b>" + (c.zh === p.cap ? "★ " : "") + esc(c.zh.replace(/(市|地区)$/, "")) + "</b><small>" +
+                  [st, c.zh === p.cap ? "省会" : "", c.n ? c.n + " 个景点" : (c.go && !/^city:/.test(c.go) ? "景点大全" : "")].filter(Boolean).join(" · ") + "</small></span></a>"; }).join("") + "</div></div>";
           }).join("");
           return cards ? '<div class="ct-rh">' + r + "<small>" + byR[r].length + " 个</small></div><div class=\"ct-g\">" + cards + "</div>" : "";
         }).join("") || '<div class="ct-none">没有符合的城市</div>';
+        lazy(body);
       }
+      // 图片：滚到附近才加载，同时最多 6 张，失败的隔几秒重试（维基共享资源一下子请求太多会限流）；加载过的直接用
+      var DONE = {}, QUE = [], busy = 0, io = window.IntersectionObserver ? new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { io.unobserve(e.target); QUE.push(e.target); pump(); } }); }, { rootMargin: "300px" }) : null;
+      function pump() {
+        while (busy < 6 && QUE.length) { (function (im) { var u = im.getAttribute("data-src"), n = +(im.getAttribute("data-try") || 0); if (!im.isConnected) return; busy++;
+          im.onload = function () { busy--; DONE[u] = 1; pump(); };
+          im.onerror = function () { busy--; if (n < 3) { im.setAttribute("data-try", n + 1); im.removeAttribute("src"); setTimeout(function () { QUE.push(im); pump(); }, 2500 * (n + 1)); } else if (im.closest(".ct-c")) { var ni = document.createElement("i"); ni.className = "ni"; ni.textContent = "🏙"; im.replaceWith(ni); } else im.remove(); pump(); };
+          im.src = u; })(QUE.shift()); }
+      }
+      function lazy(root) { root.querySelectorAll("img[data-src]").forEach(function (im) { var u = im.getAttribute("data-src"); if (DONE[u] || !io) im.src = u; else io.observe(im); }); }
       $("ct-q").addEventListener("input", function (e) { q = e.target.value.trim(); tree(); });
       if (tw !== host) tw.addEventListener("click", function (e) { var t = e.target.closest && e.target.closest("a[data-go]"); if (t) { e.preventDefault(); go(t.dataset.go, t.getAttribute("href")); } });
       function paintAll() { paint(); tree(); }
