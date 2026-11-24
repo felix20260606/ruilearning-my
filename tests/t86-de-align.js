@@ -28,7 +28,8 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
   { const c = { window: { VL: "en" }, module: { exports: {} } }; vm.createContext(c); vm.runInContext(W("web/write.js"), c); ok(Object.keys(c.module.exports.TYPES).join() === "task2,task1,email,free", "write: English unchanged"); }
   const rd = W("web/read.js"); ok(/"\/api\/news\?d=" \+ nday\(\) \+ \(DE \? "&lang=de" : ""\)/.test(rd) && /SAMPLE_LIST = DE \? SAMPLES_DE : SAMPLES/.test(rd) && /AI\.ask\("newsimp", \{ lang: LGC/.test(rd) && /TTS\.sys\(P\.sents\[i\], \{ lang: LGC/.test(rd), "read: German news, samples, simplify, TTS");
   ok(/reading:news\|reading:newsq/.test(W("web/boot.js")), "read: today's news cached per language");
-  const ls = W("web/listen.js"); ok(/const SER = \(DE \? SER_DE :/.test(ls) && /\["dw", "📰 慢速新闻"/.test(ls) && /AI\.ask\("lquiz", \{ lang: RL\(\)/.test(ls) && !/lang: "en"/.test(ls), "listen: DW series, German scoring");
+  const ls = W("web/listen.js");
+  ok(/OFF = \(\) => \{ const A = OFF_ALL\(\), o = \{\}; for \(const id in A\) if \(SM\[/.test(ls) && /if \(!ok\(id\)\) \{ openId = null; view = "home"/.test(ls) && /x\.ser !== ser && SM\[x\.ser\]\) \{/.test(ls), "listen: other language's downloads / last episode don't break the page"); ok(/const SER = \(DE \? SER_DE :/.test(ls) && /\["dw", "📰 慢速新闻"/.test(ls) && /AI\.ask\("lquiz", \{ lang: RL\(\)/.test(ls) && !/lang: "en"/.test(ls), "listen: DW series, German scoring");
   ok(/sl = o\.sl \|\| VLS\(\)/.test(W("web/tr.js")), "tr: source language follows VL");
   ok(!/if\(DE\)SECS\.listen=/.test(W("web/tabs.js")) && /DE_OFF=\{\}/.test(W("web/tabs.js")), "tabs: speak/read/write/sme/video/exam in German");
   { const X = W("web/exam.js"); ok(/AI\.ask\("exam", \{ lang: LGC/.test(X) && /TFL = DE \? \{ TRUE: "Richtig"/.test(X) && /\["dw"\] : \["sme", "ree"\]/.test(X) && /pc \+ "%"/.test(X), "exam: Goethe mock (German questions, DW, tagesschau, %)"); }

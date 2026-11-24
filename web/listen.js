@@ -209,7 +209,9 @@
     U.json("/api/sme?s=" + s).then(j => fin(j.ok ? j.list : []));
   }
   let openId = null; // 正在打开的那一期（加载完之前 EP 还是空的，页面历史要用）
+  const ok = id => !!SM[serOf(String(id || ""))]; // 这一期属于这种语言的栏目吗（英语的期号在学德语时打不开，反过来也一样）
   function openEp(id) {
+    if (!ok(id)) { openId = null; view = "home"; loadList(ser); draw(); return; } // 上次在另一种语言里打开的那期（页面历史 / 下载记录）：回到列表
     openId = id;
     if (OFF()[id] && !(id in BLOB) && "caches" in window) { offBlob(id).then(() => openEp(id)); return; } // 下载过的：先拿到本机的音频再画
     view = "ep"; trShow = false; EP = EPS[id] || null; epBusy = !EP; draw(); if (root && root.getClientRects().length) window.scrollTo(0, 0);
@@ -311,12 +313,13 @@
     d.busy = false; if (EP && EP.id === id) draw();
   }
   // ---------- 📥 离线下载（Cache Storage「sme-off-v1」：/off/期号.mp3 + /off/期号.json {ep, sents, zh}） ----------
-  const OFFC = "sme-off-v1", OFF = () => LG("sme:off", {}) || {}, BLOB = {}, OFFB = {};
+  // 📥 下载的节目 sme:off 两种语言共用一个键：只列这种语言有的栏目（以前学德语时列英语下载的期，找不到栏目 → 整页出错、一片空白）
+  const OFFC = "sme-off-v1", OFF_ALL = () => LG("sme:off", {}) || {}, OFF = () => { const A = OFF_ALL(), o = {}; for (const id in A) if (SM[(A[id] && A[id].s) || serOf(id)] && ok(id)) o[id] = A[id]; return o; }, BLOB = {}, OFFB = {};
   const srcOf = (id, ep) => { const u = (ep || EPS[id] || EP || {}).mp3 || ""; return BLOB[id] || (window.NET && u ? NET.src(u) : u); }; // 已知连不上 BBC 就直接走中转
   async function offBlob(id) { // 下载过的这期 → 本机的 blob: 地址（Safari 也能拖进度条）
     if (id in BLOB) return BLOB[id];
     try { const r = await (await caches.open(OFFC)).match("/off/" + id + ".mp3"); BLOB[id] = r ? URL.createObjectURL(await r.blob()) : ""; } catch (e) { BLOB[id] = ""; }
-    if (!BLOB[id]) { const O = OFF(); if (O[id]) { delete O[id]; LS("sme:off", O); } } // 缓存被系统清掉了
+    if (!BLOB[id]) { const O = OFF_ALL(); if (O[id]) { delete O[id]; LS("sme:off", O); } } // 缓存被系统清掉了
     return BLOB[id];
   }
   async function offJson(id) { if (!OFF()[id]) return null; try { const r = await (await caches.open(OFFC)).match("/off/" + id + ".json"); return r ? await r.json() : null; } catch (e) { return null; } }
@@ -334,14 +337,14 @@
       const c = await caches.open(OFFC);
       await c.put("/off/" + id + ".mp3", new Response(blob, { headers: { "content-type": "audio/mpeg" } }));
       await c.put("/off/" + id + ".json", new Response(JSON.stringify({ ep, sents, zh: ZH[id] || null }), { headers: { "content-type": "application/json" } }));
-      const m = meta(id), O = OFF(); O[id] = { t: ep.title, d: m.d || "", s: serOf(id), size: blob.size, at: Date.now() }; LS("sme:off", O);
+      const m = meta(id), O = OFF_ALL(); O[id] = { t: ep.title, d: m.d || "", s: serOf(id), size: blob.size, at: Date.now() }; LS("sme:off", O);
       tip("📥 下好了（" + mb(blob.size) + "），没网也能听");
     } catch (e) { tip("下载失败：" + (e.message || e)); }
     delete OFFB[id]; draw();
   }
   async function offDel(id) {
     try { const c = await caches.open(OFFC); await c.delete("/off/" + id + ".mp3"); await c.delete("/off/" + id + ".json"); } catch (e) {}
-    const O = OFF(); delete O[id]; LS("sme:off", O); if (BLOB[id] && AU.dataset.id !== id) { URL.revokeObjectURL(BLOB[id]); delete BLOB[id]; } draw();
+    const O = OFF_ALL(); delete O[id]; LS("sme:off", O); if (BLOB[id] && AU.dataset.id !== id) { URL.revokeObjectURL(BLOB[id]); delete BLOB[id]; } draw();
   }
 
   // ---------- 📈 我的听力（每天几分钟、精听、听写、跟读） ----------
@@ -742,12 +745,12 @@
   // 🔙 页面历史：哪个栏目、打开了哪一期（看不到这一页时不记）
   if (window.NAV) NAV.reg("sme", () => root && root.getClientRects().length ? { ser, ep: view === "ep" ? (EP && EP.id) || openId : null } : undefined, x => {
     if (!x || !root) return;
-    if (x.ser && x.ser !== ser && (SM[x.ser] || x.ser === "new")) { ser = x.ser; LS("sme:s", ser); }
+    if (x.ser && x.ser !== ser && SM[x.ser]) { ser = x.ser; LS("sme:s", ser); }
     if (x.ep) { if (!(view === "ep" && ((EP && EP.id) || openId) === x.ep)) openEp(x.ep); return; }
     if (view !== "home") { view = "home"; loadList(ser); draw(); } else { loadList(ser); draw(); }
   });
   window.smeShow = () => { init(); if (!root) return; pull(); loadList(ser); draw(); };
-  window.smeOpen = id => { init(); if (!root) return; const s = serOf(id); if (s) { ser = s; LS("sme:s", s); loadList(s); } openEp(id); }; // 直接打开某一期（🔎 真人例句里点「打开这一期」）
+  window.smeOpen = id => { init(); if (!root) return; const s = serOf(id); if (s && SM[s]) { ser = s; LS("sme:s", s); loadList(s); } openEp(id); }; // 直接打开某一期（🔎 真人例句里点「打开这一期」）
   window.smeDoneToday = () => { const D = done(), t = U.day(); return Object.keys(D).filter(id => U.day(D[id]) === t); }; // 「📅 每日」的「听」用
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
