@@ -4,49 +4,25 @@
   "author": "Torres Pit托哥",
   "lang": "en",
   "tl": "zh-CN",
-  "at": 1795102100685,
+  "at": 1795502164464,
   "cues": [
     {
       "s": 0,
-      "e": 5.89,
-      "t": "I'm going to give her 50 euro and if it's not crazy enough then you take it.",
-      "r": "我打算给她 50 欧元，如果这还不够疯狂，那就收下吧。"
+      "e": 7.89,
+      "t": "I'm going to give her 50 euro and if it's not crazy enough then you take it. [music]",
+      "r": "我打算给她 50 欧元，如果这还不够疯狂，那就收下吧。 [音乐]"
     },
     {
       "s": 11.2,
-      "e": 12.28,
-      "t": "How old are you?",
-      "r": "你多大了？"
-    },
-    {
-      "s": 12.28,
-      "e": 13.88,
-      "t": "What do you think?",
-      "r": "你怎么认为？"
-    },
-    {
-      "s": 13.88,
-      "e": 15.76,
-      "t": "Man.",
-      "r": "男人。"
-    },
-    {
-      "s": 15.76,
       "e": 17.56,
-      "t": "I think like 25 I thought.",
-      "r": "我想大概是25岁吧。"
+      "t": "How old are you? What do you think? Man. I think like 25 I thought.",
+      "r": "你多大了？你怎么认为？男人。我想大概是25岁吧。"
     },
     {
       "s": 17.56,
-      "e": 20.76,
-      "t": "No no no I'm not 25 I'm 53.",
-      "r": "不不不，我不是25岁，我是53岁。"
-    },
-    {
-      "s": 20.76,
       "e": 22.88,
-      "t": "What? Or black stone crack?",
-      "r": "什么？或者黑石裂纹？"
+      "t": "No no no I'm not 25 I'm 53. What? Or black stone crack?",
+      "r": "不不不，我不是25岁，我53岁了。什么？或者黑石裂纹？"
     },
     {
       "s": 22.88,
@@ -56,369 +32,177 @@
     },
     {
       "s": 27.12,
-      "e": 29,
-      "t": "Put yourself first.",
-      "r": "先照顾好自己。"
-    },
-    {
-      "s": 29,
       "e": 30.48,
-      "t": "How about your family?",
-      "r": "你家人怎么样？"
+      "t": "Put yourself first. How about your family?",
+      "r": "先照顾好自己。你家人怎么样？"
     },
     {
       "s": 30.48,
-      "e": 36.92,
-      "t": "Ah the family is going to take up themselves. Otherwise the family is going to cry at your funeral. So put yourself first.",
-      "r": "啊，这家人打算自己解决。否则你的家人会在你的葬礼上哭泣。所以，请把自己的需求放在第一位。"
+      "e": 34.08,
+      "t": "Ah the family is going to take up themselves. Otherwise the family is",
+      "r": "啊，这家人打算自己收拾残局。否则你的家人会"
     },
     {
-      "s": 36.92,
-      "e": 38.36,
-      "t": "Do you have a wife?",
-      "r": "你有妻子吗？"
-    },
-    {
-      "s": 38.36,
+      "s": 34.08,
       "e": 39.32,
-      "t": "I used to.",
-      "r": "我以前是。"
+      "t": "going to cry at your funeral. So put yourself first. Do you have a wife? I used to.",
+      "r": "在你的葬礼上哭的。所以，请把自己的需求放在第一位。你有妻子吗？我以前是。"
     },
     {
       "s": 39.32,
-      "e": 41.6,
-      "t": "Ah but you put yourself first.",
-      "r": "啊，但你总是把自己放在第一位。"
-    },
-    {
-      "s": 41.6,
-      "e": 42.76,
-      "t": "Always yourself first.",
-      "r": "永远把你自己放在第一位。"
-    },
-    {
-      "s": 42.76,
-      "e": 44.64,
-      "t": "Am I your favorite Asian man?",
-      "r": "我是你最喜欢的亚洲男人吗？"
-    },
-    {
-      "s": 44.64,
       "e": 45.32,
-      "t": "Of course.",
-      "r": "当然。"
+      "t": "Ah but you put yourself first. Always yourself first. Am I your favorite Asian man? Of course.",
+      "r": "啊，但你总是把自己放在第一位。永远把你自己放在第一位。我是你最喜欢的亚洲男人吗？当然。"
     },
     {
       "s": 45.32,
-      "e": 46.88,
-      "t": "I think we're falling in love.",
-      "r": "我觉得我们坠入爱河了。是的"
-    },
-    {
-      "s": 46.88,
-      "e": 47.6,
-      "t": "Yeah.",
-      "r": "。"
-    },
-    {
-      "s": 47.6,
-      "e": 48.24,
-      "t": "Are we?",
-      "r": "是吗？"
-    },
-    {
-      "s": 48.24,
       "e": 50.88,
-      "t": "I Of course we are.",
-      "r": "当然是。"
+      "t": "I think we're falling in love. Yeah. Are we? I Of course we are.",
+      "r": "我觉得我们坠入爱河了。是的。是吗？当然是。"
     },
     {
       "s": 50.88,
-      "e": 52.4,
-      "t": "It's okay to fall in love.",
-      "r": "坠入爱河没什么不好。"
-    },
-    {
-      "s": 54.08,
       "e": 57.2,
-      "t": "We could we could fall in love platonically.",
-      "r": "我们可能会发展成柏拉图式的恋爱关系。"
+      "t": "It's okay to fall in love. We could we could fall in love platonically.",
+      "r": "坠入爱河没什么不好。 [笑声] 我们可能会发展成柏拉图式的恋爱关系。"
     },
     {
       "s": 57.2,
-      "e": 57.88,
-      "t": "No no no no.",
-      "r": "不不不不。"
-    },
-    {
-      "s": 57.88,
-      "e": 58.48,
-      "t": "No homo.",
-      "r": "别想歪了。"
-    },
-    {
-      "s": 58.48,
-      "e": 59.08,
-      "t": "No no no.",
-      "r": "不不不。"
-    },
-    {
-      "s": 59.08,
       "e": 59.52,
-      "t": "Homo.",
-      "r": "人。"
+      "t": "No no no no. No homo. No no no. Homo.",
+      "r": "不不不不。别想歪了。不不不。人。"
     },
     {
       "s": 59.52,
-      "e": 60.56,
-      "t": "Why no homo?",
-      "r": "为什么说“不搞基”？"
-    },
-    {
-      "s": 60.56,
-      "e": 64.19,
-      "t": "No McQueen Berlin bro. Yeah yeah yeah yeah yeah.",
-      "r": "没有麦昆柏林兄弟。对对对对对对。"
+      "e": 66.21,
+      "t": "Why no homo? No McQueen Berlin bro. Yeah yeah yeah yeah yeah.",
+      "r": "为什么说“不搞基”？没有麦昆柏林兄弟。对对对对对对。 [音乐]"
     },
     {
       "s": 68.04,
-      "e": 69.43,
-      "t": "Oh.",
-      "r": "哦。"
-    },
-    {
-      "s": 70.44,
       "e": 73.24,
-      "t": "Woah.",
-      "r": "哇哦。哇。这"
+      "t": "Oh. Woah. Woah.",
+      "r": "哦。 [音乐] 哇哦。哇哦。这"
     },
     {
       "s": 73.24,
-      "e": 75.84,
-      "t": "What's up?",
-      "r": "是怎么回事？"
+      "e": 80.16,
+      "t": "What's up? Nice to see you. Good to see you. This is Max. You have seen him in a lot",
+      "r": "是怎么回事？很高兴见到你。这是麦克斯。你在"
     },
     {
-      "s": 75.84,
-      "e": 77.04,
-      "t": "Nice to see you.",
-      "r": "很高兴见到你。"
+      "s": 80.16,
+      "e": 84.6,
+      "t": "of my videos. We went to Budapest we went everywhere. Um he's about to show",
+      "r": "我的很多视频里都见过他。我们去了布达佩斯，我们去了所有地方。嗯，他正要带"
     },
     {
-      "s": 77.04,
-      "e": 77.8,
-      "t": "Good to see you.",
-      "r": "很高兴见到你。"
+      "s": 84.6,
+      "e": 88.8,
+      "t": "me the best German food. If it's not the best then I was told by Nick that",
+      "r": "我品尝最棒的德国美食。如果它不是最好的，那么尼克告诉我，"
     },
     {
-      "s": 77.8,
-      "e": 86.76,
-      "t": "This is Max. You have seen him in a lot of my videos. We went to Budapest we went everywhere. Um he's about to show me the best German food. If it's not the",
-      "r": "这是麦克斯。你在我的很多视频里都见过他。我们去了布达佩斯，我们去了所有地方。嗯，他正要带我品尝最棒的德国美食。如果它不是"
-    },
-    {
-      "s": 86.76,
-      "e": 90.64,
-      "t": "best then I was told by Nick that And they lied to you. What do you do?",
-      "r": "最好的，那么尼克告诉我，他们就骗了你。你做什么工作？"
-    },
-    {
-      "s": 90.64,
+      "s": 88.8,
       "e": 95.32,
-      "t": "Yeah you boycott them. Take them out of your life.",
-      "r": "对，你要抵制他们。把他们从你的生活中剔除出去。"
+      "t": "And they lied to you. What do you do? Yeah you boycott them. Take them out of your life.",
+      "r": "他们就骗了你。你做什么工作？对，你要抵制他们。把他们从你的生活中剔除出去。"
     },
     {
       "s": 95.32,
-      "e": 96.96,
-      "t": "Excuse me?",
-      "r": "打扰一下？"
+      "e": 98.72,
+      "t": "Excuse me? Why why are you better friends now with",
+      "r": "打扰一下？为什么你现在和"
     },
     {
-      "s": 96.96,
-      "e": 105.12,
-      "t": "Why why are you better friends now with Nick than me? You know Nick for how long? 15 minutes? You know me for 10 years.",
-      "r": "为什么你现在和尼克的关系比和我的关系更好？你认识尼克多久了？ 15分钟？你认识我十年了。"
+      "s": 98.72,
+      "e": 104.44,
+      "t": "Nick than me? You know Nick for how long? 15 minutes? You know me for 10",
+      "r": "尼克的关系比和我的关系更好？你认识尼克多久了？ 15分钟？你认识我"
     },
     {
-      "s": 105.12,
-      "e": 109.76,
-      "t": "All right maybe we test the friendship.",
-      "r": "好吧，或许我们可以考验一下这段友谊。"
-    },
-    {
-      "s": 110.96,
+      "s": 104.44,
       "e": 113.96,
-      "t": "Who says Germany don't have good food huh?",
-      "r": "谁说德国没有美食？"
+      "t": "years. All right maybe we test the friendship. Who says Germany don't have good food huh?",
+      "r": "十年了。好吧，或许我们可以考验一下这段友谊。谁说德国没有美食？"
     },
     {
       "s": 113.96,
-      "e": 118.52,
-      "t": "They have good food from Turkey. Got a donair.",
-      "r": "他们有很棒的土耳其美食。买了份烤肉卷。"
-    },
-    {
-      "s": 118.52,
       "e": 121,
-      "t": "Donair.",
-      "r": "多纳烤肉。"
+      "t": "They have good food from Turkey. Got a donair. Donair.",
+      "r": "他们有很棒的土耳其美食。买了份烤肉卷。多纳烤肉。"
     },
     {
       "s": 124.04,
-      "e": 126.28,
-      "t": "Wow.",
-      "r": "哇。这是"
-    },
-    {
-      "s": 126.28,
-      "e": 132.52,
-      "t": "Best kebab I've ever had. If you're ever in Berlin, that was so good.",
-      "r": "我吃过最好吃的烤肉串。如果你有机会去柏林，那真是太棒了。"
-    },
-    {
-      "s": 132.52,
       "e": 132.92,
-      "t": "Okay.",
-      "r": "好的。"
+      "t": "Wow. Best kebab I've ever had. If you're ever in Berlin, that was so good. Okay.",
+      "r": "哇。这是我吃过最好吃的烤肉串。如果你有机会去柏林，那真是太棒了。好的。"
     },
     {
       "s": 132.92,
-      "e": 133.92,
-      "t": "Where are you from?",
-      "r": "你从哪来？"
-    },
-    {
-      "s": 133.92,
-      "e": 134.56,
-      "t": "From Berlin.",
-      "r": "来自柏林。"
-    },
-    {
-      "s": 134.56,
-      "e": 136.8,
-      "t": "What is it like to live in Berlin?",
-      "r": "在柏林生活是一种怎样的体验？"
-    },
-    {
-      "s": 136.8,
       "e": 138.68,
-      "t": "I think it's a lot of fun, definitely.",
-      "r": "我觉得这绝对很有趣。"
+      "t": "Where are you from? From Berlin. What is it like to live in Berlin? I think it's a lot of fun, definitely.",
+      "r": "你从哪来？来自柏林。在柏林生活是一种怎样的体验？我觉得这绝对很有趣。"
     },
     {
       "s": 138.68,
-      "e": 140,
-      "t": "Yeah, I'm still a student.",
-      "r": "是的，我还是个学生。"
-    },
-    {
-      "s": 140,
       "e": 141.64,
-      "t": "Do you get to study for free?",
-      "r": "你能免费学习吗？"
+      "t": "Yeah, I'm still a student. Do you get to study for free?",
+      "r": "是的，我还是个学生。你能免费学习吗？"
     },
     {
       "s": 141.64,
-      "e": 143.24,
-      "t": "Oh, no. I'm still in high school.",
-      "r": "哦，不。我还在上高中。"
+      "e": 146.92,
+      "t": "Oh, no. I'm still in high school. Oh, you're high school? Yeah. What do you eat to be so beautiful and",
+      "r": "哦，不。我还在上高中。哦，你还在上高中？是的。你吃什么才能长得这么漂亮"
     },
     {
-      "s": 143.24,
-      "e": 144.36,
-      "t": "Oh, you're high school?",
-      "r": "哦，你还在上高中？是的"
-    },
-    {
-      "s": 144.36,
-      "e": 145,
-      "t": "Yeah.",
-      "r": "。"
-    },
-    {
-      "s": 145,
-      "e": 149.32,
-      "t": "What do you eat to be so beautiful and tall? Any tips for viewers?",
-      "r": "你吃什么才能长得这么漂亮高挑？有什么建议可以给观众吗？"
-    },
-    {
-      "s": 149.32,
-      "e": 151.36,
-      "t": "it's just my genetics, I think.",
-      "r": "我想这大概是我的基因决定的吧。"
-    },
-    {
-      "s": 151.36,
-      "e": 153.93,
-      "t": "No, so guys, no secret, just genetics.",
-      "r": "不，伙计们，这没什么秘密，只是基因决定的。"
+      "s": 146.92,
+      "e": 155.04,
+      "t": "tall? Any tips for viewers? it's just my genetics, I think. No, so guys, no secret, just genetics.",
+      "r": "高挑？有什么建议可以给观众吗？我想这大概是我的基因决定的吧。不，伙计们，这没什么秘密，只是基因决定的。 [笑声]"
     },
     {
       "s": 155.04,
-      "e": 157.28,
-      "t": "I guess drinking's fun, if you're into it.",
-      "r": "我想，如果你喜欢的话，喝酒应该挺有意思的。是的"
-    },
-    {
-      "s": 157.28,
-      "e": 157.64,
-      "t": "Yeah.",
-      "r": "。"
-    },
-    {
-      "s": 157.64,
       "e": 161.48,
-      "t": "Uh hanging around in maybe parks.",
-      "r": "呃，可能在公园里闲逛。"
+      "t": "I guess drinking's fun, if you're into it. Yeah. Uh hanging around in maybe parks.",
+      "r": "我想，如果你喜欢的话，喝酒应该挺有意思的。是的。呃，可能在公园里闲逛。"
     },
     {
       "s": 161.48,
-      "e": 163.2,
-      "t": "Why are we here?",
-      "r": "我们为什么会在这里？"
-    },
-    {
-      "s": 163.2,
-      "e": 167.28,
-      "t": "Because I want to show you how beautiful Berlin is to live in.",
-      "r": "因为我想向你们展示柏林有多么宜居。"
-    },
-    {
-      "s": 167.28,
       "e": 169.65,
-      "t": "First,",
-      "r": "首先，"
+      "t": "Why are we here? Because I want to show you how beautiful Berlin is to live in. First,",
+      "r": "我们为什么会在这里？因为我想向你们展示柏林有多么宜居。首先，"
     },
     {
-      "s": 171.48,
+      "s": 169.65,
       "e": 175.88,
       "t": "Every time we see a beer garden, we stop and take a beer, cuz that's the German rule.",
-      "r": "每次我们看到啤酒花园，我们都会停下来喝杯啤酒，因为这是德国人的规矩。"
+      "r": "（音乐）每次我们看到啤酒花园，我们都会停下来喝杯啤酒，因为这是德国人的规矩。"
     },
     {
       "s": 175.88,
-      "e": 178.36,
-      "t": "How to offend a German?",
-      "r": "如何得罪德国人？"
+      "e": 180.6,
+      "t": "How to offend a German? Oh my god, if you skip the line. If you",
+      "r": "如何得罪德国人？我的天哪，如果你插队的话。如果你"
     },
     {
-      "s": 178.36,
-      "e": 187.44,
-      "t": "Oh my god, if you skip the line. If you skip the line, Germans would be very offended, because everyone has to be in line",
-      "r": "我的天哪，如果你插队的话。如果你插队，德国人会非常生气，因为每个人都必须一个接"
+      "s": 180.6,
+      "e": 189.16,
+      "t": "skip the line, Germans would be very offended, because everyone has to be in line behind each other,",
+      "r": "插队，德国人会非常生气，因为每个人都必须一个接一个地排队，"
     },
     {
-      "s": 187.44,
+      "s": 189.16,
       "e": 192.52,
-      "t": "behind each other, and like there's no skipping.",
-      "r": "一个地排队，不允许插队。"
+      "t": "and like there's no skipping.",
+      "r": "不允许插队。"
     },
     {
-      "s": 208.96,
+      "s": 208.29,
       "e": 211.88,
       "t": "Is that your life?",
-      "r": "你的生活吗？"
+      "r": "这就是你的生活吗？"
     },
     {
       "s": 218.52,
@@ -434,57 +218,39 @@
     },
     {
       "s": 231.6,
-      "e": 234.12,
-      "t": "WHAT DO YOU WANT TO DRINK? CAN I BUY YOU A BEER?",
-      "r": "你想喝点什么？我可以请你喝杯啤酒吗？"
-    },
-    {
-      "s": 234.12,
-      "e": 234.92,
-      "t": "PLEASE.",
-      "r": "请。"
-    },
-    {
-      "s": 234.92,
       "e": 238.36,
-      "t": "NO, PLEASE. I'll buy you a steak.",
-      "r": "不，求你了。我请你吃牛排。"
+      "t": "WHAT DO YOU WANT TO DRINK? CAN I BUY YOU A BEER? PLEASE. NO, PLEASE. I'll buy you a steak.",
+      "r": "你想喝点什么？我可以请你喝杯啤酒吗？请。不，求你了。我请你吃牛排。"
     },
     {
-      "s": 240.92,
+      "s": 239.08,
       "e": 246.28,
       "t": "So, I would have assumed if you skipped the line in Germany, people would be offended.",
-      "r": "所以，我原本以为如果你在德国插队，人们会觉得被冒犯了。"
+      "r": "[笑声] 所以，我原本以为如果你在德国插队，人们会觉得被冒犯了。"
     },
     {
       "s": 246.28,
-      "e": 255.48,
-      "t": "And then Torres is literally proving at the moment that stereotypes are not really working. This guy's skipping the line.",
-      "r": "而托雷斯目前正在用实际行动证明，刻板印象其实并不奏效。这家伙插队了。"
+      "e": 251.92,
+      "t": "And then Torres is literally proving at the moment that stereotypes are not",
+      "r": "而托雷斯目前正在用实际行动证明，刻板印象其实并不"
     },
     {
-      "s": 255.48,
-      "e": 263.48,
-      "t": "And now he's like started a conversation with all of these German guys. They're actually making jokes. They're actually having a laugh.",
-      "r": "现在他好像和这些德国人聊了起来。他们其实是在开玩笑。他们其实是在笑。"
+      "s": 251.92,
+      "e": 259.04,
+      "t": "really working. This guy's skipping the line. And now he's like started a conversation with all of these",
+      "r": "奏效。这家伙插队了。现在他好像和这些"
     },
     {
-      "s": 263.48,
+      "s": 259.04,
       "e": 266.4,
-      "t": "And I'm just like",
-      "r": "我当时就"
+      "t": "German guys. They're actually making jokes. They're actually having a laugh. And I'm just like",
+      "r": "德国人聊了起来。他们其实是在开玩笑。他们其实是在笑。我当时就"
     },
     {
       "s": 269.4,
-      "e": 272.08,
-      "t": "But she has everybody understood sometimes.",
-      "r": "但有时候她能让所有人都理解她。"
-    },
-    {
-      "s": 272.08,
-      "e": 273.14,
-      "t": "He's still angry.",
-      "r": "他仍然很生气。"
+      "e": 274.08,
+      "t": "But she has everybody understood sometimes. He's still angry.",
+      "r": "但有时候她能让所有人都理解她。他仍然很生气。 [笑声]"
     },
     {
       "s": 274.08,
@@ -500,21 +266,33 @@
     },
     {
       "s": 283.36,
+      "e": 287,
+      "t": "All right, guys. I'm so naive. Like I literally thought like people are like",
+      "r": "，各位。我真是太天真了。我当时真的以为大家都在"
+    },
+    {
+      "s": 287,
       "e": 290.48,
-      "t": "All right, guys. I'm so naive. Like I literally thought like people are like just camping here. I honestly thought cuz the park is so nice like",
-      "r": "，各位。我真是太天真了。我当时真的以为大家都在这里露营呢。说实话，我一开始以为是因为公园环境这么好，所以大家都在"
+      "t": "just camping here. I honestly thought cuz the park is so nice like",
+      "r": "这里露营呢。说实话，我一开始以为是因为公园环境这么好，所以大家都在"
     },
     {
       "s": 290.48,
-      "e": 296.72,
+      "e": 298.74,
       "t": "they're all camping here until I see the guy just start licking things and we saw the knife.",
-      "r": "这里露营，直到我看到那个人开始舔东西，然后我们还看到了刀。"
+      "r": "这里露营，直到我看到那个人开始舔东西，然后我们还看到了刀。 [嗤笑]"
     },
     {
       "s": 304.32,
+      "e": 308.08,
+      "t": "Berlin Zoo is one of the German capital's most enduringly popular",
+      "r": "柏林动物园是德国首都最受欢迎的"
+    },
+    {
+      "s": 308.08,
       "e": 313.36,
-      "t": "Berlin Zoo is one of the German capital's most enduringly popular attractions. The park around it draws some of the city's hard drug users.",
-      "r": "柏林动物园是德国首都最受欢迎的景点之一。公园周围吸引了一些城市里的重度毒品使用者。"
+      "t": "attractions. The park around it draws some of the city's hard drug users.",
+      "r": "景点之一，经久不衰。公园周围吸引了一些城市里的重度毒品使用者。"
     },
     {
       "s": 313.36,
@@ -524,201 +302,117 @@
     },
     {
       "s": 317.36,
-      "e": 319.44,
-      "t": "Guys, don't do drugs.",
-      "r": "伙计们，别吸毒。"
+      "e": 320.76,
+      "t": "Guys, don't do drugs. Honestly, look at yourself, guys. I",
+      "r": "伙计们，别吸毒。说实话，伙计们，看看你们自己吧。我的"
     },
     {
-      "s": 319.44,
-      "e": 326.16,
-      "t": "Honestly, look at yourself, guys. I mean, he probably went through some really difficult hardship. All the kids are running around and he's just",
-      "r": "说实话，伙计们，看看你们自己吧。我的意思是，他可能经历过一些非常艰难困苦的事情。孩子们都在跑来跑去，而他却只顾着"
+      "s": 320.76,
+      "e": 324.08,
+      "t": "mean, he probably went through some really difficult hardship. All the kids",
+      "r": "意思是，他可能经历过一些非常艰难困苦的事情。孩子们都在"
     },
     {
-      "s": 326.16,
-      "e": 334.6,
-      "t": "doing that thing. It's It's kind of crazy. I mean, to see the to see the contrast. Right in the park, the",
-      "r": "做那件事。这简直太疯狂了。我的意思是，为了看看对比。就在公园里，"
+      "s": 324.08,
+      "e": 328.76,
+      "t": "are running around and he's just doing that thing. It's It's kind of",
+      "r": "跑来跑去，而他却只顾着做那件事。这简直太"
     },
     {
-      "s": 334.6,
-      "e": 337,
-      "t": "he's like injecting some some stuff, man.",
-      "r": "他好像在注射什么东西似的。"
+      "s": 328.76,
+      "e": 336.56,
+      "t": "crazy. I mean, to see the to see the contrast. Right in the park, the he's like injecting some some stuff,",
+      "r": "疯狂了。我的意思是，为了看看对比。就在公园里，他好像在注射什么东西似的"
     },
     {
-      "s": 337,
-      "e": 339.84,
-      "t": "So, woman that I met in my life.",
-      "r": "所以，我一生中遇到的那个女人。是的"
+      "s": 336.56,
+      "e": 341.68,
+      "t": "man. So, woman that I met in my life. Yeah. And",
+      "r": "。所以，我一生中遇到的那个女人。是的。"
     },
     {
-      "s": 339.84,
-      "e": 340.68,
-      "t": "Yeah.",
-      "r": "。"
+      "s": 341.68,
+      "e": 347.68,
+      "t": "he he wrote is to cleanse sick souls then with the copyright she did to me",
+      "r": "他写道，是为了净化那些因她对我施加的版权"
     },
     {
-      "s": 340.68,
-      "e": 350.28,
-      "t": "And he he wrote is to cleanse sick souls then with the copyright she did to me and spiritual torture.",
-      "r": "他写道，是为了净化那些因她对我施加的版权和精神折磨而生病的灵魂。"
-    },
-    {
-      "s": 350.28,
-      "e": 352.36,
-      "t": "You have spiritual torture?",
-      "r": "你遭受精神折磨吗？"
-    },
-    {
-      "s": 352.36,
-      "e": 354.6,
-      "t": "Uh I was tortured, yeah.",
-      "r": "呃，我遭受了酷刑，是的。"
-    },
-    {
-      "s": 354.6,
+      "s": 347.68,
       "e": 355.76,
-      "t": "By what?",
-      "r": "通过什么？"
+      "t": "and spiritual torture. You have spiritual torture? Uh I was tortured, yeah. By what?",
+      "r": "和精神折磨而生病的灵魂。你遭受精神折磨吗？呃，我遭受了酷刑，是的。通过什么？"
     },
     {
       "s": 355.76,
-      "e": 359.44,
-      "t": "Uh my father and a lot of the people around them.",
-      "r": "呃，我父亲和他们周围的很多人。"
+      "e": 363.84,
+      "t": "Uh my father and a lot of the people around them. He hit you? Nah, spiritual torture, so",
+      "r": "呃，我父亲和他们周围的很多人。他打你了？不，是精神折磨。那么，"
     },
     {
-      "s": 359.44,
-      "e": 360.88,
-      "t": "He hit you?",
-      "r": "他打你了？"
-    },
-    {
-      "s": 360.88,
-      "e": 368.04,
-      "t": "Nah, spiritual torture, so How did your father torture you spiritually?",
-      "r": "不，是精神折磨。那么，你父亲是如何在精神上折磨你的呢？"
-    },
-    {
-      "s": 369.08,
-      "e": 370.4,
-      "t": "Your father raped you?",
-      "r": "你父亲强奸了你？是"
-    },
-    {
-      "s": 370.4,
+      "s": 363.84,
       "e": 371.76,
-      "t": "Yeah, yeah, yeah.",
-      "r": "啊，是啊，是啊。"
+      "t": "How did your father torture you spiritually? Your father raped you? Yeah, yeah, yeah.",
+      "r": "你父亲是如何在精神上折磨你的呢？你父亲强奸了你？是啊，是啊，是啊。"
     },
     {
       "s": 371.76,
-      "e": 373.12,
-      "t": "Your dad raped you?",
-      "r": "你爸爸强奸了你？是的"
-    },
-    {
-      "s": 373.12,
-      "e": 379.84,
-      "t": "Yeah, he my my father was the inspiration for Lord Voldemort.",
-      "r": "，我父亲是伏地魔的原型。"
-    },
-    {
-      "s": 379.84,
       "e": 382.04,
-      "t": "Is this where your home is?",
-      "r": "这是你的家吗？"
+      "t": "Your dad raped you? Yeah, he my my father was the inspiration for Lord Voldemort. Is this where your home is?",
+      "r": "你爸爸强奸了你？是的，我父亲是伏地魔的原型。这是你的家吗？"
     },
     {
       "s": 382.04,
-      "e": 383.76,
-      "t": "Yeah, what means home?",
-      "r": "是啊，家的意义是什么？"
+      "e": 388.88,
+      "t": "Yeah, what means home? I live here now, but But why do you live here? Uh",
+      "r": "是啊，家的意义是什么？我现在住在这里，但是你为什么住在这里？嗯，"
     },
     {
-      "s": 383.76,
-      "e": 387.68,
-      "t": "I live here now, but But why do you live here?",
-      "r": "我现在住在这里，但是你为什么住在这里？"
+      "s": 388.88,
+      "e": 393.8,
+      "t": "I did go on with the workings of Albert Einstein and",
+      "r": "我继续研究了阿尔伯特·爱因斯坦的理论，"
     },
     {
-      "s": 387.68,
-      "e": 396.32,
-      "t": "Uh I did go on with the workings of Albert Einstein and basically revealed my mother from my",
-      "r": "嗯，我继续研究了阿尔伯特·爱因斯坦的理论，基本上揭示了我"
-    },
-    {
-      "s": 396.32,
+      "s": 393.8,
       "e": 399.4,
-      "t": "mother's side, I'm Christ family.",
-      "r": "母亲的血统，我是基督家族的成员。"
+      "t": "basically revealed my mother from my mother's side, I'm Christ family.",
+      "r": "基本上揭示了我母亲的血统，我是基督家族的成员。"
     },
     {
       "s": 399.4,
-      "e": 403.72,
-      "t": "So, it's Christ family for generations.",
-      "r": "所以，这是世世代代的基督家族。"
-    },
-    {
-      "s": 403.72,
       "e": 406.08,
-      "t": "Very section has been going on there.",
-      "r": "那里一直都有各种活动。"
+      "t": "So, it's Christ family for generations. Very section has been going on there.",
+      "r": "所以，这是世世代代的基督家族。那里一直都有各种活动。"
     },
     {
       "s": 406.08,
-      "e": 408.76,
-      "t": "So, where do you go shower?",
-      "r": "那么，你平时去哪里洗澡？"
+      "e": 414.2,
+      "t": "So, where do you go shower? Oh, I did not shower for for some time, but Would you want to get a job at some",
+      "r": "那么，你平时去哪里洗澡呢？哦，我已经有一段时间没洗澡了，但是你想在某个时候找份工作吗？"
     },
     {
-      "s": 408.76,
-      "e": 415.96,
-      "t": "Oh, I did not shower for for some time, but Would you want to get a job at some point or like you just want to follow",
-      "r": "哦，我已经有一段时间没洗澡了，但是你想在某个时候找份工作吗？还是只想追随"
-    },
-    {
-      "s": 415.96,
-      "e": 418.88,
-      "t": "your People owe me trillions.",
-      "r": "你的人民？他们欠我数万亿。"
-    },
-    {
-      "s": 418.88,
+      "s": 414.2,
       "e": 420.24,
-      "t": "Owe you trillions?",
-      "r": "欠你数万亿美元？是的"
+      "t": "point or like you just want to follow your People owe me trillions. Owe you trillions?",
+      "r": "还是只想追随你的人民？他们欠我数万亿。欠你数万亿美元？是的"
     },
     {
       "s": 420.24,
-      "e": 421.24,
-      "t": "Yeah.",
-      "r": "。"
+      "e": 424.6,
+      "t": "Yeah. How long did it take for you to build this? Oh,",
+      "r": "。你花了多长时间才建成这个？哦，"
     },
     {
-      "s": 421.24,
-      "e": 423.44,
-      "t": "How long did it take for you to build this?",
-      "r": "你花了多长时间才建成这个？"
+      "s": 424.6,
+      "e": 430.12,
+      "t": "the bases I did in in 1 hour, very quick. Okay. Cuz I was not sure if they would be okay",
+      "r": "我只花了一个小时就完成了底座，非常快。好的。因为我不确定他们是否会同意"
     },
     {
-      "s": 423.44,
-      "e": 427.8,
-      "t": "Oh, the bases I did in in 1 hour, very quick.",
-      "r": "哦，我只花了一个小时就完成了底座，非常快。"
-    },
-    {
-      "s": 427.8,
-      "e": 428.28,
-      "t": "Okay.",
-      "r": "好的。"
-    },
-    {
-      "s": 428.28,
+      "s": 430.12,
       "e": 434.56,
-      "t": "Cuz I was not sure if they would be okay with it being here and then they did cut off something over there from a tree.",
-      "r": "因为我不确定他们是否会同意它放在这里，然后他们真的从那边的树上砍下了一些东西。"
+      "t": "with it being here and then they did cut off something over there from a tree.",
+      "r": "它放在这里，然后他们真的从那边的树上砍下了一些东西。"
     },
     {
       "s": 434.56,
@@ -728,57 +422,39 @@
     },
     {
       "s": 442.52,
+      "e": 447.24,
+      "t": "Berlin is so famous for its like free free spirit, but it definitely has a big",
+      "r": "柏林以其自由奔放的精神而闻名，但它也确实存在严重的"
+    },
+    {
+      "s": 447.24,
       "e": 453.24,
-      "t": "Berlin is so famous for its like free free spirit, but it definitely has a big drug problem. It's it has the highest mortality rate of overdose of drug in",
-      "r": "柏林以其自由奔放的精神而闻名，但它也确实存在严重的毒品问题。它是德国药物过量致死率最高的地区"
+      "t": "drug problem. It's it has the highest mortality rate of overdose of drug in",
+      "r": "毒品问题。它是德国药物过量致死率最高的地区"
     },
     {
       "s": 453.24,
+      "e": 457.52,
+      "t": "the whole of Germany. But unlike the rest of Europe, like pickpocket is not",
+      "r": "。但与欧洲其他地方不同，扒窃在"
+    },
+    {
+      "s": 457.52,
       "e": 461.88,
-      "t": "the whole of Germany. But unlike the rest of Europe, like pickpocket is not really a thing here. I mean, it's a thing, but it's not as bad as Paris. So,",
-      "r": "。但与欧洲其他地方不同，扒窃在这里并不常见。我的意思是，这确实是个问题，但远没有巴黎那么糟糕。所以，你说得很"
+      "t": "really a thing here. I mean, it's a thing, but it's not as bad as Paris. So,",
+      "r": "这里并不常见。我的意思是，这确实是个问题，但远没有巴黎那么糟糕。所以，你说得很"
     },
     {
       "s": 461.88,
-      "e": 463.28,
-      "t": "that's a good point.",
-      "r": "有道理。"
-    },
-    {
-      "s": 463.28,
-      "e": 465.12,
-      "t": "Another reason why you should come to Berlin?",
-      "r": "你为什么应该来柏林？"
-    },
-    {
-      "s": 465.12,
       "e": 465.84,
-      "t": "What exactly?",
-      "r": "究竟是什么？"
+      "t": "that's a good point. Another reason why you should come to Berlin? What exactly?",
+      "r": "有道理。你为什么应该来柏林？究竟是什么？"
     },
     {
       "s": 465.84,
-      "e": 467.52,
-      "t": "Have you ever been pickpocket?",
-      "r": "你曾被扒窃过吗？"
-    },
-    {
-      "s": 467.52,
-      "e": 468.04,
-      "t": "No.",
-      "r": "不。"
-    },
-    {
-      "s": 468.04,
-      "e": 469.28,
-      "t": "Are you Where are you from?",
-      "r": "你是哪里人？"
-    },
-    {
-      "s": 469.28,
       "e": 470.08,
-      "t": "I'm from Greece.",
-      "r": "我来自希腊。"
+      "t": "Have you ever been pickpocket? No. Are you Where are you from? I'm from Greece.",
+      "r": "你曾被扒窃过吗？不。你是哪里人？我来自希腊。"
     },
     {
       "s": 470.08,
@@ -788,183 +464,93 @@
     },
     {
       "s": 472.52,
-      "e": 478.48,
-      "t": "Everything, like drunk people on the streets, like blood, only like that, but Blood?",
-      "r": "一切，就像街上的醉汉，就像血，仅此而已，但血呢？是的"
-    },
-    {
-      "s": 478.48,
       "e": 479.12,
-      "t": "Yeah.",
-      "r": "。"
+      "t": "Everything, like drunk people on the streets, like blood, only like that, but Blood? Yeah.",
+      "r": "一切，就像街上的醉汉，就像血，仅此而已，但血呢？是的。"
     },
     {
       "s": 479.12,
-      "e": 480.6,
-      "t": "What blood?",
-      "r": "什么血？"
-    },
-    {
-      "s": 480.6,
       "e": 486.6,
-      "t": "Like people who eat on the street, for example, with the blood, sometimes, like With blood?",
-      "r": "例如，像那些在街上吃饭的人，有时会吃带血的食物，比如带血的？是的"
+      "t": "What blood? Like people who eat on the street, for example, with the blood, sometimes, like With blood?",
+      "r": "什么血？例如，像那些在街上吃饭的人，有时会吃带血的食物，比如带血的？是的"
     },
     {
       "s": 486.6,
-      "e": 486.96,
-      "t": "Yeah.",
-      "r": "。"
-    },
-    {
-      "s": 486.96,
-      "e": 489.2,
-      "t": "What's the worst thing in Berlin?",
-      "r": "柏林最糟糕的事情是什么？"
-    },
-    {
-      "s": 489.2,
-      "e": 489.88,
-      "t": "Worst thing?",
-      "r": "最糟糕的事？是的"
-    },
-    {
-      "s": 489.88,
       "e": 490.56,
-      "t": "Yeah.",
-      "r": "。"
+      "t": "Yeah. What's the worst thing in Berlin? Worst thing? Yeah.",
+      "r": "。柏林最糟糕的事情是什么？最糟糕的事？是的。"
     },
     {
       "s": 490.56,
-      "e": 492.52,
-      "t": "I think like the tourists.",
-      "r": "我的想法和游客一样。"
+      "e": 496.68,
+      "t": "I think like the tourists. Tourists? She's from Berlin. She literally just",
+      "r": "我的想法和游客一样。游客？她来自柏林。她刚才竟然"
     },
     {
-      "s": 492.52,
-      "e": 494.28,
-      "t": "Tourists?",
-      "r": "游客？"
-    },
-    {
-      "s": 494.28,
-      "e": 499.16,
-      "t": "She's from Berlin. She literally just said she hates me.",
-      "r": "她来自柏林。她刚才竟然说她恨我。"
-    },
-    {
-      "s": 499.16,
+      "s": 496.68,
       "e": 506.04,
-      "t": "Why do you Why do you hate The tourists and the Why are the tourists bad?",
-      "r": "你为什么讨厌游客？游客为什么不好？"
+      "t": "said she hates me. Why do you Why do you hate The tourists and the Why are the tourists bad?",
+      "r": "说她恨我。你为什么讨厌游客？游客为什么不好？"
     },
     {
       "s": 506.04,
-      "e": 509.84,
-      "t": "I mean it's super full, like all the places Yeah.",
-      "r": "我的意思是，这里人超级多，跟所有地方一样。是啊。"
+      "e": 512.88,
+      "t": "I mean it's super full, like all the places Yeah. the bars, the clubs, the restaurants",
+      "r": "我的意思是，这里人超级多，跟所有地方一样。是啊。酒吧、夜总会、餐馆，是的"
     },
     {
-      "s": 509.84,
-      "e": 513.52,
-      "t": "the bars, the clubs, the restaurants Yeah.",
-      "r": "酒吧、夜总会、餐馆，是的。"
-    },
-    {
-      "s": 513.52,
-      "e": 515.68,
-      "t": "Everything is so full because of the tourists.",
-      "r": "因为游客太多，到处都挤满了人。"
-    },
-    {
-      "s": 515.68,
+      "s": 512.88,
       "e": 519.24,
-      "t": "But what's the best thing of Berlin?",
-      "r": "但柏林最棒的地方是什么？"
+      "t": "Yeah. Everything is so full because of the tourists. But what's the best thing of Berlin?",
+      "r": "。因为游客太多，到处都挤满了人。但柏林最棒的地方是什么？"
     },
     {
       "s": 522.4,
-      "e": 523.76,
-      "t": "Free education?",
-      "r": "免费教育？"
-    },
-    {
-      "s": 523.76,
-      "e": 525.56,
-      "t": "Yeah, maybe. Yeah.",
-      "r": "嗯，也许吧。是的。"
-    },
-    {
-      "s": 525.56,
       "e": 529.8,
-      "t": "And if you get fired, the government will pay for you?",
-      "r": "如果你被解雇了，政府会支付你的薪水吗？"
+      "t": "Free education? Yeah, maybe. Yeah. And if you get fired, the government will pay for you?",
+      "r": "免费教育？嗯，也许吧。是的。如果你被解雇了，政府会支付你的薪水吗？"
     },
     {
       "s": 529.88,
-      "e": 531.04,
-      "t": "If you If we get fired?",
-      "r": "如果你……如果我们被解雇了呢？是的"
-    },
-    {
-      "s": 531.04,
-      "e": 531.84,
-      "t": "Yeah.",
-      "r": "。"
-    },
-    {
-      "s": 531.84,
-      "e": 532.56,
-      "t": "I think yeah.",
-      "r": "我想是的。"
-    },
-    {
-      "s": 532.56,
       "e": 533.6,
-      "t": "Oh, wow.",
-      "r": "哦，哇。"
+      "t": "If you If we get fired? Yeah. I think yeah. Oh, wow.",
+      "r": "如果你……如果我们被解雇了呢？是的。我想是的。哦，哇。"
     },
     {
       "s": 533.6,
-      "e": 534.76,
-      "t": "You know You know it.",
-      "r": "你知道的，你明白的。"
+      "e": 541.04,
+      "t": "You know You know it. Go get fired. Go get fired. I was told that in Germany, if you get",
+      "r": "你知道的，你明白的。去被解雇吧。去被解雇吧。有人告诉我，在德国，如果你被"
     },
     {
-      "s": 534.76,
-      "e": 538.56,
-      "t": "Go get fired.",
-      "r": "去被解雇吧。去被解雇吧。有人"
-    },
-    {
-      "s": 538.56,
+      "s": 541.04,
       "e": 546,
-      "t": "I was told that in Germany, if you get fired, the government will pay you 2/3 of your salary for 2 years.",
-      "r": "告诉我，在德国，如果你被解雇，政府会支付你两年工资的三分之二。"
+      "t": "fired, the government will pay you 2/3 of your salary for 2 years.",
+      "r": "解雇，政府会支付你两年工资的三分之二。"
     },
     {
       "s": 546,
-      "e": 552.28,
-      "t": "Or like one Or like one Or like one year, I'm not sure. Like that. You need to apply and then you need to reapply and reapply. They're changing the laws",
-      "r": "或者像一年，或者像一个，或者像一年，我不确定。就是这样。你需要申请一次，然后需要重新申请，再重新申请。他们现在正在修改法律"
+      "e": 548.88,
+      "t": "Or like one Or like one Or like one year, I'm not sure. Like that. You need",
+      "r": "或者像一年，或者像一个，或者像一年，我不确定。就是这样。你需要"
     },
     {
-      "s": 552.28,
-      "e": 552.92,
-      "t": "now.",
-      "r": "。"
-    },
-    {
-      "s": 552.92,
+      "s": 548.88,
       "e": 553.4,
-      "t": "Oh.",
-      "r": "哦。"
+      "t": "to apply and then you need to reapply and reapply. They're changing the laws now. Oh.",
+      "r": "申请一次，然后需要重新申请，再重新申请。他们现在正在修改法律。哦。"
     },
     {
       "s": 553.4,
+      "e": 557.36,
+      "t": "The social systems, let's put it like this, the social systems in Germany are",
+      "r": "这么说吧，德国的社会体系"
+    },
+    {
+      "s": 557.36,
       "e": 561.24,
-      "t": "The social systems, let's put it like this, the social systems in Germany are are quite extensive and um taking care of a lot of people.",
-      "r": "这么说吧，德国的社会体系非常庞大，而且照顾着很多人（的音乐）。"
+      "t": "are quite extensive and um taking care of a lot of people.",
+      "r": "相当庞大，而且照顾着很多人（的音乐）。"
     },
     {
       "s": 561.24,
@@ -1010,405 +596,249 @@
     },
     {
       "s": 602.48,
-      "e": 606.8,
-      "t": "Then the Bachelor decision I do the Google account. Yeah, yes, I'm going to get it. Oh, you could have just said.",
-      "r": "然后，在决定注册单身汉账号时，我注册了谷歌账号。是的，我会买的。哦，你本来可以直接说的。"
+      "e": 604.96,
+      "t": "Then the Bachelor decision I do the Google account. Yeah, yes, I'm going to",
+      "r": "然后，在决定注册单身汉账号时，我注册了谷歌账号。是的，我会买的"
     },
     {
-      "s": 606.8,
-      "e": 609.92,
-      "t": "But Bachelor Master German friend.",
-      "r": "但我有位德国学士硕士朋友。"
+      "s": 604.96,
+      "e": 611.08,
+      "t": "get it. Oh, you could have just said. But Bachelor Master German friend. No way, it's not going to go to the",
+      "r": "。哦，你本来可以直接说的。但我有位德国学士硕士朋友。不可能，它不会像"
     },
     {
-      "s": 609.92,
-      "e": 614.96,
-      "t": "No way, it's not going to go to the airport like the Google like in the snow.",
-      "r": "不可能，它不会像谷歌地图那样在雪地里行驶到机场。"
-    },
-    {
-      "s": 614.96,
+      "s": 611.08,
       "e": 619.04,
-      "t": "Oh, so what's wrong? You have to go to the Google or not?",
-      "r": "哦，出什么事了？你必须去谷歌搜索吗？"
+      "t": "airport like the Google like in the snow. Oh, so what's wrong? You have to go to the Google or not?",
+      "r": "谷歌地图那样在雪地里行驶到机场。哦，出什么事了？你必须去谷歌搜索吗？"
     },
     {
       "s": 625.16,
-      "e": 626.52,
-      "t": "Oh, really?",
-      "r": "哦真的吗？"
-    },
-    {
-      "s": 626.52,
-      "e": 629.64,
-      "t": "No way, it's not going to come to KTV in the snow.",
-      "r": "不可能，下雪天是不会去KTV的。"
-    },
-    {
-      "s": 629.64,
       "e": 632,
-      "t": "Oh, no, you can go to the Google.",
-      "r": "哦，不用了，你可以去谷歌搜索。"
+      "t": "Oh, really? No way, it's not going to come to KTV in the snow. Oh, no, you can go to the Google.",
+      "r": "哦真的吗？不可能，下雪天是不会去KTV的。哦，不用了，你可以去谷歌搜索。"
     },
     {
       "s": 632,
-      "e": 634.64,
-      "t": "Oh, really? No, you can go.",
-      "r": "哦真的吗？不，你可以走了。"
-    },
-    {
-      "s": 635.72,
-      "e": 637.28,
-      "t": "You want to move to China?",
-      "r": "你想移居中国吗？"
-    },
-    {
-      "s": 637.28,
       "e": 639.16,
-      "t": "Oh, maybe, maybe, who knows?",
-      "r": "哦，也许吧，谁知道呢？"
+      "t": "Oh, really? No, you can go. You want to move to China? Oh, maybe, maybe, who knows?",
+      "r": "哦真的吗？不，你可以走了。你想移居中国吗？哦，也许吧，谁知道呢？"
     },
     {
       "s": 639.16,
-      "e": 649.08,
-      "t": "I don't know where Max is bringing me, but it looks like a fancy place. So, all right guys, so Max is taking us to this touristy place cuz I'm a tourist.",
-      "r": "我不知道马克斯要带我去哪里，但看起来像个高档的地方。好了各位，Max要带我们去这个旅游景点，因为我是个游客。"
+      "e": 642.84,
+      "t": "I don't know where Max is bringing me, but it looks like a fancy place. So, all",
+      "r": "我不知道马克斯要带我去哪里，但看起来像个高档的地方。好了"
     },
     {
-      "s": 650.56,
-      "e": 652.16,
-      "t": "Are you guys tourists?",
-      "r": "你们是游客吗？是的"
-    },
-    {
-      "s": 652.16,
+      "s": 642.84,
       "e": 653.28,
-      "t": "Yes.",
-      "r": "。"
+      "t": "right guys, so Max is taking us to this touristy place cuz I'm a tourist. Are you guys tourists? Yes.",
+      "r": "各位，Max要带我们去这个旅游景点，因为我是个游客。你们是游客吗？是的。"
     },
     {
       "s": 653.28,
-      "e": 654.88,
-      "t": "From where?",
-      "r": "从哪里？"
-    },
-    {
-      "s": 654.88,
       "e": 657.64,
-      "t": "I'm German.",
-      "r": "我是德国人。"
+      "t": "From where? I'm German.",
+      "r": "从哪里？我是德国人。"
     },
     {
       "s": 664.72,
-      "e": 667.8,
-      "t": "German football is kind of bad, right?",
-      "r": "德国足球有点糟糕，对吧？"
-    },
-    {
-      "s": 667.8,
-      "e": 669.08,
-      "t": "German football is kind of bad?",
-      "r": "德国足球有点糟糕？"
-    },
-    {
-      "s": 669.08,
-      "e": 669.72,
-      "t": "Is it bad?",
-      "r": "不好吗？"
-    },
-    {
-      "s": 669.72,
       "e": 670.4,
-      "t": "No.",
-      "r": "不，"
+      "t": "German football is kind of bad, right? German football is kind of bad? Is it bad? No.",
+      "r": "德国足球有点糟糕，对吧？德国足球有点糟糕？不好吗？不，"
     },
     {
       "s": 670.4,
-      "e": 670.92,
-      "t": "It's good?",
-      "r": "这样好吗？是的"
-    },
-    {
-      "s": 670.92,
-      "e": 671.36,
-      "t": "Yeah.",
-      "r": "。"
-    },
-    {
-      "s": 671.36,
-      "e": 671.76,
-      "t": "Really?",
-      "r": "真的吗？"
-    },
-    {
-      "s": 671.76,
       "e": 672.4,
-      "t": "Yeah, of course.",
-      "r": "当然。"
+      "t": "It's good? Yeah. Really? Yeah, of course.",
+      "r": "这样好吗？是的。真的吗？当然。"
     },
     {
       "s": 672.4,
-      "e": 674.16,
-      "t": "Will we win the World Cup this year?",
-      "r": "我们今年能赢得世界杯吗？"
-    },
-    {
-      "s": 674.16,
       "e": 676.32,
-      "t": "Uh, no.",
-      "r": "呃，不。"
+      "t": "Will we win the World Cup this year? Uh, no.",
+      "r": "我们今年能赢得世界杯吗？呃，不。"
     },
     {
-      "s": 683.16,
-      "e": 687.96,
-      "t": "But guys, you can almost see like a nipple architectural design here.",
-      "r": "但是伙计们，你们几乎可以看到这里像乳头一样的建筑设计。"
+      "s": 681.86,
+      "e": 689.68,
+      "t": "But guys, you can almost see like a nipple architectural design here. That's the roof of the building,",
+      "r": "[音乐] 但是伙计们，你们几乎可以看到这里像乳头一样的建筑设计。"
     },
     {
-      "s": 687.96,
-      "e": 691.84,
-      "t": "That's the roof of the building, according to the local here.",
-      "r": "据当地人说，那是建筑物的屋顶。"
-    },
-    {
-      "s": 691.84,
+      "s": 689.68,
       "e": 698.16,
-      "t": "That's because the person who built it is so obsessed with his wife's body, boo.",
-      "r": "那是因为建造它的人太迷恋他妻子的身材了，呜呜。"
+      "t": "according to the local here. That's because the person who built it is so obsessed with his wife's body, boo.",
+      "r": "据当地人说，那是建筑物的屋顶。那是因为建造它的人太迷恋他妻子的身材了，呜呜。"
     },
     {
       "s": 698.16,
-      "e": 703.88,
-      "t": "Um he built the roof according to the shape.",
-      "r": "他按照形状建造了屋顶。"
+      "e": 706,
+      "t": "Um he built the roof according to the shape. It's just It's just Berlin. People just",
+      "r": "他按照形状建造了屋顶。这里就是柏林。人们总是随心所欲"
     },
     {
-      "s": 703.88,
-      "e": 711.92,
-      "t": "It's just It's just Berlin. People just do whatever they want. And this is what German people do on the weekend. It's so nice this park, right? Everyone's just",
-      "r": "这里就是柏林。人们总是随心所欲。这就是德国人周末的日常。这个公园真漂亮，对吧？大家都在"
+      "s": 706,
+      "e": 710.28,
+      "t": "do whatever they want. And this is what German people do on the weekend. It's so",
+      "r": "。这就是德国人周末的日常。"
     },
     {
-      "s": 711.92,
+      "s": 710.28,
       "e": 715.28,
-      "t": "chilling and sitting down.",
-      "r": "放松地坐着。"
+      "t": "nice this park, right? Everyone's just chilling and sitting down.",
+      "r": "这个公园真漂亮，对吧？大家都在放松地坐着。"
     },
     {
       "s": 716,
-      "e": 724.8,
-      "t": "I don't know why why whenever I look at European, I feel like they have no stress. Like they There's just no stress in their life.",
-      "r": "我不知道为什么，每次看到欧洲人，我都觉得他们没有压力。他们的生活似乎没有任何压力。"
+      "e": 719.8,
+      "t": "I don't know why why whenever I look at European, I feel like they have no",
+      "r": "我不知道为什么，每次看到欧洲人，我都觉得他们没有"
     },
     {
-      "s": 724.8,
-      "e": 725.92,
-      "t": "Thank you.",
-      "r": "谢谢。"
-    },
-    {
-      "s": 725.92,
+      "s": 719.8,
       "e": 727.96,
-      "t": "Do you have any stress in life?",
-      "r": "你生活中会有压力吗？"
+      "t": "stress. Like they There's just no stress in their life. Thank you. Do you have any stress in life?",
+      "r": "压力。他们的生活似乎没有任何压力。谢谢。你生活中会有压力吗？"
     },
     {
       "s": 727.96,
-      "e": 729.04,
-      "t": "Stress?",
-      "r": "压力？有吗"
-    },
-    {
-      "s": 729.04,
-      "e": 730.56,
-      "t": "Yeah, do you have any?",
-      "r": "？"
-    },
-    {
-      "s": 730.56,
       "e": 733.56,
-      "t": "Uh I'm okay.",
-      "r": "呃，我没事。"
+      "t": "Stress? Yeah, do you have any? Uh I'm okay.",
+      "r": "压力？有吗？呃，我没事。"
     },
     {
       "s": 733.56,
-      "e": 734.28,
-      "t": "No stress?",
-      "r": "没有压力？"
+      "e": 740.84,
+      "t": "No stress? Yeah, no, I'm okay. Um yeah, work sometimes, but generally",
+      "r": "没有压力？嗯，没事。嗯，有时候会工作，但总的来说，"
     },
     {
-      "s": 734.28,
-      "e": 735.32,
-      "t": "Yeah, no, I'm okay.",
-      "r": "嗯，没事。"
-    },
-    {
-      "s": 735.32,
+      "s": 740.84,
       "e": 744.12,
-      "t": "Um yeah, work sometimes, but generally right now life is pretty good.",
-      "r": "嗯，有时候会工作，但总的来说，目前生活还不错。"
+      "t": "right now life is pretty good.",
+      "r": "目前生活还不错。"
     },
     {
       "s": 755.6,
-      "e": 758.68,
-      "t": "This is a Berlin public toilet.",
-      "r": "这是柏林的一处公共厕所。"
+      "e": 761.36,
+      "t": "This is a Berlin public toilet. I think as a urban designer graduate, I",
+      "r": "这是柏林的一处公共厕所。作为一名城市设计专业的毕业生，我"
     },
     {
-      "s": 758.68,
-      "e": 767.88,
-      "t": "I think as a urban designer graduate, I think there's a major flaw in this design. I think you can see their private parts as they wee here.",
-      "r": "作为一名城市设计专业的毕业生，我认为这个设计存在重大缺陷。我觉得你可以在这里看到他们小便时的私处。"
+      "s": 761.36,
+      "e": 769.68,
+      "t": "think there's a major flaw in this design. I think you can see their private parts as they wee here. I mean",
+      "r": "认为这个设计存在重大缺陷。我觉得你可以在这里看到他们小便时的私处。我的意思是，"
     },
     {
-      "s": 767.88,
-      "e": 771.84,
-      "t": "I mean I think you can pull past.",
-      "r": "我的意思是，我觉得你可以挺过去的。"
-    },
-    {
-      "s": 771.84,
-      "e": 774.44,
-      "t": "Can you see?",
-      "r": "你看到了吗？"
+      "s": 769.68,
+      "e": 776.87,
+      "t": "I think you can pull past. Can you see? [laughter]",
+      "r": "我觉得你可以挺过去的。你看到了吗？ [笑声]"
     },
     {
       "s": 778,
-      "e": 780.68,
-      "t": "Oh my god.",
-      "r": "我的天哪。"
+      "e": 784.8,
+      "t": "Oh my god. No, no, I have nothing to do with this. All right, guys, whatever you saw that",
+      "r": "我的天哪。不，（笑）不，这跟我一点关系都没有。好了，各位，你们看到的都是"
     },
     {
-      "s": 780.68,
-      "e": 783.52,
-      "t": "No, no, I have nothing to do with this.",
-      "r": "不，（笑）不，这跟我一点关系都没有。"
-    },
-    {
-      "s": 783.52,
-      "e": 787.8,
-      "t": "All right, guys, whatever you saw that was my finger. Ouch.",
-      "r": "好了，各位，你们看到的都是我的手指。哎哟。这并"
-    },
-    {
-      "s": 787.8,
+      "s": 784.8,
       "e": 791.6,
-      "t": "It's not a true representation of this.",
-      "r": "不能真实反映事实。"
+      "t": "was my finger. Ouch. It's not a true representation of this.",
+      "r": "我的手指。哎哟。这并不能真实反映事实。"
     },
     {
       "s": 793.48,
-      "e": 796.04,
-      "t": "All right, Max, tell us the university you have graduated in.",
-      "r": "好的，马克斯，告诉我们你毕业于哪所大学。"
+      "e": 797.48,
+      "t": "All right, Max, tell us the university you have graduated in. Uh I'm",
+      "r": "好的，马克斯，告诉我们你毕业于哪所大学。呃，我"
     },
     {
-      "s": 796.04,
-      "e": 799.12,
-      "t": "Uh I'm from Leiden University.",
-      "r": "呃，我毕业于莱顿大学。"
-    },
-    {
-      "s": 799.12,
+      "s": 797.48,
       "e": 800.12,
-      "t": "Tell us what you study.",
-      "r": "请告诉我们你学习的专业。"
+      "t": "from Leiden University. Tell us what you study.",
+      "r": "毕业于莱顿大学。请告诉我们你学习的专业。"
     },
     {
       "s": 800.12,
+      "e": 803.96,
+      "t": "Okay, international studies with a focus on East Asian studies. We studied",
+      "r": "好的，国际研究专业，重点是东亚研究。我们研究了"
+    },
+    {
+      "s": 803.96,
       "e": 808.16,
-      "t": "Okay, international studies with a focus on East Asian studies. We studied demographics in Hong Kong, which was super interesting. Then I went to bed",
-      "r": "好的，国际研究专业，重点是东亚研究。我们研究了香港的人口统计数据，这非常有趣。然后我就上床睡觉，在床上"
+      "t": "demographics in Hong Kong, which was super interesting. Then I went to bed",
+      "r": "香港的人口统计数据，这非常有趣。然后我就上床睡觉，在床上"
     },
     {
       "s": 808.16,
-      "e": 810.96,
-      "t": "and studied um Chinese studies there.",
-      "r": "学习中文。"
+      "e": 812.72,
+      "t": "and studied um Chinese studies there. Get like a law degree because whenever",
+      "r": "学习中文。去读个法律学位吧，因为"
     },
     {
-      "s": 810.96,
-      "e": 819.96,
-      "t": "Get like a law degree because whenever you study in China in the department of politics, you get like a law degree. And then afterwards I studied public policy",
-      "r": "去读个法律学位吧，因为在中国，只要你读政治系，就能拿到类似法律学位的东西。之后我"
+      "s": 812.72,
+      "e": 816.92,
+      "t": "you study in China in the department of politics, you get like a law degree. And",
+      "r": "在中国，只要你读政治系，就能拿到类似法律学位的东西。"
     },
     {
-      "s": 819.96,
+      "s": 816.92,
+      "e": 821.76,
+      "t": "then afterwards I studied public policy in Berlin, which is called Hertie",
+      "r": "之后我在柏林学习公共政策，也就是赫尔梯"
+    },
+    {
+      "s": 821.76,
       "e": 826.44,
-      "t": "in Berlin, which is called Hertie School. And then I also did Singapore where we met again and studied at NUS.",
-      "r": "在柏林学习公共政策，也就是赫尔梯学院。然后我又去了新加坡，在那里我们再次相遇，并在新加坡国立大学学习。"
+      "t": "School. And then I also did Singapore where we met again and studied at NUS.",
+      "r": "学院。然后我又去了新加坡，在那里我们再次相遇，并在新加坡国立大学学习。"
     },
     {
       "s": 826.44,
-      "e": 827.88,
-      "t": "So I studied too much clearly.",
-      "r": "所以很明显，我学习过度了。"
-    },
-    {
-      "s": 827.88,
-      "e": 830.8,
-      "t": "Have you ever paid for your school fee?",
-      "r": "你交过学费吗？"
-    },
-    {
-      "s": 830.8,
       "e": 833.82,
-      "t": "Um Definitely no.",
-      "r": "嗯，绝对不行。"
+      "t": "So I studied too much clearly. Have you ever paid for your school fee? Um Definitely no.",
+      "r": "所以很明显，我学习过度了。你交过学费吗？嗯，绝对不行。"
     },
     {
-      "s": 835.12,
-      "e": 841.56,
-      "t": "Well, you I did get like lots of scholarships. I paid like a little bit here and there I had to pay but it wasn't much. Like also",
-      "r": "嗯，我的确获得了不少奖学金。我零零散散地付了点钱，但都不多。就像"
+      "s": 833.82,
+      "e": 840.04,
+      "t": "Well, you I did get like lots of scholarships. I paid like a little bit here and there I",
+      "r": "[笑声] 嗯，我的确获得了不少奖学金。我零零散散地付了"
     },
     {
-      "s": 841.56,
+      "s": 840.04,
       "e": 846.72,
-      "t": "in Europe when you study it doesn't cost much, right?",
-      "r": "在欧洲留学一样，费用也不高，对吧？"
+      "t": "had to pay but it wasn't much. Like also in Europe when you study it doesn't cost much, right?",
+      "r": "点钱，但都不多。就像在欧洲留学一样，费用也不高，对吧？"
     },
     {
       "s": 847.4,
-      "e": 849.88,
-      "t": "Oh.",
-      "r": "哦。"
-    },
-    {
-      "s": 849.88,
       "e": 853.56,
-      "t": "Oh, it doesn't get any better than this.",
-      "r": "哦，这简直太棒了。"
+      "t": "Oh. Oh, it doesn't get any better than this.",
+      "r": "哦。哦，这简直太棒了。"
     },
     {
       "s": 856.28,
-      "e": 858.36,
-      "t": "Oh, does it have truffle?",
-      "r": "哦，里面有松露吗？是的"
+      "e": 862.64,
+      "t": "Oh, does it have truffle? Yeah. Bro. Okay, guys. Sorry for being rude but I'm going to use my hand. I'm going",
+      "r": "哦，里面有松露吗？是的。兄弟。好了，各位。不好意思，我得用手。我要"
     },
     {
-      "s": 858.36,
-      "e": 859.08,
-      "t": "Yeah.",
-      "r": "。"
+      "s": 862.64,
+      "e": 868.64,
+      "t": "to take a bite. It's the best",
+      "r": "咬一口。这是"
     },
     {
-      "s": 859.08,
-      "e": 865.2,
-      "t": "Bro. Okay, guys. Sorry for being rude but I'm going to use my hand. I'm going to take a bite.",
-      "r": "兄弟。好了，各位。不好意思，我得用手。我要咬一口。"
-    },
-    {
-      "s": 865.52,
-      "e": 870.6,
-      "t": "It's the best in German food I've ever had in my life.",
-      "r": "这是我这辈子吃过的最好吃的德国菜。"
-    },
-    {
-      "s": 870.6,
+      "s": 868.72,
       "e": 873.32,
-      "t": "It's Spätzle.",
-      "r": "是德式面疙瘩（Spätzle）。"
+      "t": "in German food I've ever had in my life. It's Spätzle.",
+      "r": "我这辈子吃过的最好吃的德国菜。是德式面疙瘩（Spätzle）。"
     },
     {
       "s": 880.24,
@@ -1418,165 +848,171 @@
     },
     {
       "s": 883.32,
+      "e": 887.96,
+      "t": "If you are policy maker in Berlin, how do you deal with the drug problem in",
+      "r": "如果你是柏林的政策制定者，你会如何处理柏林的毒品问题？"
+    },
+    {
+      "s": 887.96,
       "e": 893.28,
-      "t": "If you are policy maker in Berlin, how do you deal with the drug problem in Berlin or is it not even a problem? Cuz people come to Berlin for this. So you",
-      "r": "如果你是柏林的政策制定者，你会如何处理柏林的毒品问题？或者你认为这根本就不是一个问题？因为人们就是为了这个才来柏林的。所以你"
+      "t": "Berlin or is it not even a problem? Cuz people come to Berlin for this. So you",
+      "r": "或者你认为这根本就不是一个问题？因为人们就是为了这个才来柏林的。所以你"
     },
     {
       "s": 893.28,
+      "e": 897.4,
+      "t": "can't close all the techno bar and stuff. Like people go to techno bar and",
+      "r": "不能把所有的电子音乐酒吧之类的都关掉。就像人们去电子音乐酒吧，"
+    },
+    {
+      "s": 897.4,
       "e": 901.76,
-      "t": "can't close all the techno bar and stuff. Like people go to techno bar and they need the substance. So if you are a German policy maker, how do",
-      "r": "不能把所有的电子音乐酒吧之类的都关掉。就像人们去电子音乐酒吧，他们需要毒品一样。那么，如果你是一位德国政策制定者，"
+      "t": "they need the substance. So if you are a German policy maker, how do",
+      "r": "他们需要毒品一样。那么，如果你是一位德国政策制定者，"
     },
     {
       "s": 901.76,
-      "e": 902.64,
-      "t": "you deal with this?",
-      "r": "你会如何处理这个问题？"
+      "e": 904.44,
+      "t": "you deal with this? I think it's difficult to just kind of",
+      "r": "你会如何处理这个问题？我认为仅仅依靠"
     },
     {
-      "s": 902.64,
-      "e": 910.96,
-      "t": "I think it's difficult to just kind of make the problem disappear by extremely strict laws. Like I feel like people want it, people are going to sort of",
-      "r": "我认为仅仅依靠极其严格的法律很难彻底解决这个问题。我觉得既然人们想要，他们总会"
+      "s": 904.44,
+      "e": 909.24,
+      "t": "make the problem disappear by extremely strict laws. Like I feel like people",
+      "r": "极其严格的法律很难彻底解决这个问题。我觉得既然人们"
     },
     {
-      "s": 910.96,
-      "e": 912.44,
-      "t": "find a way.",
-      "r": "找到办法的。"
+      "s": 909.24,
+      "e": 915.88,
+      "t": "want it, people are going to sort of find a way. What they did in Germany now on the one hand is they",
+      "r": "想要，他们总会找到办法的。一方面，德国现在将"
     },
     {
-      "s": 912.44,
+      "s": 915.88,
       "e": 920.84,
-      "t": "What they did in Germany now on the one hand is they legalized marijuana but only like certain amounts for your own consumption",
-      "r": "一方面，德国现在将大麻合法化了，但只允许个人购买一定数量的大麻，"
+      "t": "legalized marijuana but only like certain amounts for your own consumption",
+      "r": "大麻合法化了，但只允许个人购买一定数量的大麻，"
     },
     {
       "s": 920.84,
+      "e": 924.28,
+      "t": "but you have to join a growing club, so you grow it",
+      "r": "而且你必须加入一个种植俱乐部，就像在"
+    },
+    {
+      "s": 924.28,
       "e": 927.96,
-      "t": "but you have to join a growing club, so you grow it in like a club, so it's sort of all registered. Uh but when it comes to",
-      "r": "而且你必须加入一个种植俱乐部，就像在俱乐部里种植一样，所以一切都是登记注册的。呃，但是说到"
+      "t": "in like a club, so it's sort of all registered. Uh but when it comes to",
+      "r": "俱乐部里种植一样，所以一切都是登记注册的。呃，但是说到"
     },
     {
       "s": 927.96,
+      "e": 932.04,
+      "t": "harder drugs, um Drug use on Berlin streets has declined",
+      "r": "更严重的毒品，嗯，"
+    },
+    {
+      "s": 932.04,
       "e": 936.96,
-      "t": "harder drugs, um Drug use on Berlin streets has declined since the legalization of safe injection facilities in 2000.",
-      "r": "更严重的毒品，嗯，自从2000年安全注射设施合法化以来，柏林街头的毒品使用量有所下降。"
+      "t": "since the legalization of safe injection facilities in 2000.",
+      "r": "自从2000年安全注射设施合法化以来，柏林街头的毒品使用量有所下降。"
     },
     {
       "s": 936.96,
-      "e": 940.64,
-      "t": "They provide a hygienic space for people to legally take drugs.",
-      "r": "这些设施为人们提供了一个卫生的合法吸毒场所。"
+      "e": 943.64,
+      "t": "They provide a hygienic space for people to legally take drugs. In Berlin, there's a really well-known park",
+      "r": "这些设施为人们提供了一个卫生的合法吸毒场所。在柏林，有一个非常著名的公园"
     },
     {
-      "s": 940.64,
+      "s": 943.64,
       "e": 947.4,
-      "t": "In Berlin, there's a really well-known park called Görlitzer Park, Görli if you're local.",
-      "r": "在柏林，有一个非常著名的公园叫做格尔利茨公园（Görlitzer Park），如果你是当地人，他们可能简称为格尔利（Görli）。"
+      "t": "called Görlitzer Park, Görli if you're local.",
+      "r": "叫做格尔利茨公园（Görlitzer Park），如果你是当地人，他们可能简称为格尔利（Görli）。"
     },
     {
       "s": 947.4,
+      "e": 952.64,
+      "t": "And the thing there is that everyone sort of knows that there is dealers",
+      "r": "而且，大家都知道那里有经销商在"
+    },
+    {
+      "s": 952.64,
       "e": 957.36,
-      "t": "And the thing there is that everyone sort of knows that there is dealers there that sell. But I would say it's sort of like it remains somewhat of a",
-      "r": "而且，大家都知道那里有经销商在卖东西。但我认为这仍然有点像是一个"
+      "t": "there that sell. But I would say it's sort of like it remains somewhat of a",
+      "r": "卖东西。但我认为这仍然有点像是一个"
     },
     {
       "s": 957.36,
+      "e": 961.56,
+      "t": "gray area because the idea is I I assume, I don't know for sure, but I",
+      "r": "灰色地带，因为我猜想，虽然我不确定，但我"
+    },
+    {
+      "s": 961.56,
       "e": 965.8,
-      "t": "gray area because the idea is I I assume, I don't know for sure, but I assume that as a city you can control the problem",
-      "r": "灰色地带，因为我猜想，虽然我不确定，但我认为作为一个城市，你可以更好地控制这个问题，而不是让它"
+      "t": "assume that as a city you can control the problem",
+      "r": "认为作为一个城市，你可以更好地控制这个问题，而不是让它"
     },
     {
       "s": 965.8,
-      "e": 971.76,
-      "t": "more rather than it being spread out across the city, you just concentrate it in one park.",
-      "r": "扩散到整个城市，而是把它集中在一个公园里。某种程度上，"
+      "e": 969.96,
+      "t": "more rather than it being spread out across the city, you just concentrate it",
+      "r": "扩散到整个城市，而是把它集中"
     },
     {
-      "s": 971.76,
-      "e": 977.28,
-      "t": "And you sort of let these people in a way do their thing.",
-      "r": "你就是放任这些人做他们想做的事。"
+      "s": 969.96,
+      "e": 979.4,
+      "t": "in one park. And you sort of let these people in a way do their thing. Um so they don't cause harm in other",
+      "r": "在一个公园里。某种程度上，你就是放任这些人做他们想做的事。嗯，这样它们就不会在其他方面造成危害"
     },
     {
-      "s": 977.28,
-      "e": 987,
-      "t": "Um so they don't cause harm in other areas. And it's sort of, you know, people want to do that, they go to that area and they get it and whatever. But",
-      "r": "嗯，这样它们就不会在其他方面造成危害。你知道，人们想做这件事，他们就去那个地区，然后得到它等等。但"
+      "s": 979.4,
+      "e": 984.44,
+      "t": "areas. And it's sort of, you know, people want to do that, they go to that",
+      "r": "。你知道，人们想做这件事，他们就去那个"
     },
     {
-      "s": 987,
+      "s": 984.44,
       "e": 988.52,
-      "t": "you can also monitor it.",
-      "r": "你也可以对其进行监控。"
+      "t": "area and they get it and whatever. But you can also monitor it.",
+      "r": "地区，然后得到它等等。但你也可以对其进行监控。"
     },
     {
       "s": 988.52,
-      "e": 990.48,
-      "t": "there police there?",
-      "r": "那里有警察吗？"
-    },
-    {
-      "s": 990.48,
-      "e": 993.12,
-      "t": "Potentially undercover or something.",
-      "r": "可能是卧底之类的。"
-    },
-    {
-      "s": 993.12,
       "e": 995.6,
-      "t": "We don't We don't know. We'll find out, I guess.",
-      "r": "我们不知道。我想我们很快就会知道了。"
+      "t": "there police there? Potentially undercover or something. We don't We don't know. We'll find out, I guess.",
+      "r": "那里有警察吗？可能是卧底之类的。我们不知道。我想我们很快就会知道了。"
     },
     {
       "s": 995.6,
-      "e": 1000,
-      "t": "Knowing you, god damn it. I shouldn't have told All right, guys, let's go to that park.",
-      "r": "真他妈的，我认识你。我不该说“好了，伙计们，我们去那个公园吧”。"
-    },
-    {
-      "s": 1000,
       "e": 1000.76,
-      "t": "Is it far?",
-      "r": "远吗？"
+      "t": "Knowing you, god damn it. I shouldn't have told All right, guys, let's go to that park. Is it far?",
+      "r": "认识你，真是的。我不应该说“好了，伙计们，我们去那个公园吧”。远吗？"
     },
     {
       "s": 1000.76,
-      "e": 1003.4,
-      "t": "Do you know the Do you know the park we're going to?",
-      "r": "你知道我们要去的那个公园吗？是的"
+      "e": 1007.08,
+      "t": "Do you know the Do you know the park we're going to? Yes, it's crazy. I I heard about it. We're going to walk",
+      "r": "你知道我们要去的那个公园吗？是的，这太疯狂了。我听说过这件事。我们将"
     },
     {
-      "s": 1003.4,
-      "e": 1005.8,
-      "t": "Yes, it's crazy. I I heard about it.",
-      "r": "，这太疯狂了。我听说过这件事。"
-    },
-    {
-      "s": 1005.8,
+      "s": 1007.08,
       "e": 1010.52,
-      "t": "We're going to walk in this playground and some people going to talk to us and I I'm filming.",
-      "r": "我们将在这个游乐场里走走，会有人和我们交谈，我会拍摄。是的"
+      "t": "in this playground and some people going to talk to us and I I'm filming.",
+      "r": "在这个游乐场里走走，会有人和我们交谈，我会拍摄。是的"
     },
     {
       "s": 1010.52,
-      "e": 1019.92,
-      "t": "Yeah, so in that park, every time I walk past the park and there's a bush, someone will be talking to you. It's almost like a tree is talking to you.",
-      "r": "，在那个公园里，每次我路过公园，看到灌木丛的时候，都会有人跟我说话。感觉就像一棵树在跟你说话一样。"
+      "e": 1014.44,
+      "t": "Yeah, so in that park, every time I walk past the park and there's a bush,",
+      "r": "，在那个公园里，每次我路过公园，看到灌木丛的时候，"
     },
     {
-      "s": 1021.24,
-      "e": 1022.84,
-      "t": "Sorry.",
-      "r": "对不起。"
-    },
-    {
-      "s": 1022.84,
+      "s": 1014.44,
       "e": 1024.72,
-      "t": "Ah.",
-      "r": "啊。"
+      "t": "someone will be talking to you. It's almost like a tree is talking to you. Sorry. Ah.",
+      "r": "都会有人跟我说话。感觉就像一棵树在跟你说话一样。对不起。啊。"
     },
     {
       "s": 1024.72,
@@ -1586,75 +1022,39 @@
     },
     {
       "s": 1031.12,
-      "e": 1032.8,
-      "t": "I don't think he should be drinking.",
-      "r": "我认为他不应该喝酒。"
-    },
-    {
-      "s": 1032.8,
-      "e": 1033.6,
-      "t": "Correct.",
-      "r": "正确的。"
-    },
-    {
-      "s": 1035.04,
       "e": 1037.32,
-      "t": "Come on.",
-      "r": "拜托。"
+      "t": "I don't think he should be drinking. Correct. Come on.",
+      "r": "我认为他不应该喝酒。正确的。 [笑声] 拜托。"
     },
     {
       "s": 1040.76,
-      "e": 1042.8,
-      "t": "What did he say?",
-      "r": "他说了什么？妈的"
+      "e": 1047.92,
+      "t": "What did he say? Oh, What the Say, what did he say? Nothing. He didn't say any words that",
+      "r": "他说了什么？妈的。搞什么鬼？他说了什么？没有什么。他没说任何"
     },
     {
-      "s": 1042.8,
-      "e": 1046.2,
-      "t": "Oh, What the Say, what did he say?",
-      "r": "。搞什么鬼？他说了什么？"
-    },
-    {
-      "s": 1046.2,
-      "e": 1049.56,
-      "t": "Nothing. He didn't say any words that you could But he said woo woo woo.",
-      "r": "没有什么。他没说任何你能听懂的话，但他发出“呜呜呜”的声音。"
-    },
-    {
-      "s": 1049.56,
+      "s": 1047.92,
       "e": 1054.24,
-      "t": "Yeah, no. He's just saying woo woo woo. Like, it doesn't mean anything.",
-      "r": "不，不是。他只是在发出呜呜呜的声音。这根本说明不了什么。"
+      "t": "you could But he said woo woo woo. Yeah, no. He's just saying woo woo woo. Like, it doesn't mean anything.",
+      "r": "你能听懂的话，但他发出“呜呜呜”的声音。不，不是。他只是在发出呜呜呜的声音。这根本说明不了什么。"
     },
     {
       "s": 1054.24,
-      "e": 1054.96,
-      "t": "What?",
-      "r": "什么？是的"
-    },
-    {
-      "s": 1054.96,
-      "e": 1055.6,
-      "t": "Yeah.",
-      "r": "。"
-    },
-    {
-      "s": 1055.6,
-      "e": 1057.84,
-      "t": "And then he he smashed the wine bottle.",
-      "r": "然后他就把酒瓶摔碎了。是的"
-    },
-    {
-      "s": 1057.84,
       "e": 1058.4,
-      "t": "Yeah.",
-      "r": "。"
+      "t": "What? Yeah. And then he he smashed the wine bottle. Yeah.",
+      "r": "什么？是的。然后他就把酒瓶摔碎了。是的。"
     },
     {
       "s": 1058.4,
+      "e": 1062.8,
+      "t": "If you in Europe and you see one of those drunk guys with a bottle of wine",
+      "r": "如果你在欧洲，看到一个醉汉拿着酒瓶之类的东西"
+    },
+    {
+      "s": 1062.8,
       "e": 1066.24,
-      "t": "If you in Europe and you see one of those drunk guys with a bottle of wine or something walking around, you never have to worry about the fact that they",
-      "r": "如果你在欧洲，看到一个醉汉拿着酒瓶之类的东西走来走去，你完全不用担心他"
+      "t": "or something walking around, you never have to worry about the fact that they",
+      "r": "走来走去，你完全不用担心他"
     },
     {
       "s": 1066.24,
@@ -1676,69 +1076,69 @@
     },
     {
       "s": 1090.92,
+      "e": 1095.64,
+      "t": "All right, guys. So, this place is near the famous Berlin I showed you guys",
+      "r": "，各位。所以，这个地方就在我之前带你们参观过的著名的柏林附近"
+    },
+    {
+      "s": 1095.64,
       "e": 1100.36,
-      "t": "All right, guys. So, this place is near the famous Berlin I showed you guys before. This is where they pre-drink and then they go do crazy things. So, I'm",
-      "r": "，各位。所以，这个地方就在我之前带你们参观过的著名的柏林附近。他们在这里预先喝酒，然后去做一些疯狂的事情。所以，我"
+      "t": "before. This is where they pre-drink and then they go do crazy things. So, I'm",
+      "r": "。他们在这里预先喝酒，然后去做一些疯狂的事情。所以，我"
     },
     {
       "s": 1100.36,
-      "e": 1107.62,
-      "t": "paying people 20 euro for their craziest story. If it's actually crazy, Oh, tell me you should go. You should go.",
-      "r": "打算付给每个人20欧元，让他们讲出最离奇的故事。如果这真的太疯狂了，哦，告诉我你应该去。你应该去。"
+      "e": 1104.96,
+      "t": "paying people 20 euro for their craziest story. If it's actually crazy,",
+      "r": "打算付给每个人20欧元，让他们讲出最离奇的故事。如果这真的太疯狂了，"
     },
     {
-      "s": 1108.04,
-      "e": 1111.24,
-      "t": "I'll pay I'll pay for your What do we consider crazy?",
-      "r": "我会付钱，我会付钱给你。我们怎么定义疯狂呢？"
+      "s": 1104.96,
+      "e": 1109.72,
+      "t": "Oh, tell me you should go. You should go. I'll pay I'll pay for your",
+      "r": "哦，告诉我你应该去。你应该去。 [笑声] 我会付钱，我会付钱给你。"
     },
     {
-      "s": 1111.24,
-      "e": 1112.56,
-      "t": "Here's your 20 euro.",
-      "r": "这是你的20欧元。"
+      "s": 1109.72,
+      "e": 1115.04,
+      "t": "What do we consider crazy? Here's your 20 euro. Okay. And if it's not that crazy, he takes the",
+      "r": "我们怎么定义疯狂呢？这是你的20欧元。好的。如果情况没那么糟糕，他就收下这笔"
     },
     {
-      "s": 1112.56,
-      "e": 1113.16,
-      "t": "Okay.",
-      "r": "好的。"
+      "s": 1115.04,
+      "e": 1119.08,
+      "t": "money, okay? Okay, so one Let's go, let's",
+      "r": "钱，好吗？好的，那么一 [笑声] 走吧，"
     },
     {
-      "s": 1113.16,
-      "e": 1116.2,
-      "t": "And if it's not that crazy, he takes the money, okay?",
-      "r": "如果情况没那么糟糕，他就收下这笔钱，好吗？"
+      "s": 1119.08,
+      "e": 1121.92,
+      "t": "Okay, let's go. Let's go. So, one time I was hanging out with my",
+      "r": "好的，走吧。我们走吧。有一次我和"
     },
     {
-      "s": 1116.2,
-      "e": 1117.44,
-      "t": "Okay, so one",
-      "r": "好的，那么一"
+      "s": 1121.92,
+      "e": 1126.24,
+      "t": "friends and we went over to this random place uh this person's house. I'm sorry,",
+      "r": "朋友们一起出去玩，我们去了某个不知名的地方，呃，这个人的家。抱歉，"
     },
     {
-      "s": 1118.52,
-      "e": 1120.2,
-      "t": "Let's go, let's Okay, let's go. Let's go.",
-      "r": "走吧，好的，走吧。我们走吧。有"
-    },
-    {
-      "s": 1120.2,
-      "e": 1128,
-      "t": "So, one time I was hanging out with my friends and we went over to this random place uh this person's house. I'm sorry, I'm a bit tipsy, so I might be a bit",
-      "r": "一次我和朋友们一起出去玩，我们去了某个不知名的地方，呃，这个人的家。抱歉，我有点醉了，所以可能有点……"
-    },
-    {
-      "s": 1128,
+      "s": 1126.24,
       "e": 1129.04,
-      "t": "That's totally fine.",
-      "r": "没关系。"
+      "t": "I'm a bit tipsy, so I might be a bit That's totally fine.",
+      "r": "我有点醉了，所以可能有点……没关系。"
     },
     {
       "s": 1129.04,
+      "e": 1132.72,
+      "t": "my speech. And we when we went to this person's house, we were just hanging",
+      "r": "我的演讲。我们去这个人家里玩的时候，就只是"
+    },
+    {
+      "s": 1132.72,
       "e": 1136.4,
-      "t": "my speech. And we when we went to this person's house, we were just hanging out, just doing like the fun stuff that teenagers do. And at some point, this",
-      "r": "我的演讲。我们去这个人家里玩的时候，就只是闲逛，做着青少年会做的那些好玩的事情。然后，在某个时刻，这个"
+      "t": "out, just doing like the fun stuff that teenagers do. And at some point, this",
+      "r": "闲逛，做着青少年会做的那些好玩的事情。然后，在某个时刻，这个"
     },
     {
       "s": 1136.4,
@@ -1748,21 +1148,21 @@
     },
     {
       "s": 1142.36,
-      "e": 1145.68,
-      "t": "Woah. Okay, see. Immediate I'm not getting that money.",
-      "r": "哇。好的，明白了。我肯定拿不到那笔钱。我们彼此之间"
+      "e": 1148.4,
+      "t": "Woah. Okay, see. Immediate I'm not getting that money. And all of us we're like best friends, but",
+      "r": "哇哦。好的，明白了。我肯定拿不到那笔钱。我们彼此之间就像最好的朋友，但说"
     },
     {
-      "s": 1145.68,
-      "e": 1151.92,
-      "t": "And all of us we're like best friends, but we're more like brother dynamic than anything,",
-      "r": "就像最好的朋友，但说"
+      "s": 1148.4,
+      "e": 1157.04,
+      "t": "we're more like brother dynamic than anything, honestly. And when person comes out of this like room",
+      "r": "实话，我们之间的关系更像是兄弟。当一个人"
     },
     {
-      "s": 1151.92,
+      "s": 1157.04,
       "e": 1162.28,
-      "t": "honestly. And when person comes out of this like room with the straps and then we just kind of like run away. We did. I we felt really",
-      "r": "实话，我们之间的关系更像是兄弟。当一个人带着带子从房间里出来时，我们就赶紧逃跑了。我们做到了。我们当时感觉很"
+      "t": "with the straps and then we just kind of like run away. We did. I we felt really",
+      "r": "带着带子从房间里出来时，我们就赶紧逃跑了。我们做到了。我们当时感觉很"
     },
     {
       "s": 1162.28,
@@ -1771,124 +1171,88 @@
       "r": "糟糕，因为那个人当时好像受到了很大的影响，所以我们就"
     },
     {
-      "s": 1165.88,
+      "s": 1165.26,
       "e": 1167.52,
       "t": "dipped. It wasn't really that crazy.",
-      "r": "溜走了。其实也没那么疯狂。真是个"
+      "r": "（笑）溜走了。其实也没那么疯狂。真是个"
     },
     {
       "s": 1167.52,
-      "e": 1173.44,
-      "t": "That's such a bad story. I thought you would say you use the you use it. I wish we did honestly but you know.",
-      "r": "糟糕的故事。我以为你会说你用它。说实话，我希望我们能做到，但是你知道的。"
+      "e": 1171.24,
+      "t": "That's such a bad story. I thought you would say you use the you use it. I wish",
+      "r": "糟糕的故事。我以为你会说你用它。说实话，我希望"
     },
     {
-      "s": 1173.44,
-      "e": 1175.36,
-      "t": "So what is your story?",
-      "r": "那么（笑声）你的故事是什么？妈的"
+      "s": 1171.24,
+      "e": 1177.48,
+      "t": "we did honestly but you know. So what is your story? Oh I got to uh",
+      "r": "我们能做到，但是你知道的。那么（笑声）你的故事是什么？妈的。我得……"
     },
     {
-      "s": 1175.36,
-      "e": 1179,
-      "t": "Oh I got to uh Unless you can have the money.",
-      "r": "。我得……除非你能给我钱。"
-    },
-    {
-      "s": 1179,
+      "s": 1177.48,
       "e": 1180.8,
-      "t": "The craziest story of your life.",
-      "r": "你人生中最疯狂的故事。"
+      "t": "Unless you can have the money. The craziest story of your life.",
+      "r": "除非你能给我钱。你人生中最疯狂的故事。"
     },
     {
       "s": 1180.8,
-      "e": 1192.11,
-      "t": "Craziest story of my life. Um I was um we were day drinking for my friend's birthday party and I've never mixed a drink before and I mixed a 60",
-      "r": "我人生中最疯狂的故事。嗯，当时……我们为了我朋友的生日派对白天喝酒，我以前从来没调过酒，结果我调了一杯 60 度的酒"
+      "e": 1186.64,
+      "t": "Craziest story of my life. Um I was um we were day drinking for my",
+      "r": "我人生中最疯狂的故事。嗯，当时……我们为了我"
     },
     {
-      "s": 1192.44,
+      "s": 1186.64,
       "e": 1193.96,
-      "t": "STORY.",
-      "r": "故事。"
+      "t": "friend's birthday party and I've never mixed a drink before and I mixed a 60 STORY.",
+      "r": "朋友的生日派对白天喝酒，我以前从来没调过酒，结果我调了一杯 60 度的酒 [笑声] 故事。"
     },
     {
       "s": 1193.96,
-      "e": 1194.73,
-      "t": "OKAY.",
-      "r": "好的。"
-    },
-    {
-      "s": 1195.52,
-      "e": 1196.48,
-      "t": "WE'RE SORRY.",
-      "r": "对不起。"
-    },
-    {
-      "s": 1196.48,
       "e": 1198.01,
-      "t": "OKAY, YOU TAKE ALL THE MONEY.",
-      "r": "好吧，你把所有的钱都拿走。"
+      "t": "OKAY. WE'RE SORRY. OKAY, YOU TAKE ALL THE MONEY.",
+      "r": "好的。 [尖叫] 我们很抱歉。好吧，你把所有的钱都拿走。"
     },
     {
-      "s": 1198.16,
-      "e": 1199.44,
-      "t": "WE'RE SORRY.",
-      "r": "我们很抱歉。"
-    },
-    {
-      "s": 1199.44,
-      "e": 1200.12,
-      "t": "I'm good.",
-      "r": "我很好。"
-    },
-    {
-      "s": 1200.12,
+      "s": 1198.01,
       "e": 1200.6,
-      "t": "Okay.",
-      "r": "好的。"
+      "t": "WE'RE SORRY. I'm good. Okay.",
+      "r": "[笑声] 我们很抱歉。我很好。好的。"
     },
     {
       "s": 1200.6,
-      "e": 1207.84,
-      "t": "What's the craziest story of your Okay, okay. I'm going to give her 50 euro and if it's not crazy enough then you take it.",
-      "r": "你经历过的最疯狂的故事是什么？好吧，好吧。我打算给她 50 欧元，如果这还不够疯狂，那就收下吧。"
+      "e": 1203.36,
+      "t": "What's the craziest story of your Okay, okay. I'm going to give her 50",
+      "r": "你经历过的最疯狂的故事是什么？好吧，好吧。我打算给她 50"
     },
     {
-      "s": 1207.84,
+      "s": 1203.36,
       "e": 1209.92,
-      "t": "Okay, and then you say The craziest story of my life.",
-      "r": "好吧，然后你说，这是我人生中最疯狂的故事。"
+      "t": "euro and if it's not crazy enough then you take it. Okay, and then you say The craziest story of my life.",
+      "r": "欧元，如果这还不够疯狂，那就收下吧。好吧，然后你说，这是我人生中最疯狂的故事。"
     },
     {
       "s": 1209.92,
-      "e": 1211.44,
-      "t": "Craziest story of your life.",
-      "r": "你人生中最疯狂的故事是什么？"
-    },
-    {
-      "s": 1211.44,
       "e": 1212.52,
-      "t": "Give me 5 minutes.",
-      "r": "给我五分钟时间。"
+      "t": "Craziest story of your life. Give me 5 minutes.",
+      "r": "你人生中最疯狂的故事是什么？给我五分钟时间。"
     },
     {
       "s": 1212.52,
-      "e": 1214.24,
-      "t": "We'll be we're outside of Kit Kat.",
-      "r": "我们会待在Kit Kat外面。"
-    },
-    {
-      "s": 1214.24,
       "e": 1216.48,
-      "t": "Does it have to be like red to drive?",
-      "r": "开车一定要用红色吗？"
+      "t": "We'll be we're outside of Kit Kat. Does it have to be like red to drive?",
+      "r": "我们会待在Kit Kat外面。开车一定要用红色吗？"
     },
     {
       "s": 1216.48,
+      "e": 1220.48,
+      "t": "No, it's just that you think it's like craziest of your life. If you think it's",
+      "r": "不，只是你觉得这是你人生中最疯狂的事而已。如果你觉得这"
+    },
+    {
+      "s": 1220.48,
       "e": 1222.48,
-      "t": "No, it's just that you think it's like craziest of your life. If you think it's not that crazy then you take the 50 euro.",
-      "r": "不，只是你觉得这是你人生中最疯狂的事而已。如果你觉得这不算太离谱，那就拿走这50 欧元吧。"
+      "t": "not that crazy then you take the 50 euro.",
+      "r": "不算太离谱，那就拿走这50 欧元吧。"
     },
     {
       "s": 1222.48,
@@ -1898,81 +1262,63 @@
     },
     {
       "s": 1224.48,
-      "e": 1225.56,
-      "t": "No, you just take the money.",
-      "r": "不，你直接拿走钱就行了。"
+      "e": 1227.2,
+      "t": "No, you just take the money. Let me tell you let me tell you about my",
+      "r": "不，你直接拿走钱就行了。让我来给你讲讲我的"
     },
     {
-      "s": 1225.56,
-      "e": 1233.64,
-      "t": "Let me tell you let me tell you about my story. So it was it's like the craziest coincidence I ever had. Like it was traveling with my best friend",
-      "r": "让我来给你讲讲我的故事。真是太巧了，这简直是我经历过的最不可思议的巧合。就像我和我最好的朋友"
+      "s": 1227.2,
+      "e": 1231.72,
+      "t": "story. So it was it's like the craziest coincidence I ever had. Like it was",
+      "r": "故事。真是太巧了，这简直是我经历过的最不可思议的巧合。就像我"
     },
     {
-      "s": 1233.64,
-      "e": 1236.48,
-      "t": "in Scotland and we got into a car like hitchhiking.",
-      "r": "在苏格兰旅行，我们搭便车一样。是的"
-    },
-    {
-      "s": 1236.48,
+      "s": 1231.72,
       "e": 1237.04,
-      "t": "Yeah.",
-      "r": "。"
+      "t": "traveling with my best friend in Scotland and we got into a car like hitchhiking. Yeah.",
+      "r": "和我最好的朋友在苏格兰旅行，我们搭便车一样。是的。"
     },
     {
       "s": 1237.04,
-      "e": 1241.12,
-      "t": "And then we talked to the woman and like talked about her job and stuff.",
-      "r": "然后我们和那位女士聊了聊，聊了聊她的工作之类的。是的"
+      "e": 1242.96,
+      "t": "And then we talked to the woman and like talked about her job and stuff. Yeah. And then she was like",
+      "r": "然后我们和那位女士聊了聊，聊了聊她的工作之类的。是的。然后她就说"
     },
     {
-      "s": 1241.12,
-      "e": 1241.52,
-      "t": "Yeah.",
-      "r": "。"
-    },
-    {
-      "s": 1241.52,
+      "s": 1242.96,
       "e": 1246.76,
-      "t": "And then she was like I work in here and there and then my best friend was like, wait.",
-      "r": "然后她就说我偶尔会在这里工作，然后我最好的朋友就说，等等。"
+      "t": "I work in here and there and then my best friend was like, wait.",
+      "r": "我偶尔会在这里工作，然后我最好的朋友就说，等等。"
     },
     {
       "s": 1246.76,
-      "e": 1249,
-      "t": "Are you working with my aunt?",
-      "r": "你和我姑姑一起工作吗？"
+      "e": 1251.08,
+      "t": "Are you working with my aunt? And they knew each other. Like it was so",
+      "r": "你和我姑姑一起工作吗？他们彼此认识。感觉一切都太"
     },
     {
-      "s": 1249,
-      "e": 1255.08,
-      "t": "And they knew each other. Like it was so random. That's like that was crazy.",
-      "r": "他们彼此认识。感觉一切都太随机了。简直太疯狂了。"
-    },
-    {
-      "s": 1255.08,
+      "s": 1251.08,
       "e": 1256.6,
-      "t": "Okay, you take the money.",
-      "r": "好吧，你收下这笔钱吧。"
+      "t": "random. That's like that was crazy. Okay, you take the money.",
+      "r": "随机了。简直太疯狂了。好吧，你收下这笔钱吧。"
     },
     {
       "s": 1256.6,
-      "e": 1258.36,
-      "t": "That's the craziest story of your life?",
-      "r": "这就是你人生中最疯狂的故事？"
+      "e": 1259.24,
+      "t": "That's the craziest story of your life? No, but then",
+      "r": "这就是你人生中最疯狂的故事？不，好吧，那你跟"
     },
     {
-      "s": 1258.36,
-      "e": 1264.08,
-      "t": "No, but then Okay, tell me the craziest story of your life. I'm going to give you another 50 euro.",
-      "r": "不，好吧，那你跟我说说你人生中最疯狂的故事吧。我再给你50 欧元。"
+      "s": 1259.24,
+      "e": 1262.64,
+      "t": "Okay, tell me the craziest story of your life. I'm going to give you another 50",
+      "r": "我说说你人生中最疯狂的故事吧。我再给你50"
     },
     {
-      "s": 1264.08,
+      "s": 1262.64,
       "e": 1269.76,
-      "t": "If it's not that crazy enough but you I actually have to give me the craziest story.",
-      "r": "如果这还不够疯狂，那你得给我讲个最疯狂的故事才行。"
+      "t": "euro. If it's not that crazy enough but you I actually have to give me the craziest story.",
+      "r": "欧元。如果这还不够疯狂，那你得给我讲个最疯狂的故事才行。"
     },
     {
       "s": 1269.76,
@@ -1982,69 +1328,27 @@
     },
     {
       "s": 1272.24,
-      "e": 1273.52,
-      "t": "Tell me.",
-      "r": "告诉我。"
-    },
-    {
-      "s": 1273.52,
-      "e": 1275.36,
-      "t": "Can I tell a story of somebody else that I met?",
-      "r": "我可以讲讲我遇到的另一个人的故事吗？是的"
-    },
-    {
-      "s": 1275.36,
       "e": 1276.2,
-      "t": "Yeah.",
-      "r": "。"
+      "t": "Tell me. Can I tell a story of somebody else that I met? Yeah.",
+      "r": "告诉我。我可以讲讲我遇到的另一个人的故事吗？是的。"
     },
     {
       "s": 1276.2,
-      "e": 1277.12,
-      "t": "Okay.",
-      "r": "好的。"
+      "e": 1284.64,
+      "t": "Okay. So, I met this person at some point and they told me that their cousin kept on like",
+      "r": "好的。所以，我后来遇到了这个人，他告诉我他的表哥一直纠缠他，想"
     },
     {
-      "s": 1277.12,
-      "e": 1286.72,
-      "t": "So, I met this person at some point and they told me that their cousin kept on like coming onto them and trying to have",
-      "r": "所以，我后来遇到了这个人，他告诉我他的表哥一直纠缠他，想"
-    },
-    {
-      "s": 1286.72,
-      "e": 1287.6,
-      "t": "something with them.",
-      "r": "和他发生点什么。"
-    },
-    {
-      "s": 1287.6,
-      "e": 1288.2,
-      "t": "What?",
-      "r": "什么？是的"
-    },
-    {
-      "s": 1288.2,
+      "s": 1284.64,
       "e": 1288.92,
-      "t": "Yes.",
-      "r": "。  [笑声]"
+      "t": "coming onto them and trying to have something with them. What? Yes.",
+      "r": "和他发生点什么。什么？是的。  [笑声]"
     },
     {
       "s": 1288.92,
-      "e": 1290.44,
-      "t": "And that shocked me.",
-      "r": "这让我很震惊。"
-    },
-    {
-      "s": 1290.44,
-      "e": 1293.12,
-      "t": "Um and yeah. Basically, I'm just going to end it at that.",
-      "r": "嗯，是的。基本上，我就说到这里吧。"
-    },
-    {
-      "s": 1293.12,
       "e": 1294.4,
-      "t": "tell your crazy story?",
-      "r": "讲讲你那段疯狂的故事？祝"
+      "t": "And that shocked me. Um and yeah. Basically, I'm just going to end it at that. tell your crazy story?",
+      "r": "这让我很震惊。嗯，是的。基本上，我就说到这里吧。讲讲你那段疯狂的故事？祝"
     },
     {
       "s": 1294.4,
@@ -2054,33 +1358,39 @@
     },
     {
       "s": 1299.12,
+      "e": 1302,
+      "t": "Max just came up with this brilliant idea. If you're ever in Berlin, you're",
+      "r": "马克斯刚刚想出了一个绝妙的主意。如果你身在柏林，感到"
+    },
+    {
+      "s": 1302,
       "e": 1305.4,
-      "t": "Max just came up with this brilliant idea. If you're ever in Berlin, you're bored, or you're lonely in any part of the world, and you just want to come to",
-      "r": "马克斯刚刚想出了一个绝妙的主意。如果你身在柏林，感到无聊，或者在世界任何地方感到孤独，只想来"
+      "t": "bored, or you're lonely in any part of the world, and you just want to come to",
+      "r": "无聊，或者在世界任何地方感到孤独，只想来"
     },
     {
       "s": 1305.4,
-      "e": 1311.32,
-      "t": "Germany and have a German show you a good time, here's your part-time boyfriend.",
-      "r": "德国让一个德国人带你度过一段美好时光，那么这就是你的兼职男友。"
+      "e": 1312.6,
+      "t": "Germany and have a German show you a good time, here's your part-time boyfriend. His email",
+      "r": "德国让一个德国人带你度过一段美好时光，那么这就是你的兼职男友。他的邮件："
     },
     {
-      "s": 1311.32,
-      "e": 1318.16,
-      "t": "His email I can be your companion. I show you a good time. I tell you about Germany. I show you how to invest and do business",
-      "r": "他的邮件：我可以做你的伴侣。我让你玩得开心。我来给你讲讲德国。我将向您展示如何在德国投资和经商"
+      "s": 1312.6,
+      "e": 1316.4,
+      "t": "I can be your companion. I show you a good time. I tell you about Germany. I",
+      "r": "我可以做你的伴侣。我让你玩得开心。我来给你讲讲德国。我"
     },
     {
-      "s": 1318.16,
-      "e": 1320.88,
-      "t": "in Germany, and we explore the culture together.",
-      "r": "，我们还会一起探索德国文化。"
+      "s": 1316.4,
+      "e": 1320.36,
+      "t": "show you how to invest and do business in Germany, and we explore the culture",
+      "r": "将向您展示如何在德国投资和经商，我们还会一起探索德国文化"
     },
     {
-      "s": 1320.88,
+      "s": 1320.36,
       "e": 1326.88,
-      "t": "I'm not part of the service, so don't expect me to be here unless you pay enough.",
-      "r": "我不是服务人员，所以除非你付足够的钱，否则别指望我会在这里。"
+      "t": "together. I'm not part of the service, so don't expect me to be here unless you pay enough.",
+      "r": "。我不是服务人员，所以除非你付足够的钱，否则别指望我会在这里。"
     }
   ]
 }

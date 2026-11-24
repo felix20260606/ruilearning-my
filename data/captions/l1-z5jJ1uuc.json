@@ -1,0 +1,946 @@
+{
+  "v": "l1-z5jJ1uuc",
+  "title": "Become fluent in English using the Immersion method",
+  "author": "English by Jay - Sprout",
+  "lang": "en",
+  "tl": "zh-CN",
+  "at": 1795504702964,
+  "cues": [
+    {
+      "s": 0.4,
+      "e": 12.72,
+      "t": "3 years ago when I met Chang, her English wasn't that good. Hey, but now she's fluent. Her English is",
+      "r": "三年前我认识张的时候，她的英语还不太好。嘿，不过她现在已经能说一口流利的英语了。她的英语非常"
+    },
+    {
+      "s": 12.72,
+      "e": 23.28,
+      "t": "topnotch. A So, how did she go from not that good to very, very good?",
+      "r": "出色。那么，她是如何从音乐水平一般到非常非常优秀的呢？"
+    },
+    {
+      "s": 23.28,
+      "e": 28.08,
+      "t": "You might think the answer is because she's been dating me, but it's",
+      "r": "你可能会认为答案（音乐）是因为她一直在和我约会，但事实并非"
+    },
+    {
+      "s": 28.08,
+      "e": 33.68,
+      "t": "not. Today I'll share with you the three tips I shared with Chang which helped",
+      "r": "如此。今天我将与大家分享我给张同学的三条建议，这三条建议帮助"
+    },
+    {
+      "s": 33.68,
+      "e": 40.44,
+      "t": "her reach full fluency in English. But first",
+      "r": "她达到了英语流利的程度。但首先是"
+    },
+    {
+      "s": 48.72,
+      "e": 51.72,
+      "t": "coffee.",
+      "r": "咖啡。"
+    },
+    {
+      "s": 53.36,
+      "e": 66.52,
+      "t": "This is a water tank and this is a water dispenser. I am filling up the water tank from the water dispenser.",
+      "r": "这是一个水箱，这是一个饮水机。我正在用饮水机给水箱加水。"
+    },
+    {
+      "s": 68.56,
+      "e": 74.02,
+      "t": "I am attaching the water tank to the coffee machine. I am taking the coffee",
+      "r": "我正在将水箱连接到咖啡机上。我正在把咖啡"
+    },
+    {
+      "s": 74.02,
+      "e": 87.12,
+      "t": "pod and putting it in the coffee machine. I am pressing the button and the coffee is coming out of",
+      "r": "音乐胶囊放进咖啡机里。我按下按钮，咖啡就从机器里流出来，"
+    },
+    {
+      "s": 87.12,
+      "e": 92.2,
+      "t": "the machine into the mug.",
+      "r": "流入杯子里。"
+    },
+    {
+      "s": 95.36,
+      "e": 103.2,
+      "t": "I have just made a coffee and that is the first tip to reach full fluency.",
+      "r": "我刚泡了杯咖啡，这是达到流利程度的第一个秘诀。"
+    },
+    {
+      "s": 103.2,
+      "e": 111.36,
+      "t": "What coffee? No, your home is your English zone.",
+      "r": "什么咖啡？不，你的家就是你的英语天地。"
+    },
+    {
+      "s": 111.36,
+      "e": 120.08,
+      "t": "What do I mean by that? Well, everything in your home has a name. Like this mug.",
+      "r": "我这话是什么意思？嗯，你家里的所有东西都有名字。就像这个马克杯。"
+    },
+    {
+      "s": 120.08,
+      "e": 134.4,
+      "t": "This is the mug. And this is the handle. Can you repeat? Mug. Handle. Good.",
+      "r": "这就是马克杯。这就是把手。你能再说一遍吗？马克杯。处理。好的。"
+    },
+    {
+      "s": 134.4,
+      "e": 141.04,
+      "t": "The idea behind this game is that you learn the name for everything in your",
+      "r": "这个游戏的目的是让你记住"
+    },
+    {
+      "s": 141.04,
+      "e": 146.32,
+      "t": "house. Treat your house like a dictionary. Treat it like an English",
+      "r": "家里所有物品的名称。把你的家当作一本字典。把它当成英国的"
+    },
+    {
+      "s": 146.32,
+      "e": 151.92,
+      "t": "playground. And it's very important to speak out",
+      "r": "游乐场来对待。"
+    },
+    {
+      "s": 151.92,
+      "e": 159.44,
+      "t": "loud to speak out loud the name of things like this is a carton of oat",
+      "r": "大声说出东西的名称非常重要，比如这盒燕麦"
+    },
+    {
+      "s": 159.44,
+      "e": 171.2,
+      "t": "milk. There might be some new words that surprise you, like door handle versus door knob.",
+      "r": "奶的名称。你可能会遇到一些让你感到惊讶的新词，例如门把手和门旋钮的区别。"
+    },
+    {
+      "s": 171.2,
+      "e": 175.52,
+      "t": "I bet you didn't know the difference between these two. And if you did,",
+      "r": "我敢打赌你以前不知道这两者的区别。如果你做到了，那"
+    },
+    {
+      "s": 175.52,
+      "e": 188.12,
+      "t": "you're a genius. A door knob is circular. It's round. And you twist it to open the door.",
+      "r": "你真是个天才。门把手是圆形的。它是圆形的。然后你扭动它就能打开门。"
+    },
+    {
+      "s": 188.48,
+      "e": 198.48,
+      "t": "A door handle is rectangular and you push it down to open the door",
+      "r": "门把手是长方形的，向下按压即可开门，向上"
+    },
+    {
+      "s": 198.48,
+      "e": 206.48,
+      "t": "and pull it up to lock the door. I'm locking the door with the key.",
+      "r": "拉起即可锁门。我正在用钥匙锁门。"
+    },
+    {
+      "s": 206.48,
+      "e": 216.92,
+      "t": "Wait, we need to be inside. So, let's unlock this door and go back inside.",
+      "r": "等等，我们得进屋。那么，我们把门打开，进去吧。"
+    },
+    {
+      "s": 218.16,
+      "e": 227.36,
+      "t": "But what if you don't know the name for something? Either you watch my videos or",
+      "r": "但如果你不知道某个东西的名称怎么办？你可以观看我的视频，或者"
+    },
+    {
+      "s": 227.36,
+      "e": 235.04,
+      "t": "you can simply use a tool like chat GPT or Gemini. You take a picture of that",
+      "r": "直接使用像 Chat GPT 或 Gemini 这样的工具。你拍下那东西的照片，"
+    },
+    {
+      "s": 235.04,
+      "e": 243.76,
+      "t": "thing and ask what is this called in English? What is this called in English?",
+      "r": "然后问它用英语叫什么？这用英语怎么说？"
+    },
+    {
+      "s": 243.76,
+      "e": 250.16,
+      "t": "H cushion. This is a cushion. So now you have the",
+      "r": "H 型垫。这是一个靠垫。现在你知道它的"
+    },
+    {
+      "s": 250.16,
+      "e": 255.04,
+      "t": "name of it. You can make simple sentences. And these questions might",
+      "r": "名字了。你可以造简单的句子。这些问题或许会有"
+    },
+    {
+      "s": 255.04,
+      "e": 260.72,
+      "t": "help. What color is it? What shape is it? What material is it? What is the",
+      "r": "帮助。它是什么颜色的？它是什么形状的？它是什么材质的？"
+    },
+    {
+      "s": 260.72,
+      "e": 265.36,
+      "t": "function of it? And what does it feel like? For example,",
+      "r": "它的功能是什么？那感觉如何？例如，"
+    },
+    {
+      "s": 265.36,
+      "e": 271.6,
+      "t": "okay, let's see. The cushion is red. It's in the shape of a love heart. It",
+      "r": "好的，我们来看看。靠垫是红色的。它的形状像一颗爱心。它"
+    },
+    {
+      "s": 271.6,
+      "e": 278.4,
+      "t": "has long arms, so it looks like a real creature. Is made of cotton, and it's",
+      "r": "有很长的手臂，所以看起来像个真正的生物。它由棉质材料制成，"
+    },
+    {
+      "s": 278.4,
+      "e": 285.58,
+      "t": "very comfy and soft. I like to use this cushion to support my head when I take",
+      "r": "非常舒适柔软。我喜欢用这个靠垫"
+    },
+    {
+      "s": 285.58,
+      "e": 290.16,
+      "t": "a nap on the sofa. It's really comfy.",
+      "r": "在沙发上小憩时支撑头部。它真的很舒服。"
+    },
+    {
+      "s": 290.16,
+      "e": 296.48,
+      "t": "You can do this exercise anytime at home. When you cook, I am frying an egg",
+      "r": "你可以随时在家做这个练习。你做饭的时候，我正在"
+    },
+    {
+      "s": 296.48,
+      "e": 306.48,
+      "t": "in the frying pan. when you take a shower. I'm standing under the shower head about to take a shower",
+      "r": "煎锅里煎鸡蛋。当你洗澡的时候。我站在淋浴喷头下准备洗澡，"
+    },
+    {
+      "s": 306.48,
+      "e": 312.88,
+      "t": "or when you do the chores. I am vacuuming the floor. Or in the UK we say",
+      "r": "或者你做家务的时候。我正在用吸尘器打地。或者在英国，我们称之为"
+    },
+    {
+      "s": 312.88,
+      "e": 318,
+      "t": "hoovering. I'm hoovering. And even when you listen to music, you can ask",
+      "r": "吸尘。我在吸尘。即使在听音乐的时候，你也可以问问"
+    },
+    {
+      "s": 318,
+      "e": 326.2,
+      "t": "yourself, what instruments can I hear? How does this music make me feel?",
+      "r": "自己，我能听到哪些乐器？这音乐让我有什么感觉？"
+    },
+    {
+      "s": 331.2,
+      "e": 337.6,
+      "t": "This is a beautiful piano piece by the composer Austin Farwell.",
+      "r": "这是作曲家奥斯汀·法威尔创作的一首优美的钢琴曲。"
+    },
+    {
+      "s": 337.6,
+      "e": 348.48,
+      "t": "When I listen to music like this, it makes me feel relaxed, at ease, and peaceful.",
+      "r": "听这样的音乐，会让我感到放松、自在、平静。"
+    },
+    {
+      "s": 348.48,
+      "e": 354.72,
+      "t": "Can you see what I did there? I I'm using my home as my English zone. I'm",
+      "r": "你看出我做了什么吗？我把家当作我的英语学习区。我正在从"
+    },
+    {
+      "s": 354.72,
+      "e": 359.68,
+      "t": "learning new vocabulary from the things around me and then I'm making simple",
+      "r": "周围的事物中学习新词汇，然后"
+    },
+    {
+      "s": 359.68,
+      "e": 367.04,
+      "t": "sentences with those words. The key is to speak out loud. If you have the",
+      "r": "用这些词汇造简单的句子。关键是要大声说出来。如果你有"
+    },
+    {
+      "s": 367.04,
+      "e": 374.08,
+      "t": "problem that you can understand but you can't speak, then the likelihood is it's",
+      "r": "听懂但说不出话的问题，那很可能是"
+    },
+    {
+      "s": 374.08,
+      "e": 380.08,
+      "t": "because you haven't practiced speaking out loud enough. Now, speaking is just",
+      "r": "因为你大声说话的练习不够多。现在，说话就像"
+    },
+    {
+      "s": 380.08,
+      "e": 384.88,
+      "t": "muscle memory, like going to the gym. The more you do it, the more your",
+      "r": "去健身房锻炼一样，完全是肌肉记忆。你做得越多，你的"
+    },
+    {
+      "s": 384.88,
+      "e": 392.48,
+      "t": "muscles remember the actions. So the more you move your mouth and tongue to",
+      "r": "肌肉就越能记住这些动作。所以，你越是动嘴动舌来"
+    },
+    {
+      "s": 392.48,
+      "e": 405.76,
+      "t": "form the words, the faster those words come out. By the way, this is a soft toy. This is an electric piano.",
+      "r": "发音，说出这些话的速度就越快。顺便说一下，这是一个毛绒玩具。这是一架电钢琴。"
+    },
+    {
+      "s": 405.76,
+      "e": 412.44,
+      "t": "And this is a plant in a plant pot.",
+      "r": "这是一盆植物。"
+    },
+    {
+      "s": 414.4,
+      "e": 419.2,
+      "t": "You can also practice speaking out loud with a fun and simple game. It's called",
+      "r": "你还可以通过一个有趣又简单的游戏来练习大声说话。它叫做"
+    },
+    {
+      "s": 419.2,
+      "e": 424.56,
+      "t": "the word association game. Let's take this bell as our starting word. I'm",
+      "r": "词语联想游戏。让我们以这声钟响作为我们的起始词。我要"
+    },
+    {
+      "s": 424.56,
+      "e": 432,
+      "t": "going to make associations. So, bell, ring, wedding, celebration, champagne,",
+      "r": "建立联系。所以，铃铛，铃声，婚礼，庆典，香槟，葡萄酒，"
+    },
+    {
+      "s": 432,
+      "e": 441.6,
+      "t": "wine, bubbles, water, puddle, rain, mountain, sky, blue, blah, blah, blah,",
+      "r": "气泡，水，水坑，雨，山，天空，蓝色，等等等等等等"
+    },
+    {
+      "s": 441.6,
+      "e": 447.84,
+      "t": "blah, blah. You get the idea. I'm making associations in a chain. This game is",
+      "r": "。你明白我的意思。我正在建立一系列关联。这款游戏"
+    },
+    {
+      "s": 447.84,
+      "e": 453.44,
+      "t": "going to really build your spontaneous speaking and help you feel less anxious",
+      "r": "将真正提升你的即兴演讲能力，帮助你减少"
+    },
+    {
+      "s": 453.44,
+      "e": 458.96,
+      "t": "and more confident when you speak. Plus, it's fun. I'll dive deeper into this",
+      "r": "演讲时的焦虑，增强自信。而且，它还很有趣。我会"
+    },
+    {
+      "s": 458.96,
+      "e": 465.04,
+      "t": "game in a future episode, but for now, let's go downstairs and I'm going to",
+      "r": "在以后的节目中更深入地探讨这款游戏，但现在，我们下楼吧，我要给"
+    },
+    {
+      "s": 465.04,
+      "e": 474.64,
+      "t": "show you my favorite British shows. For anyone wondering, that is a swinging chair. This",
+      "r": "你们展示我最喜欢的英国节目。如果你好奇的话，那是一把摇椅。这"
+    },
+    {
+      "s": 474.64,
+      "e": 483.36,
+      "t": "is a remote. It has buttons on it. When I press the power button,",
+      "r": "是遥控器。它上面有按钮。当我按下电源按钮时，"
+    },
+    {
+      "s": 483.36,
+      "e": 491.28,
+      "t": "it turns on the TV, which links to my second tip. Watch what you love, but",
+      "r": "电视机就打开了，这与我的第二个技巧有关。看你喜欢的节目，但难度"
+    },
+    {
+      "s": 491.28,
+      "e": 496.4,
+      "t": "slightly above your level and without subtitles. When learning any language,",
+      "r": "要比你实际水平略高一些，而且不要看字幕。学习任何语言时，"
+    },
+    {
+      "s": 496.4,
+      "e": 503.92,
+      "t": "input is really important. As you all know in my videos, I teach English using",
+      "r": "输入都非常重要。正如大家在我的视频中看到的，我使用"
+    },
+    {
+      "s": 503.92,
+      "e": 511.04,
+      "t": "visuals and context. This is called the comprehensible input method where you",
+      "r": "视觉元素和语境来教授英语。这被称为可理解性输入法，你虽然"
+    },
+    {
+      "s": 511.04,
+      "e": 516.72,
+      "t": "understand not all of the language but you get the gist, you get the idea",
+      "r": "不能完全理解语言，但可以抓住要点，"
+    },
+    {
+      "s": 516.72,
+      "e": 523.36,
+      "t": "because of the visuals and the context. So, it's less based on forced",
+      "r": "通过视觉效果和上下文理解概念。所以，它与其说是依靠强迫"
+    },
+    {
+      "s": 523.36,
+      "e": 532.28,
+      "t": "memorization, but more on getting the overall picture through natural context.",
+      "r": "记忆，不如说是通过自然语境来了解整体情况。"
+    },
+    {
+      "s": 532.4,
+      "e": 538.96,
+      "t": "I would recommend you to watch English videos without the subtitles while still",
+      "r": "我建议你观看英语视频时不要看字幕，只要你能"
+    },
+    {
+      "s": 538.96,
+      "e": 545.6,
+      "t": "understanding 70 to 80%. Why? Well, when you watch a video with",
+      "r": "理解 70% 到 80% 的内容即可。为什么？嗯，当你看带"
+    },
+    {
+      "s": 545.6,
+      "e": 552.72,
+      "t": "the subtitles, you tend to fixate on the subtitles. you read the subtitles and",
+      "r": "字幕的视频时，你往往会把注意力集中在字幕上。你只看字幕，"
+    },
+    {
+      "s": 552.72,
+      "e": 558.8,
+      "t": "you don't watch the video and listen to the English being used. So without the",
+      "r": "不看视频，也不听视频里说的英语。因此，如果没有"
+    },
+    {
+      "s": 558.8,
+      "e": 566.64,
+      "t": "subtitles, you're training your brain to link the sounds that you hear with the",
+      "r": "字幕，你就是在训练你的大脑将听到的声音与"
+    },
+    {
+      "s": 566.64,
+      "e": 571.84,
+      "t": "visual meaning, the context. Now this is a much stronger hook in your brain",
+      "r": "视觉含义、上下文联系起来。现在，这会在你的大脑中留下更深刻的印象，"
+    },
+    {
+      "s": 571.84,
+      "e": 576.64,
+      "t": "because our visual memory is very strong. So watching without subtitles,",
+      "r": "因为我们的视觉记忆非常强大。所以不看字幕的话，"
+    },
+    {
+      "s": 576.64,
+      "e": 580.96,
+      "t": "understanding about 70 to 80%. Now, I'm going to share with you some of my",
+      "r": "大概能听懂 70% 到 80%。现在，我将与大家分享一些我最"
+    },
+    {
+      "s": 580.96,
+      "e": 586.32,
+      "t": "favorite British TV shows so you can practice this at home. If you're a",
+      "r": "喜欢的英国电视节目，这样你们就可以在家练习了。如果你是"
+    },
+    {
+      "s": 586.32,
+      "e": 594.13,
+      "t": "beginner, I would recommend three different things. First, Peppa Pig. [music]",
+      "r": "初学者，我会推荐三件事。首先是小猪佩奇。 [音乐]"
+    },
+    {
+      "s": 594.48,
+      "e": 605.2,
+      "t": "Second, Bluey. Blue. And third, the movie Finding Nemo. Nemo. Nemo.",
+      "r": "第二，布鲁伊。蓝色的。第三，是电影《海底总动员》。尼莫。尼莫。"
+    },
+    {
+      "s": 605.2,
+      "e": 610.24,
+      "t": "All of these are children's shows and children's movies. However, they are",
+      "r": "这些都是儿童节目和儿童电影。不过，它们"
+    },
+    {
+      "s": 610.24,
+      "e": 615.84,
+      "t": "fantastic for improving your English from beginner to intermediate because",
+      "r": "对于提高英语水平（从初级到中级）来说非常棒，因为"
+    },
+    {
+      "s": 615.84,
+      "e": 621.68,
+      "t": "the stories are simple and the episodes are short. If you're intermediate, try",
+      "r": "故事简单，剧集短小。如果你水平中等，可以试试"
+    },
+    {
+      "s": 621.68,
+      "e": 628.24,
+      "t": "sitcoms like Friends. I used Friends in the past to learn French and it worked.",
+      "r": "像《老友记》这样的情景喜剧。我以前用过 Friends 来学习法语，效果不错。"
+    },
+    {
+      "s": 628.24,
+      "e": 636.8,
+      "t": "Blue blah flu flank. You can also try TED ed TED videos are",
+      "r": "蓝色的流感侧翼。你也可以试试 TED ed，TED 视频"
+    },
+    {
+      "s": 636.8,
+      "e": 642.32,
+      "t": "shorter than the TED talks and they have more visuals so it's easier for you to",
+      "r": "比 TED 演讲短，而且视觉效果更好，所以更容易"
+    },
+    {
+      "s": 642.32,
+      "e": 649.04,
+      "t": "understand. If you love documentaries then I would recommend David Atenburgh.",
+      "r": "理解。如果你喜欢纪录片，那我推荐大卫·阿滕伯格的作品。"
+    },
+    {
+      "s": 649.04,
+      "e": 655.6,
+      "t": "So David Atenburgh is loved by English people and by British people. He is a",
+      "r": "所以大卫·阿滕伯格深受英国人民和英国人的喜爱。他是"
+    },
+    {
+      "s": 655.6,
+      "e": 662.8,
+      "t": "national treasure and his documentaries are all about the earth, animals, humans",
+      "r": "国宝级人物，他的纪录片都与地球、动物和人类有关，"
+    },
+    {
+      "s": 662.8,
+      "e": 668.72,
+      "t": "and they are wonderful for practicing English because he speaks very slowly,",
+      "r": "而且非常适合练习英语，因为他说话很慢，"
+    },
+    {
+      "s": 668.72,
+      "e": 674.48,
+      "t": "very clearly and you hear the same words repeating again and again. The two",
+      "r": "很清晰，你会听到同样的词语一遍又一遍地重复。"
+    },
+    {
+      "s": 674.48,
+      "e": 679.2,
+      "t": "Atomra documentaries I would recommend for you are Planet Earth which I think",
+      "r": "我推荐你看两部Atomra的纪录片，一部是《地球脉动》（Planet Earth），我觉得"
+    },
+    {
+      "s": 679.2,
+      "e": 683.76,
+      "t": "is on Netflix and the new one Kingdom.",
+      "r": "Netflix上有（音乐），另一部是新片《王国》（Kingdom）。"
+    },
+    {
+      "s": 683.76,
+      "e": 688.48,
+      "t": "Other than that, just search David Atenburgh documentaries and you'll find",
+      "r": "除此之外，你只需搜索大卫· 阿滕伯格的纪录片，就能找到"
+    },
+    {
+      "s": 688.48,
+      "e": 692.32,
+      "t": "a lot of good content there. And if you're advanced, the world is your",
+      "r": "很多优质内容。如果你足够优秀，世界就是你的"
+    },
+    {
+      "s": 692.32,
+      "e": 696.8,
+      "t": "oyster, my friend. The TV is your oyster. You can watch literally",
+      "r": "舞台，我的朋友。电视机任你挑选。你可以看任何东西"
+    },
+    {
+      "s": 696.8,
+      "e": 703.84,
+      "t": "anything. My favorite comedy show is a show called Peep Show. And this is a",
+      "r": "。我最喜欢的喜剧节目是《窥视秀》。这是一部"
+    },
+    {
+      "s": 703.84,
+      "e": 709.36,
+      "t": "British comedy. Classic British humor. It's British humor at its peak. Peep",
+      "r": "英国喜剧。典型的英式幽默。这是英式幽默的巅峰之作。《窥视秀》太"
+    },
+    {
+      "s": 709.36,
+      "e": 713.28,
+      "t": "Show is hilarious. And if you're advanced, it's going to be wonderful to",
+      "r": "搞笑了。如果你水平较高，那么"
+    },
+    {
+      "s": 713.28,
+      "e": 717.52,
+      "t": "understand more about British culture, the way that British people think. On",
+      "r": "了解更多关于英国文化和英国人的思维方式将会非常棒。"
+    },
+    {
+      "s": 717.52,
+      "e": 722.8,
+      "t": "top of Peep Show, you can also watch other comedies like The Office or The",
+      "r": "除了《窥视秀》之外，你还可以观看其他喜剧，例如《办公室》或《"
+    },
+    {
+      "s": 722.8,
+      "e": 727.52,
+      "t": "Inbetweeners. The Inbetweeners has a lot of slang words that you could learn",
+      "r": "中间人》。《中间人》这部剧里有很多俚语，你可以"
+    },
+    {
+      "s": 727.52,
+      "e": 733.12,
+      "t": "from. Again, if you're advanced, any input is good input. So, the more you",
+      "r": "从中学习。再说一遍，如果你水平够高，任何建议都是好的建议。所以，你看得越多"
+    },
+    {
+      "s": 733.12,
+      "e": 738.24,
+      "t": "watch, the more you listen, the more you improve. Just repeat, repeat, repeat.",
+      "r": "，听得越多，进步就越大。重复，重复，再重复。"
+    },
+    {
+      "s": 738.24,
+      "e": 743.44,
+      "t": "After watching these films or videos, you can ask yourself these three",
+      "r": "看完这些电影或视频后，你可以问自己以下三个"
+    },
+    {
+      "s": 743.44,
+      "e": 748.64,
+      "t": "questions which will help your speaking. What did I just watch? What was it",
+      "r": "问题，这将有助于提高你的口语能力。我刚才到底看了什么？那件事是"
+    },
+    {
+      "s": 748.64,
+      "e": 754.72,
+      "t": "about? And did I like it or not? If you want to watch English videos which show",
+      "r": "关于什么的？我喜欢还是不喜欢？如果你想观看英语视频，"
+    },
+    {
+      "s": 754.72,
+      "e": 761.52,
+      "t": "you how English is used in everyday life, like feeding animals at the farm,",
+      "r": "了解英语在日常生活中的应用，例如在农场喂养动物、"
+    },
+    {
+      "s": 761.52,
+      "e": 771.72,
+      "t": "shopping in the supermarket, and exercising in the gym, then you can go to sproutlanguage.com.",
+      "r": "在超市购物以及在健身房锻炼，那么你可以访问 sproutlanguage.com。"
+    },
+    {
+      "s": 772.16,
+      "e": 777.04,
+      "t": "On sprout language.com, the videos are categorized by your level, so you can",
+      "r": "在 sprout language.com 网站上，视频是按你的水平分类的，所以你可以"
+    },
+    {
+      "s": 777.04,
+      "e": 781.68,
+      "t": "always progress in English. Let's put this in action. I want to show you an",
+      "r": "不断提高你的英语水平。让我们付诸行动。我想给你们举个"
+    },
+    {
+      "s": 781.68,
+      "e": 787.84,
+      "t": "example with Chang. Hello. So Chang is gonna watch a video on",
+      "r": "张的例子。你好。所以张要看一段关于"
+    },
+    {
+      "s": 787.84,
+      "e": 792.96,
+      "t": "Sprout and then she's gonna practice speaking about it after with Ji. Want to",
+      "r": "Sprout的视频，然后她要和Ji一起练习用Sprout的语言进行交流。想给"
+    },
+    {
+      "s": 792.96,
+      "e": 802.28,
+      "t": "show you guys how it works in action. Feeling good. Feeling like my legs are going to ache tomorrow.",
+      "r": "大家展示一下它的实际效果。感觉很好。感觉明天腿会很酸痛。很"
+    },
+    {
+      "s": 802.48,
+      "e": 806.4,
+      "t": "It's great to chat with you. In the video, I was so excited to go skiing for",
+      "r": "高兴和你聊天。视频里，我非常兴奋，因为"
+    },
+    {
+      "s": 806.4,
+      "e": 813.76,
+      "t": "my birthday. Have you ever been skiing before? Yes. I skied with you.",
+      "r": "我生日那天要去滑雪。你以前滑过雪吗？是的。我和你一起滑雪了。"
+    },
+    {
+      "s": 813.76,
+      "e": 817.68,
+      "t": "That's right. I'm so glad you could join me. It was your first time seeing snow,",
+      "r": "这是正确的。我很高兴你能来。你也是第一次见到雪，对吧"
+    },
+    {
+      "s": 817.68,
+      "e": 822.64,
+      "t": "too, wasn't it? How did you like that? Honestly, seeing snow for the first time",
+      "r": "？你觉得怎么样？说真的，第一次看到雪的感觉"
+    },
+    {
+      "s": 822.64,
+      "e": 826.24,
+      "t": "was so magical. It sounds like you had a truly magical",
+      "r": "太神奇了。听起来你们度过了一段非常美好的"
+    },
+    {
+      "s": 826.24,
+      "e": 830.88,
+      "t": "time. It's wonderful that you learned how to ski so quickly. You picked it up",
+      "r": "时光。你这么快就学会滑雪了，真是太棒了！你学得"
+    },
+    {
+      "s": 830.88,
+      "e": 837.44,
+      "t": "really fast. A few moments later. See you later. Thank you. It was great chatting with you, Chang.",
+      "r": "真快。片刻之后。再见。谢谢。张，和你聊天很愉快。"
+    },
+    {
+      "s": 837.44,
+      "e": 841.2,
+      "t": "Your English is excellent. Keep practicing and I'll see you next time.",
+      "r": "你的英语很棒。继续练习，下次见。"
+    },
+    {
+      "s": 841.2,
+      "e": 846.16,
+      "t": "Thank you. Nice. Now, we still have a 50% off Luna",
+      "r": "谢谢。好的。现在，我们仍然有 Luna 新年五折优惠"
+    },
+    {
+      "s": 846.16,
+      "e": 849.92,
+      "t": "New Year deal. So, head on over to sproutlanguage.com where you get access",
+      "r": "活动。所以，快去 sproutlanguage.com 看看吧，在那里你可以参加"
+    },
+    {
+      "s": 849.92,
+      "e": 854.8,
+      "t": "to group classes with me, speaking practice with JI, and all the exclusive",
+      "r": "我的小组课程，和 JI 一起练习口语，以及所有"
+    },
+    {
+      "s": 854.8,
+      "e": 861.6,
+      "t": "content perfect for your level. Right now, on to the third and final tip.",
+      "r": "适合你水平的专属内容。现在，我们来看第三个也是最后一个技巧。"
+    },
+    {
+      "s": 861.6,
+      "e": 869.2,
+      "t": "So, we have trained our eyes to watch. We've trained our ears to listen. And we",
+      "r": "所以，我们已经训练自己的眼睛去观察。我们已经训练自己的耳朵去倾听。我们"
+    },
+    {
+      "s": 869.2,
+      "e": 877.76,
+      "t": "trained our mouths to speak. Now it's time to train our brains to think in",
+      "r": "训练自己的嘴巴说话。现在是时候训练我们的大脑用"
+    },
+    {
+      "s": 877.76,
+      "e": 884.24,
+      "t": "English. Most of you at home, I imagine, think in the language that you use the",
+      "r": "英语思考了。我想，你们大多数人在家时，都是用自己"
+    },
+    {
+      "s": 884.24,
+      "e": 891.12,
+      "t": "most, your mother tongue. But we want to train our brains to think in English.",
+      "r": "最常用的语言——母语——来思考的。但我们希望训练我们的大脑用英语思考。"
+    },
+    {
+      "s": 891.12,
+      "e": 896.88,
+      "t": "Now, what's a practical and simple way to do this? Well, maybe when you're on",
+      "r": "那么，有没有一种实用且简单的方法可以做到这一点呢？或许当你"
+    },
+    {
+      "s": 896.88,
+      "e": 902.08,
+      "t": "your way to work or in a public space where you can't speak, you can think,",
+      "r": "上班途中或在不能说话的公共场所时，你可以想，"
+    },
+    {
+      "s": 902.08,
+      "e": 908,
+      "t": "what if I think my thoughts in English? What if I think about the world around",
+      "r": "如果我用英语思考呢？如果我用英语思考我周围的世界呢"
+    },
+    {
+      "s": 908,
+      "e": 913.12,
+      "t": "me in English? What would that sound like? Now, in the beginning, this will",
+      "r": "？那听起来会是什么样子？当然，一开始这"
+    },
+    {
+      "s": 913.12,
+      "e": 918.16,
+      "t": "take some conscious efforts. It will be a little bit difficult. Just like any",
+      "r": "需要一些有意识的努力。这会有点困难。就像任何"
+    },
+    {
+      "s": 918.16,
+      "e": 925.52,
+      "t": "habit, it requires you to be conscious about doing it. be aware and just do it.",
+      "r": "习惯一样，它需要你有意识地去做。明白这一点，然后去做。"
+    },
+    {
+      "s": 925.52,
+      "e": 931.6,
+      "t": "Very soon it will become subconscious. It will become natural. I'm going to",
+      "r": "很快它就会变成下意识的。这会变得很自然。我来给"
+    },
+    {
+      "s": 931.6,
+      "e": 936.56,
+      "t": "show you an example. H I should probably wash the dishes",
+      "r": "你举个例子。嗨，我现在应该去洗碗了"
+    },
+    {
+      "s": 936.56,
+      "e": 941.12,
+      "t": "right now. I can't really be bothered, but might as well. Right. I'm going to",
+      "r": "。我其实懒得弄，不过还是弄弄吧。正确的。我打算"
+    },
+    {
+      "s": 941.12,
+      "e": 946.88,
+      "t": "take the scourer. Yep. Pump some washing up liquid on that scourer.",
+      "r": "拿清洁刷。是的。往百洁布上挤些洗洁精。"
+    },
+    {
+      "s": 946.88,
+      "e": 951.52,
+      "t": "Turn on the tap. Not really sure how I feel about washing",
+      "r": "打开水龙头。我不太确定自己对洗碗是什么感觉"
+    },
+    {
+      "s": 951.52,
+      "e": 956.08,
+      "t": "dishes. I mean, on the one hand, it's quite it's quite satisfying seeing those",
+      "r": "。我的意思是，一方面，看到那些"
+    },
+    {
+      "s": 956.08,
+      "e": 963.92,
+      "t": "soapy suds. M lovely soapy suds. But on the other hand, it's a bit like slave",
+      "r": "肥皂泡确实挺让人满足的。好多好闻的肥皂泡。但另一方面，这有点像奴隶"
+    },
+    {
+      "s": 963.92,
+      "e": 976.24,
+      "t": "labor. Yes. Rinsing off those soapy suds. Yes. Chopsticks or drumsticks? Do I want to wash the",
+      "r": "劳动。是的。冲洗掉身上的肥皂泡。是的。筷子还是鸡腿？我要把"
+    },
+    {
+      "s": 976.24,
+      "e": 981.12,
+      "t": "rest of those things up? Nah, leave that to Chang.",
+      "r": "剩下的东西都洗干净吗？不，那交给张吧。"
+    },
+    {
+      "s": 981.12,
+      "e": 988.88,
+      "t": "So, to recap the entire video, one, your home is your English zone. Use your",
+      "r": "所以，总结一下整个视频，第一，你的家就是你的英语区。利用你的"
+    },
+    {
+      "s": 988.88,
+      "e": 996.16,
+      "t": "house and objects around you to practice speaking out loud. Two, watch what you",
+      "r": "房子和周围的物品练习大声说话。第二，观看你"
+    },
+    {
+      "s": 996.16,
+      "e": 1001.84,
+      "t": "love without subtitles and make sure you understand most of the content, around",
+      "r": "喜欢的内容时不要看字幕，并确保你能理解大部分内容，大约"
+    },
+    {
+      "s": 1001.84,
+      "e": 1007.76,
+      "t": "70 to 80%. And three, train your brain to think in",
+      "r": "70% 到 80%。第三，训练你的大脑用"
+    },
+    {
+      "s": 1007.76,
+      "e": 1014.96,
+      "t": "English. Now, the key take-home message is that immersion is the number one way",
+      "r": "英语思考。现在，最关键的信息是，沉浸式学习是"
+    },
+    {
+      "s": 1014.96,
+      "e": 1019.44,
+      "t": "to become fluent in any language. You need to immerse yourself. You need to",
+      "r": "掌握任何语言的最佳途径。你需要全身心投入。你需要"
+    },
+    {
+      "s": 1019.44,
+      "e": 1025.44,
+      "t": "consume as much as possible and speak as much as possible. Now, if you want a",
+      "r": "尽可能多地吸收信息，尽可能多地表达观点。如果您想要一套"
+    },
+    {
+      "s": 1025.44,
+      "e": 1029.84,
+      "t": "proven immersion system, you can head on over to sproutlanguage.com.",
+      "r": "行之有效的沉浸式学习系统，可以访问 sproutlanguage.com。"
+    },
+    {
+      "s": 1029.84,
+      "e": 1035.84,
+      "t": "The link is in the description for 50% off your first month. Try the immersion",
+      "r": "链接在描述中，可享首月五折优惠。试试浸入式"
+    },
+    {
+      "s": 1035.84,
+      "e": 1042.56,
+      "t": "system. Practice speaking with JI. Join group classes with me and you will get",
+      "r": "系统。与 JI 练习口语。加入我的团体课程，你会"
+    },
+    {
+      "s": 1042.56,
+      "e": 1052.2,
+      "t": "better. Thank you so much for watching. I hope you learned a lot in this video and I will see you next week.",
+      "r": "进步的。非常感谢您的观看。希望你从这段音乐视频中学到了很多，我们下周再见。"
+    },
+    {
+      "s": 1052.4,
+      "e": 1063.2,
+      "t": "Times and places are all in who you share them with.",
+      "r": "时间（音乐）和地点（歌唱）都取决于你与谁分享（歌唱和音乐）。"
+    }
+  ]
+}

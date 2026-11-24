@@ -42036,6 +42036,96 @@
         ]
       ],
       "tip": ""
+    },
+    {
+      "id": "v_gray_area",
+      "type": "phrase",
+      "word": "gray area",
+      "phon": "",
+      "en": "",
+      "zh": "灰色地带",
+      "tag": "视频",
+      "date": "2026-11-24",
+      "forms": [],
+      "examples": [
+        [
+          "{gray area} because the idea is I I assume, I don't know for sure, but I",
+          "灰色地带，因为我猜想，虽然我不确定，但我"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_gray",
+      "type": "word",
+      "word": "gray",
+      "phon": "/ɡɹˈeɪ/",
+      "en": "Of a color between black and white, having neutral hue and intermediate brightness.",
+      "zh": "灰色的；灰色；灰；灰白",
+      "tag": "视频",
+      "date": "2026-11-24",
+      "forms": [],
+      "examples": [
+        [
+          "{gray} area because the idea is I I assume, I don't know for sure, but I",
+          "灰色地带，因为我猜想，虽然我不确定，但我"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_area",
+      "type": "word",
+      "word": "area",
+      "phon": "/ˈɛɹiə/",
+      "en": "A measure of the extent of a surface; it is measured in square units.",
+      "zh": "区域；区；地区；面积",
+      "tag": "视频",
+      "date": "2026-11-24",
+      "forms": [],
+      "examples": [
+        [
+          "gray {area} because the idea is I I assume, I don't know for sure, but I",
+          "灰色地带，因为我猜想，虽然我不确定，但我"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_assume",
+      "type": "word",
+      "word": "assume",
+      "phon": "/əsˈum/",
+      "en": "To authenticate by means of belief; to surmise; to suppose to be true, especially without proof.",
+      "zh": "认为；承担；假设；假定",
+      "tag": "视频",
+      "date": "2026-11-24",
+      "forms": [],
+      "examples": [
+        [
+          "{assume} that as a city you can control the problem",
+          "认为作为一个城市，你可以更好地控制这个问题，而不是让它"
+        ]
+      ],
+      "tip": ""
+    },
+    {
+      "id": "v_concentrate",
+      "type": "word",
+      "word": "concentrate",
+      "phon": "/kˈɑnsəntɹeɪt/",
+      "en": "To bring to, or direct toward, a common center; to unite more closely; to gather into one body, mass, or force.",
+      "zh": "集中；浓缩；专心；贯注",
+      "tag": "视频",
+      "date": "2026-11-24",
+      "forms": [],
+      "examples": [
+        [
+          "more rather than it being spread out across the city, you just {concentrate} it",
+          "扩散到整个城市，而是把它集中"
+        ]
+      ],
+      "tip": ""
     }
   ],
   "progress": {
@@ -42101,7 +42191,9 @@
     "flavor": "known",
     "fine": "known",
     "lemongrass": "known",
-    "v_assumed": "known"
+    "v_assumed": "known",
+    "v_gray": "known",
+    "v_area": "known"
   },
   "deleted": [
     "u_1782668109496_exc6",
@@ -43050,7 +43142,9 @@
     "fine": 1795364196103,
     "lemongrass": 1795364201498,
     "v_assumed": 1795364837508,
-    "v_cuz": 1795368903655
+    "v_cuz": 1795368903655,
+    "v_gray": 1795503222828,
+    "v_area": 1795503222828
   },
   "pendAdd": {},
   "pendDel": {}

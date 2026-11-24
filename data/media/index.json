@@ -9,6 +9,11 @@
   "name": "ph_first_pick",
   "sig": "1795338032654:29759:13583:12943"
  },
+ "med:s:ph|gray area": {
+  "dir": "s",
+  "name": "ph_gray_area",
+  "sig": "1795502736022:23643:21675:19939"
+ },
  "med:s:ph|nasal consonant": {
   "dir": "s",
   "name": "ph_nasal_consonant",
@@ -59,10 +64,20 @@
   "name": "ph_urged_on",
   "sig": "1795336525928:44247:15251:0"
  },
+ "med:w:area": {
+  "dir": "w",
+  "name": "area",
+  "sig": "1795502729383:23643:21675:19939"
+ },
  "med:w:assists": {
   "dir": "w",
   "name": "assists",
   "sig": "1795339342221:29767:15139:12491"
+ },
+ "med:w:assume": {
+  "dir": "w",
+  "name": "assume",
+  "sig": "1795502747766:21591:19939:21215"
  },
  "med:w:assumed": {
   "dir": "w",
@@ -103,6 +118,11 @@
   "dir": "w",
   "name": "chilling",
   "sig": "1795090852423:18991:20511:24099"
+ },
+ "med:w:concentrate": {
+  "dir": "w",
+  "name": "concentrate",
+  "sig": "1795502764192:20735:21251:0"
  },
  "med:w:consonant": {
   "dir": "w",
@@ -178,6 +198,11 @@
   "dir": "w",
   "name": "good_looking",
   "sig": "1795090155860:12579:21879:21815"
+ },
+ "med:w:gray": {
+  "dir": "w",
+  "name": "gray",
+  "sig": "1795502726865:23643:21675:19939"
  },
  "med:w:grief": {
   "dir": "w",

@@ -1,5 +1,5 @@
 {
-  "ver": 1795404389375,
+  "ver": 1795510399444,
   "items": {
     "saved|applause": {
       "v": "Applause",
@@ -2831,7 +2831,7 @@
     },
     "set|enabled": {
       "v": true,
-      "at": 1795083714909
+      "at": 1795510027376
     },
     "set|engine": {
       "v": "youtube",
@@ -3309,23 +3309,23 @@
     },
     "sugg|arrive": {
       "v": {
-        "at": 1794975228299,
-        "n": 12,
-        "s": 45.5,
-        "t": "Oh no. Let's use that situation today. Something arrives broken and you need to",
-        "v": "epMxQvdmq4M"
+        "at": 1795510379742,
+        "n": 15,
+        "s": 128.7,
+        "t": "So we have arrived at the Bukit Bintang station",
+        "v": "DBTKZ3wFnkY"
       },
-      "at": 1795103420457
+      "at": 1795510383878
     },
     "sugg|athlete": {
       "v": {
-        "at": 1795078429049,
-        "n": 6,
-        "s": 228.192,
-        "t": "we're we're we're taught not to be vulnerable as athletes and can",
-        "v": "37nsid4dTFE"
+        "at": 1795510049228,
+        "n": 9,
+        "s": 153.792,
+        "t": "one of the most famous athletes in America took up gardening.",
+        "v": "hY0jm1mA_o4"
       },
-      "at": 1795103420457
+      "at": 1795510053381
     },
     "sugg|baht": {
       "v": {
@@ -3349,13 +3349,13 @@
     },
     "sugg|bank": {
       "v": {
-        "at": 1795403749102,
+        "at": 1795504628395,
         "n": 9,
         "s": 15.2,
         "t": "Charles Banks is already being sued by Duncan. Now some of those allegations",
         "v": "8jP3zhnE0hQ"
       },
-      "at": 1795403753250
+      "at": 1795504632492
     },
     "sugg|belong": {
       "v": {
@@ -3429,13 +3429,13 @@
     },
     "sugg|build": {
       "v": {
-        "at": 1795182380714,
+        "at": 1795510049228,
         "n": 9,
-        "s": 625.398,
-        "t": "I tried to build this shot in my bed. We We all know to like have the basketball or just shoot up like Okay.",
-        "v": "VtxlTRTlsRE"
+        "s": 375.595,
+        "t": "worth up to $28 million with her own signature shoe built in.",
+        "v": "hY0jm1mA_o4"
       },
-      "at": 1795182384831
+      "at": 1795510053381
     },
     "sugg|careless": {
       "v": {
@@ -3639,13 +3639,13 @@
     },
     "sugg|drug": {
       "v": {
-        "at": 1795104324499,
+        "at": 1795500608854,
         "n": 8,
-        "s": 304.32,
-        "t": "Berlin Zoo is one of the German capital's most enduringly popular attractions. The park around it draws some of the city's hard drug users.",
+        "s": 308.08,
+        "t": "attractions. The park around it draws some of the city's hard drug users.",
         "v": "2Wf3xLuz5Kg"
       },
-      "at": 1795104328637
+      "at": 1795500613010
     },
     "sugg|dunk": {
       "v": {
@@ -3669,23 +3669,23 @@
     },
     "sugg|english": {
       "v": {
-        "at": 1795064109500,
-        "n": 12,
-        "s": 13.32,
-        "t": "You've Got Mail and do a full analysis of the American English pronunciation. Words that link",
-        "v": "VGzoIww3B5w"
+        "at": 1795504756367,
+        "n": 24,
+        "s": 0.4,
+        "t": "3 years ago when I met Chang, her English wasn't that good. Hey, but now she's fluent. Her English is",
+        "v": "l1-z5jJ1uuc"
       },
-      "at": 1795103420457
+      "at": 1795504760470
     },
     "sugg|euro": {
       "v": {
-        "at": 1795104324499,
+        "at": 1795500608854,
         "n": 6,
         "s": 0,
-        "t": "I'm going to give her 50 euro and if it's not crazy enough then you take it.",
+        "t": "I'm going to give her 50 euro and if it's not crazy enough then you take it. [music]",
         "v": "2Wf3xLuz5Kg"
       },
-      "at": 1795104328637
+      "at": 1795500613010
     },
     "sugg|expect": {
       "v": {
@@ -3799,13 +3799,13 @@
     },
     "sugg|germany": {
       "v": {
-        "at": 1795104324499,
+        "at": 1795500608854,
         "n": 9,
-        "s": 110.96,
-        "t": "Who says Germany don't have good food huh?",
+        "s": 104.44,
+        "t": "years. All right maybe we test the friendship. Who says Germany don't have good food huh?",
         "v": "2Wf3xLuz5Kg"
       },
-      "at": 1795104328637
+      "at": 1795500613010
     },
     "sugg|growth": {
       "v": {
@@ -3819,13 +3819,13 @@
     },
     "sugg|honestly": {
       "v": {
-        "at": 1795104324499,
+        "at": 1795500608854,
         "n": 4,
-        "s": 283.36,
-        "t": "All right, guys. I'm so naive. Like I literally thought like people are like just camping here. I honestly thought cuz the park is so nice like",
+        "s": 287,
+        "t": "just camping here. I honestly thought cuz the park is so nice like",
         "v": "2Wf3xLuz5Kg"
       },
-      "at": 1795104328637
+      "at": 1795500613010
     },
     "sugg|humor": {
       "v": {
@@ -3899,13 +3899,13 @@
     },
     "sugg|league": {
       "v": {
-        "at": 1795182380714,
-        "n": 11,
-        "s": 219.792,
-        "t": "hear We want to hear about you, too. I mean, of shooting. You came in the league as almost a non shooter. Could make shots, but almost a non shooter.",
-        "v": "VtxlTRTlsRE"
+        "at": 1795510049228,
+        "n": 15,
+        "s": 185.292,
+        "t": "the league's rookie scale before she signed anything. For her first season, she was paid 76,000",
+        "v": "hY0jm1mA_o4"
       },
-      "at": 1795182384831
+      "at": 1795510053381
     },
     "sugg|leg": {
       "v": {
@@ -3959,13 +3959,13 @@
     },
     "sugg|malaysia": {
       "v": {
-        "at": 1795089532066,
-        "n": 11,
-        "s": 8.194,
-        "t": "retire in a Southeast Asian country, would you choose Malaysia, Vietnam, or",
-        "v": "KXLd05Wwn-Q"
+        "at": 1795510379742,
+        "n": 31,
+        "s": 7.8,
+        "t": "Yes, we have returned to Malaysia",
+        "v": "DBTKZ3wFnkY"
       },
-      "at": 1795103420457
+      "at": 1795510383878
     },
     "sugg|map": {
       "v": {
@@ -3979,13 +3979,13 @@
     },
     "sugg|max": {
       "v": {
-        "at": 1795104324499,
+        "at": 1795500608854,
         "n": 5,
-        "s": 77.8,
-        "t": "This is Max. You have seen him in a lot of my videos. We went to Budapest we went everywhere. Um he's about to show me the best German food. If it's not the",
+        "s": 73.24,
+        "t": "What's up? Nice to see you. Good to see you. This is Max. You have seen him in a lot",
         "v": "2Wf3xLuz5Kg"
       },
-      "at": 1795104328637
+      "at": 1795500613010
     },
     "sugg|mechanic": {
       "v": {
@@ -4069,13 +4069,13 @@
     },
     "sugg|park": {
       "v": {
-        "at": 1795104324499,
+        "at": 1795500608854,
         "n": 12,
-        "s": 157.64,
-        "t": "Uh hanging around in maybe parks.",
+        "s": 155.04,
+        "t": "I guess drinking's fun, if you're into it. Yeah. Uh hanging around in maybe parks.",
         "v": "2Wf3xLuz5Kg"
       },
-      "at": 1795104328637
+      "at": 1795500613010
     },
     "sugg|photo": {
       "v": {
@@ -4099,23 +4099,23 @@
     },
     "sugg|player": {
       "v": {
-        "at": 1795403749102,
-        "n": 11,
-        "s": 214.792,
-        "t": "yet within a few years, he was the most dominant player in college",
-        "v": "8jP3zhnE0hQ"
+        "at": 1795510049228,
+        "n": 12,
+        "s": 72.7,
+        "t": "for their game against the Los Angeles Lakers. A player who gets photographed everywhere she goes put on the",
+        "v": "hY0jm1mA_o4"
       },
-      "at": 1795403753250
+      "at": 1795510053381
     },
     "sugg|policy": {
       "v": {
-        "at": 1795104324499,
+        "at": 1795500608854,
         "n": 4,
-        "s": 810.96,
-        "t": "Get like a law degree because whenever you study in China in the department of politics, you get like a law degree. And then afterwards I studied public policy",
+        "s": 816.92,
+        "t": "then afterwards I studied public policy in Berlin, which is called Hertie",
         "v": "2Wf3xLuz5Kg"
       },
-      "at": 1795104328637
+      "at": 1795500613010
     },
     "sugg|post": {
       "v": {
@@ -4129,13 +4129,13 @@
     },
     "sugg|practice": {
       "v": {
-        "at": 1794975228299,
-        "n": 13,
-        "s": 317.594,
-        "t": "help. Let's put your message into an actual practice conversation and listen",
-        "v": "epMxQvdmq4M"
+        "at": 1795504756367,
+        "n": 9,
+        "s": 374.08,
+        "t": "because you haven't practiced speaking out loud enough. Now, speaking is just",
+        "v": "l1-z5jJ1uuc"
       },
-      "at": 1795103420457
+      "at": 1795504760470
     },
     "sugg|prefer": {
       "v": {
@@ -4369,13 +4369,13 @@
     },
     "sugg|sometime": {
       "v": {
-        "at": 1795334927669,
-        "n": 8,
-        "s": 228.299,
-        "t": "NL: Sometimes at work you have to critique and evaluate.",
-        "v": "BV1ySWD65EeK"
+        "at": 1795500608854,
+        "n": 3,
+        "s": 269.4,
+        "t": "But she has everybody understood sometimes. He's still angry.",
+        "v": "2Wf3xLuz5Kg"
       },
-      "at": 1795334931824
+      "at": 1795500613010
     },
     "sugg|spend": {
       "v": {
@@ -4389,13 +4389,13 @@
     },
     "sugg|sport": {
       "v": {
-        "at": 1795078429049,
-        "n": 4,
-        "s": 179.192,
-        "t": "I don't think we have that enough in sports actually or in life.",
-        "v": "37nsid4dTFE"
+        "at": 1795510049228,
+        "n": 9,
+        "s": 201.492,
+        "t": "paid about 12.16 million dollars. Same draft slot, same sport, first season",
+        "v": "hY0jm1mA_o4"
       },
-      "at": 1795103420457
+      "at": 1795510053381
     },
     "sugg|station": {
       "v": {
@@ -4419,13 +4419,13 @@
     },
     "sugg|stress": {
       "v": {
-        "at": 1795104324499,
+        "at": 1795500608854,
         "n": 5,
-        "s": 716,
-        "t": "I don't know why why whenever I look at European, I feel like they have no stress. Like they There's just no stress in their life.",
+        "s": 719.8,
+        "t": "stress. Like they There's just no stress in their life. Thank you. Do you have any stress in life?",
         "v": "2Wf3xLuz5Kg"
       },
-      "at": 1795104328637
+      "at": 1795500613010
     },
     "sugg|struggle": {
       "v": {
@@ -4509,23 +4509,23 @@
     },
     "sugg|torture": {
       "v": {
-        "at": 1795104324499,
+        "at": 1795500608854,
         "n": 5,
-        "s": 340.68,
-        "t": "And he he wrote is to cleanse sick souls then with the copyright she did to me and spiritual torture.",
+        "s": 347.68,
+        "t": "and spiritual torture. You have spiritual torture? Uh I was tortured, yeah. By what?",
         "v": "2Wf3xLuz5Kg"
       },
-      "at": 1795104328637
+      "at": 1795500613010
     },
     "sugg|tourist": {
       "v": {
-        "at": 1795104324499,
+        "at": 1795500608854,
         "n": 7,
         "s": 490.56,
-        "t": "I think like the tourists.",
+        "t": "I think like the tourists. Tourists? She's from Berlin. She literally just",
         "v": "2Wf3xLuz5Kg"
       },
-      "at": 1795104328637
+      "at": 1795500613010
     },
     "sugg|tower": {
       "v": {
@@ -4539,13 +4539,13 @@
     },
     "sugg|train": {
       "v": {
-        "at": 1794903315876,
-        "n": 11,
-        "s": 122.216,
-        "t": "Now a train is coming in. Let's",
-        "v": "tXVEjWdvjJM"
+        "at": 1795504756367,
+        "n": 7,
+        "s": 558.8,
+        "t": "subtitles, you're training your brain to link the sounds that you hear with the",
+        "v": "l1-z5jJ1uuc"
       },
-      "at": 1795103420457
+      "at": 1795504760470
     },
     "sugg|unlike": {
       "v": {
@@ -4599,13 +4599,13 @@
     },
     "sugg|wake": {
       "v": {
-        "at": 1795403749102,
+        "at": 1795504628395,
         "n": 7,
         "s": 9.5,
         "t": "the San Antonio Spurs select Tim Duncan from Wake Forest University.",
         "v": "8jP3zhnE0hQ"
       },
-      "at": 1795403753250
+      "at": 1795504632492
     },
     "sugg|wear": {
       "v": {
@@ -4629,13 +4629,13 @@
     },
     "sugg|woo": {
       "v": {
-        "at": 1795104324499,
+        "at": 1795500608854,
         "n": 6,
-        "s": 1046.199,
-        "t": "Nothing. He didn't say any words that you could But he said woo woo woo.",
+        "s": 1047.92,
+        "t": "you could But he said woo woo woo. Yeah, no. He's just saying woo woo woo. Like, it doesn't mean anything.",
         "v": "2Wf3xLuz5Kg"
       },
-      "at": 1795104328637
+      "at": 1795500613010
     },
     "sugg|worthy": {
       "v": {
@@ -5820,13 +5820,13 @@
     },
     "sugg|basketball": {
       "v": {
-        "at": 1795403749102,
-        "n": 10,
-        "s": 62.4,
-        "t": "He earned at least $245 million playing professional basketball. He has",
-        "v": "8jP3zhnE0hQ"
+        "at": 1795510049228,
+        "n": 9,
+        "s": 13.8,
+        "t": "almost none of it from basketball. The name is the money.",
+        "v": "hY0jm1mA_o4"
       },
-      "at": 1795403753250
+      "at": 1795510053381
     },
     "sugg|technique": {
       "v": {
@@ -6053,33 +6053,33 @@
     },
     "sugg|career": {
       "v": {
-        "at": 1795403749102,
+        "at": 1795504628395,
         "n": 7,
         "s": 314.894,
         "t": "lived it every single day of his career.",
         "v": "8jP3zhnE0hQ"
       },
-      "at": 1795403753250
+      "at": 1795504632492
     },
     "sugg|college": {
       "v": {
-        "at": 1795403749102,
-        "n": 6,
-        "s": 189.492,
-        "t": "days, she made Duncan and his sisters promise to finish college with a",
-        "v": "8jP3zhnE0hQ"
+        "at": 1795510049228,
+        "n": 7,
+        "s": 363.894,
+        "t": "About a week later came the shoe money. She had worn Nike since a college deal",
+        "v": "hY0jm1mA_o4"
       },
-      "at": 1795403753250
+      "at": 1795510053381
     },
     "sugg|court": {
       "v": {
-        "at": 1795403749102,
+        "at": 1795504628395,
         "n": 5,
         "s": 75.325,
         "t": "fascinating thing about him isn't what he accomplished on the court.",
         "v": "8jP3zhnE0hQ"
       },
-      "at": 1795403753250
+      "at": 1795504632492
     },
     "sugg|duncan": {
       "v": {
@@ -6103,63 +6103,63 @@
     },
     "sugg|history": {
       "v": {
-        "at": 1795403749102,
+        "at": 1795504628395,
         "n": 7,
         "s": 362.994,
         "t": "history, spent his entire 19-year career with the San Antonio",
         "v": "8jP3zhnE0hQ"
       },
-      "at": 1795403753250
+      "at": 1795504632492
     },
     "sugg|island": {
       "v": {
-        "at": 1795403749102,
+        "at": 1795504628395,
         "n": 8,
         "s": 96.2,
         "t": "Islands, who wanted nothing more than to follow his sister to the Olympics. Not",
         "v": "8jP3zhnE0hQ"
       },
-      "at": 1795403753250
+      "at": 1795504632492
     },
     "sugg|shop": {
       "v": {
-        "at": 1795403749102,
-        "n": 10,
-        "s": 424.795,
-        "t": "that money changed him, not even a little. He is often spotted shopping at",
-        "v": "8jP3zhnE0hQ"
+        "at": 1795510379742,
+        "n": 19,
+        "s": 273,
+        "t": "the shopping mall",
+        "v": "DBTKZ3wFnkY"
       },
-      "at": 1795403753250
+      "at": 1795510383878
     },
     "sugg|spur": {
       "v": {
-        "at": 1795403749102,
+        "at": 1795504628395,
         "n": 12,
         "s": 9.5,
         "t": "the San Antonio Spurs select Tim Duncan from Wake Forest University.",
         "v": "8jP3zhnE0hQ"
       },
-      "at": 1795403753250
+      "at": 1795504632492
     },
     "sugg|teammate": {
       "v": {
-        "at": 1795403749102,
+        "at": 1795504628395,
         "n": 7,
         "s": 568.597,
         "t": "make less so that his teammates could get paid and his team could stay",
         "v": "8jP3zhnE0hQ"
       },
-      "at": 1795403753250
+      "at": 1795504632492
     },
     "sugg|tim": {
       "v": {
-        "at": 1795403749102,
+        "at": 1795504628395,
         "n": 31,
         "s": 2.3,
         "t": "Man, what a finish. A Tim Duncan. First pick in the 1997 NBA draft,",
         "v": "8jP3zhnE0hQ"
       },
-      "at": 1795403753250
+      "at": 1795504632492
     },
     "saved|standing": {
       "v": "standing",
@@ -6520,23 +6520,23 @@
     },
     "sugg|antonio": {
       "v": {
-        "at": 1795403749102,
+        "at": 1795504628395,
         "n": 14,
         "s": 9.5,
         "t": "the San Antonio Spurs select Tim Duncan from Wake Forest University.",
         "v": "8jP3zhnE0hQ"
       },
-      "at": 1795403753250
+      "at": 1795504632492
     },
     "sugg|nba": {
       "v": {
-        "at": 1795403749102,
+        "at": 1795504628395,
         "n": 18,
         "s": 2.3,
         "t": "Man, what a finish. A Tim Duncan. First pick in the 1997 NBA draft,",
         "v": "8jP3zhnE0hQ"
       },
-      "at": 1795403753250
+      "at": 1795504632492
     },
     "stat|2026-11-22": {
       "v": {
@@ -6832,7 +6832,7 @@
     },
     "marks|assumed": {
       "v": "known",
-      "at": 1795364837390
+      "at": 1795503223824
     },
     "saved|nerd": {
       "v": "nerd",
@@ -6918,6 +6918,581 @@
     "med|med:w:opponent": {
       "v": "1795404379289:19103:10355:8547",
       "at": 1795404388623
+    },
+    "sugg|club": {
+      "v": {
+        "at": 1795500608854,
+        "n": 3,
+        "s": 506.04,
+        "t": "I mean it's super full, like all the places Yeah. the bars, the clubs, the restaurants",
+        "v": "2Wf3xLuz5Kg"
+      },
+      "at": 1795500613010
+    },
+    "sugg|definitely": {
+      "v": {
+        "at": 1795500608854,
+        "n": 3,
+        "s": 132.92,
+        "t": "Where are you from? From Berlin. What is it like to live in Berlin? I think it's a lot of fun, definitely.",
+        "v": "2Wf3xLuz5Kg"
+      },
+      "at": 1795500613010
+    },
+    "savedSents|ph|gray area": {
+      "v": {
+        "at": 1795502736021,
+        "ctx": "gray area because the idea is I I assume, I don't know for sure, but I",
+        "k": "ph|gray area",
+        "ph": 1,
+        "s": 957.36,
+        "t": "gray area",
+        "tr": "灰色地带",
+        "v": "2Wf3xLuz5Kg"
+      },
+      "at": 1795502741052
+    },
+    "med|med:s:ph|gray area": {
+      "v": "1795502736022:23643:21675:19939",
+      "at": 1795502751906
+    },
+    "savedCtx|area": {
+      "v": {
+        "at": 1795502729383,
+        "s": 957.36,
+        "t": "gray area because the idea is I I assume, I don't know for sure, but I",
+        "v": "2Wf3xLuz5Kg"
+      },
+      "at": 1795502734497
+    },
+    "savedCtx|gray": {
+      "v": {
+        "at": 1795502726865,
+        "s": 957.36,
+        "t": "gray area because the idea is I I assume, I don't know for sure, but I",
+        "v": "2Wf3xLuz5Kg"
+      },
+      "at": 1795502734497
+    },
+    "marks|area": {
+      "v": "known",
+      "at": 1795502734497
+    },
+    "marks|gray": {
+      "v": "known",
+      "at": 1795502734497
+    },
+    "med|med:w:area": {
+      "v": "1795502729383:23643:21675:19939",
+      "at": 1795502751906
+    },
+    "med|med:w:gray": {
+      "v": "1795502726865:23643:21675:19939",
+      "at": 1795502751906
+    },
+    "saved|assume": {
+      "v": "assume",
+      "at": 1795502751906
+    },
+    "savedCtx|assume": {
+      "v": {
+        "at": 1795502747766,
+        "s": 961.56,
+        "t": "assume that as a city you can control the problem",
+        "v": "2Wf3xLuz5Kg"
+      },
+      "at": 1795502751906
+    },
+    "med|med:w:assume": {
+      "v": "1795502747766:21591:19939:21215",
+      "at": 1795502751906
+    },
+    "saved|concentrate": {
+      "v": "concentrate",
+      "at": 1795502768331
+    },
+    "savedCtx|concentrate": {
+      "v": {
+        "at": 1795502764192,
+        "s": 965.8,
+        "t": "more rather than it being spread out across the city, you just concentrate it",
+        "v": "2Wf3xLuz5Kg"
+      },
+      "at": 1795502768331
+    },
+    "med|med:w:concentrate": {
+      "v": "1795502764192:20735:21251:0",
+      "at": 1795502768331
+    },
+    "sugg|accord": {
+      "v": {
+        "at": 1795504452444,
+        "n": 5,
+        "s": 266.52,
+        "t": "superstar. According to data from Basketball",
+        "v": "e9KjlUgz4ts"
+      },
+      "at": 1795504456583
+    },
+    "sugg|choose": {
+      "v": {
+        "at": 1795504452444,
+        "n": 6,
+        "s": 42.48,
+        "t": "supercars on the planet, and live in lavish mansions choose to present",
+        "v": "e9KjlUgz4ts"
+      },
+      "at": 1795504456583
+    },
+    "sugg|earn": {
+      "v": {
+        "at": 1795504452444,
+        "n": 5,
+        "s": 125.96,
+        "t": "to become a champion or earn millions. She simply held his hand and made him",
+        "v": "e9KjlUgz4ts"
+      },
+      "at": 1795504456583
+    },
+    "sugg|freedom": {
+      "v": {
+        "at": 1795504452444,
+        "n": 6,
+        "s": 712.16,
+        "t": "freedom. He doesn't play their game, so he",
+        "v": "e9KjlUgz4ts"
+      },
+      "at": 1795504456583
+    },
+    "sugg|instead": {
+      "v": {
+        "at": 1795504452444,
+        "n": 7,
+        "s": 332.44,
+        "t": "According to reports from Sportskeeda on his wealth and lifestyle, instead of",
+        "v": "e9KjlUgz4ts"
+      },
+      "at": 1795504456583
+    },
+    "sugg|level": {
+      "v": {
+        "at": 1795504452444,
+        "n": 5,
+        "s": 285.68,
+        "t": "MVP titles. That level of consistency translated into enormous wealth. His total career salary reached $242",
+        "v": "e9KjlUgz4ts"
+      },
+      "at": 1795504456583
+    },
+    "sugg|luxury": {
+      "v": {
+        "at": 1795504452444,
+        "n": 6,
+        "s": 249.6,
+        "t": "not by the luxury items he owns. That's why some people are born to be",
+        "v": "e9KjlUgz4ts"
+      },
+      "at": 1795504456583
+    },
+    "sugg|peace": {
+      "v": {
+        "at": 1795504452444,
+        "n": 4,
+        "s": 237.88,
+        "t": "Duncan lives simply not because he lacks anything, but because he has found peace",
+        "v": "e9KjlUgz4ts"
+      },
+      "at": 1795504456583
+    },
+    "sugg|simply": {
+      "v": {
+        "at": 1795504452444,
+        "n": 7,
+        "s": 125.96,
+        "t": "to become a champion or earn millions. She simply held his hand and made him",
+        "v": "e9KjlUgz4ts"
+      },
+      "at": 1795504456583
+    },
+    "sugg|value": {
+      "v": {
+        "at": 1795504452444,
+        "n": 5,
+        "s": 242.08,
+        "t": "within himself. To him, a man's true value is measured",
+        "v": "e9KjlUgz4ts"
+      },
+      "at": 1795504456583
+    },
+    "sugg|wealth": {
+      "v": {
+        "at": 1795504452444,
+        "n": 6,
+        "s": 66.96,
+        "t": "change how you think about wealth. Let's take a closer look.",
+        "v": "e9KjlUgz4ts"
+      },
+      "at": 1795504456583
+    },
+    "set|workPip": {
+      "v": "note",
+      "at": 1795510217797
+    },
+    "set|workRead": {
+      "v": "code",
+      "at": 1795510171865
+    },
+    "set|workLook": {
+      "v": "clear",
+      "at": 1795510399328
+    },
+    "set|workPeek": {
+      "v": false,
+      "at": 1795504475319
+    },
+    "set|workSize": {
+      "v": "full",
+      "at": 1795504782100
+    },
+    "set|workBoss": {
+      "v": "code",
+      "at": 1795510124658
+    },
+    "set|workCover": {
+      "v": "code",
+      "at": 1795510256468
+    },
+    "set|workKey": {
+      "v": "Esc×2",
+      "at": 1795510148347
+    },
+    "sugg|blah": {
+      "v": {
+        "at": 1795504756367,
+        "n": 6,
+        "s": 432,
+        "t": "wine, bubbles, water, puddle, rain, mountain, sky, blue, blah, blah, blah,",
+        "v": "l1-z5jJ1uuc"
+      },
+      "at": 1795504760470
+    },
+    "sugg|british": {
+      "v": {
+        "at": 1795504756367,
+        "n": 8,
+        "s": 465.039,
+        "t": "show you my favorite British shows. For anyone wondering, that is a swinging chair. This",
+        "v": "l1-z5jJ1uuc"
+      },
+      "at": 1795504760470
+    },
+    "sugg|handle": {
+      "v": {
+        "at": 1795504756367,
+        "n": 4,
+        "s": 120.079,
+        "t": "This is the mug. And this is the handle. Can you repeat? Mug. Handle. Good.",
+        "v": "l1-z5jJ1uuc"
+      },
+      "at": 1795504760470
+    },
+    "sugg|language": {
+      "v": {
+        "at": 1795504756367,
+        "n": 5,
+        "s": 491.28,
+        "t": "slightly above your level and without subtitles. When learning any language,",
+        "v": "l1-z5jJ1uuc"
+      },
+      "at": 1795504760470
+    },
+    "sugg|loud": {
+      "v": {
+        "at": 1795504756367,
+        "n": 6,
+        "s": 151.92,
+        "t": "loud to speak out loud the name of things like this is a carton of oat",
+        "v": "l1-z5jJ1uuc"
+      },
+      "at": 1795504760470
+    },
+    "sugg|repeat": {
+      "v": {
+        "at": 1795504756367,
+        "n": 5,
+        "s": 120.079,
+        "t": "This is the mug. And this is the handle. Can you repeat? Mug. Handle. Good.",
+        "v": "l1-z5jJ1uuc"
+      },
+      "at": 1795504760470
+    },
+    "sugg|share": {
+      "v": {
+        "at": 1795504756367,
+        "n": 4,
+        "s": 28.08,
+        "t": "not. Today I'll share with you the three tips I shared with Chang which helped",
+        "v": "l1-z5jJ1uuc"
+      },
+      "at": 1795504760470
+    },
+    "sugg|simple": {
+      "v": {
+        "at": 1795504756367,
+        "n": 5,
+        "s": 250.159,
+        "t": "name of it. You can make simple sentences. And these questions might",
+        "v": "l1-z5jJ1uuc"
+      },
+      "at": 1795504760470
+    },
+    "sugg|subtitle": {
+      "v": {
+        "at": 1795504756367,
+        "n": 8,
+        "s": 491.28,
+        "t": "slightly above your level and without subtitles. When learning any language,",
+        "v": "l1-z5jJ1uuc"
+      },
+      "at": 1795504760470
+    },
+    "sugg|video": {
+      "v": {
+        "at": 1795504756367,
+        "n": 13,
+        "s": 218.159,
+        "t": "But what if you don't know the name for something? Either you watch my videos or",
+        "v": "l1-z5jJ1uuc"
+      },
+      "at": 1795504760470
+    },
+    "sugg|visual": {
+      "v": {
+        "at": 1795504756367,
+        "n": 5,
+        "s": 503.919,
+        "t": "visuals and context. This is called the comprehensible input method where you",
+        "v": "l1-z5jJ1uuc"
+      },
+      "at": 1795504760470
+    },
+    "sugg|wash": {
+      "v": {
+        "at": 1795504756367,
+        "n": 4,
+        "s": 931.6,
+        "t": "show you an example. H I should probably wash the dishes",
+        "v": "l1-z5jJ1uuc"
+      },
+      "at": 1795504760470
+    },
+    "set|workCorner": {
+      "v": "bl",
+      "at": 1795504735569
+    },
+    "set|workMini": {
+      "v": "l",
+      "at": 1795504735569
+    },
+    "sugg|caitlin": {
+      "v": {
+        "at": 1795510049228,
+        "n": 9,
+        "s": 26.1,
+        "t": "So what do all those millions actually look like on Caitlin Clark? Not the way",
+        "v": "hY0jm1mA_o4"
+      },
+      "at": 1795510053381
+    },
+    "sugg|clark": {
+      "v": {
+        "at": 1795510049228,
+        "n": 11,
+        "s": 26.1,
+        "t": "So what do all those millions actually look like on Caitlin Clark? Not the way",
+        "v": "hY0jm1mA_o4"
+      },
+      "at": 1795510053381
+    },
+    "sugg|dollar": {
+      "v": {
+        "at": 1795510049228,
+        "n": 14,
+        "s": 131.292,
+        "t": "about a contract extension that could be worth more than a million dollars a",
+        "v": "hY0jm1mA_o4"
+      },
+      "at": 1795510053381
+    },
+    "sugg|draft": {
+      "v": {
+        "at": 1795510049228,
+        "n": 8,
+        "s": 180.192,
+        "t": "When the Indiana Fever drafted her first in April 2024, her salary was fixed by",
+        "v": "hY0jm1mA_o4"
+      },
+      "at": 1795510053381
+    },
+    "sugg|iowa": {
+      "v": {
+        "at": 1795510049228,
+        "n": 14,
+        "s": 529.997,
+        "t": "In October 2023, while she was still at Iowa, she became the first college",
+        "v": "hY0jm1mA_o4"
+      },
+      "at": 1795510053381
+    },
+    "sugg|prada": {
+      "v": {
+        "at": 1795510049228,
+        "n": 9,
+        "s": 0,
+        "t": "Front row at Prada in Milan, courtside with her own camera shooting LeBron",
+        "v": "hY0jm1mA_o4"
+      },
+      "at": 1795510053381
+    },
+    "sugg|sell": {
+      "v": {
+        "at": 1795510049228,
+        "n": 6,
+        "s": 350.894,
+        "t": "Within an hour of the pick, most sizes of her new Fever jersey had sold out on",
+        "v": "hY0jm1mA_o4"
+      },
+      "at": 1795510053381
+    },
+    "sugg|shoe": {
+      "v": {
+        "at": 1795510049228,
+        "n": 11,
+        "s": 363.894,
+        "t": "About a week later came the shoe money. She had worn Nike since a college deal",
+        "v": "hY0jm1mA_o4"
+      },
+      "at": 1795510053381
+    },
+    "sugg|breakfast": {
+      "v": {
+        "at": 1795510379742,
+        "n": 24,
+        "s": 1842.4,
+        "t": "To enjoy our breakfast",
+        "v": "DBTKZ3wFnkY"
+      },
+      "at": 1795510383878
+    },
+    "sugg|bus": {
+      "v": {
+        "at": 1795510379742,
+        "n": 20,
+        "s": 2455.633,
+        "t": "Our bus route around the Malaysia scenic area",
+        "v": "DBTKZ3wFnkY"
+      },
+      "at": 1795510383878
+    },
+    "sugg|delicious": {
+      "v": {
+        "at": 1795510379742,
+        "n": 81,
+        "s": 159.833,
+        "t": "There are a lot of delicious foods inside",
+        "v": "DBTKZ3wFnkY"
+      },
+      "at": 1795510383878
+    },
+    "sugg|dish": {
+      "v": {
+        "at": 1795510379742,
+        "n": 21,
+        "s": 479.133,
+        "t": "This is Malaysia's national dish——Nasi Lemak",
+        "v": "DBTKZ3wFnkY"
+      },
+      "at": 1795510383878
+    },
+    "sugg|egg": {
+      "v": {
+        "at": 1795510379742,
+        "n": 25,
+        "s": 567.4,
+        "t": "And this is their house egg tart",
+        "v": "DBTKZ3wFnkY"
+      },
+      "at": 1795510383878
+    },
+    "sugg|hotel": {
+      "v": {
+        "at": 1795510379742,
+        "n": 24,
+        "s": 44.4,
+        "t": "A very famous five-star hotel in Kuala Lumpur, Malaysia",
+        "v": "DBTKZ3wFnkY"
+      },
+      "at": 1795510383878
+    },
+    "sugg|laugh": {
+      "v": {
+        "at": 1795510379742,
+        "n": 23,
+        "s": 148.033,
+        "t": "（Laughs）",
+        "v": "DBTKZ3wFnkY"
+      },
+      "at": 1795510383878
+    },
+    "sugg|noodle": {
+      "v": {
+        "at": 1795510379742,
+        "n": 43,
+        "s": 553.6,
+        "t": "Its curry noodles",
+        "v": "DBTKZ3wFnkY"
+      },
+      "at": 1795510383878
+    },
+    "sugg|rice": {
+      "v": {
+        "at": 1795510379742,
+        "n": 23,
+        "s": 560.8,
+        "t": "And this Rendang chicken rice",
+        "v": "DBTKZ3wFnkY"
+      },
+      "at": 1795510383878
+    },
+    "sugg|soft": {
+      "v": {
+        "at": 1795510379742,
+        "n": 15,
+        "s": 759.8,
+        "t": "Its red beans are very soft and glutinous",
+        "v": "DBTKZ3wFnkY"
+      },
+      "at": 1795510383878
+    },
+    "sugg|super": {
+      "v": {
+        "at": 1795510379742,
+        "n": 35,
+        "s": 218.033,
+        "t": "really super close",
+        "v": "DBTKZ3wFnkY"
+      },
+      "at": 1795510383878
+    },
+    "sugg|taste": {
+      "v": {
+        "at": 1795510379742,
+        "n": 20,
+        "s": 459.766,
+        "t": "So you can choose based on your preferred taste,",
+        "v": "DBTKZ3wFnkY"
+      },
+      "at": 1795510383878
     }
   }
 }
