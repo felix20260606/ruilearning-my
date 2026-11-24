@@ -23,9 +23,10 @@
    "desc": "世界文化遗产「秦始皇陵及兵马俑坑」，一号坑里几千个真人大小的陶俑排成军阵，每个俑的脸都不一样。另有二号坑、三号坑和铜车马展厅，丽山园是秦始皇陵封土所在地。",
    "tips": "一号坑最震撼，先看；铜车马在文物陈列厅别错过。请讲解或租讲解器体验差别很大。景区外很多「导游」拉客，认准官方讲解。最好和华清宫排在同一天。",
    "rate": 3,
-   "photo": "",
+   "photo": "Terracotta Army, View of Pit 1.jpg",
    "q": "秦始皇帝陵博物院",
-   "src": "https://zh.wikipedia.org/zh-cn/秦始皇兵马俑"
+   "src": "https://zh.wikipedia.org/zh-cn/秦始皇兵马俑",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-xian-huaqinggong",
@@ -41,9 +42,10 @@
    "desc": "唐代皇家温泉离宫，唐玄宗和杨贵妃的故事就在这里；有唐代御汤遗址（海棠汤、莲花汤），还有 1936 年西安事变时蒋介石住过的五间厅。背后就是骊山。",
    "tips": "下午看完兵马俑再来正好。想看《长恨歌》要提前买票、晚上回市区安排好交通；冬天演出可能停（以官方为准）。",
    "rate": 3,
-   "photo": "",
+   "photo": "2023-10-08 Huaqing Palace 華清宮.jpg",
    "q": "华清宫",
-   "src": "https://zh.wikipedia.org/zh-cn/华清池"
+   "src": "https://zh.wikipedia.org/zh-cn/华清池",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-xian-shanlibo",
@@ -59,9 +61,10 @@
    "desc": "中国最好的历史博物馆之一，从史前到唐代的陕西出土文物，周代青铜器、汉代玉器、唐三彩和何家村金银器都很出名。另有秦汉馆在西咸新区，可分开去。",
    "tips": "免费票每天放票后很快约满，提前 5 天左右蹲点预约（以官方规则为准）；约不到可以买含讲解的套票。至少留半天。",
    "rate": 3,
-   "photo": "",
+   "photo": "陕西历史博物馆 - panoramio.jpg",
    "q": "陕西历史博物馆",
-   "src": "https://www.news.cn/local/20250330/cafbe801525e4183a7d8060bc5a5c5b8/c.html"
+   "src": "https://www.news.cn/local/20250330/cafbe801525e4183a7d8060bc5a5c5b8/c.html",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-xian-dayanta",
@@ -96,9 +99,10 @@
    "desc": "大雁塔南边一条两公里多的仿唐步行街，晚上灯光全开，街上有「不倒翁小姐姐」等街头表演、唐风巡游，很多人穿汉服 / 唐装拍照。",
    "tips": "周末和节假日人非常多，注意随身物品；回程地铁比打车快。附近可以租汉服、化唐妆。",
    "rate": 3,
-   "photo": "",
+   "photo": "2023-10-10 Great Tang All Day Mall (大唐不夜城步行街), Hsi-an (西安) 01.jpg",
    "q": "大唐不夜城",
-   "src": "https://zh.wikipedia.org/zh-cn/大唐不夜城"
+   "src": "https://zh.wikipedia.org/zh-cn/大唐不夜城",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-xian-furongyuan",
@@ -171,9 +175,10 @@
    "desc": "西安回族聚居区，羊肉泡馍、肉夹馍、凉皮、甑糕、柿子饼、牛羊肉串都能吃到。北院门是游客街，洒金桥、大皮院更多本地老店。里面还有中国规模最大的古清真寺之一——化觉巷清真大寺（中式殿宇建筑）。",
    "tips": "北院门价格偏高、商业化重，想吃地道的往洒金桥走。尊重清真饮食习惯，不要带猪肉制品进店。",
    "rate": 3,
-   "photo": "",
+   "photo": "西安回民街.jpg",
    "q": "回民街",
-   "src": "https://zh.wikipedia.org/zh-cn/回民街"
+   "src": "https://zh.wikipedia.org/zh-cn/回民街",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-xian-beilin",
@@ -246,9 +251,10 @@
    "desc": "城墙东北角下的仿古美食街区，把陕西各地小吃集中在一起：biangbiang 面、子长煎饼、岐山臊子面、葫芦头泡馍等，还有网红「摔碗酒」。",
    "tips": "适合一次吃遍陕西各地风味。摔碗酒是拍照项目，图个热闹。",
    "rate": 2,
-   "photo": "",
+   "photo": "西安永兴坊 01.jpg",
    "q": "永兴坊",
-   "src": "https://zh.wikipedia.org/zh-cn/永兴坊"
+   "src": "https://zh.wikipedia.org/zh-cn/永兴坊",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-xian-cuihuashan",
@@ -264,9 +270,10 @@
    "desc": "秦岭北麓的山崩地质公园，有天池（堰塞湖）、巨石堆成的「山崩石海」和冰洞风洞，是西安人周末爬山、避暑的地方，也是「终南山」一带最容易去的景点。",
    "tips": "穿登山鞋。冬天山上冷，石头可能结冰。想安静看终南山可以再往西去南五台。",
    "rate": 2,
-   "photo": "",
+   "photo": "Cuihua National Geological Park.JPG",
    "q": "翠华山国家地质公园",
-   "src": "https://gs.ctrip.com/html5/you/sight/7/6099.html"
+   "src": "https://gs.ctrip.com/html5/you/sight/7/6099.html",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-xian-louguantai",

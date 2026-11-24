@@ -80,9 +80,10 @@
    "desc": "沟谷里保存的明清村落，一百多座四合院，有看家楼、泌阳堡、文星阁和节孝碑，门楼砖雕、木雕很精美，被称为「东方人类古代传统居住村寨的活化石」。",
    "tips": "从塬上的观景台先俯瞰全村再下去。部分院子还有村民住，进院前问一声。",
    "rate": 2,
-   "photo": "",
+   "photo": "Dangjiacun.JPG",
    "q": "党家村",
-   "src": "https://zh.wikipedia.org/zh-cn/党家村"
+   "src": "https://zh.wikipedia.org/zh-cn/党家村",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-weinan-simaqianci",
@@ -117,9 +118,10 @@
    "desc": "华山西边的姊妹山，花岗岩山峰和峡谷，人比华山少很多，有索道和栈道，适合不想挤华山的人。",
    "tips": "秋天红叶季最好看。",
    "rate": 1,
-   "photo": "",
+   "photo": "Shaohua Mountain Scenic Spot in Shaanxi Province.jpg",
    "q": "少华山国家森林公园",
-   "src": "https://zh.wikipedia.org/zh-cn/少华山"
+   "src": "https://zh.wikipedia.org/zh-cn/少华山",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-weinan-qiachuan",
@@ -193,7 +195,8 @@
    "rate": 1,
    "photo": "",
    "q": "尧头窑文化旅游生态园区",
-   "src": "https://zh.wikipedia.org/zh-cn/尧头窑"
+   "src": "https://zh.wikipedia.org/zh-cn/尧头窑",
+   "photo_checked": "自动找到的不对，留空（人工看过）"
   }
  ]
 }

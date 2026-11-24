@@ -25,7 +25,8 @@
    "rate": 3,
    "photo": "",
    "q": "药王山",
-   "src": "https://zh.wikipedia.org/zh-cn/药王山"
+   "src": "https://zh.wikipedia.org/zh-cn/药王山",
+   "photo_checked": "自动找到的不对，留空（人工看过）"
   },
   {
    "id": "shaanxi-tongchuan-yuhuagong",
@@ -41,9 +42,10 @@
    "desc": "唐太宗修的避暑离宫，后来改为玉华寺，玄奘晚年在这里翻译《大般若经》并圆寂。现在是森林景区，有肃成院遗址、玄奘纪念馆和山林步道，夏天凉快。",
    "tips": "10 月中下旬红叶最好。宫殿只剩遗址，主要是看山林。",
    "rate": 2,
-   "photo": "",
+   "photo": "玉华宫岩洞 - panoramio.jpg",
    "q": "玉华宫风景名胜区",
-   "src": "https://zh.wikipedia.org/zh-cn/玉华宫"
+   "src": "https://zh.wikipedia.org/zh-cn/玉华宫",
+   "photo_checked": "ok（人工看过缩略图）"
   },
   {
    "id": "shaanxi-tongchuan-chenlu",
@@ -115,7 +117,8 @@
    "rate": 1,
    "photo": "",
    "q": "耀州窑博物馆",
-   "src": "https://zh.wikipedia.org/zh-cn/耀州窑"
+   "src": "https://zh.wikipedia.org/zh-cn/耀州窑",
+   "photo_checked": "自动找到的不对，留空（人工看过）"
   },
   {
    "id": "shaanxi-tongchuan-daxiangshan",
@@ -133,7 +136,8 @@
    "rate": 1,
    "photo": "",
    "q": "铜川香山",
-   "src": "https://zh.wikipedia.org/zh-cn/香山_(铜川)"
+   "src": "https://zh.wikipedia.org/zh-cn/香山_(铜川)",
+   "photo_checked": "自动找到的不对，留空（人工看过）"
   },
   {
    "id": "shaanxi-tongchuan-shendesita",
@@ -151,7 +155,8 @@
    "rate": 1,
    "photo": "",
    "q": "神德寺塔",
-   "src": "https://zh.wikipedia.org/zh-cn/神德寺塔"
+   "src": "https://zh.wikipedia.org/zh-cn/神德寺塔",
+   "photo_checked": "自动找到的不对，留空（人工看过）"
   }
  ]
 }
