@@ -1,0 +1,587 @@
+{
+  "head" : {
+    "vars" : [ "p", "pl", "pen", "type" ]
+  },
+  "results" : {
+    "bindings" : [ {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8646"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Hong Kong"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "香港"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q779415"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q14773"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Macau"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "澳门"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q779415"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q15175"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Guangdong"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "广东省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q15176"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Guangxi"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "广西壮族自治区"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q57362"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q16963"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Jiangsu"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "江苏省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q16967"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Zhejiang"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "浙江省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q17269"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Tibet Autonomous Region"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "西藏自治区"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q57362"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q19770"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Sichuan"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "四川省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q19206"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Heilongjiang"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "黑龙江省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q21208"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Hebei"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "河北省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q34800"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Xinjiang"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "新疆维吾尔自治区"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q57362"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q40956"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Anhui"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "安徽省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q41079"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Inner Mongolia"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "内蒙古自治区"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q57362"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q41705"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Fujian"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "福建省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q42200"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Hainan"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "海南省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q42392"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Gansu"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "甘肃省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q43194"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Yunnan"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "云南省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q43407"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Shandong"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "山东省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q43684"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Henan"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "河南省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q43934"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Liaoning"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "辽宁省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q45208"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Jilin"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "吉林省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q45761"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Hunan"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "湖南省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q45833"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Qinghai"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "青海省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q46862"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Hubei"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "湖北省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q46913"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Shanxi"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "山西省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q47097"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Guizhou"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "贵州省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q47974"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Shaanxi"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "陕西省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q57052"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Jiangxi"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "江西省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q57251"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Taiwan"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "台湾省"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q57448"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Ningxia"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "宁夏回族自治区"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q57362"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q10894284"
+      },
+      "type" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1615742"
+      }
+    } ]
+  }
+}

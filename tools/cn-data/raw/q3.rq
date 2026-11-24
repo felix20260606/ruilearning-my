@@ -1,0 +1,11 @@
+SELECT ?p ?c ?cl ?cen ?coord ?img ?zhw WHERE {
+  { BIND(wd:Q57251 AS ?p) wd:Q865 p:P150 ?st . ?st ps:P150 ?c . FILTER NOT EXISTS { ?st pq:P582 ?e } }
+  UNION
+  { BIND(wd:Q14773 AS ?p) ?c wdt:P131 wd:Q14773 . ?c wdt:P31 ?t . VALUES ?t { wd:Q1049474 wd:Q15060255 wd:Q1144278 } }
+  FILTER NOT EXISTS { ?c wdt:P576 ?d }
+  OPTIONAL { ?c rdfs:label ?cl FILTER(lang(?cl)="zh-cn") }
+  OPTIONAL { ?c rdfs:label ?cen FILTER(lang(?cen)="en") }
+  OPTIONAL { ?c wdt:P625 ?coord }
+  OPTIONAL { ?c wdt:P18 ?img }
+  OPTIONAL { ?zhw schema:about ?c ; schema:isPartOf <https://zh.wikipedia.org/> }
+}

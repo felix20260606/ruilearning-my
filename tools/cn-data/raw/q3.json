@@ -1,0 +1,218 @@
+{
+  "head" : {
+    "vars" : [ "p", "c", "cl", "cen", "coord", "img", "zhw" ]
+  },
+  "results" : {
+    "bindings" : [ {
+      "c" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1867"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E8%87%BA%E5%8C%97%E5%B8%82"
+      },
+      "cen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Taipei"
+      },
+      "cl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "台北市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q57251"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(121.5625 25.0375)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/20260204%20Taipei%2C%20Taiwan%20Skyline.jpg"
+      }
+    }, {
+      "c" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q115256"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E6%A1%83%E5%9C%92%E5%B8%82"
+      },
+      "cen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Taoyuan"
+      },
+      "cl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "桃园市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q57251"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(121.314328 24.991278)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Taoyuan%20City%20-%20panoramio%20%281%29.jpg"
+      }
+    }, {
+      "c" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q140631"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E8%87%BA%E5%8D%97%E5%B8%82"
+      },
+      "cen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Tainan"
+      },
+      "cl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "台南市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q57251"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(120.185 22.99)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Downtown%20Tainan%282012%29.jpg"
+      }
+    }, {
+      "c" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q181557"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E9%AB%98%E9%9B%84%E5%B8%82"
+      },
+      "cen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Kaohsiung"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q57251"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(120.2975 22.615)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Kaohsiung%20Skyline%202020.jpg"
+      }
+    }, {
+      "c" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q244898"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E6%96%B0%E5%8C%97%E5%B8%82"
+      },
+      "cen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "New Taipei City"
+      },
+      "cl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "新北市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q57251"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(121.465 25.0125)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/View%20of%20Banqiao%20District%2C%20New%20Taipei%2C%20Taiwan%20Cityscape%202017.jpg"
+      }
+    }, {
+      "c" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q245023"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E8%87%BA%E4%B8%AD%E5%B8%82"
+      },
+      "cen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Taichung"
+      },
+      "cl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "台中市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q57251"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(120.679444444 24.143888888)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Taichung%20montage.PNG"
+      }
+    }, {
+      "c" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q245107"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E8%87%BA%E7%81%A3%E5%9C%B0%E5%8D%80"
+      },
+      "cen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Taiwan Area"
+      },
+      "cl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "台湾地区"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q57251"
+      }
+    } ]
+  }
+}

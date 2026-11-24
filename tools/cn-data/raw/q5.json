@@ -1,0 +1,1560 @@
+{
+  "head" : {
+    "vars" : [ "p", "pl", "plz", "pen", "coord", "img", "zhw", "cap", "capl", "capcoord" ]
+  },
+  "results" : {
+    "bindings" : [ {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q5869"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "拉萨市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q17269"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(91.1408186 29.6457567)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E8%A5%BF%E8%97%8F%E8%87%AA%E6%B2%BB%E5%8C%BA"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Tibet Autonomous Region"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "西藏自治区"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "西藏自治区"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(86.940278 31.705556)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/ISS041-E-81025%20-%20View%20of%20China.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q4970"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "杭州市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q16967"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(120.1675 30.25)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E6%B5%99%E6%B1%9F%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Zhejiang"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "浙江省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "浙江省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(120.15 30.266666666)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Wuyi%2C%20Zhejiang%20in%201968%20by%20CORONA%20satellite.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q5826"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "西安市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q47974"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(108.942222222 34.261111111)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E9%99%95%E8%A5%BF%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Shaanxi"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "陕西省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "陕西省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(109.3 35.6)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/ISS016-E-9096%20-%20View%20of%20China.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11720"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "沈阳市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q43934"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(123.428055555 41.8025)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E8%BE%BD%E5%AE%81%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Liaoning"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "辽宁省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "辽宁省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(123.425833333 41.803888888)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/ISS059-E-75503%20-%20View%20of%20China.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q16959"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "乌鲁木齐市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q34800"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(87.6125 43.8225)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E6%96%B0%E7%96%86%E7%BB%B4%E5%90%BE%E5%B0%94%E8%87%AA%E6%B2%BB%E5%8C%BA"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Xinjiang"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "新疆维吾尔自治区"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "新疆维吾尔自治区"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(87.61379 43.8253)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Xinjiang%20Space%20View.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q42956"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "哈尔滨市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q19206"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(126.633333333 45.75)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E9%BB%91%E9%BE%99%E6%B1%9F%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Heilongjiang"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "黑龙江省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "黑龙江省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(129.0 48.0)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/SonghuaRiver%20ASTER%2020020401.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q16572"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "广州市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q15175"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(113.26 23.13)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E5%B9%BF%E4%B8%9C%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Guangdong"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "广东省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "广东省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(113.5 23.4)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Leizhou%20peninsula.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q16666"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "南京市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q16963"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(118.778888888 32.060833333)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E6%B1%9F%E8%8B%8F%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Jiangsu"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "江苏省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "江苏省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(120.0 33.0)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Suzhou%2C%20Jingsu%2C%20China%20%28ASTER%29.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q30340"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "郑州市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q43684"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(113.66051 34.74919)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E6%B2%B3%E5%8D%97%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Henan"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "河南省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "河南省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(113.5 33.9)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Henan%20floods%20July%2026%2C%202020.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11746"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "武汉市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q46862"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(114.2975 30.595)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E6%B9%96%E5%8C%97%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Hubei"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "湖北省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "湖北省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(112.3 31.2)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Yangtze%20Dams%20Spill%20Water.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q30002"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "成都市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q19770"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(104.063333333 30.66)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E5%9B%9B%E5%B7%9D%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Sichuan"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "四川省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "四川省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(103.0 30.0)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Larix%20potaninii%20trees%20Huluhai.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q58401"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "石家庄市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q21208"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(114.51 38.0425)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E6%B2%B3%E5%8C%97%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Hebei"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "河北省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "河北省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(114.508611111 38.042222222)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Snow%20in%20China.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q68481"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "福州市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q41705"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(119.291666666 26.076944444)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E7%A6%8F%E5%BB%BA%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Fujian"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "福建省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "福建省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(118.3 25.9)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/ISS060-E-60237.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q92161"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "长春市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q45208"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(125.322777777 43.88)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E5%90%89%E6%9E%97%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Jilin"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "吉林省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "吉林省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(125.308333333 43.884166666)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Jilin%2C%20China.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q170247"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "济南市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q43407"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(116.983333333 36.666666666)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E5%B1%B1%E4%B8%9C%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Shandong"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "山東省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "山东省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(118.4 36.4)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Tai%202.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q174091"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "长沙市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q45761"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(112.97087 28.19874)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E6%B9%96%E5%8D%97%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Hunan"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "湖南省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "湖南省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(111.8 27.6)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Waters%20of%20central%20China.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q183584"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "兰州市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q42392"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(103.83177 36.06171)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E7%94%98%E8%82%83%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Gansu"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "甘肃省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "甘肃省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(102.0 38.0)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Gobi%20Desert%20-%20Envisat.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q182852"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "昆明市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q43194"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(102.706111111 25.043333333)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E4%BA%91%E5%8D%97%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Yunnan"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "云南省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "云南省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(102.708888888 25.049444444)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Iss068e023350.jpeg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q171943"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "南昌市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q57052"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(115.887222 28.684167)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E6%B1%9F%E8%A5%BF%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Jiangxi"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "江西省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "江西省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(116.0 27.3)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Satellite%20Image%20of%20Tahihe.png"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q192271"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "贵阳市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q47097"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(106.707777777 26.579444444)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E8%B4%B5%E5%B7%9E%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Guizhou"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "贵州省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "贵州省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(106.833333333 26.833333333)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Five%20hundred%20meter%20Aperture%20Spherical%20Telescope%2C%20China%20%28ASTER%29.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q185684"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "合肥市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q40956"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(117.28083 31.86389)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E5%AE%89%E5%BE%BD%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Anhui"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "安徽省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "安徽省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(117.0 31.833333333)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Chao%20Lake%20NASA.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q211243"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "银川市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q57448"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(106.225 38.485)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E5%AE%81%E5%A4%8F%E5%9B%9E%E6%97%8F%E8%87%AA%E6%B2%BB%E5%8C%BA"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Ningxia"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "宁夏回族自治区"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "宁夏回族自治区"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(106.27056 38.46654)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Xixia.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q69060"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "西宁市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q45833"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(101.77866 36.62386)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E9%9D%92%E6%B5%B7%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Qinghai"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "青海省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "青海省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(96.0 35.0)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Qinghai%20Cross%20Section.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q189823"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "海口市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q42200"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(110.32 20.02)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E6%B5%B7%E5%8D%97%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Hainan"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "海南省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "海南省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(110.32398 20.03342)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Hainan%20NASA%20Terra%20MODIS%202020-11-13.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q72778"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "太原市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q46913"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(112.54245 37.87326)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E5%B1%B1%E8%A5%BF%E7%9C%81"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Shanxi"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "山西省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "山西省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(112.564444444 37.873333333)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Great%20Wall%20of%20China%2C%20Satellite%20image.jpeg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q393836"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "通州区"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q956"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(116.65133 39.90858)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E5%8C%97%E4%BA%AC%E5%B8%82"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Beijing"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "北京市"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "北京市"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(116.407526 39.90403)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Skyline%20of%20Beijing%20CBD%20with%20B-5906%20approaching%20%2820211016171955%29.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q179608"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "南宁市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q15176"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(108.31501 22.81918)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E5%B9%BF%E8%A5%BF%E5%A3%AE%E6%97%8F%E8%87%AA%E6%B2%BB%E5%8C%BA"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Guangxi"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "广西壮族自治区"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "广西壮族自治区"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(108.3 23.6)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/1%20li%20jiang%20guilin%20yangshuo%202011.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q660185"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "黄浦区"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8686"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(121.485 31.2331)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E4%B8%8A%E6%B5%B7%E5%B8%82"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Shanghai"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上海市"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "上海市"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(121.469166666 31.2325)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/%E4%B8%8A%E6%B5%B7%C2%B7%E4%B8%8A%E6%B5%B7%E5%B8%82%C2%B7%EF%BC%88%E4%BF%AF%E6%8B%8D%EF%BC%89.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q535534"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "呼和浩特市"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q41079"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(111.66293 40.81507)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E5%86%85%E8%92%99%E5%8F%A4%E8%87%AA%E6%B2%BB%E5%8C%BA"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Inner Mongolia"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "内蒙古自治区"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "内蒙古自治区"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(113.0 44.0)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Dust%20storm%20in%20the%20Gobi%20Desert%2C%20China%20%288568589729%29.jpg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q713343"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "渝中区"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11725"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(106.565 29.55588)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E9%87%8D%E5%BA%86%E5%B8%82"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Chongqing"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "重庆市"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "重庆市"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(106.506944444 29.55)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Chongqing%2C%20China%20ESA23338300.jpeg"
+      }
+    }, {
+      "cap" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q708102"
+      },
+      "capl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "河西区"
+      },
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11736"
+      },
+      "capcoord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(117.2173 39.10862)"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E5%A4%A9%E6%B4%A5%E5%B8%82"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Tianjin"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "天津市"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "天津市"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(117.205555555 39.146666666)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Tianjin%2C%20China%20ESA15420167.jpeg"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8646"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E9%A6%99%E6%B8%AF"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Hong Kong"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "香港"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "香港"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(114.158611111 22.278333333)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Hong%20Kong%20from%20Victoria%20Peak1.jpg"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q14773"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E6%BE%B3%E9%96%80"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Macau"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "澳門"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "澳门"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(113.538055555 22.19)"
+      },
+      "img" : {
+        "type" : "uri",
+        "value" : "http://commons.wikimedia.org/wiki/Special:FilePath/Panorama%20of%20Macau%20Peninsula2021.jpg"
+      }
+    }, {
+      "p" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q57251"
+      },
+      "zhw" : {
+        "type" : "uri",
+        "value" : "https://zh.wikipedia.org/wiki/%E5%8F%B0%E6%B9%BE%E7%9C%81_(%E4%B8%AD%E5%8D%8E%E4%BA%BA%E6%B0%91%E5%85%B1%E5%92%8C%E5%9B%BD)"
+      },
+      "pen" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Taiwan"
+      },
+      "plz" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "台湾省"
+      },
+      "pl" : {
+        "xml:lang" : "zh-cn",
+        "type" : "literal",
+        "value" : "台湾省"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(121.0 23.7)"
+      }
+    } ]
+  }
+}

@@ -26,6 +26,13 @@
     ".cm-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.cm-acts button,.cm-acts a{font:inherit;font-size:12.5px;font-weight:800;border-radius:999px;padding:4px 12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;text-decoration:none}" +
     ".cm-acts .on-b{background:#1f7a55;border-color:#1f7a55;color:#fff}.cm-acts .on-w{background:#b98410;border-color:#b98410;color:#fff}.cm-acts .pri{background:var(--ui-pur,#8b5cf6);border-color:var(--ui-pur,#8b5cf6);color:#fff}" +
     ".cm-bot{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;padding:8px 14px 12px;border-top:1px solid var(--line);font-size:12.5px;color:var(--soft)}.cm-bot label{cursor:pointer}.cm-bot button{font:inherit;font-size:12.5px;font-weight:700;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:3px 11px;cursor:pointer}" +
+".ct{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:12px 14px;margin:0 0 18px}.ct-h{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:6px}.ct-h h2{font-size:15px;font-weight:900;margin-right:auto}" +
+    ".ct-q{font:inherit;font-size:13px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:5px 12px;min-width:0;flex:0 1 180px}.ct-h button{font:inherit;font-size:12.5px;font-weight:700;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:4px 11px;cursor:pointer}" +
+    ".ct-rh{font-size:12px;font-weight:800;color:var(--soft);margin:10px 2px 4px}.ct-p{border-top:1px solid var(--line)}.ct-p summary{display:flex;align-items:center;gap:8px;padding:7px 2px;cursor:pointer;list-style:none}.ct-p summary::-webkit-details-marker{display:none}" +
+    ".ct-p summary:before{content:\"▸\";color:var(--soft);width:10px}.ct-p[open] summary:before{content:\"▾\"}.ct-p summary b{font-size:14px}.ct-p summary small{color:var(--soft);font-size:12px}.ct-p.been summary b{color:#7ce3b8}" +
+    ".ct-go{margin-left:auto;font-size:12px;font-weight:700;color:var(--jade-deep,#c59bef);text-decoration:none}.ct-cs{display:flex;flex-wrap:wrap;gap:6px;padding:2px 0 10px 18px}" +
+    ".ct-c{font-size:12.5px;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--ink);background:var(--bg);text-decoration:none}.ct-c:hover{border-color:#c59bef}.ct-c.been{background:rgba(47,191,113,.25);border-color:rgba(47,191,113,.7)}" +
+    ".ct-c.pass{background:rgba(31,160,160,.22);border-color:rgba(31,160,160,.7)}.ct-c.want{background:rgba(255,201,77,.2);border-color:rgba(255,201,77,.7)}.ct-c.skip{opacity:.45}.ct-none{color:var(--soft);font-size:13px;padding:10px 0}" +
     ".cm-rec{padding:0 14px 12px;font-size:12.5px;color:var(--soft)}.cm-rec a{color:var(--ink);text-decoration:none;cursor:pointer;margin-right:10px;white-space:nowrap}.cm-rec a:hover{color:#c59bef}";
 
   function init(host) {
@@ -35,10 +42,11 @@
       '<div class="cm-tip" id="cm-tip"></div><div class="cm-lg"><span><i style="background:rgba(47,191,113,.8)"></i>去过</span><span><i style="background:rgba(31,160,160,.7)"></i>路过</span><span><i style="background:rgba(255,201,77,.7)"></i>想去</span><span><i style="background:#2b2f38;border:1px solid #5a6070"></i>还没去</span></div></div>' +
       '<div class="cm-pn" id="cm-pn"></div>' +
       '<div class="cm-bot"><label><input type="checkbox" id="cm-dots" checked> 城市点</label><label><input type="checkbox" id="cm-only"> 只看去过 / 路过的城市</label><label><input type="checkbox" id="cm-lab" checked> 省名</label><span style="margin-left:auto"></span><button type="button" id="cm-png">📷 导出图片</button></div>' +
-      '<div class="cm-rec" id="cm-rec"></div></div>';
+      '<div class="cm-rec" id="cm-rec"></div></div>' +
+      '<div class="ct"><div class="ct-h"><h2>📂 全国目录 · 地区 → 省 → 城市</h2><input class="ct-q" id="ct-q" type="search" placeholder="🔍 搜城市 / 省…" autocomplete="off"><button type="button" id="ct-all">全部展开</button></div><div id="ct-body"></div></div>';
     var $ = function (id) { return document.getElementById(id); };
-    Promise.all([fetch("cn/map.json").then(function (r) { return r.json(); }), fetch("cn/visited.json", { cache: "no-cache" }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; })]).then(function (res) {
-      var M = res[0], DEF = res[1] || {}, BY = {}, PV = {}, sel = null;
+    Promise.all([fetch("cn/map.json").then(function (r) { return r.json(); }), fetch("cn/visited.json", { cache: "no-cache" }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }), fetch("cn/index.json").then(function (r) { return r.json(); }).catch(function () { return []; })]).then(function (res) {
+      var M = res[0], DEF = res[1] || {}, TREE = res[2] || [], BY = {}, PV = {}, sel = null;
       var defBeen = {}, defWant = {};
       (DEF.been || []).forEach(function (id) { defBeen[id] = 1; }); (DEF.want || []).forEach(function (id) { defWant[id] = 1; });
       M.cities.forEach(function (c) { BY[c.id] = c; });
@@ -136,7 +144,29 @@
           cv.toBlob(function (b) { if (UU && UU.download) UU.download("我的中国足迹.png", b, "png"); else window.open(URL.createObjectURL(b), "_blank"); }, "image/png"); };
         img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(txt);
       }
-      paint(); TRIPST.on(paint); TRIPST.sync();
+      // ---- 📂 全国目录（三级：地区 → 省 → 城市），颜色跟地图一样；点城市进城市页，点省名进省页 ----
+      var openP = {}, q = "";
+      function cityGo(c, p) { return c.go || "prov:" + p.slug; }  // 还没有城市页的 → 省页
+      function cHref(c, p) { var g = cityGo(c, p); return /^city:/.test(g) ? "cn-city.html?c=" + g.slice(5) : g === "hzsights" ? "hz-sights.html" : g === "cqsights" ? "cq-sights.html" : provHref(p.slug); }
+      function tree() {
+        var body = $("ct-body"); if (!body) return; var regs = [], byR = {}, ql = q.toLowerCase();
+        TREE.forEach(function (p) { if (!byR[p.region]) { byR[p.region] = []; regs.push(p.region); } byR[p.region].push(p); });
+        body.innerHTML = regs.map(function (r) {
+          var ps = byR[r].map(function (p) {
+            var cs = p.cities.filter(function (c) { return !ql || c.zh.indexOf(q) >= 0 || p.zh.indexOf(q) >= 0 || c.slug.indexOf(ql) >= 0; }); if (!cs.length) return "";
+            var nb = 0; p.cities.forEach(function (c) { if ((S[c.id] || {}).been) nb++; });
+            var open = !!(openP[p.slug] || q);
+            return '<details class="ct-p' + (nb ? " been" : "") + '"' + (open ? " open" : "") + ' data-p="' + p.slug + '"><summary><b>' + esc(p.zh) + '</b><small>' + (nb ? "去过 " + nb + " / " : "") + p.cities.length + ' 个</small><a class="ct-go" href="' + provHref(p.slug) + '" data-go="prov:' + p.slug + '">省页 ›</a></summary><div class="ct-cs">' +
+              cs.map(function (c) { var s = S[c.id] || {}; return '<a class="ct-c' + (s.been ? " been" : s.pass ? " pass" : s.want ? " want" : s.skip ? " skip" : "") + '" href="' + esc(cHref(c, p)) + '" data-go="' + esc(cityGo(c, p)) + '">' + esc(c.zh.replace(/(市|地区)$/, "")) + "</a>"; }).join("") + "</div></details>";
+          }).join("");
+          return ps ? '<div class="ct-r"><div class="ct-rh">' + r + "</div>" + ps + "</div>" : "";
+        }).join("") || '<div class="ct-none">没有符合的城市</div>';
+      }
+      $("ct-body").addEventListener("toggle", function (e) { var d = e.target; if (d.dataset && d.dataset.p && !q) openP[d.dataset.p] = d.open; }, true);
+      $("ct-q").addEventListener("input", function (e) { q = e.target.value.trim(); tree(); });
+      $("ct-all").addEventListener("click", function () { var all = TREE.every(function (p) { return openP[p.slug]; }); TREE.forEach(function (p) { openP[p.slug] = !all; }); this.textContent = all ? "全部展开" : "全部收起"; tree(); });
+      function paintAll() { paint(); tree(); }
+      paintAll(); TRIPST.on(paintAll); TRIPST.sync();
     }).catch(function (e) { host.innerHTML = '<div class="cm" style="padding:14px;color:var(--soft)">地图没加载出来（' + esc(e) + '）</div>'; });
   }
   window.CNMAP = { init: init };

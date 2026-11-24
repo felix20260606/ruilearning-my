@@ -12,9 +12,10 @@ for f in sorted(glob.glob(os.path.join(src,'*.json'))):
     try: j=json.load(open(f,encoding='utf-8'))
     except Exception as e: print('skip',f,e); continue
     if not isinstance(j,dict) or 'city' not in j: continue
-    c=j['city'];slug=c['slug'];zh=c['zh'].rstrip('市')
+    c=j['city'];zh=c['zh'].rstrip('市')
     m=[x for x in P['cities'] if x['zh'].rstrip('市')==zh]
     base=m[0] if m else {}
+    slug=base.get('slug') or c['slug']  # 网址名以省页数据为准（<省拼音>-<市拼音>）
     S=[]
     seen=set()
     for x in j['sights']:

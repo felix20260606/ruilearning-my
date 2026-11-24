@@ -1,5 +1,6 @@
-import json,os,sys
-P=json.load(open('data_all.json'))
+import json,os,sys,re,unicodedata
+RAW=os.path.join(os.path.dirname(os.path.abspath(__file__)),'raw')  # 查回来的原始数据留底在 tools/cn-data/raw/
+P=json.load(open(os.path.join(RAW,'data_all.json'),encoding='utf-8'))
 SLUG={'北京市':'beijing','天津市':'tianjin','河北省':'hebei','山西省':'shanxi','内蒙古自治区':'neimenggu','辽宁省':'liaoning','吉林省':'jilin','黑龙江省':'heilongjiang',
 '上海市':'shanghai','江苏省':'jiangsu','浙江省':'zhejiang','安徽省':'anhui','福建省':'fujian','江西省':'jiangxi','山东省':'shandong','河南省':'henan','湖北省':'hubei','湖南省':'hunan',
 '广东省':'guangdong','广西壮族自治区':'guangxi','海南省':'hainan','重庆市':'chongqing','四川省':'sichuan','贵州省':'guizhou','云南省':'yunnan','西藏自治区':'xizang',
@@ -26,16 +27,30 @@ for reg,names in REG:
             x['zh']=NAMEFIX.get(x['zh'],x['zh'])
             if MUNI4: x['cap']=False  # 直辖市不标「省会」：距离都是从市中心算的
         cities=sorted(p['cities'].values(),key=lambda x:(not x['cap'],x['km'] if x['km'] is not None else 9999))
-        C=[]
+        C=[];used=set()
+        def cslug(en,zhn):
+            en2=unicodedata.normalize('NFKD',en or '').encode('ascii','ignore').decode()  # Ürümqi → Urumqi
+            w=[re.sub('[^a-z]','',t.lower()) for t in re.split(r'[\s\-]+',en2) if re.sub('[^a-z]','',t.lower())]
+            w=[t for t in w if t not in ('city','district','county','prefecture','autonomous','league','area','special','administrative','region')] or w or ['c']
+            k=w[0];i=1
+            if len(k)<4 and len(w)>1: k=k+w[1];i=2  # Wan Chai → wanchai
+            if k in used: k=''.join(re.sub('[^a-z]','',t.lower()) for t in re.split(r'[\s\-]+',en2))  # 重名（新竹县 / 新竹市）：用完整英文名
+            while k in used: k=k+'x'
+            used.add(k);return slug+'-'+k
         for x in cities:
-            d=dict(id='cn-'+x['id'],zh=x['zh'],en=x['en'],desc=x['desc'],img=x['img'],lat=round(x['coord'][0],5),lng=round(x['coord'][1],5),km=x['km'],cap=x['cap'],wiki=x['zhw'])
+            d=dict(id='cn-'+x['id'],slug=cslug(x['en'],x['zh']),zh=x['zh'],en=x['en'],desc=x['desc'],img=x['img'],lat=round(x['coord'][0],5),lng=round(x['coord'][1],5),km=x['km'],cap=x['cap'],wiki=x['zhw'])
             if x['zh'] in CGO: d['go'],d['goT']=CGO[x['zh']]
             elif (zh,x['zh']) in CITYPG: d['go'],d['goT']=CITYPG[(zh,x['zh'])]
             C.append(d)
         if not p['img'] and C: p['img']=C[0]['img']
-        doc=dict(slug=slug,zh=zh,short=SHORT[zh],en=p['en'],region=reg,cap='' if MUNI4 else (p['cap'] or ''),desc=p['desc'],img=p['img'],lat=round(p['coord'][0],5),lng=round(p['coord'][1],5),wiki=p['zhw'],go=PGO.get(zh,[]),cities=C)
+        doc=dict(slug=slug,qid=('Q865' if zh=='台湾' else p['id']),zh=zh,short=SHORT[zh],en=p['en'],region=reg,cap='' if MUNI4 else (p['cap'] or ''),desc=p['desc'],img=p['img'],lat=round(p['coord'][0],5),lng=round(p['coord'][1],5),wiki=p['zhw'],go=PGO.get(zh,[]),cities=C)
         json.dump(doc,open(os.path.join(out,slug+'.json'),'w'),ensure_ascii=False,separators=(',',':'))
         idx.append(dict(slug=slug,zh=zh,short=SHORT[zh],en=p['en'],region=reg,cap='' if MUNI4 else (p['cap'] or ''),img=p['img'],n=len(C),desc=p['desc'][:60]))
-json.dump(idx,open('index.json','w'),ensure_ascii=False)
+TREE=[]
+for reg,names in REG:
+    for zh in names:
+        d=json.load(open(os.path.join(out,SLUG[zh]+'.json'),encoding='utf-8'))
+        TREE.append(dict(slug=d['slug'],zh=d['zh'],short=d['short'],region=reg,cities=[dict(id=c['id'],zh=c['zh'],slug=c['slug'],go=c.get('go','')) for c in d['cities']]))
+json.dump(TREE,open(os.path.join(out,'index.json'),'w',encoding='utf-8'),ensure_ascii=False,separators=(',',':'))  # 中国页三级目录：地区 → 省 → 市
 print(len(idx),'provinces',sum(i['n'] for i in idx),'cities')
 for i in idx: print(i['region'],i['zh'],i['n'],bool(i['img']))

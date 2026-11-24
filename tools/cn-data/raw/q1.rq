@@ -1,0 +1,7 @@
+SELECT ?p ?pl ?pen ?type WHERE {
+  VALUES ?type { wd:Q1615742 wd:Q57362 wd:Q1208447 wd:Q779415 }
+  ?p wdt:P31 ?type .
+  FILTER NOT EXISTS { ?p wdt:P576 ?dis }
+  OPTIONAL { ?p rdfs:label ?pl FILTER(lang(?pl)="zh-cn") }
+  OPTIONAL { ?p rdfs:label ?pen FILTER(lang(?pen)="en") }
+}
