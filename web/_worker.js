@@ -1186,8 +1186,9 @@ Exactly 6 notes and 4 mcq, all in the order the information is heard. Notes must
 // 判断题第二道检查：另让 AI 只看原文判断每一句（不告诉它原答案），和出题时的答案不一样的那句不要（AI 偶尔会把答案标反）
 const EXAM_TF_CHECK_DE = `You check true/false/not-given reading questions against a German passage. For each numbered statement decide ONLY from the passage: TRUE (the passage says the same), FALSE (the passage says the opposite or something incompatible), NOT GIVEN (the passage does not say). Read carefully: negations, recommendations vs. orders, "some" vs. "all", numbers.
 Reply with ONLY JSON: {"a":["TRUE|FALSE|NOT GIVEN", ...]} with one answer per statement, in order.`;
-async function examTfCheck(env, text, tf) {
-  const r = await aiJson(env, [{ role: "system", content: EXAM_TF_CHECK_DE }, { role: "user", content: "Passage:\n" + text + "\n\nStatements:\n" + tf.map((x, i) => i + 1 + ". " + x.s).join("\n") }], o => isObj(o) && Array.isArray(o.a) && o.a.length === tf.length, 300);
+const EXAM_TF_CHECK = EXAM_TF_CHECK_DE.replace("against a German passage", "against an English passage");
+async function examTfCheck(env, text, tf, de) {
+  const r = await aiJson(env, [{ role: "system", content: de ? EXAM_TF_CHECK_DE : EXAM_TF_CHECK }, { role: "user", content: "Passage:\n" + text + "\n\nStatements:\n" + tf.map((x, i) => i + 1 + ". " + x.s).join("\n") }], o => isObj(o) && Array.isArray(o.a) && o.a.length === tf.length, 300);
   if (!r.ok) return tf; // 检查没做成：照原样（不因为检查失败就出不了题）
   return tf.filter((x, i) => String(r.a[i] || "").toUpperCase().replace(/_/g, " ").trim() === x.a);
 }
@@ -1282,8 +1283,8 @@ async function examGen(env, b) {
     const nz = de ? exNormDe : exNorm, n = k => Array.isArray(last && last[k]) ? last[k].length : 0, T = " " + nz(text) + " ", miss = ((last && (last.notes || last.gaps)) || []).filter(x => x && x.a && !T.includes(" " + nz(x.a) + " ")).map(x => x.a).slice(0, 4);
     return json({ ok: false, error: r.error || "bad output", detail: last ? Object.keys(last).map(k => k + ":" + n(k)).join(" ") + (miss.length ? " | 答案不在原文：" + miss.join(", ") : "") : "" }, 502);
   }
-  if (de && mode === "reading") { // 🇩🇪 判断题再核对一遍；核对后少于 2 道或没有对 / 错混着，就算这次没出好（再点一次重出）
-    got.tfng = await examTfCheck(env, text, got.tfng);
+  if (mode === "reading") { // 判断题再核对一遍（英语雅思、德语歌德都做）；核对后少于 2 道，就算这次没出好（再点一次重出）
+    got.tfng = await examTfCheck(env, text, got.tfng, de);
     if (got.tfng.length < 2) return json({ ok: false, error: "判断题核对没通过，再出一次" }, 502);
   }
   got.model = r.model; if (kv) await cput(kv, ck, JSON.stringify(got), { expirationTtl: 60 * 86400 });

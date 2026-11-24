@@ -13,4 +13,6 @@ const big = R.SAMPLES.map(x => x.text).join("\n\n").repeat(40), t0 = Date.now(),
 ok(n > 40000 && Date.now() - t0 < 500, "reading word count is linear (" + n + " words in " + (Date.now() - t0) + " ms)");
 const tk = R.tokens('Hi there. "Quoted" word; Ärger über Öl? Yes!');
 ok(tk.map(x => x.first ? 1 : 0).join("") === "10111001", "sentence-start flags unchanged: " + tk.map(x => x.w + ":" + x.first).join(" "));
+ok(/const IMG_KEY="vocab:img"/.test(V) && /localStorage\.setItem\(KEY,JSON\.stringify\(noImg\(s\)\)\)/.test(V) && !/state\.imgcache=imgCache;save\(state\)/.test(V) && /NOIMG_TTL=7\*864e5/.test(V), "picture cache stored separately, not-found remembered 7 days");
+ok(/if \(mode === "reading"\) \{ \/\/ 判断题再核对一遍（英语雅思、德语歌德都做）/.test(W("_worker.js")), "IELTS reading also double-checks TRUE/FALSE/NOT GIVEN");
 console.log(fail ? fail + " FAILED" : "t87 perf: all ok"); process.exit(fail ? 1 : 0);

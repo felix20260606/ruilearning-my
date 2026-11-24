@@ -12,7 +12,7 @@ async function load(){
 async function save(s){
   vStamp(s);
   if(hasStore){try{await Promise.race([window.storage.set(KEY,JSON.stringify(s)),new Promise((_,r)=>setTimeout(r,1500))]);}catch(e){}}
-  else{mem=s;try{localStorage.setItem(KEY,JSON.stringify(s));}catch(e){
+  else{mem=s;try{localStorage.setItem(KEY,JSON.stringify(noImg(s)));}catch(e){
     // 本机存储满了：先去掉配图缓存（能重新找）再存；还存不下就提醒一次（生词本内容已经传到后台的不会丢，只是这台设备的缓存没更新）
     try{const t=Object.assign({},s);delete t.imgcache;delete t.rowimgcache;localStorage.setItem(KEY,JSON.stringify(t));}
     catch(e2){if(!save.warned){save.warned=1;try{toast("⚠️ 这台设备的浏览器存储满了，生词本的改动只能先传到后台。可以在浏览器设置里清一下这个网站以外的数据。");}catch(e3){}}}
@@ -20,6 +20,23 @@ async function save(s){
   schedulePush();
 }
 function def(){return{progress:{},custom:[],deleted:[],pending:[],srs:{}};}
+// 🖼 配图缓存单独存（vocab:img / vocab:rowimg，不跟生词本一起存）：以前在生词本里占 300 KB，练习时每答一张卡都要连它一起重写一遍，手机上每次多几十毫秒；
+//   改了只在 2 秒后写一次。没找到图的也记下（7 天内不再去维基百科找，以前每次打开网页都重新找一遍）
+const IMG_KEY="vocab:img",ROWIMG_KEY="vocab:rowimg",NOIMG_TTL=7*864e5;
+const noImg=s=>{if(!s||(!("imgcache" in s)&&!("rowimgcache" in s)))return s;const t=Object.assign({},s);delete t.imgcache;delete t.rowimgcache;return t;};
+let imgSaveT=0;
+function imgSave(){clearTimeout(imgSaveT);imgSaveT=setTimeout(()=>{
+  const now=Date.now(),o={};for(const k in imgCache){const v=imgCache[k];if(Array.isArray(v))o[k]=v;else if(v===null)o[k]={none:now};else if(v&&v.none)o[k]=v;}
+  const r={};for(const k in rowImgCache){const v=rowImgCache[k];if(v&&v!=="pending")r[k]=v;}
+  try{localStorage.setItem(IMG_KEY,JSON.stringify(o));localStorage.setItem(ROWIMG_KEY,JSON.stringify(r));}catch(e){} // 存不下就算了（能重新找）
+},2000);}
+function imgLoad(st){ // 读单独存的配图缓存；第一次（以前存在生词本里的）搬过来
+  let o=null,r=null;try{o=JSON.parse(localStorage.getItem(IMG_KEY)||"null");r=JSON.parse(localStorage.getItem(ROWIMG_KEY)||"null");}catch(e){}
+  if(!o&&st&&st.imgcache)o=st.imgcache; if(!r&&st&&st.rowimgcache)r=st.rowimgcache;
+  const now=Date.now(),I={};for(const k in o||{}){const v=o[k];if(Array.isArray(v))I[k]=v;else if(v&&v.none&&now-v.none<NOIMG_TTL)I[k]=v;} // 没图的记录 7 天后再找一次
+  const RW={};for(const k in r||{}){const v=r[k];if(v&&v!=="pending")RW[k]=v;}
+  return {I,RW};
+}
 /* 掌握状态、待整理队列：改了的项记下时间（progAt / pendAdd / pendDel），合并时同一项按时间新的为准（后台同样）——
    别的设备 / 标签页的旧缓存改不回去，「清空待整理」也清得掉。哪个页面改的都一样：保存前和上次的样子比一下就知道改了哪些 */
 let vSnap=null;
@@ -148,7 +165,7 @@ function applyImg(id){
   const arr=imgCache[id];
   document.querySelectorAll('img[data-wimg="'+id+'"]').forEach(im=>{
     if(Array.isArray(arr)&&arr.length){im.src=arr[0];im.style.display="";}
-    else if(arr===null){im.style.display="none";}
+    else if(arr===null||(arr&&arr.none)){im.style.display="none";}
   });
   document.querySelectorAll('[data-wgallery="'+id+'"]').forEach(g=>{
     const bv=g.closest('.bigvisual');
@@ -201,14 +218,14 @@ async function fetchWiki(id){
   if(failed&&!urls.length){imgCache[id]=null;applyImg(id);delete imgCache[id];imgRetry[id]=Date.now()+10*60e3;return;} // 没连上：先不显示，下次再找
   imgCache[id]=urls.length?urls:null;
   applyImg(id);
-  state.imgcache=imgCache;save(state);
+  imgSave();
 }
 function populateImgs(){
   const ids=new Set();
   document.querySelectorAll("[data-wimg],[data-wgallery]").forEach(im=>ids.add(im.getAttribute("data-wimg")||im.getAttribute("data-wgallery")));
   ids.forEach(id=>{
     const c=imgCache[id];
-    if(Array.isArray(c))applyImg(id);
+    if(Array.isArray(c)||(c&&c.none))applyImg(id); // 有图 / 记着没图：直接用
     else if(c===undefined)fetchWiki(id);
   });
   populateRowImgs();
@@ -236,7 +253,7 @@ async function fetchRowImg(title){
   }catch(e){delete rowImgCache[title];imgRetry["r:"+title]=Date.now()+10*60e3;done();return;} // 没连上不记成「没有图」
   done();
   applyRowImg(title);
-  state.rowimgcache=rowImgCache;save(state);
+  imgSave();
 }
 function populateRowImgs(){
   const titles=new Set();
@@ -654,8 +671,7 @@ refresh(); // show seed words immediately, no waiting on storage
 (async()=>{
   const loaded=await load();
   if(loaded){state=loaded;if(!state.progress)state.progress={};if(!state.custom)state.custom=[];if(!state.deleted)state.deleted=[];if(!state.pending)state.pending=[];
-    imgCache=state.imgcache||{};Object.keys(imgCache).forEach(k=>{if(!Array.isArray(imgCache[k]))delete imgCache[k];});
-    rowImgCache=state.rowimgcache||{};Object.keys(rowImgCache).forEach(k=>{if(rowImgCache[k]==="pending"||rowImgCache[k]===null)delete rowImgCache[k];}); // null 以前也可能是没连上：重新找一次
+    {const g=imgLoad(state);imgCache=g.I;rowImgCache=g.RW;if("imgcache" in state||"rowimgcache" in state){delete state.imgcache;delete state.rowimgcache;imgSave();if(!hasStore)try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}} // 配图缓存搬到单独的键，生词本里去掉
     refresh();
     if(state.sort){sortBy=state.sort;const ss=document.getElementById("sort-sel");if(ss)ss.value=sortBy;renderList();}
     loadVoices();
