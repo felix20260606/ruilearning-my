@@ -410,10 +410,10 @@
     const lc = SITE.ctlLeft(); if (!lc) return;
     if (!pill) {
       pill = document.createElement("div"); pill.id = "vs-pill";
-      pill.innerHTML = '<span class="tg" data-a="tg" data-tip="双语字幕 - 开/关"><span class="ic" data-a="tg">BAN</span><span class="st" data-a="tg">ON</span></span><span class="gr" data-a="set" data-tip="双语字幕 - 设置">' + I("gear") + "</span>";
+      pill.innerHTML = '<span class="tg" data-a="tg" data-tip="双语字幕 - 开/关"><span class="ic" data-a="tg">BAN</span><span class="st" data-a="tg">ON</span></span><span class="wk" data-a="wk" data-tip="上班模式：字幕小窗 / 伪装阅读 / 老板键">🙈</span><span class="gr" data-a="set" data-tip="双语字幕 - 设置">' + I("gear") + "</span>";
       pill.addEventListener("click", e => {
         const a = e.target.dataset.a; if (!a) return; e.stopPropagation(); e.preventDefault();
-        if (a === "tg") chrome.storage.sync.set({ enabled: !S.enabled }); else openSettings();
+        if (a === "tg") chrome.storage.sync.set({ enabled: !S.enabled }); else if (a === "wk") { if (window.VS_WK) window.VS_WK.menu(e.target); } else openSettings();
       });
     }
     if (pill.parentNode !== lc) lc.append(pill);

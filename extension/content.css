@@ -521,3 +521,5 @@ html.vs-bili .vs-pl #vs-tip,html.vs-bili .vs-pl #vs-mini,html.vs-bili .vs-pl #vs
 html.vs-bili #vs-pill{height:26px;margin:auto 6px;gap:6px;font-size:12px}html.vs-bili #vs-pill .ic{width:20px;height:20px;font-size:10px}html.vs-bili #vs-pill .gr{font-size:17px}
 html.vs-vv-on.vs-bili .bpx-player-container{position:relative}
 html.vs-vv-on.vs-bili .bpx-player-container>.bpx-player-primary-area{width:calc(100% - var(--vs-vvw))!important}
+/* 🙈 上班模式入口：BAN 开关和齿轮中间，设置里关掉就不显示 */
+#vs-pill .wk{display:none;font-size:17px;line-height:1;cursor:pointer;position:relative;opacity:.8}#vs-pill .wk:hover{opacity:1}html.vs-wk-on #vs-pill .wk{display:inline-flex}

@@ -5,7 +5,7 @@
 //   ② 📄 伪装阅读：视频画面整个盖住，字幕一句句排成代码 / 文档 / 表格的样子（中文像注释），当前句高亮，点哪句从哪句放
 //   ③ 🙈 老板键：按一下（默认 ` 键，可在设置里换成 F2 / 连按两下 Esc），立刻暂停、静音、关掉小窗，整页盖上一个像在工作的界面
 //      （代码编辑器 / 表格 / 文档），标签页标题和图标也跟着换；再按一下回到原样（声音、播放状态恢复）
-// 视频页左下角有个 🙈 小按钮打开菜单；任意网页的生词复习卡在 page.js。
+// 播放器控制栏 BAN 开关旁边的 🙈 打开菜单；任意网页的生词复习卡在 page.js。
 // 依赖 content.js 的 window.VS_WORK（字幕、译文、当前句、跳句）
 (function () {
   "use strict";
@@ -172,27 +172,21 @@
   }
   window.addEventListener("keydown", onKey, true);
 
-  // ---------- 视频页左下角的 🙈 菜单 ----------
-  let btn = null, menu = null;
-  function toast(m) { const t = document.createElement("div"); t.textContent = m; t.style.cssText = "position:fixed;left:50%;bottom:80px;transform:translateX(-50%);z-index:2147483646;background:rgba(32,33,36,.92);color:#fff;padding:9px 16px;border-radius:10px;font:14px -apple-system,sans-serif;max-width:80vw"; document.documentElement.append(t); setTimeout(() => t.remove(), 2600); }
+  // ---------- 🙈 菜单：入口在播放器控制栏的 BAN 开关旁边（齿轮左边） ----------
+  let menu = null, anchor = null;
+  function toast(m) { const t = document.createElement("div"); t.textContent = m; t.style.cssText = "position:fixed;left:50%;bottom:80px;transform:translateX(-50%);z-index:2147483646;background:rgba(32,33,36,.92);color:#fff;padding:9px 16px;border-radius:10px;font:14px -apple-system,sans-serif;max-width:80vw"; (document.fullscreenElement || document.documentElement).append(t); setTimeout(() => t.remove(), 2600); }
   function hideMenu() { if (menu) menu.style.display = "none"; }
   function paintBtn() {
     const A = API(), show = !!(A && A.enabled() && A.isWatch() && W.workBtn !== false);
-    if (!show) { if (btn) btn.style.display = "none"; hideMenu(); return; }
-    if (!btn) {
-      btn = document.createElement("button"); btn.id = "vs-wk-btn"; btn.textContent = "🙈"; btn.title = "上班模式：字幕小窗、伪装阅读、老板键";
-      btn.style.cssText = "position:fixed;left:10px;bottom:10px;z-index:2147483000;width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(32,33,36,.75);font-size:17px;cursor:pointer;opacity:.45;transition:opacity .15s";
-      btn.onmouseenter = () => (btn.style.opacity = "1"); btn.onmouseleave = () => (btn.style.opacity = ".45");
-      btn.onclick = e => { e.stopPropagation(); toggleMenu(); };
-      document.documentElement.append(btn);
-      document.addEventListener("click", e => { if (menu && menu.style.display !== "none" && !menu.contains(e.target) && e.target !== btn) hideMenu(); }, true);
-    }
-    btn.style.display = "";
+    document.documentElement.classList.toggle("vs-wk-on", show);
+    if (!show) { hideMenu(); return; }
     if (menu && menu.style.display !== "none") drawMenu();
   }
-  function toggleMenu() { if (!menu) { menu = document.createElement("div"); menu.id = "vs-wk-menu"; document.documentElement.append(menu); menu.addEventListener("click", onMenu); } if (menu.style.display === "block") { hideMenu(); return; } drawMenu(); menu.style.display = "block"; }
+  document.addEventListener("click", e => { if (menu && menu.style.display !== "none" && !menu.contains(e.target) && !(e.target.closest && e.target.closest('[data-a="wk"]'))) hideMenu(); }, true);
+  window.VS_WK = { menu: el => { anchor = el; toggleMenu(); } };
+  function toggleMenu() { if (!menu) { menu = document.createElement("div"); menu.id = "vs-wk-menu"; menu.addEventListener("click", onMenu); } const host = document.fullscreenElement || document.documentElement; if (menu.parentNode !== host) host.append(menu); if (menu.style.display === "block") { hideMenu(); return; } drawMenu(); menu.style.display = "block"; }
   function drawMenu() {
-    menu.style.cssText = "display:block;position:fixed;left:10px;bottom:52px;z-index:2147483001;width:300px;background:#26282c;color:#eee;border:1px solid #454950;border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.45);padding:10px 12px;font:13.5px/1.5 -apple-system,'PingFang SC',sans-serif";
+    const r = anchor && anchor.isConnected ? anchor.getBoundingClientRect() : { left: 10, top: innerHeight - 52 }; menu.style.cssText = "display:block;position:fixed;left:" + Math.max(8, Math.min(innerWidth - 310, r.left - 140)) + "px;bottom:" + Math.max(8, innerHeight - r.top + 12) + "px;z-index:2147483001;width:300px;background:#26282c;color:#eee;border:1px solid #454950;border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.45);padding:10px 12px;font:13.5px/1.5 -apple-system,'PingFang SC',sans-serif";
     const chips = (k, L) => Object.keys(L).map(x => '<button data-set="' + k + '" data-v="' + x + '" style="border:1px solid ' + (W[k] === x ? "#9c6ade" : "#454950") + ";background:" + (W[k] === x ? "rgba(156,106,222,.25)" : "#2d2f34") + ';color:#eee;border-radius:999px;padding:2px 9px;margin:3px 4px 0 0;font:inherit;font-size:12.5px;cursor:pointer">' + L[x] + "</button>").join("");
     const row = (a, t, sub, on) => '<button data-a="' + a + '" style="display:block;width:100%;text-align:left;border:0;background:' + (on ? "rgba(156,106,222,.3)" : "#2d2f34") + ';color:#eee;border-radius:10px;padding:8px 10px;margin-top:8px;font:inherit;cursor:pointer"><b>' + t + '</b><div style="color:#9aa0a6;font-size:12px">' + sub + "</div></button>";
     menu.innerHTML = '<b style="font-size:14.5px">🙈 上班模式</b>' +
@@ -207,5 +201,5 @@
     const a = b.dataset.a; hideMenu();
     if (a === "pip") pipOpen(); else if (a === "read") readOpen(); else if (a === "boss") bossToggle();
   }
-  setInterval(paintBtn, 1500);
+  setInterval(paintBtn, 1500); paintBtn();
 })();

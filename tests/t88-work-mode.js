@@ -17,5 +17,7 @@ for (const k of ["workBtn", "workKey", "workBoss", "workPip", "workRead", "workC
   ok(H.includes('data-k="' + k + '"'), "popup has " + k); ok(new RegExp("\\b" + k + ":").test(PJ), "popup default " + k);
 }
 ok(/function wcTick/.test(P) && /workCardOff/.test(P) && /bottom:60px/.test(P) && /document\.documentElement\.append\(wcHost\)/.test(P), "review card: ticks, off-for-today, sits above the 学习模式 pill, actually appended");
+ok(/<span class="wk" data-a="wk"[^>]*>🙈<\/span><span class="gr" data-a="set"/.test(C) && /else if \(a === "wk"\) \{ if \(window\.VS_WK\) window\.VS_WK\.menu\(e\.target\); \}/.test(C), "🙈 sits in the BAN pill, left of the gear, and opens the menu");
+ok(/window\.VS_WK = \{ menu:/.test(W) && /classList\.toggle\("vs-wk-on", show\)/.test(W) && !/vs-wk-btn/.test(W) && /html\.vs-wk-on #vs-pill \.wk\{display:inline-flex\}/.test(X("content.css")), "no floating corner button; pill icon shown via html.vs-wk-on");
 ok(!/\/\/[^\n]*document\.documentElement\.append\(wcHost\)/.test(P), "card append not swallowed by a // comment");
 console.log(fail ? fail + " FAILED" : "t88 work mode: all ok"); process.exit(fail ? 1 : 0);
