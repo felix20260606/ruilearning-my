@@ -119,6 +119,24 @@
    "q": "璧山云巴",
    "src": "https://en.wikipedia.org/wiki/Bishan_SkyShuttle",
    "photo_checked": "自动找到的不对，留空（人工看过）"
+  },
+  {
+   "id": "cqd-bishan-wenmiao",
+   "zh": "璧山文庙",
+   "en": "Bishan Confucian Temple",
+   "cat": "宗教建筑",
+   "area": "璧山 · 城区",
+   "addr": "重庆市璧山区中山北路110号（大成广场西侧）",
+   "transit": "轨道 1 号线到璧山站，转公交或打车到大成广场（以导航为准）",
+   "hours": "08:00–17:30（以官方为准）",
+   "price": "免费（以官方为准）",
+   "dur": "约 1 小时",
+   "desc": "璧山城区里的孔庙古建筑，主体大成殿是重檐歇山式，斗拱层层交织、屋面黄绿琉璃相间，殿内供奉孔子及四配、十二哲。周边是城区的大成广场。",
+   "tips": "在城里顺路看一眼即可，可以和秀湖公园排在同一天。",
+   "rate": 1,
+   "photo": "",
+   "q": "璧山文庙",
+   "src": "https://gs.ctrip.com/html5/you/sight/chongqing158/131917480.html"
   }
  ]
 }

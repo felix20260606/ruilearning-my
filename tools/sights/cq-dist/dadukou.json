@@ -71,7 +71,7 @@
    "cat": "公园自然",
    "area": "大渡口 · 文体路",
    "addr": "重庆市大渡口区文体路 77 号",
-   "transit": "解放碑附近乘轨道 2 号线到大渡口区，出站按导航步行（以导航为准）",
+   "transit": "轨道 2 号线大渡口站 4 号口出站步行约 460 米（以导航为准）",
    "hours": "全天开放（以现场为准）",
    "price": "免费",
    "dur": "1 小时",
@@ -80,7 +80,8 @@
    "rate": 1,
    "photo": "",
    "q": "大渡口公园",
-   "src": "https://www.wingontravel.com/discovery/scenic-dadukou-park-10534472"
+   "src": "https://www.wingontravel.com/discovery/scenic-dadukou-park-10534472",
+   "photo_checked": "自动找到的不对（不是公园（铁路相关远景）），留空（人工看过）"
   },
   {
    "id": "cqd-dadukou-huashengyuan",
@@ -99,6 +100,42 @@
    "photo": "",
    "q": "华生园金色蛋糕梦幻王国",
    "src": "https://touch.travel.qunar.com/poi/9553247"
+  },
+  {
+   "id": "cqd-dadukou-meide",
+   "zh": "中华美德公园",
+   "en": "Chinese Virtues Park",
+   "cat": "公园自然",
+   "area": "大渡口 · 新山村",
+   "addr": "重庆市大渡口区文体支路224号",
+   "transit": "轨道 2 号线平安站 3 号口步行约 5 分钟，或大渡口站步行约 6 分钟（以导航为准）",
+   "hours": "全天开放（以现场为准）",
+   "price": "免费",
+   "dur": "1–2 小时",
+   "desc": "以传统美德为主题的中式园林公园，园内分孝德、廉德、仁德等板块，有亭台回廊、莲池、城墙式拱门、观渡塔，以及孔子、老子等雕塑和石刻碑廊。轨道 2 号线的高架从园边穿过。",
+   "tips": "人少安静，适合拍照散步；和大渡口公园、大渡口美术馆相距步行约 10 分钟，可以一起逛。秋冬银杏变黄时最好看。",
+   "rate": 1,
+   "photo": "",
+   "q": "中华美德公园",
+   "src": "https://gs.ctrip.com/html5/you/sight/chongqing158/112689.html"
+  },
+  {
+   "id": "cqd-dadukou-meishuguan",
+   "zh": "大渡口美术馆",
+   "en": "Dadukou Art Museum",
+   "cat": "博物馆",
+   "area": "大渡口 · 新山村",
+   "addr": "重庆市大渡口区文体路120号（大渡口公园旁）",
+   "transit": "轨道 2 号线大渡口站步行约 10 分钟（以导航为准）",
+   "hours": "约 09:00–17:30（以官方为准）",
+   "price": "免费（以官方为准）",
+   "dur": "约 1 小时",
+   "desc": "大渡口公园旁的区级美术馆，2022 年开放，主馆 3 层、建筑面积约 2000 平方米，不定期举办公益艺术展览。",
+   "tips": "展览不固定，出发前看一下当期有没有展；和大渡口公园、中华美德公园排在一起。",
+   "rate": 1,
+   "photo": "",
+   "q": "大渡口美术馆",
+   "src": "https://gs.ctrip.com/html5/you/sight/chongqing158/134056099.html"
   }
  ]
 }
