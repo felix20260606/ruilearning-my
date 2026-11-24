@@ -1,6 +1,8 @@
 import json,os,sys,re,unicodedata
 RAW=os.path.join(os.path.dirname(os.path.abspath(__file__)),'raw')  # 查回来的原始数据留底在 tools/cn-data/raw/
 P=json.load(open(os.path.join(RAW,'data_all.json'),encoding='utf-8'))
+# 每个省的封面图：手挑一个代表景点（covers.json：省名 → [景点, Commons 文件名]），省页大图和中国页目录卡片都用它
+COV=json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'covers.json'),encoding='utf-8'))
 SLUG={'北京市':'beijing','天津市':'tianjin','河北省':'hebei','山西省':'shanxi','内蒙古自治区':'neimenggu','辽宁省':'liaoning','吉林省':'jilin','黑龙江省':'heilongjiang',
 '上海市':'shanghai','江苏省':'jiangsu','浙江省':'zhejiang','安徽省':'anhui','福建省':'fujian','江西省':'jiangxi','山东省':'shandong','河南省':'henan','湖北省':'hubei','湖南省':'hunan',
 '广东省':'guangdong','广西壮族自治区':'guangxi','海南省':'hainan','重庆市':'chongqing','四川省':'sichuan','贵州省':'guizhou','云南省':'yunnan','西藏自治区':'xizang',
@@ -42,6 +44,7 @@ for reg,names in REG:
             if x['zh'] in CGO: d['go'],d['goT']=CGO[x['zh']]
             elif (zh,x['zh']) in CITYPG: d['go'],d['goT']=CITYPG[(zh,x['zh'])]
             C.append(d)
+        if zh in COV: p['img']=COV[zh][1]
         if not p['img'] and C: p['img']=C[0]['img']
         doc=dict(slug=slug,qid=('Q865' if zh=='台湾' else p['id']),zh=zh,short=SHORT[zh],en=p['en'],region=reg,cap='' if MUNI4 else (p['cap'] or ''),desc=p['desc'],img=p['img'],lat=round(p['coord'][0],5),lng=round(p['coord'][1],5),wiki=p['zhw'],go=PGO.get(zh,[]),cities=C)
         json.dump(doc,open(os.path.join(out,slug+'.json'),'w'),ensure_ascii=False,separators=(',',':'))
@@ -50,7 +53,11 @@ TREE=[]
 for reg,names in REG:
     for zh in names:
         d=json.load(open(os.path.join(out,SLUG[zh]+'.json'),encoding='utf-8'))
-        TREE.append(dict(slug=d['slug'],zh=d['zh'],short=d['short'],region=reg,cities=[dict(id=c['id'],zh=c['zh'],slug=c['slug'],go=c.get('go','')) for c in d['cities']]))
+        def nsight(c):  # 城市页里有几个景点（杭州、渝中挂的是景点大全，数那边的）
+            f=os.path.join(out,'city',c['slug']+'.json')
+            return len(json.load(open(f,encoding='utf-8'))['sights']) if os.path.exists(f) else 0
+        TREE.append(dict(slug=d['slug'],zh=d['zh'],short=d['short'],region=reg,img=d['img'],cover=COV.get(zh,['',''])[0],cap=d['cap'],
+                         cities=[dict(id=c['id'],zh=c['zh'],slug=c['slug'],go=c.get('go',''),n=nsight(c)) for c in d['cities']]))
 json.dump(TREE,open(os.path.join(out,'index.json'),'w',encoding='utf-8'),ensure_ascii=False,separators=(',',':'))  # 中国页三级目录：地区 → 省 → 市
 print(len(idx),'provinces',sum(i['n'] for i in idx),'cities')
 for i in idx: print(i['region'],i['zh'],i['n'],bool(i['img']))

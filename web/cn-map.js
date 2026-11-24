@@ -26,13 +26,21 @@
     ".cm-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.cm-acts button,.cm-acts a{font:inherit;font-size:12.5px;font-weight:800;border-radius:999px;padding:4px 12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;text-decoration:none}" +
     ".cm-acts .on-b{background:#1f7a55;border-color:#1f7a55;color:#fff}.cm-acts .on-w{background:#b98410;border-color:#b98410;color:#fff}.cm-acts .pri{background:var(--ui-pur,#8b5cf6);border-color:var(--ui-pur,#8b5cf6);color:#fff}" +
     ".cm-bot{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;padding:8px 14px 12px;border-top:1px solid var(--line);font-size:12.5px;color:var(--soft)}.cm-bot label{cursor:pointer}.cm-bot button{font:inherit;font-size:12.5px;font-weight:700;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:3px 11px;cursor:pointer}" +
-".ct{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:12px 14px;margin:0 0 18px}.ct-h{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:6px}.ct-h h2{font-size:15px;font-weight:900;margin-right:auto}" +
-    ".ct-q{font:inherit;font-size:13px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:5px 12px;min-width:0;flex:0 1 180px}.ct-h button{font:inherit;font-size:12.5px;font-weight:700;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:4px 11px;cursor:pointer}" +
-    ".ct-rh{font-size:12px;font-weight:800;color:var(--soft);margin:10px 2px 4px}.ct-p{border-top:1px solid var(--line)}.ct-p summary{display:flex;align-items:center;gap:8px;padding:7px 2px;cursor:pointer;list-style:none}.ct-p summary::-webkit-details-marker{display:none}" +
-    ".ct-p summary:before{content:\"▸\";color:var(--soft);width:10px}.ct-p[open] summary:before{content:\"▾\"}.ct-p summary b{font-size:14px}.ct-p summary small{color:var(--soft);font-size:12px}.ct-p.been summary b{color:#7ce3b8}" +
-    ".ct-go{margin-left:auto;font-size:12px;font-weight:700;color:var(--jade-deep,#c59bef);text-decoration:none}.ct-cs{display:flex;flex-wrap:wrap;gap:6px;padding:2px 0 10px 18px}" +
-    ".ct-c{font-size:12.5px;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--ink);background:var(--bg);text-decoration:none}.ct-c:hover{border-color:#c59bef}.ct-c.been{background:rgba(47,191,113,.25);border-color:rgba(47,191,113,.7)}" +
-    ".ct-c.pass{background:rgba(31,160,160,.22);border-color:rgba(31,160,160,.7)}.ct-c.want{background:rgba(255,201,77,.2);border-color:rgba(255,201,77,.7)}.ct-c.skip{opacity:.45}.ct-none{color:var(--soft);font-size:13px;padding:10px 0}" +
+".ct-h{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:22px 2px 4px}.ct-h h2{font-family:var(--display);font-size:16px;font-weight:900;margin:0 auto 0 0;letter-spacing:.02em}" +
+    ".ct-q{font:inherit;font-size:13.5px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:7px 14px;min-width:0;flex:0 1 220px;outline:none}.ct-q:focus{border-color:rgba(197,155,239,.6)}" +
+    ".ct-sum{font-size:12.5px;color:var(--soft);margin:0 2px 2px;display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center}.ct-sum i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}" +
+    ".ct-rh{display:flex;align-items:baseline;gap:8px;margin:20px 2px 10px;font-family:var(--display);font-weight:900;font-size:14px;color:var(--ink)}.ct-rh:before{content:\"\";width:4px;height:15px;border-radius:2px;background:#c59bef;align-self:center}.ct-rh small{font-family:inherit;font-weight:700;font-size:12px;color:var(--soft)}" +
+    ".ct-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}" +
+    ".ct-k{background:var(--paper);border:1px solid var(--line);border-radius:16px;overflow:hidden;transition:border-color .15s,box-shadow .15s}.ct-k:hover{border-color:rgba(197,155,239,.45);box-shadow:0 6px 22px rgba(0,0,0,.28)}.ct-k.been{border-color:rgba(47,191,113,.5)}" +
+    ".ct-ph{position:relative;display:block;height:124px;overflow:hidden;background:#20232b;text-decoration:none;color:#fff}.ct-ph img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s}.ct-k:hover .ct-ph img{transform:scale(1.05)}" +
+    ".ct-ph:after{content:\"\";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05) 30%,rgba(0,0,0,.78))}" +
+    ".ct-nm{position:absolute;left:13px;bottom:11px;z-index:1;display:flex;align-items:center;gap:7px;font-size:18px;font-weight:900;text-shadow:0 1px 8px rgba(0,0,0,.6)}.ct-nm i{font-style:normal;font-size:11px;font-weight:800;border:1px solid rgba(255,255,255,.55);border-radius:6px;padding:0 5px;text-shadow:none}" +
+    ".ct-pr{position:absolute;right:12px;bottom:12px;z-index:1;font-size:12px;font-weight:800;text-shadow:0 1px 6px rgba(0,0,0,.6)}.ct-pr b{color:#7ce3b8}.ct-cv{position:absolute;right:9px;top:8px;z-index:1;font-size:10.5px;background:rgba(0,0,0,.45);border-radius:999px;padding:2px 8px;opacity:.85}" +
+    ".ct-bar{position:absolute;left:0;right:0;bottom:0;height:3px;z-index:1;background:rgba(255,255,255,.12);display:flex}.ct-bar span{display:block;height:100%}" +
+    ".ct-cs{display:flex;flex-wrap:wrap;gap:6px;padding:11px 12px 13px}" +
+    ".ct-c{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--ink);background:var(--bg);text-decoration:none;transition:border-color .12s}.ct-c:hover{border-color:#c59bef}.ct-c small{font-size:10.5px;font-weight:600;color:var(--soft)}.ct-c.cap{border-color:rgba(197,155,239,.5)}" +
+    ".ct-c.been{background:rgba(47,191,113,.22);border-color:rgba(47,191,113,.7)}.ct-c.pass{background:rgba(31,160,160,.2);border-color:rgba(31,160,160,.7)}.ct-c.want{background:rgba(255,201,77,.17);border-color:rgba(255,201,77,.7)}.ct-c.skip{opacity:.45}.ct-none{color:var(--soft);font-size:13px;padding:14px 2px}" +
+    "@media(max-width:520px){.ct-g{grid-template-columns:1fr}.ct-ph{height:112px}.ct-q{flex:1 1 100%}}" +
     ".cm-rec{padding:0 14px 12px;font-size:12.5px;color:var(--soft)}.cm-rec a{color:var(--ink);text-decoration:none;cursor:pointer;margin-right:10px;white-space:nowrap}.cm-rec a:hover{color:#c59bef}";
 
   function init(host) {
@@ -42,8 +50,11 @@
       '<div class="cm-tip" id="cm-tip"></div><div class="cm-lg"><span><i style="background:rgba(47,191,113,.8)"></i>去过</span><span><i style="background:rgba(31,160,160,.7)"></i>路过</span><span><i style="background:rgba(255,201,77,.7)"></i>想去</span><span><i style="background:#2b2f38;border:1px solid #5a6070"></i>还没去</span></div></div>' +
       '<div class="cm-pn" id="cm-pn"></div>' +
       '<div class="cm-bot"><label><input type="checkbox" id="cm-dots" checked> 城市点</label><label><input type="checkbox" id="cm-only"> 只看去过 / 路过的城市</label><label><input type="checkbox" id="cm-lab" checked> 省名</label><span style="margin-left:auto"></span><button type="button" id="cm-png">📷 导出图片</button></div>' +
-      '<div class="cm-rec" id="cm-rec"></div></div>' +
-      '<div class="ct"><div class="ct-h"><h2>📂 全国目录 · 地区 → 省 → 城市</h2><input class="ct-q" id="ct-q" type="search" placeholder="🔍 搜城市 / 省…" autocomplete="off"><button type="button" id="ct-all">全部展开</button></div><div id="ct-body"></div></div>';
+      '<div class="cm-rec" id="cm-rec"></div></div>';
+    // 📂 全国目录（省卡片 + 下面所有城市）：页面里有 #cntree 就放那里，没有就接在地图下面
+    var tw = document.getElementById("cntree"); if (!tw) { tw = document.createElement("div"); host.appendChild(tw); }
+    tw.innerHTML = '<div class="ct-h"><h2>🗺 全国 34 个省级行政区 · 所有城市</h2><input class="ct-q" id="ct-q" type="search" placeholder="🔍 搜城市 / 省…" autocomplete="off"></div>' +
+      '<div class="ct-sum" id="ct-sum"></div><div id="ct-body"></div>';
     var $ = function (id) { return document.getElementById(id); };
     Promise.all([fetch("cn/map.json").then(function (r) { return r.json(); }), fetch("cn/visited.json", { cache: "no-cache" }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }), fetch("cn/index.json").then(function (r) { return r.json(); }).catch(function () { return []; })]).then(function (res) {
       var M = res[0], DEF = res[1] || {}, TREE = res[2] || [], BY = {}, PV = {}, sel = null;
@@ -144,27 +155,35 @@
           cv.toBlob(function (b) { if (UU && UU.download) UU.download("我的中国足迹.png", b, "png"); else window.open(URL.createObjectURL(b), "_blank"); }, "image/png"); };
         img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(txt);
       }
-      // ---- 📂 全国目录（三级：地区 → 省 → 城市），颜色跟地图一样；点城市进城市页，点省名进省页 ----
-      var openP = {}, q = "";
+      // ---- 📂 全国目录：地区 → 省（封面照片卡）→ 城市（全部平铺），颜色跟地图一样；点照片进省页，点城市进城市页 ----
+      var q = "";
       function cityGo(c, p) { return c.go || "prov:" + p.slug; }  // 还没有城市页的 → 省页
       function cHref(c, p) { var g = cityGo(c, p); return /^city:/.test(g) ? "cn-city.html?c=" + g.slice(5) : g === "hzsights" ? "hz-sights.html" : g === "cqsights" ? "cq-sights.html" : provHref(p.slug); }
+      function img(f) { return "https://commons.wikimedia.org/wiki/Special:FilePath/" + encodeURIComponent(f) + "?width=560"; }
       function tree() {
-        var body = $("ct-body"); if (!body) return; var regs = [], byR = {}, ql = q.toLowerCase();
-        TREE.forEach(function (p) { if (!byR[p.region]) { byR[p.region] = []; regs.push(p.region); } byR[p.region].push(p); });
+        var body = $("ct-body"); if (!body) return; var regs = [], byR = {}, ql = q.toLowerCase(), all = 0, nb = 0, np = 0, nw = 0;
+        TREE.forEach(function (p) { if (!byR[p.region]) { byR[p.region] = []; regs.push(p.region); } byR[p.region].push(p);
+          p.cities.forEach(function (c) { var s = S[c.id] || {}; all++; if (s.been) nb++; else if (s.pass) np++; else if (s.want || s.plan) nw++; }); });
+        $("ct-sum").innerHTML = '<span>' + TREE.length + ' 个省级 · ' + all + ' 个城市</span><span><i style="background:#2fbf71"></i>去过 ' + nb + '</span><span><i style="background:#1fa0a0"></i>路过 ' + np + '</span><span><i style="background:#ffc94d"></i>想去 ' + nw + '</span><span style="opacity:.8">点照片进省页 · 点城市进城市页（小数字 = 景点数）</span>';
         body.innerHTML = regs.map(function (r) {
-          var ps = byR[r].map(function (p) {
-            var cs = p.cities.filter(function (c) { return !ql || c.zh.indexOf(q) >= 0 || p.zh.indexOf(q) >= 0 || c.slug.indexOf(ql) >= 0; }); if (!cs.length) return "";
-            var nb = 0; p.cities.forEach(function (c) { if ((S[c.id] || {}).been) nb++; });
-            var open = !!(openP[p.slug] || q);
-            return '<details class="ct-p' + (nb ? " been" : "") + '"' + (open ? " open" : "") + ' data-p="' + p.slug + '"><summary><b>' + esc(p.zh) + '</b><small>' + (nb ? "去过 " + nb + " / " : "") + p.cities.length + ' 个</small><a class="ct-go" href="' + provHref(p.slug) + '" data-go="prov:' + p.slug + '">省页 ›</a></summary><div class="ct-cs">' +
-              cs.map(function (c) { var s = S[c.id] || {}; return '<a class="ct-c' + (s.been ? " been" : s.pass ? " pass" : s.want ? " want" : s.skip ? " skip" : "") + '" href="' + esc(cHref(c, p)) + '" data-go="' + esc(cityGo(c, p)) + '">' + esc(c.zh.replace(/(市|地区)$/, "")) + "</a>"; }).join("") + "</div></details>";
+          var cards = byR[r].map(function (p) {
+            var hitP = !ql || p.zh.indexOf(q) >= 0 || p.slug.indexOf(ql) >= 0;
+            var cs = hitP ? p.cities : p.cities.filter(function (c) { return c.zh.indexOf(q) >= 0 || c.slug.indexOf(ql) >= 0; }); if (!cs.length) return "";
+            var b = 0, ps = 0, w = 0, n = p.cities.length; p.cities.forEach(function (c) { var s = S[c.id] || {}; if (s.been) b++; else if (s.pass) ps++; else if (s.want || s.plan) w++; });
+            var pct = function (x) { return (x / n * 100).toFixed(1) + "%"; };
+            return '<div class="ct-k' + (b ? " been" : "") + '"><a class="ct-ph" href="' + provHref(p.slug) + '" data-go="prov:' + p.slug + '" title="打开' + esc(p.zh) + '省页">' +
+              (p.img ? '<img loading="lazy" alt="" src="' + esc(img(p.img)) + '">' : "") + (p.cover ? '<span class="ct-cv">📷 ' + esc(p.cover) + "</span>" : "") +
+              '<span class="ct-nm">' + esc(p.zh) + "<i>" + esc(p.short) + '</i></span><span class="ct-pr">' + (b ? "去过 <b>" + b + "</b> / " + n : n + " 个城市") + " ›</span>" +
+              '<span class="ct-bar"><span style="width:' + pct(b) + ';background:#2fbf71"></span><span style="width:' + pct(ps) + ';background:#1fa0a0"></span><span style="width:' + pct(w) + ';background:#ffc94d"></span></span></a>' +
+              '<div class="ct-cs">' + cs.map(function (c) { var s = S[c.id] || {};
+                return '<a class="ct-c' + (s.been ? " been" : s.pass ? " pass" : s.want || s.plan ? " want" : s.skip ? " skip" : "") + (c.zh === p.cap ? " cap" : "") + '" href="' + esc(cHref(c, p)) + '" data-go="' + esc(cityGo(c, p)) + '"' + (c.zh === p.cap ? ' title="省会"' : "") + ">" +
+                  (c.zh === p.cap ? "★ " : "") + esc(c.zh.replace(/(市|地区)$/, "")) + (c.n ? "<small>" + c.n + "</small>" : "") + "</a>"; }).join("") + "</div></div>";
           }).join("");
-          return ps ? '<div class="ct-r"><div class="ct-rh">' + r + "</div>" + ps + "</div>" : "";
+          return cards ? '<div class="ct-rh">' + r + "<small>" + byR[r].length + " 个</small></div><div class=\"ct-g\">" + cards + "</div>" : "";
         }).join("") || '<div class="ct-none">没有符合的城市</div>';
       }
-      $("ct-body").addEventListener("toggle", function (e) { var d = e.target; if (d.dataset && d.dataset.p && !q) openP[d.dataset.p] = d.open; }, true);
       $("ct-q").addEventListener("input", function (e) { q = e.target.value.trim(); tree(); });
-      $("ct-all").addEventListener("click", function () { var all = TREE.every(function (p) { return openP[p.slug]; }); TREE.forEach(function (p) { openP[p.slug] = !all; }); this.textContent = all ? "全部展开" : "全部收起"; tree(); });
+      if (tw !== host) tw.addEventListener("click", function (e) { var t = e.target.closest && e.target.closest("a[data-go]"); if (t) { e.preventDefault(); go(t.dataset.go, t.getAttribute("href")); } });
       function paintAll() { paint(); tree(); }
       paintAll(); TRIPST.on(paintAll); TRIPST.sync();
     }).catch(function (e) { host.innerHTML = '<div class="cm" style="padding:14px;color:var(--soft)">地图没加载出来（' + esc(e) + '）</div>'; });
