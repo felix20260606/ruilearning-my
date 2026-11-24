@@ -92,7 +92,10 @@ function page(f){return "https://commons.wikimedia.org/wiki/File:"+encodeURIComp
 function wiki(t){return "https://zh.wikipedia.org/zh-cn/"+encodeURIComponent(t.replace(/ /g,"_"));}
 function amapAt(x){return "https://uri.amap.com/marker?position="+x.lng+","+x.lat+"&name="+encodeURIComponent(x.zh)+"&coordinate=wgs84&callnative=1&src=banlife.trip";}
 function amapSights(x){return "https://uri.amap.com/search?keyword="+encodeURIComponent("景点")+"&city="+encodeURIComponent(x.zh)+"&callnative=1&src=banlife.trip";}
-function go(g){if(window.parent&&window.parent!==window){try{parent.postMessage({tripGo:g},"*");}catch(e){}}}
+function go(g){if(window.parent&&window.parent!==window){try{parent.postMessage({tripGo:g},"*");}catch(e){}}else location.href=href(g);}
+// 单独打开（不在网站里）时，data-go 的按钮直接跳到对应页面
+var FILE={cn:"trip-nav.html?r=cn",hzsights:"hz-sights.html",cqsights:"cq-sights.html",cq:"cq-transit.html",db:"dongbei-trip.html"};
+function href(g){return /^prov:/.test(g)?"cn-prov.html?p="+g.slice(5):/^city:/.test(g)?"cn-city.html?c="+g.slice(5):(FILE[g]||"trip-nav.html?r=cn");}
 var slug=(new URLSearchParams(location.search).get("p")||"").replace(/[^a-z]/g,"");
 var D=null,BY={},F={st:"",q:"",so:"km"},mine=false;
 function st(x){return TRIPST.get(x.id)||{been:false,want:false};}
@@ -105,7 +108,7 @@ function card(x){
     '<div class="meta">📍 '+x.lat.toFixed(2)+'°N, '+x.lng.toFixed(2)+'°E'+(x.km!=null&&!x.cap?' · 离'+esc(D.capShort)+'约 '+x.km+' 公里（直线）':"")+'</div>'+
     (x.desc?'<p class="desc">'+esc(x.desc)+'</p>':"")+
     '<div class="acts"><button class="bt b" data-k="been">'+(s.been?"✅ 已去过":"☐ 去过")+'</button><button class="bt w" data-k="want">'+(s.want?"⭐ 想去":"☆ 想去")+'</button>'+
-    (x.go?'<a class="lk go" data-go="'+esc(x.go)+'">'+esc(x.goT)+' ›</a>':"")+
+    (x.go?'<a class="lk go" href="'+esc(href(x.go))+'" data-go="'+esc(x.go)+'">'+esc(x.goT)+' ›</a>':"")+
     '<a class="lk" href="'+esc(amapAt(x))+'" target="_blank" rel="noopener">📍 高德地图</a><a class="lk" href="'+esc(amapSights(x))+'" target="_blank" rel="noopener">🔍 搜景点</a>'+
     (x.wiki?'<a class="lk s" href="'+esc(wiki(x.wiki))+'" target="_blank" rel="noopener">维基百科</a>':"")+'</div></div></article>';
 }
@@ -132,9 +135,9 @@ fetch("cn/"+slug+".json",{cache:"no-cache"}).then(function(r){if(!r.ok)throw new
   var muni=/^(北京|上海|天津|重庆|香港|澳门|台湾)/.test(d.zh);if(muni)D.capShort=d.zh==="台湾"?"台北":"市中心";
   document.title=d.zh+" · 中国省份";$("hk").textContent=d.region+" · "+d.en;$("h1").textContent="🇨🇳 "+d.zh+"（"+d.short+"）";$("hs").textContent=d.desc;
   if(d.img)$("hero").style.backgroundImage='url("'+img(d.img,1200)+'")';
-  $("n-all").textContent=d.cities.length;$("n-lbl").textContent=/^(北京|上海|天津|重庆)/.test(d.zh)?"个区县":/^(香港)/.test(d.zh)?"个区":"个城市 / 地区";
-  $("n-cap").textContent=d.cap?d.cap.replace(/市$/,""):(d.zh==="台湾"?"台北":"—");
-  $("hl").innerHTML='<a class="lk" data-go="cn">‹ 全国省份</a>'+(d.go||[]).map(function(g){return '<a class="lk go" data-go="'+esc(g[0])+'">'+esc(g[1])+' ›</a>';}).join("")+
+  $("n-all").textContent=d.cities.length;$("n-lbl").textContent=/^(北京|上海|天津|重庆)/.test(d.zh)?"个区县":/^(香港|澳门)/.test(d.zh)?"个区":d.zh==="台湾"?"个县市":"个城市 / 地区";
+  $("n-cap").textContent=d.cap?d.cap.replace(/市$/,""):(d.zh==="台湾"?"台北":"—");if(!d.cap&&d.zh!=="台湾")$("n-cap").parentNode.style.display="none"; /* 直辖市、港澳不显示「省会」 */
+  $("hl").innerHTML='<a class="lk" href="'+href("cn")+'" data-go="cn">‹ 全国省份</a>'+(d.go||[]).map(function(g){return '<a class="lk go" href="'+esc(href(g[0]))+'" data-go="'+esc(g[0])+'">'+esc(g[1])+' ›</a>';}).join("")+
     '<a class="lk" href="'+esc(amapAt({lng:d.lng,lat:d.lat,zh:d.zh}))+'" target="_blank" rel="noopener">📍 高德地图</a>'+(d.wiki?'<a class="lk" href="'+esc(wiki(d.wiki))+'" target="_blank" rel="noopener">维基百科</a>':"");
   render();TRIPST.sync();
 }).catch(function(e){$("h1").textContent="读不到这个省的数据";$("hs").textContent=String(e);});

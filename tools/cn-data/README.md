@@ -12,4 +12,4 @@
 2. `python3 prep_raw.py`（q2.json → cities_raw.json），然后 `python3 build_data.py`：拉中文维基开头两句（简体）、首图补照片、算离省会直线距离 → `data_all.json`
 3. `python3 make_files.py ../../web/cn`：按地区排好，写出 34 个 `<拼音>.json`，并挂上已经做好的攻略页（杭州 / 重庆景点大全、重庆中转、东北自驾）
 
-以后做城市页：在 `make_files.py` 给城市加 `go`（tabs.js 认的名字），省页卡片会自动出「›」按钮。
+城市页：每个城市的景点放一个 `<拼音>.json`（格式见 `make_city.py` 开头），跑 `python3 make_city.py ../../web <省拼音> <景点目录>` → 写出 `web/cn/city/<拼音>.json`，并给省页那张城市卡片挂上「🏙 … 景点大全 ›」（tabs.js 认 `city:<拼音>` → `cn-city.html?c=<拼音>`）。`make_files.py` 重新生成省页数据时会读 `web/cn/city/` 保留这些链接。

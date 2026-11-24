@@ -50,20 +50,21 @@
     if(i<TRIP_FILES.length)openTrip(i); else if(empty){empty.style.display='flex';tf.style.display='none';}
   }
   // 🧭 旅游标签：导航（全部）、🇨🇳 中国、🇲🇾 马来西亚；中国 / 马来西亚打开的是导航页只显示那几栏（trip-nav.html?r=cn|my）
-  var PROV=/^prov:[a-z]+$/; // 🇨🇳 省份页：prov:<拼音> → cn-prov.html?p=<拼音>（数据在 cn/<拼音>.json）
+  var PROV=/^prov:[a-z]+$/,CITY=/^city:[a-z-]+$/; // 🏙 城市页：city:<拼音> → cn-city.html?c=<拼音>（数据在 cn/city/<拼音>.json）
+  // 🇨🇳 省份页：prov:<拼音> → cn-prov.html?p=<拼音>（数据在 cn/<拼音>.json）
   var CN_GRP=['cn','cq','cqsights','hzsights','db'],MY_GRP=['my','sights','last6','genting','ks','lk','pg','mel1','mel','sg','sg2'];
   function setDest(d){
     if(d==='foot')d='my'; // 「我的足迹」那页删了，统一用 🇲🇾 马来西亚（老的记录 / 链接也跳到这里）
     var isDb=(d==='db');
     if(destTnav)destTnav.classList.toggle('on',d==='tnav');
-    if(destCn)destCn.classList.toggle('on',CN_GRP.indexOf(d)>=0||PROV.test(d)); // 🇨🇳 中国：看中国的行程时也亮着
+    if(destCn)destCn.classList.toggle('on',CN_GRP.indexOf(d)>=0||PROV.test(d)||CITY.test(d)); // 🇨🇳 中国：看中国的行程时也亮着
     if(destMy)destMy.classList.toggle('on',MY_GRP.indexOf(d)>=0); // 🇲🇾 马来西亚：看马来西亚 / 从吉隆坡出发的行程时也亮着
     if(isDb){
       openDongbeiDefault();
     }else{
       if(row)row.style.display='none';
       if(empty)empty.style.display='none';
-      if(tf){tf.style.display='block';tf.setAttribute('src',PROV.test(d)?'cn-prov.html?p='+d.slice(5):d==='cn'?TNAV_FILE+'?r=cn':d==='my'?TNAV_FILE+'?r=my':d==='cqsights'?CQS_FILE:d==='hzsights'?HZS_FILE:d==='sights'?SIGHTS_FILE:d==='ks'?KS_FILE:d==='genting'?GT_FILE:d==='cq'?CQ_FILE:d==='last6'?LAST6_FILE:d==='tnav'?TNAV_FILE:(d==='lk'?LK_FILE:(d==='pg'?PG_FILE:(d==='sg2'?SG2_FILE:(d==='sg'?SG_FILE:(d==='mel1'?MELAKA1_FILE:MELAKA_FILE))))));}
+      if(tf){tf.style.display='block';tf.setAttribute('src',PROV.test(d)?'cn-prov.html?p='+d.slice(5):CITY.test(d)?'cn-city.html?c='+d.slice(5):d==='cn'?TNAV_FILE+'?r=cn':d==='my'?TNAV_FILE+'?r=my':d==='cqsights'?CQS_FILE:d==='hzsights'?HZS_FILE:d==='sights'?SIGHTS_FILE:d==='ks'?KS_FILE:d==='genting'?GT_FILE:d==='cq'?CQ_FILE:d==='last6'?LAST6_FILE:d==='tnav'?TNAV_FILE:(d==='lk'?LK_FILE:(d==='pg'?PG_FILE:(d==='sg2'?SG2_FILE:(d==='sg'?SG_FILE:(d==='mel1'?MELAKA1_FILE:MELAKA_FILE))))));}
     }
     try{localStorage.setItem('trip_dest',d);}catch(e){}
     if(window.NAV)NAV.mark();
@@ -142,7 +143,7 @@
       root.classList.add('show-trip');
       if(!tripLoaded){tripLoaded=true;
         var d0='tnav';try{d0=localStorage.getItem('trip_dest')||'tnav';}catch(e){} // 第一次打开默认「🧭 导航」
-        setDest((d0==='db'||d0==='mel'||d0==='mel1'||d0==='sg'||d0==='sg2'||d0==='pg'||d0==='lk'||d0==='tnav'||d0==='foot'||d0==='last6'||d0==='cq'||d0==='genting'||d0==='ks'||d0==='sights'||d0==='cqsights'||d0==='hzsights'||d0==='cn'||d0==='my'||PROV.test(d0))?d0:'tnav'); // 新加的「🗺 我的足迹」排最前、第一次默认它
+        setDest((d0==='db'||d0==='mel'||d0==='mel1'||d0==='sg'||d0==='sg2'||d0==='pg'||d0==='lk'||d0==='tnav'||d0==='foot'||d0==='last6'||d0==='cq'||d0==='genting'||d0==='ks'||d0==='sights'||d0==='cqsights'||d0==='hzsights'||d0==='cn'||d0==='my'||PROV.test(d0)||CITY.test(d0))?d0:'tnav'); // 新加的「🗺 我的足迹」排最前、第一次默认它
       }
     }else if(which==='ielts'){
       root.classList.add('show-ielts');
@@ -199,7 +200,7 @@
   if(destTnav)destTnav.onclick=function(){setDest('tnav');};
   if(destCn)destCn.onclick=function(){setDest('cn');};
   if(destMy)destMy.onclick=function(){setDest('my');};
-  window.addEventListener('message',function(e){var m={lk:'lk',pg:'pg',sg2:'sg2',sg:'sg',mel1:'mel1',mel:'mel',db:'db',foot:'my',last6:'last6',cq:'cq',genting:'genting',ks:'ks',sights:'sights',cqsights:'cqsights',hzsights:'hzsights',cn:'cn',my:'my',tnav:'tnav'};if(e&&e.data&&e.data.tripGo&&(m[e.data.tripGo]||PROV.test(e.data.tripGo)))setDest(m[e.data.tripGo]||e.data.tripGo);});
+  window.addEventListener('message',function(e){var m={lk:'lk',pg:'pg',sg2:'sg2',sg:'sg',mel1:'mel1',mel:'mel',db:'db',foot:'my',last6:'last6',cq:'cq',genting:'genting',ks:'ks',sights:'sights',cqsights:'cqsights',hzsights:'hzsights',cn:'cn',my:'my',tnav:'tnav'};if(e&&e.data&&e.data.tripGo&&(m[e.data.tripGo]||PROV.test(e.data.tripGo)||CITY.test(e.data.tripGo)))setDest(m[e.data.tripGo]||e.data.tripGo);});
   l1En.onclick=function(){show(L2_OF.en);};
   l1Life.onclick=function(){show(L2_OF.life);};
   tNb.onclick=function(){show('notebook');};
@@ -245,7 +246,7 @@
     if(lBtn)lBtn.classList.toggle('on',which==='lexam');
     if(rBtn)rBtn.classList.toggle('on',which==='rexam');
     basics.style.display=which==='basics'?'block':'none';
-    if(which==='basics'&&window.VL==='de'&&!basics.__de){basics.__de=1;var gs=document.createElement('script');gs.src="goethe-basics.js?v=86e49e03";gs.onload=function(){if(window.goetheBasicsHtml)basics.innerHTML=window.goetheBasicsHtml();};document.head.appendChild(gs);} // 🇩🇪 学德语：常识换成歌德考试常识（goethe-basics.js，第一次打开才加载）
+    if(which==='basics'&&window.VL==='de'&&!basics.__de){basics.__de=1;var gs=document.createElement('script');gs.src="goethe-basics.js?v=86e49e03";gs.onload=function(){if(window.goetheBasicsHtml)basics.innerHTML=window.goetheBasicsHtml();};gs.onerror=function(){basics.__de=0;gs.remove();if(window.U)U.log("basics","歌德常识没加载成功，下次打开再试");};document.head.appendChild(gs);} // 🇩🇪 学德语：常识换成歌德考试常识（goethe-basics.js，第一次打开才加载；没加载成功就清掉标记，下次打开再试）
     notesV.style.display=isNotes?'block':'none';
     if(exV){exV.style.display=isEx?'block':'none';if(isEx&&window.examShow)examShow(exV,which==='lexam'?'listening':'reading');}
     if(isNotes&&ifr&&!ifr.getAttribute('src'))ifr.setAttribute('src','ielts-notes.html');

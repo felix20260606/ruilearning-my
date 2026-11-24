@@ -11,21 +11,31 @@ SHORT={'北京市':'京','天津市':'津','河北省':'冀','山西省':'晋','
 PGO={'浙江省':[('hzsights','🍵 杭州景点大全')],'重庆市':[('cqsights','🌶 重庆景点大全'),('cq','✈️ 重庆中转 · 半天')],'辽宁省':[('db','🚗 东北三省自驾')],'吉林省':[('db','🚗 东北三省自驾')],'黑龙江省':[('db','🚗 东北三省自驾')]}
 CGO={'杭州市':('hzsights','🍵 杭州景点大全'),'渝中区':('cqsights','🌶 重庆景点大全')}
 BYZH={p['zh']:p for p in P.values()}
+NAMEFIX={'澳門半島':'澳门半岛','路環':'路环','路氹城':'路氹城（填海区）'}  # 维基数据里只有繁体的几个名字
+import glob
+CITYPG={}
+for f in glob.glob(os.path.join(sys.argv[1],'city','*.json')):
+    j=json.load(open(f,encoding='utf-8'));CITYPG[(j.get('provZh'),j['zh'])]=('city:'+j['slug'],'🏙 %s景点大全'%j['zh'].rstrip('市'))
 out=sys.argv[1];os.makedirs(out,exist_ok=True)
 idx=[]
 for reg,names in REG:
     for zh in names:
         p=BYZH[zh];slug=SLUG[zh]
+        MUNI4=zh[:2] in ('北京','上海','天津','重庆')
+        for x in p['cities'].values():
+            x['zh']=NAMEFIX.get(x['zh'],x['zh'])
+            if MUNI4: x['cap']=False  # 直辖市不标「省会」：距离都是从市中心算的
         cities=sorted(p['cities'].values(),key=lambda x:(not x['cap'],x['km'] if x['km'] is not None else 9999))
         C=[]
         for x in cities:
             d=dict(id='cn-'+x['id'],zh=x['zh'],en=x['en'],desc=x['desc'],img=x['img'],lat=round(x['coord'][0],5),lng=round(x['coord'][1],5),km=x['km'],cap=x['cap'],wiki=x['zhw'])
             if x['zh'] in CGO: d['go'],d['goT']=CGO[x['zh']]
+            elif (zh,x['zh']) in CITYPG: d['go'],d['goT']=CITYPG[(zh,x['zh'])]
             C.append(d)
         if not p['img'] and C: p['img']=C[0]['img']
-        doc=dict(slug=slug,zh=zh,short=SHORT[zh],en=p['en'],region=reg,cap=p['cap'] or '',desc=p['desc'],img=p['img'],lat=round(p['coord'][0],5),lng=round(p['coord'][1],5),wiki=p['zhw'],go=PGO.get(zh,[]),cities=C)
+        doc=dict(slug=slug,zh=zh,short=SHORT[zh],en=p['en'],region=reg,cap='' if MUNI4 else (p['cap'] or ''),desc=p['desc'],img=p['img'],lat=round(p['coord'][0],5),lng=round(p['coord'][1],5),wiki=p['zhw'],go=PGO.get(zh,[]),cities=C)
         json.dump(doc,open(os.path.join(out,slug+'.json'),'w'),ensure_ascii=False,separators=(',',':'))
-        idx.append(dict(slug=slug,zh=zh,short=SHORT[zh],en=p['en'],region=reg,cap=p['cap'] or '',img=p['img'],n=len(C),desc=p['desc'][:60]))
+        idx.append(dict(slug=slug,zh=zh,short=SHORT[zh],en=p['en'],region=reg,cap='' if MUNI4 else (p['cap'] or ''),img=p['img'],n=len(C),desc=p['desc'][:60]))
 json.dump(idx,open('index.json','w'),ensure_ascii=False)
 print(len(idx),'provinces',sum(i['n'] for i in idx),'cities')
 for i in idx: print(i['region'],i['zh'],i['n'],bool(i['img']))
