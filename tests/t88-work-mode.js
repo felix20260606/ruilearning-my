@@ -19,5 +19,11 @@ for (const k of ["workBtn", "workKey", "workBoss", "workPip", "workRead", "workC
 ok(/function wcTick/.test(P) && /workCardOff/.test(P) && /bottom:60px/.test(P) && /document\.documentElement\.append\(wcHost\)/.test(P), "review card: ticks, off-for-today, sits above the 学习模式 pill, actually appended");
 ok(/<span class="wk" data-a="wk"[^>]*>🙈<\/span><span class="gr" data-a="set"/.test(C) && /else if \(a === "wk"\) \{ if \(window\.VS_WK\) window\.VS_WK\.menu\(e\.target\); \}/.test(C), "🙈 sits in the BAN pill, left of the gear, and opens the menu");
 ok(/window\.VS_WK = \{ menu:/.test(W) && /classList\.toggle\("vs-wk-on", show\)/.test(W) && !/vs-wk-btn/.test(W) && /html\.vs-wk-on #vs-pill \.wk\{display:inline-flex\}/.test(X("content.css")), "no floating corner button; pill icon shown via html.vs-wk-on");
+for (const k of ["blur", "dim", "cover", "sub"]) ok(new RegExp("html\\.vs-lk-" + k + " ").test(W) || (k === "cover" && /#vs-wk-cover\{position:absolute/.test(W)), "look " + k + " has css");
+ok(/LOOKS = \{ clear: "清楚", blur: "🧊 毛玻璃", dim: "🌑 暗屏", cover: "📋 遮罩", sub: "💬 只留字幕" \}/.test(W) && /SIZES = \{ full: "原样", mini: "🔳 小框" \}/.test(W), "画面 and 大小 choices");
+ok(/html\.vs-sz-mini #movie_player\.vs-pl video\.html5-main-video\{left:0!important;top:0!important/.test(W) && /new Event\("resize"\)/.test(W) && /!document\.fullscreenElement/.test(W), "mini box: video pinned inside, YouTube relayout, off in fullscreen");
+ok(/#vs-wk-cover\{position:absolute!important;inset:0!important;z-index:55!important;pointer-events:none/.test(W) && /html\.vs-bili #vs-wk-cover\{z-index:110/.test(W), "cover sits under the subtitles (YouTube 60 / Bili 120) and lets clicks through");
+ok(/html\.vs-peek \.vs-pl:hover video\{filter:none!important;opacity:1!important\}/.test(W) && /clip-path:inset\(0\)/.test(W), "peek on hover; blur clipped");
+ok(/requestPictureInPicture/.test(W) && /COVER_CSS = BOSS_CSS\.replace/.test(W) && /applyLook\(on\)/.test(W), "video PiP, cover reuses boss skins, looks applied on every watch page");
 ok(!/\/\/[^\n]*document\.documentElement\.append\(wcHost\)/.test(P), "card append not swallowed by a // comment");
 console.log(fail ? fail + " FAILED" : "t88 work mode: all ok"); process.exit(fail ? 1 : 0);
