@@ -466,17 +466,17 @@ async function gtrans(text, tl, bd, sl) {
 }
 // 🇩🇪 德语查词（/api/dict?lang=de&w=…）：中文（谷歌，按德语翻）+ 维基词典英文版的德语词条（词性、英文释义、德语例句、名词的性 der/die/das、音标；
 //   变形如 ging 会给出原形 lemma）+ Tatoeba 德语例句；存 KV「d/de/词」30 天。结构和英语的一样，多 gender、lemma 两个字段
-const WIKT_UA = { "User-Agent": "ruilearning-my (personal study site)" };
+const WIKT_UA = { "User-Agent": "ruilearning-my/1.0 (https://ruilearning-my.pages.dev; personal study site)" }; // 维基媒体要求 UA 带联系方式，不然容易被限流
 const stripHtml = h => String(h || "").replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/\s+/g, " ").trim();
 async function wiktDe(w) {
   const cap = w.charAt(0).toUpperCase() + w.slice(1), tries = [...new Set([w, cap, w.toLowerCase()])];
   for (const t of tries) {
-    let j = null; try { const r = await fetch("https://en.wiktionary.org/api/rest_v1/page/definition/" + encodeURIComponent(t), { headers: WIKT_UA, cf: { cacheTtl: 86400 } }); if (r.ok) j = await r.json(); } catch (e) {}
+    let j = null; try { const r = await fetch("https://en.wiktionary.org/api/rest_v1/page/definition/" + encodeURIComponent(t), { headers: WIKT_UA, cf: { cacheTtl: 86400 } }); if (r.status === 429 || r.status >= 500) return { busy: true }; if (r.ok) j = await r.json(); } catch (e) { return { busy: true }; } // 被限流 / 连不上：别再试别的写法，也别存
     if (!j || !Array.isArray(j.de) || !j.de.length) continue;
-    const en = [], lemmas = [];
+    const en = [], lemmas = []; let nDef = 0, nForm = 0;
     j.de.forEach(x => (x.definitions || []).slice(0, 4).forEach(df => {
-      const def = stripHtml(df.definition); if (!def) return;
-      const lm = /\b(?:plural|singular|participle|preterite|subjunctive|imperative|inflection|form|comparative|superlative|genitive|dative|accusative|nominative|diminutive)\b[^.;]*?\bof\s+(\p{L}+)\s*$/u.exec(def); if (lm && lm[1] !== t) lemmas.push(lm[1]); /* 只认「…的变形」：plural of Haus、preterite of gehen */
+      const def = stripHtml(df.definition); if (!def) return; nDef++;
+      const lm = /\b(?:plural|singular|participle|preterite|subjunctive|imperative|inflection|form|comparative|superlative|genitive|dative|accusative|nominative|diminutive)\b[^.;]*?\bof\s+(\p{L}+)\s*$/u.exec(def); if (lm && lm[1] !== t) { lemmas.push(lm[1]); nForm++; } /* 只认「…的变形」：plural of Haus、preterite of gehen */
       if (en.length < 6) en.push({ pos: String(x.partOfSpeech || "").toLowerCase(), def, ex: df.parsedExamples && df.parsedExamples[0] ? stripHtml(df.parsedExamples[0].example) : "" });
     }));
     if (!en.length) continue;
@@ -488,27 +488,28 @@ async function wiktDe(w) {
         const g = /\{\{de-noun\|([mfn])\b/.exec(sec) || /\{\{de-ndecl\|([mfn])\b/.exec(sec); if (g) gender = { m: "der", f: "die", n: "das" }[g[1]];
         const ip = /\{\{IPA\|de\|([^}|]+)/.exec(sec); if (ip) phon = ip[1].trim(); }
     } catch (e) {}
-    return { title: t, en, gender, phon, lemma: lemmas[0] || "" };
+    return { title: t, en, gender, phon, lemma: nDef && nForm === nDef ? lemmas[0] : "" }; // 只有全是「…的变形」才算有原形（Essen 有「Esse 的复数」这一条，但它本身就是原形）
   }
   return null;
 }
 async function dictDe(req, env, u) {
   const w = String(u.searchParams.get("w") || "").normalize("NFC").trim().replace(/\s+/g, " ");
   if (!w || w.length > 80 || !/^\p{L}[\p{L}0-9' .,?!-]*$/u.test(w)) return json({ ok: false, error: "bad word" }, 400);
-  const kv = env.CAPTIONS, key = "d/de/" + w.toLowerCase();
+  const kv = env.CAPTIONS, key = "d/de/" + w; // 德语大小写不同是不同的词（arm 穷 / Arm 胳膊、essen / Essen）：按原样存
   try {
     const hit = kv && (await kv.get(key, "json")); if (hit && !(await freshOf(req, u, kv))) return json(Object.assign({ ok: true, cached: true }, hit));
     const one = w.split(" ").length <= 3, single = !w.includes(" ");
-    const [g, wk, ex] = await Promise.all([
+    const [g, wk0, ex] = await Promise.all([
       gtrans(w, "zh-CN", one, "de").catch(() => null),
-      single ? wiktDe(w).catch(() => null) : null,
+      single ? wiktDe(w).catch(() => ({ busy: true })) : null,
       w.length <= 40 ? sent(new Request("https://x/"), env, new URL("https://x/api/sent?lang=de&w=" + encodeURIComponent(w.toLowerCase()))).then(r => r.json()).catch(() => null) : null,
     ]);
+    const busy = !!(wk0 && wk0.busy), wk = busy ? null : wk0;
     const out = { word: wk && wk.title || w, phon: wk ? wk.phon : "", audio: "", zh: "", zhs: [], en: wk ? wk.en : [], examples: [], gender: wk ? wk.gender : "", lemma: wk ? wk.lemma : "" };
     if (g) { out.zh = (g.sentences || []).map(x => x.trans || "").join(""); out.zhs = (g.dict || []).slice(0, 4).map(x => ({ pos: x.pos || "", terms: (x.terms || []).slice(0, 6) })); }
     if (ex && ex.ok) out.examples = (ex.items || []).slice(0, 5).map(x => [x.en, x.zh]);
     if (!out.zh && !out.en.length) return json({ ok: false, error: "not found", word: w }, 404);
-    if (kv && out.zh && (out.en.length || out.zhs.length || out.examples.length)) await cput(kv, key, JSON.stringify(out), { expirationTtl: (single && !wk ? 1 : 30) * 86400 }); // 维基词典没连上 / 没有：只存 1 天
+    if (kv && !busy && out.zh && (out.en.length || out.zhs.length || out.examples.length)) await cput(kv, key, JSON.stringify(out), { expirationTtl: ((single && !wk) || (w.length <= 40 && !(ex && ex.ok)) ? 1 : 30) * 86400 }); // 维基词典被限流：不存；没有词条 / 例句没取到：只存 1 天
     return json(Object.assign({ ok: true }, out));
   } catch (e) { return json({ ok: false, error: String(e && e.message || e) }, 500); }
 }
@@ -585,7 +586,9 @@ const NEWS_FEEDS = [
 // 🇩🇪 学德语（?lang=de）：tagesschau（ARD 新闻，正文干净；DW、Deutschlandfunk 的网页抽出来夹着导航，没用）
 const NEWS_FEEDS_DE = [["tagesschau", "https://www.tagesschau.de/xml/rss2/"], ["tagesschau", "https://www.tagesschau.de/wissen/index~rss2.xml"], ["tagesschau", "https://www.tagesschau.de/ausland/index~rss2.xml"], ["tagesschau", "https://www.tagesschau.de/wirtschaft/index~rss2.xml"]];
 // tagesschau 正文里的「Stand: 日期」、结尾的「Dieses Thema im Programm…」「Mehr zum Thema」去掉
-const deClean = t => { const P = t.split("\n\n"), out = []; for (const p of P) { if (/^(Dieses Thema im Programm|Mehr zum Thema|Über dieses Thema berichtete|Weitere Informationen|Quelle:)/i.test(p.trim())) break; if (/^Stand: \d/.test(p.trim())) continue; out.push(p); } return out.join("\n\n"); };
+const deClean0 = t => { const P = t.split("\n\n"), out = []; for (const p of P) { if (/^(Dieses Thema im Programm|Mehr zum Thema|Über dieses Thema berichtete|Weitere Informationen|Quelle:)/i.test(p.trim())) break; if (/^Stand: \d/.test(p.trim())) continue; out.push(p); } return out.join("\n\n"); };
+// 再去掉 tagesschau 正文里夹着的「相关文章」（一行标题 + 一段以「… mehr」结尾的摘要）和页脚「tagesschau.de | 标题 | 日期 | 时间」
+const deClean = t => { const P = deClean0(t).split("\n\n"), out = []; for (const p of P) { const q = p.trim(); if (/^tagesschau\.de \|/.test(q) || /\|\s*\d{1,2}\.\d{1,2}\.\d{4}\s*\|/.test(q)) continue; if (/(\s|…|\.\.\.)mehr$/.test(q)) { const last = out[out.length - 1]; if (last && last.length < 160 && !/[.!?:]$/.test(last.trim())) out.pop(); continue; } out.push(p); } return out.join("\n\n"); };
 function rssItems(xml, src) {
   const dec = s => String(s || "").replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;|&apos;|&#x27;/g, "'").replace(/&#(\d+);/g, (m, n) => String.fromCharCode(+n)).replace(/\s+/g, " ").trim();
   const tag = (x, n) => { const m = x.match(new RegExp("<" + n + "(?:\\s[^>]*)?>([\\s\\S]*?)</" + n + ">")); return m ? dec(m[1]) : ""; };
@@ -612,7 +615,7 @@ async function news(req, env, u) {
   for (const i of all.slice(0, 8)) {
     const x = await extractArticle(i.u); if (!x.ok) continue; if (de) x.text = deClean(x.text);
     const n = x.text.split(/\s+/).length; if (n < 250) continue;
-    let text = x.text.replace(/^[^\n]{0,200}\n\n/, m => (/[.!?"”]\s*$/.test(m.trim()) ? m : "")); // 第一段是标题（没有句号）就去掉，免得读两遍
+    let text = x.text.replace(/^[^\n]{0,200}\n\n/, m => (/[.!?"”“»«]\s*$/.test(m.trim()) && !/^[„"«»“]/.test(m.trim()) ? m : "")); // 第一段是标题（没有句号）就去掉，免得读两遍
     if (n > 1500) { const P = text.split("\n\n"), out = []; let c = 0; for (const p of P) { if (c > 1200) break; out.push(p); c += p.split(/\s+/).length; } text = out.join("\n\n"); }
     pick = { src: i.s, url: i.u, title: i.t || x.title, text, words: text.split(/\s+/).length, pub: i.p }; break;
   }
@@ -893,7 +896,7 @@ async function alignPart(env, key, epKey, part, lang) {
 // GET /api/dw?ep=<号>&zh=1 → { ok, lines:[中文] }（谷歌 → Workers AI，KV dw/zh/<号> 一年，家里人共用）
 // GET /api/dw?al=<号>&part=N → 和 /api/sme?al= 一样（Whisper 德语）
 const DW_UA = { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36", "Accept": "text/html" };
-const dwTxt = h => String(h || "").replace(/<br\s*\/?>/gi, " ").replace(/<[^>]+>/g, "").replace(/&#160;|&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;|&#x27;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/\s+/g, " ").trim();
+const dwTxt = h => String(h || "").replace(/[\u00ad\u200b-\u200d\u2060\ufeff]/g, "").replace(/<br\s*\/?>/gi, " ").replace(/<[^>]+>/g, "").replace(/&#160;|&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;|&#x27;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/\s+/g, " ").trim();
 function dwParse(id, h) {
   const title = dwTxt((h.match(/<title>([\s\S]*?)<\/title>/) || [])[1] || "").replace(/\s*\|.*$/, "");
   const mp3 = (h.match(/<source src="(https:\/\/radiodownloaddw-a\.akamaihd\.net\/[^"]+?langsamenachrichten\/[^"]+?\.mp3)"/) || h.match(/"(https:\/\/radiodownloaddw-a\.akamaihd\.net\/[^"]+?langsamenachrichten\/[^"]+?\.mp3)"/) || [])[1] || "";
@@ -1190,7 +1193,9 @@ const EXAM_TF_CHECK = EXAM_TF_CHECK_DE.replace("against a German passage", "agai
 async function examTfCheck(env, text, tf, de) {
   const r = await aiJson(env, [{ role: "system", content: de ? EXAM_TF_CHECK_DE : EXAM_TF_CHECK }, { role: "user", content: "Passage:\n" + text + "\n\nStatements:\n" + tf.map((x, i) => i + 1 + ". " + x.s).join("\n") }], o => isObj(o) && Array.isArray(o.a) && o.a.length === tf.length, 300);
   if (!r.ok) return tf; // 检查没做成：照原样（不因为检查失败就出不了题）
-  return tf.filter((x, i) => String(r.a[i] || "").toUpperCase().replace(/_/g, " ").trim() === x.a);
+  const MAP = { RICHTIG: "TRUE", WAHR: "TRUE", FALSCH: "FALSE", "STEHT NICHT IM TEXT": "NOT GIVEN", "NICHT GEGEBEN": "NOT GIVEN", "NICHT IM TEXT": "NOT GIVEN", NG: "NOT GIVEN", T: "TRUE", F: "FALSE" };
+  const norm = a => { const k = String(a || "").toUpperCase().replace(/_/g, " ").replace(/[.!]/g, "").trim(); return MAP[k] || k; }; // 检查的 AI 有时用德语 / 缩写回答
+  return tf.filter((x, i) => norm(r.a[i]) === x.a);
 }
 const exNormEn = s => String(s || "").toLowerCase().replace(/[’']/g, "'").replace(/[^a-z0-9' ]+/g, " ").replace(/\s+/g, " ").trim(), exNorm = exNormEn;
 const exNormDe = s => String(s || "").normalize("NFC").toLowerCase().replace(/[’']/g, "'").replace(/[^\p{L}0-9' ]+/gu, " ").replace(/\s+/g, " ").trim(); // 德语：保留 ä ö ü ß
@@ -1284,8 +1289,7 @@ async function examGen(env, b) {
     return json({ ok: false, error: r.error || "bad output", detail: last ? Object.keys(last).map(k => k + ":" + n(k)).join(" ") + (miss.length ? " | 答案不在原文：" + miss.join(", ") : "") : "" }, 502);
   }
   if (mode === "reading") { // 判断题再核对一遍（英语雅思、德语歌德都做）；核对后少于 2 道，就算这次没出好（再点一次重出）
-    got.tfng = await examTfCheck(env, text, got.tfng, de);
-    if (got.tfng.length < 2) return json({ ok: false, error: "判断题核对没通过，再出一次" }, 502);
+    got.tfng = await examTfCheck(env, text, got.tfng, de); // 核对不一致的判断题去掉（一道都不剩也照样出卷：段落、填空、选择题还在，不浪费这次出题）
   }
   got.model = r.model; if (kv) await cput(kv, ck, JSON.stringify(got), { expirationTtl: 60 * 86400 });
   return json(Object.assign({ ok: true }, got));
@@ -1605,14 +1609,14 @@ async function vapid(kv) {
 async function vapidAuth(v, endpoint) {
   const aud = new URL(endpoint).origin, now = Math.floor(Date.now() / 1000);
   const head = b64uText(JSON.stringify({ typ: "JWT", alg: "ES256" })), body = b64uText(JSON.stringify({ aud, exp: now + 12 * 3600, sub: "https://ruilearning-my.pages.dev" }));
-  const key = await crypto.subtle.importKey("jwk", v.jwk, { name: "ECDSA", namedCurve: "P-256" }, false, ["sign"]);
+  const key = v.key || (v.key = await crypto.subtle.importKey("jwk", v.jwk, { name: "ECDSA", namedCurve: "P-256" }, false, ["sign"])); // 一次推送任务里只导入一次
   const sig = await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, key, new TextEncoder().encode(head + "." + body));
   return "vapid t=" + head + "." + body + "." + b64u(sig) + ", k=" + v.pub;
 }
 // 这个人今天练了几张、连续几天（同 /api/board：插件数据的 stat|日期 + 断签保护）
-async function pushInfo(kv, x) {
+async function pushInfo(kv, x, day0) { // day0：按哪天算（23:30 的提醒过了零点补推时算前一天）
   const pre = (x.u ? "u/" + x.u + "/" : "") + (x.lang && x.lang !== "en" ? "l/" + x.lang + "/" : ""), [e, m] = await Promise.all([kv.get(pre + EXT_KEY, "json"), kv.get(pre + "mine:daily", "json")]);
-  const it = (e && e.items) || {}, mi = (m && m.items) || {}, day = bjDay(), act = d => { const r = it["stat|" + d]; return r && !r.del && r.v && +r.v.n > 0; }, frz = d => mi["frz:" + d] && !mi["frz:" + d].del;
+  const it = (e && e.items) || {}, mi = (m && m.items) || {}, day = day0 || bjDay(), act = d => { const r = it["stat|" + d]; return r && !r.del && r.v && +r.v.n > 0; }, frz = d => mi["frz:" + d] && !mi["frz:" + d].del;
   const prev = d => new Date(Date.parse(d + "T12:00:00Z") - 864e5).toISOString().slice(0, 10);
   let k = act(day) ? day : prev(day), st = 0, g = 0; while (g++ < 4000 && (act(k) || frz(k))) { if (act(k)) st++; k = prev(k); }
   const r = it["stat|" + day]; return { today: r && r.v ? +r.v.n || 0 : 0, streak: st };
@@ -1639,24 +1643,27 @@ async function push(req, env, u) {
       const h = u.searchParams.get("peek") || ""; if (!/^[0-9a-f]{16}$/.test(h)) return json({ ok: false, error: "bad id" }, 400);
       const L = await pushIdx(kv), mine = Object.values(L).filter(x => x.e === h);
       if (!mine.length) return json(Object.assign({ ok: true }, pushText({ today: 0, streak: 0 })));
-      const x = mine.sort((a, b) => (b.sent || 0) - (a.sent || 0))[0];
-      return json(Object.assign({ ok: true }, pushText(await pushInfo(kv, x), x, mine.length > 1)));
+      const x = mine.sort((a, b) => (b.sent || 0) - (a.sent || 0))[0], recent = x.sent && Date.now() - x.sent < 4 * 3600e3 && x.last; // 刚推的那条：按提醒那天算
+      return json(Object.assign({ ok: true }, pushText(await pushInfo(kv, x, recent || undefined), x, mine.length > 1)));
     }
     if (req.method !== "POST") return json({ ok: false, error: "method" }, 405);
     let b = null; try { b = JSON.parse((await req.text()) || "{}"); } catch (e) {} if (!isObj(b)) return json({ ok: false, error: "bad body" }, 400);
     if (b.send) { // 定时任务：只读索引；到点、今天没推过的才去读这个人的练习记录、推送、写一次
       const L = await pushIdx(kv), now = Date.now(), due = Object.entries(L).filter(([, x]) => { const d = pushDue(x.time, now); return d.due && x.last !== d.day; }), out = { sent: 0, skip: 0, gone: 0, fail: 0, due: due.length };
       if (!due.length) return json(Object.assign({ ok: true }, out));
-      const v = await vapid(kv); let ch = false;
+      const v = await vapid(kv), info = {}, upd = {}, gone = new Set();
       for (const [id, x] of due.slice(0, 40)) { // 一次最多 40 组（免费版每个请求最多 50 个子请求）
-        const d = pushDue(x.time, now), i = await pushInfo(kv, x);
-        if (i.today >= 20) { x.last = d.day; ch = true; out.skip++; continue; } // 今天已经练够了：不打扰
+        const d = pushDue(x.time, now), ik = x.u + "|" + x.lang + "|" + d.day, i = info[ik] || (info[ik] = await pushInfo(kv, x, d.day)); // 同一个人同一种语言只读一次练习记录；按提醒那天算（过零点补推算前一天）
+        if (i.today >= 20) { upd[id] = { last: d.day }; out.skip++; continue; } // 那天已经练够了：不打扰
         const r = await fetch(x.ep, { method: "POST", headers: { TTL: "43200", Urgency: "normal", Authorization: await vapidAuth(v, x.ep), "Content-Length": "0" } }).catch(() => null);
-        if (r && (r.status === 404 || r.status === 410)) { delete L[id]; ch = true; out.gone++; continue; }
-        if (r && r.ok) { x.last = d.day; x.sent = now; x.fail = 0; x.exp = now + PUSH_TTL; ch = true; out.sent++; }
-        else { x.fail = (x.fail || 0) + 1; out.fail++; ch = true; if (r && (r.status === 401 || r.status === 403) && x.fail >= 3) { delete L[id]; out.gone++; } }
+        if (r && (r.status === 404 || r.status === 410 || r.status === 400)) { gone.add(id); out.gone++; continue; } // 订阅没了 / 坏了
+        if (r && r.ok) { upd[id] = { last: d.day, sent: now, fail: 0, exp: now + PUSH_TTL }; out.sent++; }
+        else { const f = (x.fail || 0) + 1; out.fail++; if ((r && (r.status === 401 || r.status === 403) && f >= 3) || f >= 10) { gone.add(id); out.gone++; } else upd[id] = { fail: f }; } // 401/403 三次、别的错连续 10 次：删
       }
-      if (ch) await kv.put("push:subs", JSON.stringify(L));
+      if (gone.size || Object.keys(upd).length) { // 写之前重新读一遍：推送这段时间里有人关掉 / 换了订阅，别被旧的盖回去
+        const L2 = await pushIdx(kv); gone.forEach(id => delete L2[id]); for (const id in upd) if (L2[id]) Object.assign(L2[id], upd[id]);
+        await kv.put("push:subs", JSON.stringify(L2));
+      }
       return json(Object.assign({ ok: true }, out));
     }
     if (isObj(b.renew) && isObj(b.renew.sub) && typeof b.renew.old === "string" && PUSH_HOST.test(b.renew.sub.endpoint || "")) { // 手机换了订阅：搬过去

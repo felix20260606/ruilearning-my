@@ -71,5 +71,20 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
   // 过期的组不算
   const L2 = subs(); for (const id in L2) L2[id].exp = 1; kv.set("push:subs", JSON.stringify(L2));
   r = await call("/api/push", { sub: { endpoint: EP("fresh") }, u: "" }); ok(r.j.ok && Object.keys(subs()).length === 1, "expired combos dropped");
+  // 过零点补推：23:45 的提醒在 00:07 推，看的是前一天练了没有（那天练够了就不推）
+  { kv.clear(); kv.set("users", JSON.stringify([{ id: "", name: "Rui" }])); const realNow = Date.now, T = Date.parse("2026-11-24T00:07:00+08:00"); Date.now = () => T;
+    try {
+      kv.set("ext", JSON.stringify({ ver: 1, items: { "stat|2026-11-23": { v: { n: 30 }, at: 1 } } }));
+      let r = await call("/api/push", { sub: { endpoint: EP("late") }, u: "", time: "23:45" }); ok(r.j.ok, "subscribe 23:45");
+      const sent = [], of2 = globalThis.fetch; globalThis.fetch = async u => { sent.push(String(u)); return new Response("", { status: 201 }); };
+      r = await call("/api/push", { send: 1 }); ok(r.j.skip === 1 && r.j.sent === 0 && !sent.length, "00:07 run judges the 23rd (30 cards) → no push: " + JSON.stringify(r.j));
+      kv.set("ext", JSON.stringify({ ver: 1, items: {} })); const L = JSON.parse(kv.get("push:subs")); for (const id in L) L[id].last = ""; kv.set("push:subs", JSON.stringify(L));
+      // 推送过程中有人关掉了另一组：写回时不能把它加回来
+      await call("/api/push", { sub: { endpoint: EP("other") }, u: "", time: "23:50" });
+      globalThis.fetch = async u => { const S = JSON.parse(kv.get("push:subs")); for (const id in S) if (S[id].ep === EP("other")) delete S[id]; kv.set("push:subs", JSON.stringify(S)); return new Response("", { status: 201 }); };
+      r = await call("/api/push", { send: 1 }); const S2 = JSON.parse(kv.get("push:subs"));
+      ok(r.j.sent >= 1 && !Object.values(S2).some(x => x.ep === EP("other")), "unsubscribed during send stays unsubscribed");
+      globalThis.fetch = of2;
+    } finally { Date.now = realNow; } }
   console.log(fail ? fail + " FAILED" : "t84 push: all ok"); process.exit(fail ? 1 : 0);
 })();

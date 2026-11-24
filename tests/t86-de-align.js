@@ -54,7 +54,7 @@ let fail = 0; const ok = (c, m) => { if (!c) { fail++; console.log("FAIL", m); }
   [st, j] = await call("/api/sme?ep=dw/80017572"); ok(j.ok && j.s === "dw" && j.mp3.includes("langsamenachrichten") && j.lines[0].t === "Die Regierung macht etwas.", "sme?ep=dw/… opens DW episode");
   [st, j] = await call("/api/sme?zh=1&co=1&ep=dw/80017572"); ok(j.ok === false && j.error === "not cached", "DW translation cache-only");
   [st, j] = await call("/api/sent?lang=de&w=haus"); ok(j.ok && j.items.length === 1 && j.items[0].en === "Das Haus ist groß." && kv.has("s/de/haus"), "sent?lang=de: German, filtered, own cache key");
-  [st, j] = await call("/api/dict?lang=de&w=Haus"); ok(j.ok && j.gender === "das" && j.phon === "[haʊ̯s]" && j.en[0].def === "house" && kv.has("d/de/haus"), "dict?lang=de: gender, IPA, definition");
+  [st, j] = await call("/api/dict?lang=de&w=Haus"); ok(j.ok && j.gender === "das" && j.phon === "[haʊ̯s]" && j.en[0].def === "house" && kv.has("d/de/Haus"), "dict?lang=de: gender, IPA, definition (cache key keeps case)");
   [st, j] = await call("/api/dict?lang=de&w=" + encodeURIComponent("schön")); ok(st !== 400, "dict?lang=de accepts umlauts");
   globalThis.fetch = of;
   const src = W("web/_worker.js");
