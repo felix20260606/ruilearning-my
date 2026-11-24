@@ -1,6 +1,6 @@
 /* 🗺 中国足迹地图（window.CNMAP）：旅游中心「🇨🇳 中国」最上面那张，trip-nav.html?r=cn 时自动画
    数据：cn/map.json（省界 SVG 路径 + 496 个城市点，tools/cn-data/make_map.py 生成）+ cn/visited.json（默认足迹：用户告诉 Claude 去过哪，写在这里）
-   状态：trip-state.js（TRIPST）——省页 / 城市页勾的「去过 / 想去」（id = cn-<维基数据编号>），景点大全里勾了某个城市的任何景点也算去过这个城市（map.json 的 alias：hz- → 杭州 …）
+   状态：trip-state.js（TRIPST）——省页 / 城市页勾的「去过 / 想去 / 计划（算想去）/ 不想去（不上色）/ 评价 / 再去」（id = cn-<维基数据编号>），景点大全里勾了某个城市的任何景点也算去过这个城市（map.json 的 alias：hz- → 杭州 …）
    省：有去过的城市 = 绿；只有想去 = 金；都没有 = 灰。点省 / 点城市弹出小卡片：改去过 / 想去、打开省页 / 城市页
    操作：拖动、滚轮 / 双指缩放、＋ − ⟲；只看去过；城市点开关；最近标记；导出图片（PNG） */
 (function () {
@@ -29,7 +29,7 @@
     ".cm-rec{padding:0 14px 12px;font-size:12.5px;color:var(--soft)}.cm-rec a{color:var(--ink);text-decoration:none;cursor:pointer;margin-right:10px;white-space:nowrap}.cm-rec a:hover{color:#c59bef}";
 
   function init(host) {
-    var st = document.createElement("style"); st.textContent = CSS; document.head.appendChild(st);
+    var st = document.createElement("style"); st.textContent = CSS; document.head.appendChild(st); if (TRIPST.S) TRIPST.S.css();
     host.innerHTML = '<div class="cm"><div class="cm-top"><h2>🗺 我的中国足迹</h2><div class="cm-st" id="cm-st"></div></div>' +
       '<div class="cm-box" id="cm-box"><div class="cm-ctl"><button type="button" data-z="1.5" title="放大">＋</button><button type="button" data-z="0.667" title="缩小">－</button><button type="button" data-z="0" title="回到全国">⟲</button></div>' +
       '<div class="cm-tip" id="cm-tip"></div><div class="cm-lg"><span><i style="background:rgba(47,191,113,.8)"></i>去过</span><span><i style="background:rgba(255,201,77,.7)"></i>想去</span><span><i style="background:#2b2f38;border:1px solid #5a6070"></i>还没去</span></div></div>' +
@@ -58,12 +58,13 @@
         for (id in defBeen) S[id] = { been: true, at: 0, src: "默认" }; for (id in defWant) if (!S[id]) S[id] = { want: true, at: 0, src: "默认" };
         for (id in A) {
           var v = A[id].v || {};
-          if (BY[id]) { S[id] = { been: !!v.been, want: !!v.want, at: A[id].at, src: "城市" }; continue; }
+          if (BY[id]) { S[id] = { been: !!v.been, want: !!(v.want || v.plan), skip: !!v.skip, rate: v.rate || "", again: !!v.again, raw: v, at: A[id].at, src: "城市" }; continue; } // 计划也算想去（金色）；不想去不上色
           for (k in M.alias || {}) if (id.indexOf(k) === 0 && M.alias[k] && v.been) { var c = M.alias[k], o = S[c] || {}; if (!o.been || (A[id].at > (o.at || 0) && o.src !== "城市")) S[c] = { been: true, want: false, at: Math.max(A[id].at, o.at || 0), src: o.src === "城市" ? "城市" : "景点" }; }
         }
         return S;
       }
       var S = {};
+      function base(id) { var r = TRIPST.get(id); if (r) return r; var s = S[id] || {}; return { been: !!s.been, want: !!s.want }; } // 这个城市现在的记录（没点过就用默认足迹 / 景点算出来的）
       function paint() {
         S = state();
         var only = $("cm-only").checked, dots = $("cm-dots").checked, nb = 0, nw = 0, pb = {}, pw = {};
@@ -80,8 +81,8 @@
         var pn = $("cm-pn"), c = BY[key], p = c ? PV[c.p] : PV[key]; if (!p) { pn.className = "cm-pn"; return; }
         if (c) {
           var s = S[c.id] || {};
-          pn.innerHTML = "<b>" + esc(c.zh) + "</b><small>" + esc(p.zh) + (s.been ? " · ✅ 去过" + (s.src === "景点" ? "（景点大全里勾过）" : s.src === "默认" ? "（默认足迹）" : "") : s.want ? " · ⭐ 想去" : "") + "</small>" +
-            '<div class="cm-acts"><button type="button" data-k="been" class="' + (s.been ? "on-b" : "") + '">' + (s.been ? "✅ 已去过" : "☐ 去过") + '</button><button type="button" data-k="want" class="' + (s.want ? "on-w" : "") + '">' + (s.want ? "⭐ 想去" : "☆ 想去") + "</button>" +
+          pn.innerHTML = "<b>" + esc(c.zh) + "</b><small>" + esc(p.zh) + (s.been ? " · ✅ 去过" + (s.rate ? " " + TRIPST.S.RATE[s.rate] : "") + (s.again ? " · 🔁 还想再去" : "") + (s.src === "景点" ? "（景点大全里勾过）" : s.src === "默认" ? "（默认足迹）" : "") : s.want ? " · ⭐ 想去" : s.skip ? " · 🚫 不想去" : "") + "</small>" +
+            '<div class="cm-acts">' + TRIPST.S.btns(base(c.id)) +
             (c.go ? '<a class="pri" href="' + esc(cityHref(c)) + '" data-go="' + esc(c.go) + '">🏙 城市页 ›</a>' : "") + '<a href="' + esc(provHref(c.p)) + '" data-go="prov:' + esc(c.p) + '">' + esc(p.zh) + ' ›</a><button type="button" data-zoom="' + esc(c.p) + '">🔍 放大这个省</button></div>';
         } else {
           var n = M.cities.filter(function (x) { return x.p === p.slug; }).length;
@@ -117,7 +118,7 @@
         if (t.dataset.z != null) { var f = +t.dataset.z; zoomAt(f, vb[0] + vb[2] / 2, vb[1] + vb[3] / 2); return; }
         if (t.dataset.zoom) { zoomProv(t.dataset.zoom); return; }
         if (t.dataset.close) { sel = null; $("cm-pn").className = "cm-pn"; paint(); return; }
-        if (t.dataset.k && BY[sel]) { var s = S[sel] || {}, v = { been: !!s.been, want: !!s.want }; v[t.dataset.k] = !v[t.dataset.k]; if (t.dataset.k === "been" && v.been) v.want = false; TRIPST.set(sel, v); return; }
+        if (t.dataset.k && BY[sel]) { TRIPST.set(sel, TRIPST.S.toggle(base(sel), t.dataset.k)); return; }
         if (t.dataset.c && !t.dataset.k) { sel = t.dataset.c; var c = BY[sel]; zoomProv(c.p); paint(); return; }
         if (t.dataset.go) { e.preventDefault(); go(t.dataset.go, t.getAttribute("href")); }
         if (t.id === "cm-png") exportPng();

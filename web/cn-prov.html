@@ -44,15 +44,12 @@
   .ph img{width:100%;height:170px;object-fit:cover;display:block}.ph .no{display:flex;align-items:center;justify-content:center;height:170px;font-size:50px;line-height:1}
   .tag{position:absolute;left:8px;top:8px;font-size:11.5px;line-height:1.5;color:#fff;background:rgba(0,0,0,.6);padding:2px 9px;border-radius:999px}
   .tag.cap{background:#b98410}
-  .mk{position:absolute;right:8px;top:8px;font-size:12px;font-weight:800;line-height:1.5;padding:2px 10px;border-radius:999px;display:none}
-  .card.been .mk.b{display:inline-block;background:#1f7a55;color:#fff}.card.want:not(.been) .mk.w{display:inline-block;background:#b98410;color:#fff}
   .cb{padding:11px 14px 13px;display:flex;flex-direction:column;flex:1}
   .nm b{font-size:16px;font-weight:900;display:block;line-height:1.4}.nm small{display:block;color:var(--soft);font-size:12px;line-height:1.45}
   .meta{font-size:12.5px;color:var(--soft);margin-top:3px}
   .desc{font-size:13.2px;margin-top:7px;color:var(--ui-ink-2,var(--ink))}
   .acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:11px}
   .bt{font:inherit;font-size:12.5px;font-weight:800;border-radius:999px;padding:4px 12px;cursor:pointer;border:1px solid var(--line);background:var(--paper-2);color:var(--ink)}
-  .card.been .bt.b{background:#1f7a55;border-color:#1f7a55;color:#fff}.card.want .bt.w{background:#b98410;border-color:#b98410;color:#fff}
   .empty,.err{text-align:center;color:var(--soft);padding:40px 0;font-size:14px}
   footer{text-align:center;color:var(--soft);font-size:12px;margin-top:26px;line-height:1.8}
   @media (max-width:520px){.hero h1{font-size:25px}.grid{grid-template-columns:1fr}#st{flex-wrap:nowrap;overflow-x:auto}}
@@ -85,6 +82,7 @@
 <script>
 (function(){
 "use strict";
+TRIPST.S.css(); // 去过 / 想去 / 计划 / 不想去 / 评价 / 再去：按钮、标记、筛选都用 trip-state.js 的 TRIPST.S
 var $=function(id){return document.getElementById(id);};
 function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function img(f,w){return "https://commons.wikimedia.org/wiki/Special:FilePath/"+encodeURIComponent(f)+"?width="+(w||560);}
@@ -101,26 +99,25 @@ var D=null,BY={},F={st:"",q:"",so:"km"},mine=false;
 function st(x){return TRIPST.get(x.id)||{been:false,want:false};}
 function card(x){
   var s=st(x),ph=x.img?'<img loading="lazy" src="'+esc(img(x.img))+'" alt="'+esc(x.zh)+'" onerror="this.outerHTML=\'<div class=no>🏙</div>\'">':'<div class="no">🏙</div>';
-  return '<article class="card'+(s.been?" been":"")+(s.want?" want":"")+'" id="c-'+esc(x.id)+'" data-id="'+esc(x.id)+'">'+
+  return '<article class="card '+TRIPST.S.cls(s)+'" id="c-'+esc(x.id)+'" data-id="'+esc(x.id)+'">'+
     (x.img?'<a class="ph" href="'+esc(page(x.img))+'" target="_blank" rel="noopener">':'<div class="ph">')+ph+
-    (x.cap?'<span class="tag cap">⭐ 省会</span>':(x.km!=null?'<span class="tag">离'+esc(D.capShort)+' '+x.km+' km</span>':""))+'<span class="mk b">✅ 去过</span><span class="mk w">⭐ 想去</span>'+(x.img?'</a>':'</div>')+
+    (x.cap?'<span class="tag cap">⭐ 省会</span>':(x.km!=null?'<span class="tag">离'+esc(D.capShort)+' '+x.km+' km</span>':""))+TRIPST.S.mark(s)+(x.img?'</a>':'</div>')+
     '<div class="cb"><div class="nm"><b>'+esc(x.zh)+'</b><small>'+esc(x.en)+'</small></div>'+
     '<div class="meta">📍 '+x.lat.toFixed(2)+'°N, '+x.lng.toFixed(2)+'°E'+(x.km!=null&&!x.cap?' · 离'+esc(D.capShort)+'约 '+x.km+' 公里（直线）':"")+'</div>'+
     (x.desc?'<p class="desc">'+esc(x.desc)+'</p>':"")+
-    '<div class="acts"><button class="bt b" data-k="been">'+(s.been?"✅ 已去过":"☐ 去过")+'</button><button class="bt w" data-k="want">'+(s.want?"⭐ 想去":"☆ 想去")+'</button>'+
+    '<div class="acts">'+TRIPST.S.btns(s)+
     (x.go?'<a class="lk go" href="'+esc(href(x.go))+'" data-go="'+esc(x.go)+'">'+esc(x.goT)+' ›</a>':"")+
     '<a class="lk" href="'+esc(amapAt(x))+'" target="_blank" rel="noopener">📍 高德地图</a><a class="lk" href="'+esc(amapSights(x))+'" target="_blank" rel="noopener">🔍 搜景点</a>'+
     (x.wiki?'<a class="lk s" href="'+esc(wiki(x.wiki))+'" target="_blank" rel="noopener">维基百科</a>':"")+'</div></div></article>';
 }
-function match(x){var s=st(x);if(F.st==="been"&&!s.been)return false;if(F.st==="want"&&!s.want)return false;if(F.st==="left"&&s.been)return false;
+function match(x){var s=st(x);if(!TRIPST.S.match(s,F.st,""))return false;
   if(F.q){var h=(x.zh+" "+x.en+" "+x.desc).toLowerCase();if(h.indexOf(F.q.toLowerCase())<0)return false;}return true;}
 function order(a,b){if(F.so==="name")return a.zh.localeCompare(b.zh,"zh");return (b.cap-a.cap)||((a.km==null?9e9:a.km)-(b.km==null?9e9:b.km));}
-function stats(){var b=0,w=0,C=D.cities;C.forEach(function(x){var s=st(x);if(s.been)b++;else if(s.want)w++;});
+function stats(){var b=0,w=0,C=D.cities;C.forEach(function(x){var s=st(x);if(s.been)b++;else if(s.want||s.plan)w++;});
   $("n-been").textContent=b;$("n-want").textContent=w;$("bar").style.width=(C.length?Math.round(b*100/C.length):0)+"%";
-  var SS=[["","全部 "+C.length],["left","还没去 "+(C.length-b)],["want","⭐ 想去 "+w],["been","✅ 去过 "+b]];
-  $("st").innerHTML='<span class="lbl">状态</span>'+SS.map(function(z){return '<button class="chip'+(F.st===z[0]?" on":"")+'" data-st="'+z[0]+'">'+z[1]+'</button>';}).join("");}
+  $("st").innerHTML='<span class="lbl">状态</span>'+TRIPST.S.chips(C,st,null,F.st);}
 function render(){var L=D.cities.filter(match).sort(order);$("grid").innerHTML=L.map(card).join("");$("empty").style.display=L.length?"none":"";stats();}
-function toggle(id,k){var x=BY[id];if(!x)return;var v=Object.assign({},st(x));v[k]=!v[k];if(k==="been"&&v.been)v.want=false;mine=true;TRIPST.set(id,v);mine=false;
+function toggle(id,k){var x=BY[id];if(!x)return;var v=TRIPST.S.toggle(st(x),k);mine=true;TRIPST.set(id,v);mine=false;
   var el=$("c-"+id);if(el&&match(x))el.outerHTML=card(x);else render();stats();}
 document.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest("button,a[data-go]");if(!t)return;
   if(t.dataset.k){var c=t.closest(".card");if(c)toggle(c.dataset.id,t.dataset.k);return;}
