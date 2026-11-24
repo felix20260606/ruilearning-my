@@ -16,7 +16,7 @@
   var FAT_FILES={nav:'fat-nav.html',calc:'jianzhi-calc.html',wrap:'jianzhi-wrap.html',x10:'jianzhi-exec10.html','14d':'jianzhi-14day.html',kl:'jianzhi-kl.html',ly:'jianzhi-linyi.html',bkk:'jianzhi-plan.html'};
   var row=document.getElementById('triprow'),empty=document.getElementById('tripempty');
   var destDb=document.getElementById('dest-db'),destMel=document.getElementById('dest-mel'),destMel1=document.getElementById('dest-mel1'),destSg=document.getElementById('dest-sg'),destSg2=document.getElementById('dest-sg2'),destPg=document.getElementById('dest-pg'),destLk=document.getElementById('dest-lk'),destTnav=document.getElementById('dest-tnav');
-  var SIGHTS_FILE='kl-sights.html',KS_FILE='kselangor-1day.html',GT_FILE='genting-1day.html',CQ_FILE='cq-transit.html',LAST6_FILE='last6-trip.html',destLast6=document.getElementById('dest-last6'),FOOT_FILE='my-trips.html',destFoot=document.getElementById('dest-foot'),MELAKA_FILE='malacca.html',MELAKA1_FILE='malacca-1day.html',SG_FILE='sg-trip.html',SG2_FILE='sg-2day.html',PG_FILE='penang-trip.html',LK_FILE='langkawi-trip.html',TNAV_FILE='trip-nav.html';
+  var SIGHTS_FILE='kl-sights.html',CQS_FILE='cq-sights.html',HZS_FILE='hz-sights.html',KS_FILE='kselangor-1day.html',GT_FILE='genting-1day.html',CQ_FILE='cq-transit.html',LAST6_FILE='last6-trip.html',destLast6=document.getElementById('dest-last6'),FOOT_FILE='my-trips.html',destFoot=document.getElementById('dest-foot'),MELAKA_FILE='malacca.html',MELAKA1_FILE='malacca-1day.html',SG_FILE='sg-trip.html',SG2_FILE='sg-2day.html',PG_FILE='penang-trip.html',LK_FILE='langkawi-trip.html',TNAV_FILE='trip-nav.html';
   var grpEn=document.querySelector('.subgrp[data-l1="en"]'),grpLife=document.querySelector('.subgrp[data-l1="life"]');
   if(!l1En||!l1Life||!tNb)return;
   var root=document.documentElement, tripLoaded=false, fatLoaded=false;
@@ -66,7 +66,7 @@
     }else{
       if(row)row.style.display='none';
       if(empty)empty.style.display='none';
-      if(tf){tf.style.display='block';tf.setAttribute('src',d==='sights'?SIGHTS_FILE:d==='ks'?KS_FILE:d==='genting'?GT_FILE:d==='cq'?CQ_FILE:d==='last6'?LAST6_FILE:d==='foot'?FOOT_FILE:d==='tnav'?TNAV_FILE:(d==='lk'?LK_FILE:(d==='pg'?PG_FILE:(d==='sg2'?SG2_FILE:(d==='sg'?SG_FILE:(d==='mel1'?MELAKA1_FILE:MELAKA_FILE))))));}
+      if(tf){tf.style.display='block';tf.setAttribute('src',d==='cqsights'?CQS_FILE:d==='hzsights'?HZS_FILE:d==='sights'?SIGHTS_FILE:d==='ks'?KS_FILE:d==='genting'?GT_FILE:d==='cq'?CQ_FILE:d==='last6'?LAST6_FILE:d==='foot'?FOOT_FILE:d==='tnav'?TNAV_FILE:(d==='lk'?LK_FILE:(d==='pg'?PG_FILE:(d==='sg2'?SG2_FILE:(d==='sg'?SG_FILE:(d==='mel1'?MELAKA1_FILE:MELAKA_FILE))))));}
     }
     try{localStorage.setItem('trip_dest',d);}catch(e){}
     if(window.NAV)NAV.mark();
@@ -145,7 +145,7 @@
       root.classList.add('show-trip');
       if(!tripLoaded){tripLoaded=true;
         var d0='foot';try{d0=localStorage.getItem('trip_dest')||'foot';if(!localStorage.getItem('trip:foot:seen')){localStorage.setItem('trip:foot:seen','1');d0='foot';}}catch(e){} // 「🗺 我的足迹」排最前、第一次打开默认它（「吉隆坡周边」没有单独的标签，从导航页卡片打开） // 新加的「🗺 我的足迹」第一次打开默认它
-        setDest((d0==='db'||d0==='mel'||d0==='mel1'||d0==='sg'||d0==='sg2'||d0==='pg'||d0==='lk'||d0==='tnav'||d0==='foot'||d0==='last6'||d0==='cq'||d0==='genting'||d0==='ks'||d0==='sights')?d0:'foot'); // 新加的「🗺 我的足迹」排最前、第一次默认它
+        setDest((d0==='db'||d0==='mel'||d0==='mel1'||d0==='sg'||d0==='sg2'||d0==='pg'||d0==='lk'||d0==='tnav'||d0==='foot'||d0==='last6'||d0==='cq'||d0==='genting'||d0==='ks'||d0==='sights'||d0==='cqsights'||d0==='hzsights')?d0:'foot'); // 新加的「🗺 我的足迹」排最前、第一次默认它
       }
     }else if(which==='ielts'){
       root.classList.add('show-ielts');
@@ -206,7 +206,7 @@
   if(destLast6)destLast6.onclick=function(){setDest('last6');};
   (function(){var mb=document.getElementById('dest-more'),w=mb&&mb.parentNode;if(!mb)return;var op=function(o){w.classList.toggle('open',o);mb.textContent=o?'收起 ▴':'⋯ 更多';};op(!!U.LG('trip:more',false));mb.onclick=function(){var o=!w.classList.contains('open');op(o);U.LS('trip:more',o);};})(); // 🧭 旅游标签默认只显示「我的足迹」「导航」，其他的点「⋯ 更多」展开（记住展开没有） // 🧭 吉隆坡周边 6 天（last6-trip.html）：没有单独的标签，从导航页卡片打开（destLast6 为空）
   if(destLk)destLk.onclick=function(){setDest('lk');};
-  window.addEventListener('message',function(e){var m={lk:'lk',pg:'pg',sg2:'sg2',sg:'sg',mel1:'mel1',mel:'mel',db:'db',foot:'foot',last6:'last6',cq:'cq',genting:'genting',ks:'ks',sights:'sights'};if(e&&e.data&&e.data.tripGo&&m[e.data.tripGo])setDest(m[e.data.tripGo]);});
+  window.addEventListener('message',function(e){var m={lk:'lk',pg:'pg',sg2:'sg2',sg:'sg',mel1:'mel1',mel:'mel',db:'db',foot:'foot',last6:'last6',cq:'cq',genting:'genting',ks:'ks',sights:'sights',cqsights:'cqsights',hzsights:'hzsights'};if(e&&e.data&&e.data.tripGo&&m[e.data.tripGo])setDest(m[e.data.tripGo]);});
   if(destPg)destPg.onclick=function(){setDest('pg');};
   if(destSg2)destSg2.onclick=function(){setDest('sg2');};
   if(destSg)destSg.onclick=function(){setDest('sg');};
