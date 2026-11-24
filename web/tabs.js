@@ -15,8 +15,8 @@
   var fatKl=document.getElementById('fat-kl'),fatLy=document.getElementById('fat-ly'),fatBkk=document.getElementById('fat-bkk'),fat14d=document.getElementById('fat-14d'),fatX10=document.getElementById('fat-x10'),fatWrap=document.getElementById('fat-wrap'),fatNav=document.getElementById('fat-nav'),fatCalc=document.getElementById('fat-calc');
   var FAT_FILES={nav:'fat-nav.html',calc:'jianzhi-calc.html',wrap:'jianzhi-wrap.html',x10:'jianzhi-exec10.html','14d':'jianzhi-14day.html',kl:'jianzhi-kl.html',ly:'jianzhi-linyi.html',bkk:'jianzhi-plan.html'};
   var row=document.getElementById('triprow'),empty=document.getElementById('tripempty');
-  var destDb=document.getElementById('dest-db'),destMel=document.getElementById('dest-mel'),destMel1=document.getElementById('dest-mel1'),destSg=document.getElementById('dest-sg'),destSg2=document.getElementById('dest-sg2'),destPg=document.getElementById('dest-pg'),destLk=document.getElementById('dest-lk'),destTnav=document.getElementById('dest-tnav'),destCn=document.getElementById('dest-cn'),destMy=document.getElementById('dest-my');
-  var SIGHTS_FILE='kl-sights.html',CQS_FILE='cq-sights.html',HZS_FILE='hz-sights.html',KS_FILE='kselangor-1day.html',GT_FILE='genting-1day.html',CQ_FILE='cq-transit.html',LAST6_FILE='last6-trip.html',destLast6=document.getElementById('dest-last6'),FOOT_FILE='my-trips.html',destFoot=document.getElementById('dest-foot'),MELAKA_FILE='malacca.html',MELAKA1_FILE='malacca-1day.html',SG_FILE='sg-trip.html',SG2_FILE='sg-2day.html',PG_FILE='penang-trip.html',LK_FILE='langkawi-trip.html',TNAV_FILE='trip-nav.html';
+  var destTnav=document.getElementById('dest-tnav'),destCn=document.getElementById('dest-cn'),destMy=document.getElementById('dest-my'); // 🧭 旅游只有三个标签：导航 / 中国 / 马来西亚，其它行程都从导航页的卡片进
+  var SIGHTS_FILE='kl-sights.html',CQS_FILE='cq-sights.html',HZS_FILE='hz-sights.html',KS_FILE='kselangor-1day.html',GT_FILE='genting-1day.html',CQ_FILE='cq-transit.html',LAST6_FILE='last6-trip.html',FOOT_FILE='my-trips.html',MELAKA_FILE='malacca.html',MELAKA1_FILE='malacca-1day.html',SG_FILE='sg-trip.html',SG2_FILE='sg-2day.html',PG_FILE='penang-trip.html',LK_FILE='langkawi-trip.html',TNAV_FILE='trip-nav.html';
   var grpEn=document.querySelector('.subgrp[data-l1="en"]'),grpLife=document.querySelector('.subgrp[data-l1="life"]');
   if(!l1En||!l1Life||!tNb)return;
   var root=document.documentElement, tripLoaded=false, fatLoaded=false;
@@ -53,18 +53,9 @@
   var CN_GRP=['cn','cq','cqsights','hzsights','db'],MY_GRP=['my','foot','sights','last6','genting','ks','lk','pg','mel1','mel','sg','sg2'];
   function setDest(d){
     var isDb=(d==='db');
-    if(destDb)destDb.classList.toggle('on',isDb);
-    if(destMel)destMel.classList.toggle('on',d==='mel');
-    if(destMel1)destMel1.classList.toggle('on',d==='mel1');
-    if(destSg)destSg.classList.toggle('on',d==='sg');
-    if(destSg2)destSg2.classList.toggle('on',d==='sg2');
-    if(destPg)destPg.classList.toggle('on',d==='pg');
-    if(destLk)destLk.classList.toggle('on',d==='lk');
     if(destTnav)destTnav.classList.toggle('on',d==='tnav');
     if(destCn)destCn.classList.toggle('on',CN_GRP.indexOf(d)>=0); // 🇨🇳 中国：看中国的行程时也亮着
     if(destMy)destMy.classList.toggle('on',MY_GRP.indexOf(d)>=0); // 🇲🇾 马来西亚：看马来西亚 / 从吉隆坡出发的行程时也亮着
-    if(destFoot)destFoot.classList.toggle('on',d==='foot');
-    if(destLast6)destLast6.classList.toggle('on',d==='last6');
     if(isDb){
       openDongbeiDefault();
     }else{
@@ -203,20 +194,10 @@
   };
   document.getElementById('en-secbar').addEventListener('click',function(e){var b=e.target.closest('button[data-sub]');if(b&&SECS[CUR])show(CUR,b.dataset.sub);});
   buildTripRow();
-  if(destDb)destDb.onclick=function(){setDest('db');};
-  if(destMel)destMel.onclick=function(){setDest('mel');};
   if(destTnav)destTnav.onclick=function(){setDest('tnav');};
   if(destCn)destCn.onclick=function(){setDest('cn');};
   if(destMy)destMy.onclick=function(){setDest('my');};
-  if(destFoot)destFoot.onclick=function(){setDest('foot');};
-  if(destLast6)destLast6.onclick=function(){setDest('last6');};
-  (function(){var mb=document.getElementById('dest-more'),w=mb&&mb.parentNode;if(!mb)return;var op=function(o){w.classList.toggle('open',o);mb.textContent=o?'收起 ▴':'⋯ 更多';};op(!!U.LG('trip:more',false));mb.onclick=function(){var o=!w.classList.contains('open');op(o);U.LS('trip:more',o);};})(); // 🧭 旅游标签默认只显示「我的足迹」「导航」，其他的点「⋯ 更多」展开（记住展开没有） // 🧭 吉隆坡周边 6 天（last6-trip.html）：没有单独的标签，从导航页卡片打开（destLast6 为空）
-  if(destLk)destLk.onclick=function(){setDest('lk');};
   window.addEventListener('message',function(e){var m={lk:'lk',pg:'pg',sg2:'sg2',sg:'sg',mel1:'mel1',mel:'mel',db:'db',foot:'foot',last6:'last6',cq:'cq',genting:'genting',ks:'ks',sights:'sights',cqsights:'cqsights',hzsights:'hzsights',cn:'cn',my:'my',tnav:'tnav'};if(e&&e.data&&e.data.tripGo&&m[e.data.tripGo])setDest(m[e.data.tripGo]);});
-  if(destPg)destPg.onclick=function(){setDest('pg');};
-  if(destSg2)destSg2.onclick=function(){setDest('sg2');};
-  if(destSg)destSg.onclick=function(){setDest('sg');};
-  if(destMel1)destMel1.onclick=function(){setDest('mel1');};
   l1En.onclick=function(){show(L2_OF.en);};
   l1Life.onclick=function(){show(L2_OF.life);};
   tNb.onclick=function(){show('notebook');};
