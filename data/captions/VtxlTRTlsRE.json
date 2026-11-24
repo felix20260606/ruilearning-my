@@ -1,22 +1,16 @@
 {
   "v": "VtxlTRTlsRE",
-  "title": "A Must-Watch Shooting Masterclass for Hoopers | Lebron James and Steve Nash",
+  "title": "LeBron & Steve Nash Reveal the Secrets to Elite Shooting",
   "author": "Mind the Game",
   "lang": "en",
   "tl": "zh-CN",
-  "at": 1795078521850,
+  "at": 1795540999308,
   "cues": [
     {
       "s": 0.1,
-      "e": 4,
-      "t": "Sometimes I feel like I even in a hard pull-up could fix it just from here to",
-      "r": "有时候我觉得，即使是做高难度的引体向上，我也可以把它从这里改到"
-    },
-    {
-      "s": 4,
       "e": 6.7,
-      "t": "here shoot just change it.",
-      "r": "这里，就这么简单，改变一下。"
+      "t": "Sometimes I feel like I even in a hard pull-up could fix it just from here to here shoot just change it.",
+      "r": "有时候我觉得，即使是做高难度的引体向上，我也可以把它从这里改到这里，就这么简单，改变一下。"
     },
     {
       "s": 6.7,
@@ -44,27 +38,15 @@
     },
     {
       "s": 19.1,
-      "e": 22.7,
-      "t": "bad habits in my shooting. could emulate that. I think I could",
-      "r": "坏习惯。可以效仿。我觉得我一"
-    },
-    {
-      "s": 22.7,
       "e": 24,
-      "t": "shoot from the start. Yeah.",
-      "r": "开始就能开枪。是的。"
+      "t": "bad habits in my shooting. could emulate that. I think I could shoot from the start. Yeah.",
+      "r": "坏习惯。可以效仿。我觉得我一开始就能开枪。是的。"
     },
     {
       "s": 24,
-      "e": 26.1,
-      "t": "I don't know why. It just made sense to me.",
-      "r": "我不知道为什么。我觉得这很合情理。"
-    },
-    {
-      "s": 26.1,
       "e": 30,
-      "t": "I'm a guy who don't like shooting against the laces.",
-      "r": "我这个人不喜欢逆潮流而行。"
+      "t": "I don't know why. It just made sense to me. I'm a guy who don't like shooting against the laces.",
+      "r": "我不知道为什么。我觉得这很合情理。我这个人不喜欢逆潮流而行。"
     },
     {
       "s": 30,
@@ -80,15 +62,9 @@
     },
     {
       "s": 37.3,
-      "e": 39.8,
-      "t": "What about this one? Are you a ball watcher or rim watcher?",
-      "r": "这个怎么样？你是只盯着球看还是只盯着篮筐看？"
-    },
-    {
-      "s": 39.8,
       "e": 41.4,
-      "t": "I'm a ball watcher. But me too.",
-      "r": "我喜欢看球。我也是。是的"
+      "t": "What about this one? Are you a ball watcher or rim watcher? I'm a ball watcher. But me too.",
+      "r": "这个怎么样？你是只盯着球看还是只盯着篮筐看？我喜欢看球。我也是。是的"
     },
     {
       "s": 41.4,
@@ -104,15 +80,9 @@
     },
     {
       "s": 47.3,
-      "e": 49.6,
-      "t": "with free throws. Can you help me understand?",
-      "r": "罚球方面遇到的困难。你能帮我理解一下吗？"
-    },
-    {
-      "s": 49.6,
       "e": 53.8,
-      "t": "I damn sure ain't answering that. And let's talk about prettiest",
-      "r": "我绝对不会回答这个问题。我们来聊聊最漂亮"
+      "t": "with free throws. Can you help me understand? I damn sure ain't answering that. And let's talk about prettiest",
+      "r": "罚球方面遇到的困难。你能帮我理解一下吗？我绝对不会回答这个问题。我们来聊聊最漂亮"
     },
     {
       "s": 53.8,
@@ -122,483 +92,315 @@
     },
     {
       "s": 72,
-      "e": 75.3,
-      "t": "And there's Larry kind of gets it above the head.",
-      "r": "然后拉里就把它举过头顶了。"
-    },
-    {
-      "s": 75.3,
       "e": 78.7,
-      "t": "That's so good. It looks like Luka. Mhm.",
-      "r": "太好了。看起来像卢卡。嗯。"
+      "t": "And there's Larry kind of gets it above the head. That's so good. It looks like Luka. Mhm.",
+      "r": "然后拉里就把它举过头顶了。太好了。看起来像卢卡。嗯。"
     },
     {
       "s": 78.7,
-      "e": 81.7,
-      "t": "Larry Bird and Luka shot look alike. a little bit Dirk.",
-      "r": "拉里·伯德和卢卡的投篮姿势很像。有点像德克。"
-    },
-    {
-      "s": 81.7,
       "e": 85.8,
-      "t": "Mhm. Yeah, a little bit Dirk. Bird ahead.",
-      "r": "嗯。是的，有点像德克。前方有鸟。"
+      "t": "Larry Bird and Luka shot look alike. a little bit Dirk. Mhm. Yeah, a little bit Dirk. Bird ahead.",
+      "r": "拉里·伯德和卢卡的投篮姿势很像。有点像德克。嗯。是的，有点像德克。前方有鸟。"
     },
     {
       "s": 85.8,
-      "e": 88.2,
-      "t": "Joker. Similar.",
-      "r": "小丑。相似的。"
-    },
-    {
-      "s": 88.2,
       "e": 90.7,
-      "t": "Great. I don't know how they shoot like that",
-      "r": "伟大的。我不知道他们是怎么做到那种射门，子弹能打到自己"
+      "t": "Joker. Similar. Great. I don't know how they shoot like that",
+      "r": "小丑。相似的。伟大的。我不知道他们是怎么做到那种射门，子弹能打到自己"
     },
     {
       "s": 90.7,
-      "e": 92.6,
-      "t": "where they get it behind them. That's not my",
-      "r": "身后。那不是我的“是”"
-    },
-    {
-      "s": 92.6,
       "e": 95.6,
-      "t": "Yeah. A lot of art to on that shot.",
-      "r": "。那张照片里有很多艺术元素。是的"
+      "t": "where they get it behind them. That's not my Yeah. A lot of art to on that shot.",
+      "r": "身后。那不是我的“是”。那张照片里有很多艺术元素。是的"
     },
     {
       "s": 95.6,
-      "e": 99.2,
-      "t": "Yeah. Hali.",
-      "r": "。哈利。"
+      "e": 100.8,
+      "t": "Yeah. Hali. Hali. See, once it gets to the finish, it's",
+      "r": "。哈利。你看，一旦到了终点，它就很"
     },
     {
-      "s": 99.2,
-      "e": 103.7,
-      "t": "See, once it gets to the finish, it's beautiful. It's perfect.",
-      "r": "你看，一旦到了终点，它就很漂亮了。完美。"
+      "s": 100.8,
+      "e": 107.8,
+      "t": "beautiful. It's perfect. It's beautiful. Kobe had a great shot. Yeah. Great flick flick of the wrist.",
+      "r": "漂亮了。完美。很美丽。科比投出了一记精彩的球。是的。手腕一抖，动作漂亮。"
     },
     {
-      "s": 103.7,
-      "e": 106.5,
-      "t": "It's beautiful. Kobe had a great shot. Yeah.",
-      "r": "很美丽。科比投出了一记精彩的球。是的。"
+      "s": 107.8,
+      "e": 113.1,
+      "t": "great flick of the wrist. pronounced. Reggie's was different. Yeah, Reggie's was different cuz they",
+      "r": "发音。雷吉的情况则不同。是的，雷吉的情况不一样，因为他们"
     },
     {
-      "s": 106.5,
-      "e": 108.6,
-      "t": "Great flick flick of the wrist. great flick of the wrist.",
-      "r": "手腕一抖，动作漂亮。"
+      "s": 113.1,
+      "e": 117.8,
+      "t": "they almost tell you like, you know, don't your off hand",
+      "r": "几乎是直接告诉你，你知道，不要用非"
     },
     {
-      "s": 108.6,
-      "e": 110.9,
-      "t": "pronounced. Reggie's was different.",
-      "r": "发音。雷吉的情况则不同。"
+      "s": 117.8,
+      "e": 123.79,
+      "t": "don't hold the ball. He had his hand on top of the ball. And then when he flicked, he kind of like",
+      "r": "惯用手拿球。他的手放在球的上方。然后当他挥杆时，"
     },
     {
-      "s": 110.9,
-      "e": 115.6,
-      "t": "Yeah, Reggie's was different cuz they they almost tell you like, you know,",
-      "r": "是的，雷吉的情况不一样，因为他们几乎是直接告诉你，你知道，"
+      "s": 123.79,
+      "e": 127.29,
+      "t": "I don't think he affected the ball, but he kind of pulled this hand away. Some",
+      "r": "我觉得他好像没有碰到球，但他把手缩了回去。有些"
     },
     {
-      "s": 115.6,
-      "e": 120.19,
-      "t": "don't your off hand don't hold the ball. He had his hand on",
-      "r": "不要用非惯用手拿球。他的手放在"
+      "s": 127.29,
+      "e": 131.19,
+      "t": "guys thumb the ball. I don't think he did, but he pulled this hand away and he",
+      "r": "人用拇指击球。我不认为他做到了，但他把手抽了回去，他几乎……"
     },
     {
-      "s": 120.19,
-      "e": 123.49,
-      "t": "top of the ball. And then when he flicked, he kind of",
-      "r": "球的上方。然后当他挥杆时，"
+      "s": 131.19,
+      "e": 135.29,
+      "t": "kind of almost I'm exaggerating, but he had like a finish that was",
+      "r": "我有点夸张了，但他最后就像……是"
     },
     {
-      "s": 123.49,
-      "e": 125.29,
-      "t": "like I don't think he affected the ball, but",
-      "r": "我觉得他好像没有碰到球，但"
+      "s": 135.29,
+      "e": 138.99,
+      "t": "Yeah, yeah. It was like unorthodox finish like",
+      "r": "啊，是啊。这就像是非正统的终结方式，就像有史以来"
     },
     {
-      "s": 125.29,
-      "e": 129.19,
-      "t": "he kind of pulled this hand away. Some guys thumb the ball. I don't think he",
-      "r": "他把手缩了回去。有些人用拇指击球。我不认为他"
+      "s": 138.99,
+      "e": 142.99,
+      "t": "For one of the greatest shooters ever who shot off the move, and we'll get",
+      "r": "最伟大的射手之一在移动中投篮一样，我们会深入"
     },
     {
-      "s": 129.19,
-      "e": 133.69,
-      "t": "did, but he pulled this hand away and he kind of almost I'm exaggerating, but he",
-      "r": "做到了，但他把手抽了回去，他几乎……我有点夸张了，但他"
+      "s": 142.99,
+      "e": 147.49,
+      "t": "into the different types of shots, man, how how accurate he was considering",
+      "r": "探讨不同类型的投篮，伙计，考虑到当时有"
     },
     {
-      "s": 133.69,
-      "e": 137.69,
-      "t": "had like a finish that was Yeah, yeah. It was like unorthodox",
-      "r": "最后就像……是啊，是啊。这就像是非正统的"
+      "s": 147.49,
+      "e": 153.19,
+      "t": "there was a lot going on. Right, right. Yeah, shoot your shot, man. Steph",
+      "r": "很多事情发生，他的命中率有多高。对，对。对，放手一搏吧。斯蒂芬·"
     },
     {
-      "s": 137.69,
-      "e": 140.69,
-      "t": "finish like For one of the greatest shooters ever",
-      "r": "终结方式，就像有史以来最伟大的射手之一在"
+      "s": 153.19,
+      "e": 156.49,
+      "t": "Compact So for me, Steph changed the game a",
+      "r": "库克对我来说，改变了比赛的格局，因为"
     },
     {
-      "s": 140.69,
-      "e": 145.19,
-      "t": "who shot off the move, and we'll get into the different types of shots,",
-      "r": "移动中投篮一样，我们会深入探讨不同类型的投篮，"
+      "s": 156.49,
+      "e": 163.69,
+      "t": "little bit in that he shoots almost the way I described I shot as a kid. push shot. It's straight through.",
+      "r": "他的投篮方式几乎和我小时候的投篮方式一模一样。推射。它是直通的。是的"
     },
     {
-      "s": 145.19,
-      "e": 149.19,
-      "t": "man, how how accurate he was considering there was a lot going on.",
-      "r": "伙计，考虑到当时有很多事情发生，他的命中率有多高。"
+      "s": 163.69,
+      "e": 168.79,
+      "t": "Yeah. You know, it doesn't stop in the pocket. And so he has lots of legs. Yeah.",
+      "r": "。你知道，它并不会止步于口袋里。所以他有很多腿。是的。"
     },
     {
-      "s": 149.19,
-      "e": 151.89,
-      "t": "Right, right. Yeah, shoot your shot, man.",
-      "r": "对，对。对，放手一搏吧。"
+      "s": 168.79,
+      "e": 174.09,
+      "t": "I mean, but that's still like crazy to make Yeah. Just like shots he makes from the places, the",
+      "r": "我的意思是，但这仍然像疯了一样，是的。就像他从各个位置、"
     },
     {
-      "s": 151.89,
-      "e": 154.09,
-      "t": "Steph Compact",
-      "r": "斯蒂芬·"
+      "s": 174.09,
+      "e": 181.29,
+      "t": "angles, the speed, the distance. Obviously, the finish is beautiful. And he can do it quick. Yeah.",
+      "r": "角度、速度和距离投篮一样。显然，成品非常漂亮。而且他能很快做到。是的。"
     },
     {
-      "s": 154.09,
-      "e": 159.69,
-      "t": "So for me, Steph changed the game a little bit in that he shoots almost the",
-      "r": "库克对我来说，改变了比赛的格局，因为他的投篮方式几乎和我"
+      "s": 181.29,
+      "e": 188.99,
+      "t": "Anthony Mason, free throw RIP, one hand. RIP. And there's our guy tricks. Look at the",
+      "r": "安东尼·梅森，罚球命中，单手投篮。安息。这就是我们的一些小伎俩。看看"
     },
     {
-      "s": 159.69,
-      "e": 162.49,
-      "t": "way I described I shot as a kid. push shot.",
-      "r": "小时候的投篮方式一模一样。推射。"
+      "s": 188.99,
+      "e": 194.49,
+      "t": "elbow. It's still bent. Yeah. It was just a flick of the wrist, too. Yeah.",
+      "r": "肘部。它还是弯的。是的。而且只是手腕轻轻一抖而已。是的。"
     },
     {
-      "s": 162.49,
-      "e": 164.19,
-      "t": "It's straight through. Yeah.",
-      "r": "它是直通的。是的。"
+      "s": 194.49,
+      "e": 200.39,
+      "t": "Just a flick. Oh, hey. Oh, Steve. Gorgeous.",
+      "r": "只是一闪。哦，嗨。哦，史蒂夫。华丽的。"
     },
     {
-      "s": 164.19,
-      "e": 167.59,
-      "t": "You know, it doesn't stop in the pocket. And so he has lots of legs.",
-      "r": "你知道，它并不会止步于口袋里。所以他有很多腿。是的"
+      "s": 200.39,
+      "e": 205.89,
+      "t": "Look at that wrist. Wow. Reverend Knight, get that. Get out of the net.",
+      "r": "看看那手腕。哇。奈特牧师，明白了。脱离陷阱。"
     },
     {
-      "s": 167.59,
-      "e": 170.89,
-      "t": "Yeah. I mean, but that's still like crazy to",
-      "r": "。我的意思是，但这仍然像疯了一样，是的"
+      "s": 205.89,
+      "e": 209.69,
+      "t": "A lot of a lot of a lot of time in the gym shooting the ball.",
+      "r": "在体育馆里花了大量时间练习投篮。是的"
     },
     {
-      "s": 170.89,
-      "e": 172.19,
-      "t": "make Yeah. Just like",
-      "r": "。就像"
+      "s": 209.69,
+      "e": 212.89,
+      "t": "lot of time, yeah, for sure. All right. Well, we've dedicated this",
+      "r": "，确实花了很多时间。好的。好了，我们这"
     },
     {
-      "s": 172.19,
-      "e": 176.69,
-      "t": "shots he makes from the places, the angles, the speed, the distance.",
-      "r": "他从各个位置、角度、速度和距离投篮一样。"
+      "s": 212.89,
+      "e": 217.46,
+      "t": "episode to the art of shooting the basketball. Well, I'm glad you're here. Which",
+      "r": "期节目专门讲解篮球投篮的艺术。很高兴你来了。"
     },
     {
-      "s": 176.69,
-      "e": 180.79,
-      "t": "Obviously, the finish is beautiful. And he can do it quick.",
-      "r": "显然，成品非常漂亮。而且他能很快做到。是的"
+      "s": 217.46,
+      "e": 221.69,
+      "t": "I'm glad I'm glad you're here to talk about it. hear We want to hear about you, too. I mean,",
+      "r": "（笑）我很高兴你能来这里谈谈这件事。我们也想听听你们的情况。我是说，"
     },
     {
-      "s": 180.79,
-      "e": 183.69,
-      "t": "Yeah. Anthony Mason, free throw",
-      "r": "。安东尼·梅森，罚球命中"
+      "s": 221.69,
+      "e": 228.89,
+      "t": "of shooting. You came in the league as almost a non shooter. Could make shots, but almost a non shooter.",
+      "r": "射击。你刚进入联盟时几乎不会投篮。能投篮，但几乎算不上射手。是的"
     },
     {
-      "s": 183.69,
-      "e": 186.99,
-      "t": "RIP, one hand. RIP.",
-      "r": "，单手投篮。安息。这"
+      "s": 228.89,
+      "e": 231.89,
+      "t": "Yeah. And chipped away, got to 33 pretty",
+      "r": "。一点一点地努力，"
     },
     {
-      "s": 186.99,
-      "e": 190.79,
-      "t": "And there's our guy tricks. Look at the elbow. It's still bent.",
-      "r": "就是我们的一些小伎俩。看看肘部。它还是弯的。是的"
+      "s": 231.89,
+      "e": 236.59,
+      "t": "quickly, I think. And then middle of your career was 36 and volume, all sorts",
+      "r": "我觉得很快就到了 33。然后，在你职业生涯的中期，你36岁，作品数量，各种各样的"
     },
     {
-      "s": 190.79,
-      "e": 193.69,
-      "t": "Yeah. It was just a flick of the wrist, too.",
-      "r": "。而且只是手腕轻轻一抖而已。是的"
+      "s": 236.59,
+      "e": 242.29,
+      "t": "of different ones. Um which is as fascinating as someone that just has",
+      "r": "作品。嗯，这就像有些人天生擅长"
     },
     {
-      "s": 193.69,
-      "e": 195.89,
-      "t": "Yeah. Just a flick.",
-      "r": "。只是一闪。"
+      "s": 242.29,
+      "e": 246.39,
+      "t": "a knack for shooting. I had a knack for shooting. I was obsessed. I shot I shot",
+      "r": "射击一样令人着迷。我很有射击天赋。我当时非常着迷。我每天都练习投篮"
     },
     {
-      "s": 195.89,
-      "e": 198.19,
-      "t": "Oh, hey. Oh, Steve.",
-      "r": "哦，嗨。哦，史蒂夫。"
+      "s": 246.39,
+      "e": 250.69,
+      "t": "every day, but when I started playing when I was 13, I could make shots right away. Yeah.",
+      "r": "，但我13岁开始打球的时候，就能立刻投篮得分。是的。"
     },
     {
-      "s": 198.19,
-      "e": 201.89,
-      "t": "Gorgeous. Look at that wrist.",
-      "r": "华丽的。看看那手腕。"
+      "s": 250.69,
+      "e": 253.59,
+      "t": "Weird. I don't know I don't know why. It just made sense to me.",
+      "r": "诡异的。我不知道，我不知道为什么。我觉得这很合情理。"
     },
     {
-      "s": 201.89,
-      "e": 204.59,
-      "t": "Wow. Reverend Knight, get that.",
-      "r": "哇。奈特牧师，明白了。"
+      "s": 253.59,
+      "e": 255.99,
+      "t": "Did you ever work on your form or anything or you just like when you",
+      "r": "你有没有练习过投篮姿势之类的？还是你只是"
     },
     {
-      "s": 204.59,
-      "e": 208.49,
-      "t": "Get out of the net. A lot of a lot of a lot of time in the",
-      "r": "脱离陷阱。在体育馆里花了大量时间"
+      "s": 255.99,
+      "e": 259.39,
+      "t": "picked up the ball did you You know what when I started playing, I",
+      "r": "拿起球就投篮？你知道吗，我刚开始打球的时候，就直接"
     },
     {
-      "s": 208.49,
-      "e": 211.29,
-      "t": "gym shooting the ball. lot of time, yeah, for sure.",
-      "r": "练习投篮。是的，确实有很多时间。"
+      "s": 259.39,
+      "e": 263.69,
+      "t": "just shot from here, one motion. But everything was kind of the same.",
+      "r": "从这里投篮，一个动作就完成了。但一切都差不多一样。是的"
     },
     {
-      "s": 211.29,
-      "e": 214.99,
-      "t": "All right. Well, we've dedicated this episode to the art of shooting the",
-      "r": "好的。好了，我们这期节目专门讲解"
+      "s": 263.69,
+      "e": 267.59,
+      "t": "Yeah. But then when I got older, you know, I got into the pocket. You got into the pocket.",
+      "r": "。但后来我年纪大了，你知道，我就陷入了困境。你成功得分了。"
     },
     {
-      "s": 214.99,
-      "e": 216.69,
-      "t": "basketball. Well, I'm glad you're here.",
-      "r": "篮球投篮的艺术。很高兴你来了。"
+      "s": 267.59,
+      "e": 272.69,
+      "t": "But it was I don't know. It just made sense. The backspin, the flick of the wrist, all the legs",
+      "r": "但我不知道。这完全合乎逻辑。反手旋转，手腕的轻弹，还有腿部动作，"
     },
     {
-      "s": 216.69,
-      "e": 219.19,
-      "t": "Which I'm glad I'm glad you're here",
-      "r": "（笑）我很高兴你能来这里"
+      "s": 272.69,
+      "e": 275.09,
+      "t": "Yeah. all made sense. But this is this is why",
+      "r": "没错。一切都说得通。但这正是"
     },
     {
-      "s": 219.19,
-      "e": 221.49,
-      "t": "to talk about it. hear We want to hear about you, too. I",
-      "r": "谈谈这件事。我们也想听听你们的情况。我是说"
+      "s": 275.09,
+      "e": 277.49,
+      "t": "I think this is an interesting topic. We can talk about what it takes to be a",
+      "r": "我认为这是一个有趣话题的原因。我们可以讨论成为一名"
     },
     {
-      "s": 221.49,
-      "e": 222.59,
-      "t": "mean, of shooting.",
-      "r": "，射击。"
+      "s": 277.49,
+      "e": 283.89,
+      "t": "great shooter, what different mechanics parts of the shot matter like",
+      "r": "优秀射手需要具备哪些条件，以及射击过程中哪些不同的机制环节比较重要等等。"
     },
     {
-      "s": 222.59,
-      "e": 227.49,
-      "t": "You came in the league as almost a non shooter. Could make shots,",
-      "r": "你刚进入联盟时几乎不会投篮。能投篮，"
+      "s": 283.89,
+      "e": 288.89,
+      "t": "But let's start with a fun subject. Let's talk about prettiest",
+      "r": "但我们先从一个有趣的话题开始吧。我们来聊聊最漂亮（笑）"
     },
     {
-      "s": 227.49,
-      "e": 229.39,
-      "t": "but almost a non shooter. Yeah.",
-      "r": "但几乎算不上射手。是的。一点一点地努力"
+      "s": 288.89,
+      "e": 292.89,
+      "t": "and ugliest jump shots. So give me off the top of",
+      "r": "和最丑的跳投吧。所以，请你即兴发挥，想到什么就说什么"
     },
     {
-      "s": 229.39,
-      "e": 233.59,
-      "t": "And chipped away, got to 33 pretty quickly, I think. And then middle of",
-      "r": "，我觉得很快就到了 33。然后，在"
+      "s": 292.89,
+      "e": 298.39,
+      "t": "your head like just what comes to mind, stream of consciousness, prettiest jump shots. Ray Allen.",
+      "r": "，想到什么就说什么，比如最漂亮的跳投。雷·阿伦。"
     },
     {
-      "s": 233.59,
-      "e": 239.69,
-      "t": "your career was 36 and volume, all sorts of different ones. Um which is",
-      "r": "你职业生涯的中期，你36岁，作品数量，各种各样的作品。嗯，这就像"
+      "s": 298.39,
+      "e": 304.09,
+      "t": "Mm. Steve Nash. Mm, thank you. Klay Thompson.",
+      "r": "毫米。史蒂夫·纳什。嗯，谢谢。克莱·汤普森。"
     },
     {
-      "s": 239.69,
-      "e": 243.99,
-      "t": "as fascinating as someone that just has a knack for shooting. I had a knack for",
-      "r": "有些人天生擅长射击一样令人着迷。我很擅长"
-    },
-    {
-      "s": 243.99,
-      "e": 248.39,
-      "t": "shooting. I was obsessed. I shot I shot every day, but when I started playing",
-      "r": "射击。我当时非常着迷。我每天都练习投篮，但我13岁开始打球的时候"
-    },
-    {
-      "s": 248.39,
-      "e": 250.29,
-      "t": "when I was 13, I could make shots right away.",
-      "r": "，就能立刻投篮得分。是的"
-    },
-    {
-      "s": 250.29,
-      "e": 251.79,
-      "t": "Yeah. Weird. I don't know I don't know why. It",
-      "r": "。诡异的。我不知道，我不知道为什么。我觉得这很合"
-    },
-    {
-      "s": 251.79,
-      "e": 254.79,
-      "t": "just made sense to me. Did you ever work on your form or",
-      "r": "情理。你有没有练习过投篮姿势之类的？"
-    },
-    {
-      "s": 254.79,
-      "e": 257.29,
-      "t": "anything or you just like when you picked up the ball did you",
-      "r": "还是你只是拿起球就投篮？"
-    },
-    {
-      "s": 257.29,
-      "e": 261.79,
-      "t": "You know what when I started playing, I just shot from here, one motion. But",
-      "r": "你知道吗，我刚开始打球的时候，就直接从这里投篮，一个动作就完成了。但"
-    },
-    {
-      "s": 261.79,
-      "e": 264.19,
-      "t": "everything was kind of the same. Yeah.",
-      "r": "一切都差不多一样。是的。"
-    },
-    {
-      "s": 264.19,
-      "e": 266.79,
-      "t": "But then when I got older, you know, I got into the pocket.",
-      "r": "但后来我年纪大了，你知道，我就陷入了困境。"
-    },
-    {
-      "s": 266.79,
-      "e": 268.69,
-      "t": "You got into the pocket. But it was",
-      "r": "你成功得分了。但"
-    },
-    {
-      "s": 268.69,
-      "e": 271.79,
-      "t": "I don't know. It just made sense. The backspin, the flick of the wrist, all",
-      "r": "我不知道。这完全合乎逻辑。反手旋转，手腕的轻弹，还有"
-    },
-    {
-      "s": 271.79,
-      "e": 273.19,
-      "t": "the legs Yeah.",
-      "r": "腿部动作，没错。"
-    },
-    {
-      "s": 273.19,
-      "e": 276.29,
-      "t": "all made sense. But this is this is why I think this is an interesting topic. We",
-      "r": "一切都说得通。但这正是我认为这是一个有趣话题的原因。我们"
-    },
-    {
-      "s": 276.29,
-      "e": 281.09,
-      "t": "can talk about what it takes to be a great shooter, what different mechanics",
-      "r": "可以讨论成为一名优秀射手需要具备哪些条件，以及"
-    },
-    {
-      "s": 281.09,
-      "e": 286.29,
-      "t": "parts of the shot matter like But let's start with a fun subject.",
-      "r": "射击过程中哪些不同的机制环节很重要，但我们先从一个有趣的话题开始吧。"
-    },
-    {
-      "s": 286.29,
-      "e": 291.19,
-      "t": "Let's talk about prettiest and ugliest",
-      "r": "我们来聊聊最漂亮（笑）和最丑的"
-    },
-    {
-      "s": 291.19,
-      "e": 295.49,
-      "t": "jump shots. So give me off the top of your head like just what comes to mind,",
-      "r": "跳投吧。所以，请你即兴发挥，想到什么就说什么，想到什么就说什么"
-    },
-    {
-      "s": 295.49,
-      "e": 297.59,
-      "t": "stream of consciousness, prettiest jump shots.",
-      "r": "，比如最漂亮的跳投。"
-    },
-    {
-      "s": 297.59,
-      "e": 299.09,
-      "t": "Ray Allen. Mm.",
-      "r": "雷·阿伦。毫米。"
-    },
-    {
-      "s": 299.09,
-      "e": 301.39,
-      "t": "Steve Nash. Mm, thank you.",
-      "r": "史蒂夫·纳什。嗯，谢谢。"
-    },
-    {
-      "s": 301.39,
-      "e": 307.99,
-      "t": "Klay Thompson. Bradley Beal.",
-      "r": "克莱·汤普森。布拉德利·比尔。"
-    },
-    {
-      "s": 308.19,
+      "s": 305.19,
       "e": 310.69,
-      "t": "Mitch Richmond. Booker.",
-      "r": "米奇·里奇蒙德。布克。"
+      "t": "Bradley Beal. Mitch Richmond. Booker.",
+      "r": "布拉德利·比尔。米奇·里奇蒙德。布克。"
     },
     {
       "s": 310.69,
-      "e": 313.09,
-      "t": "Devin Booker. Beautiful shot.",
-      "r": "德文·布克。拍得真好。"
-    },
-    {
-      "s": 313.09,
       "e": 316.59,
-      "t": "Chris Mullin. Mullin.",
-      "r": "克里斯·穆林。穆林。"
+      "t": "Devin Booker. Beautiful shot. Chris Mullin. Mullin.",
+      "r": "德文·布克。拍得真好。克里斯·穆林。穆林。"
     },
     {
       "s": 316.59,
-      "e": 318.89,
-      "t": "Yeah, I mean Off the top of These are like right at",
-      "r": "是的，我的意思是，这些绝对是"
-    },
-    {
-      "s": 318.89,
       "e": 321.09,
-      "t": "the top of my list. great examples. Try to go back in the",
-      "r": "我最优先考虑的。很好的例子。试着回到过去"
+      "t": "Yeah, I mean Off the top of These are like right at the top of my list. great examples. Try to go back in the",
+      "r": "是的，我的意思是，这些绝对是我最优先考虑的。很好的例子。试着回到过去"
     },
     {
       "s": 321.09,
-      "e": 324.79,
-      "t": "day. I grew up watching a guy named",
-      "r": "。我从小就看一个叫"
-    },
-    {
-      "s": 324.79,
       "e": 330.39,
-      "t": "Dale Ellis. With the name Just compact, beautiful, similar to Klay and",
-      "r": "戴尔·埃利斯的人的比赛。名字叫“Just compact, beautiful”，跟克莱他们"
+      "t": "day. I grew up watching a guy named Dale Ellis. With the name Just compact, beautiful, similar to Klay and",
+      "r": "。我从小就看一个叫戴尔·埃利斯的人的比赛。名字叫“Just compact, beautiful”，跟克莱他们"
     },
     {
       "s": 330.39,
@@ -644,39 +446,21 @@
     },
     {
       "s": 358.09,
-      "e": 360.89,
-      "t": "he had that same shot in high school. Yeah.",
-      "r": "他高中时也有过同样的投篮动作。是的。"
-    },
-    {
-      "s": 360.89,
       "e": 363.39,
-      "t": "And it was still effective. Yeah.",
-      "r": "而且它仍然有效。是的。"
+      "t": "he had that same shot in high school. Yeah. And it was still effective. Yeah.",
+      "r": "他高中时也有过同样的投篮动作。是的。而且它仍然有效。是的。"
     },
     {
       "s": 363.39,
-      "e": 366.89,
-      "t": "Our guy, Tyrese Haliburton. Hali has a different shot.",
-      "r": "我们的这位，泰瑞斯·哈利伯顿。哈利还有另一种选择。"
-    },
-    {
-      "s": 366.89,
       "e": 369.69,
-      "t": "Yeah, different shot. is great. The start is different.",
-      "r": "是的，不同的镜头。太好了。开头有所不同。"
+      "t": "Our guy, Tyrese Haliburton. Hali has a different shot. Yeah, different shot. is great. The start is different.",
+      "r": "我们的这位，泰瑞斯·哈利伯顿。哈利还有另一种选择。是的，不同的镜头。太好了。开头有所不同。"
     },
     {
       "s": 369.69,
-      "e": 372.3,
-      "t": "of it's different. Your old teammate, Tricks.",
-      "r": "它不一样。你的老队友，特里克。《"
-    },
-    {
-      "s": 372.3,
       "e": 374.8,
-      "t": "The Matrix. An interesting shot.",
-      "r": "黑客帝国》。一张很有意思的照片。"
+      "t": "of it's different. Your old teammate, Tricks. The Matrix. An interesting shot.",
+      "r": "它不一样。你的老队友，特里克。《黑客帝国》。一张很有意思的照片。"
     },
     {
       "s": 374.8,
@@ -686,345 +470,249 @@
     },
     {
       "s": 376.39,
-      "e": 381.6,
-      "t": "It's kind of crazy he made his share because he didn't extend his",
-      "r": "不可思议，他竟然因为没有伸手要钱而分到了属于自己的那份"
-    },
-    {
-      "s": 381.6,
       "e": 383,
-      "t": "his hand. He [laughter]",
-      "r": "。他（笑）"
+      "t": "It's kind of crazy he made his share because he didn't extend his his hand. He",
+      "r": "不可思议，他竟然因为没有伸手要钱而分到了属于自己的那份。他（笑）"
     },
     {
       "s": 383,
-      "e": 384.6,
-      "t": "It was like He He like",
-      "r": "就像他，就像"
-    },
-    {
-      "s": 384.6,
       "e": 388.42,
-      "t": "like a dinosaur. It's like a T-Rex.",
-      "r": "恐龙一样。它就像霸王龙一样。"
+      "t": "It was like He He like like a dinosaur. It's like a T-Rex.",
+      "r": "就像他，就像恐龙一样。它就像霸王龙一样。"
     },
     {
-      "s": 389.3,
-      "e": 393.5,
-      "t": "Couldn't reach in there, but uh Wells had like uh like a not so",
-      "r": "够不着，但是威尔斯的"
+      "s": 388.42,
+      "e": 395.5,
+      "t": "Couldn't reach in there, but uh Wells had like uh like a not so well-looking jump shot.",
+      "r": "[笑声] 够不着，但是威尔斯的跳投姿势不太好看。"
     },
     {
-      "s": 393.5,
-      "e": 397.19,
-      "t": "well-looking jump shot. Yeah, Joe had a weird one that he",
-      "r": "跳投姿势不太好看。是的，乔有一个很奇怪的"
+      "s": 395.5,
+      "e": 399.39,
+      "t": "Yeah, Joe had a weird one that he Side spin. But Joe what he did It's not",
+      "r": "是的，乔有一个很奇怪的侧旋球。但乔做到了。"
     },
     {
-      "s": 397.19,
-      "e": 400.69,
-      "t": "Side spin. But Joe what he did It's not like he he didn't always shoot it well",
-      "r": "侧旋球。但乔做到了。"
+      "s": 399.39,
+      "e": 401.19,
+      "t": "like he he didn't always shoot it well though, but he",
+      "r": "虽然他并非一直投篮不好，但他"
     },
     {
-      "s": 400.69,
-      "e": 402.39,
-      "t": "though, but he got to a place where you thought he was",
-      "r": "虽然他并非一直投篮不好，但他做到了让你觉得他能"
+      "s": 401.19,
+      "e": 403.89,
+      "t": "got to a place where you thought he was going to make that 15 footer.",
+      "r": "做到了让你觉得他能投进那个15英尺的球。是的"
     },
     {
-      "s": 402.39,
-      "e": 406.5,
-      "t": "going to make that 15 footer. yeah, he did. He did. He did. He did,",
-      "r": "投进那个15英尺的球。是的，他确实这么做了。他做到了。他做到了。没错，"
+      "s": 403.89,
+      "e": 409,
+      "t": "yeah, he did. He did. He did. He did, Joe. did it. Yep, Joe.",
+      "r": "，他确实这么做了。他做到了。他做到了。没错，乔。做到了。是的，乔。"
     },
     {
-      "s": 406.5,
-      "e": 407.6,
-      "t": "Joe. did it.",
-      "r": "乔。做到了。是"
+      "s": 409,
+      "e": 415.69,
+      "t": "Um That was some of the top of my head. I think I had one more too. Just can't remember.",
+      "r": "嗯，那些是我临时想到的。我想我还有一份。我就是想不起来了。"
     },
     {
-      "s": 407.6,
-      "e": 410.5,
-      "t": "Yep, Joe. Um",
-      "r": "的，乔。嗯，那些是"
+      "s": 415.69,
+      "e": 420.69,
+      "t": "There's a bunch from the old days um that I can't Sigma. Yeah, just different stuff.",
+      "r": "以前有很多东西，嗯，我不能 Sigma。是的，只是不同的东西。"
     },
     {
-      "s": 410.5,
-      "e": 414.6,
-      "t": "That was some of the top of my head. I think I had one more too.",
-      "r": "我临时想到的。我想我还有一份。我就是想不起来了"
+      "s": 420.69,
+      "e": 425.39,
+      "t": "Bill Cartwright. Yeah. Bill Cartwright. Hey, Bill Cartwright. Oh, way up here",
+      "r": "比尔·卡特赖特。是的。比尔·卡特赖特。嘿，比尔·卡特赖特。哦，就在这儿，"
     },
     {
-      "s": 414.6,
-      "e": 418.1,
-      "t": "Just can't remember. There's a bunch from the old days um",
-      "r": "。以前有很多东西，嗯，"
+      "s": 425.39,
+      "e": 428.3,
+      "t": "like Yeah, there was a bunch of those guys back in the day.",
+      "r": "就像……是啊，以前有很多这样的人。"
     },
     {
-      "s": 418.1,
-      "e": 419.3,
-      "t": "that I can't Sigma.",
-      "r": "我不能 Sigma。是的"
+      "s": 428.3,
+      "e": 431.39,
+      "t": "So like like let's talk about like just fundamentals for me on shooting the ball",
+      "r": "所以，我们来谈谈投篮的基本功吧，对我来说，投篮有很多讲究"
     },
     {
-      "s": 419.3,
-      "e": 421.89,
-      "t": "Yeah, just different stuff. Bill Cartwright.",
-      "r": "，只是不同的东西。比尔·卡特赖特。是的"
+      "s": 431.39,
+      "e": 435.19,
+      "t": "is like um it's there's there's there's lots",
+      "r": "就像嗯，那里有，那里有很多"
     },
     {
-      "s": 421.89,
-      "e": 423.39,
-      "t": "Yeah. Bill Cartwright.",
-      "r": "。比尔·卡特赖特。"
+      "s": 435.19,
+      "e": 438.8,
+      "t": "going on here. And it's about trying to tie these things together and simplify",
+      "r": "。关键在于尝试将这些事物联系起来并简化"
     },
     {
-      "s": 423.39,
-      "e": 427.1,
-      "t": "Hey, Bill Cartwright. Oh, way up here like Yeah, there was a bunch of those",
-      "r": "嘿，比尔·卡特赖特。哦，就在这儿，就像……是啊，以前有很多这样的"
+      "s": 438.8,
+      "e": 444.6,
+      "t": "it. Uh footwork first and foremost cuz it gets you on balance and allows you",
+      "r": "它们。首先是脚步动作，因为它能让你保持平衡，并让你"
     },
     {
-      "s": 427.1,
-      "e": 429.8,
-      "t": "guys back in the day. So like like let's talk about like just",
-      "r": "人。所以，我们来谈谈投篮的"
+      "s": 444.6,
+      "e": 448.19,
+      "t": "to get lift because lift you got to create force. You got to create power to",
+      "r": "获得腾空感，因为腾空感需要产生力量。你需要发力才能"
     },
     {
-      "s": 429.8,
-      "e": 432.39,
-      "t": "fundamentals for me on shooting the ball is like",
-      "r": "基本功吧，对我来说，投篮有很多讲究"
+      "s": 448.19,
+      "e": 456.39,
+      "t": "get the ball up in the air uh to allow the the hand to be soft. Um rhythm. Right? Like that force then creates",
+      "r": "把球打到空中，这样才能让手保持柔和。嗯，节奏。正确的？这种力量就像是创造了"
     },
     {
-      "s": 432.39,
-      "e": 437,
-      "t": "um it's there's there's there's lots going on here. And it's about trying to",
-      "r": "。关键在于尝试将"
+      "s": 456.39,
+      "e": 459.89,
+      "t": "rhythm. One thing that I think is important is",
+      "r": "节奏。我认为很重要的一点是"
     },
     {
-      "s": 437,
-      "e": 441.69,
-      "t": "tie these things together and simplify it. Uh footwork first and foremost cuz",
-      "r": "这些事物联系起来并简化它们。首先是脚步动作，因为"
+      "s": 459.89,
+      "e": 464.39,
+      "t": "your release point. Like some guys have been good at this. I think Jaylen Brown",
+      "r": "你的释放点。有些人在这方面做得很好。我认为杰伦·布朗在投中距离球时，"
     },
     {
-      "s": 441.69,
-      "e": 446.3,
-      "t": "it gets you on balance and allows you to get lift because lift you got to",
-      "r": "它能让你保持平衡，让你能够腾空而起，因为腾空需要"
+      "s": 464.39,
+      "e": 470.5,
+      "t": "actually sometimes hangs or shoots almost on the way down on his middies. He does sometimes, yeah.",
+      "r": "有时几乎是在球下落的过程中就完成了投篮动作。是的，他有时候会这样做。"
     },
     {
-      "s": 446.3,
-      "e": 449.8,
-      "t": "create force. You got to create power to get the ball up in the air",
-      "r": "产生力量。你需要发力才能把球打到空中，这样"
+      "s": 470.5,
+      "e": 476,
+      "t": "Um but I think that rule of thumb is you want to shoot as or before you get to",
+      "r": "嗯，但我认为经验法则是，你应该在到达顶端之前或同时射击，因为"
     },
     {
-      "s": 449.8,
-      "e": 454.89,
-      "t": "uh to allow the the hand to be soft. Um rhythm.",
-      "r": "才能让手保持柔和。嗯，节奏。"
+      "s": 476,
+      "e": 478.8,
+      "t": "the top cuz then you're using your legs and you got the same way and it's",
+      "r": "这样你就能用腿部力量，而且你的路线相同，可以"
     },
     {
-      "s": 454.89,
-      "e": 458.3,
-      "t": "Right? Like that force then creates rhythm.",
-      "r": "正确的？这种力量就像是创造了节奏。"
+      "s": 478.8,
+      "e": 483.89,
+      "t": "repeatable. I think it's harder to be shooting at the top or after",
+      "r": "重复操作。我认为在比赛的最后阶段或者之后进行投篮会更难，"
     },
     {
-      "s": 458.3,
-      "e": 462.5,
-      "t": "One thing that I think is important is your release point. Like some guys have",
-      "r": "我认为很重要的一点是你的释放点。有些人"
+      "s": 483.89,
+      "e": 486.89,
+      "t": "cuz the game's throwing different things at you.",
+      "r": "因为比赛会给你带来不同的挑战。"
     },
     {
-      "s": 462.5,
-      "e": 465.6,
-      "t": "been good at this. I think Jaylen Brown actually",
-      "r": "在这方面做得很好。我认为杰伦·布朗在投中距离球时，"
+      "s": 486.89,
+      "e": 492.8,
+      "t": "Um but so that that rhythm, so the feet, footwork, the legs to create force, then",
+      "r": "嗯，但是要保持那种节奏，也就是用脚、用腿来产生力量，然后用"
     },
     {
-      "s": 465.6,
-      "e": 469.19,
-      "t": "sometimes hangs or shoots almost on the way down on his middies.",
-      "r": "有时几乎是在球下落的过程中就完成了投篮动作。是的"
+      "s": 492.8,
+      "e": 496.6,
+      "t": "the rhythm to tie it together to release using that kinetic energy.",
+      "r": "节奏将它们结合起来，利用动能释放出来。"
     },
     {
-      "s": 469.19,
-      "e": 473.1,
-      "t": "He does sometimes, yeah. Um but I think that rule of thumb is you",
-      "r": "，他有时候会这样做。嗯，但我认为经验法则是，你"
+      "s": 496.6,
+      "e": 501.8,
+      "t": "you get that from? Did you Did you Did you have someone that you watched?",
+      "r": "你从哪里得到的？你有没有特别关注的人？"
     },
     {
-      "s": 473.1,
-      "e": 478.1,
-      "t": "want to shoot as or before you get to the top cuz then you're using your legs",
-      "r": "应该在到达顶端之前或同时射击，因为这样你就能用腿部力量，"
+      "s": 501.8,
+      "e": 505.2,
+      "t": "Did you somebody that you saw shooting the ball or or like",
+      "r": "你有没有看到有人在投篮？或者像"
     },
     {
-      "s": 478.1,
-      "e": 481.3,
-      "t": "and you got the same way and it's repeatable. I think it's harder to be",
-      "r": "而且你的路线相同，可以重复操作。我认为"
+      "s": 505.2,
+      "e": 510.3,
+      "t": "I would Yeah, I would say when I started playing you know",
+      "r": "我一样？是的，我会说当我开始打球的时候，你知道，"
     },
     {
-      "s": 481.3,
-      "e": 485.8,
-      "t": "shooting at the top or after cuz the game's throwing different things",
-      "r": "在比赛的最后阶段或者之后进行投篮会更难，因为比赛会给你带来不同的挑战"
+      "s": 510.3,
+      "e": 516.3,
+      "t": "52, no smartphone, no YouTube, no no league pass. Growing up in Canada",
+      "r": "52，没有智能手机，没有 YouTube，也没有联赛通行证。在加拿大长大，我最关心的就是"
     },
     {
-      "s": 485.8,
-      "e": 489.7,
-      "t": "at you. Um but so that that rhythm, so the feet,",
-      "r": "。嗯，但是要保持那种节奏，也就是用脚"
+      "s": 516.3,
+      "e": 522.2,
+      "t": "it was like what what game was on NBC on the weekend? Yeah. So it wasn't like there was a lot of You",
+      "r": "周末NBC电视台会播放什么比赛？是的。所以，并不是说"
     },
     {
-      "s": 489.7,
-      "e": 495.6,
-      "t": "footwork, the legs to create force, then the rhythm to tie it together to release",
-      "r": "、用腿来产生力量，然后用节奏将它们结合起来，"
+      "s": 522.2,
+      "e": 525.5,
+      "t": "know maybe some people in my hometown and stuff, but for me it it made sense",
+      "r": "我的家乡有很多……你知道，也许有一些人……但对我来说，这"
     },
     {
-      "s": 495.6,
-      "e": 498.5,
-      "t": "using that kinetic energy. you get that from? Did you Did you Did",
-      "r": "利用动能释放出来。你从哪里得到的？你有没有特别"
+      "s": 525.5,
+      "e": 529,
+      "t": "from the start and I think halfing being a smaller",
+      "r": "从一开始就很有道理，而且我认为，因为我个子比较小，"
     },
     {
-      "s": 498.5,
-      "e": 503.3,
-      "t": "you have someone that you watched? Did you somebody that you saw shooting",
-      "r": "关注的人？你有没有看到有人在"
+      "s": 529,
+      "e": 533,
+      "t": "player starting playing in eighth grade I had to use my legs kind of like Steph.",
+      "r": "从八年级开始打球，所以我必须像斯蒂芬那样运用我的腿。"
     },
     {
-      "s": 503.3,
-      "e": 508.1,
-      "t": "the ball or or like I would Yeah, I would say when I started",
-      "r": "投篮？或者像我一样？是的，我会说当我开始"
+      "s": 533,
+      "e": 540.9,
+      "t": "So that was a good way to start and then learning later, but yeah, it's it's interesting, right? Like the the",
+      "r": "所以这是一个很好的开始，之后再慢慢学习，是的，这很有趣，对吧？就像"
     },
     {
-      "s": 508.1,
-      "e": 513.9,
-      "t": "playing you know 52, no smartphone, no YouTube,",
-      "r": "打球的时候，你知道， 52，没有智能手机，没有 YouTube，也"
-    },
-    {
-      "s": 513.9,
-      "e": 518.5,
-      "t": "no no league pass. Growing up in Canada it was like what what game was on NBC on",
-      "r": "没有联赛通行证。在加拿大长大，我最关心的就是"
-    },
-    {
-      "s": 518.5,
-      "e": 519.5,
-      "t": "the weekend? Yeah.",
-      "r": "周末NBC电视台会播放什么比赛？是的。"
-    },
-    {
-      "s": 519.5,
-      "e": 523.6,
-      "t": "So it wasn't like there was a lot of You know maybe some people in my hometown",
-      "r": "所以，并不是说我的家乡有很多……你知道，也许有一些人……"
-    },
-    {
-      "s": 523.6,
-      "e": 527.7,
-      "t": "and stuff, but for me it it made sense from the start and I think halfing being",
-      "r": "但对我来说，这从一开始就很有道理，而且我认为，因为我个子比较"
-    },
-    {
-      "s": 527.7,
-      "e": 530.8,
-      "t": "a smaller player starting playing in eighth grade",
-      "r": "小，从八年级开始打球，所以我"
-    },
-    {
-      "s": 530.8,
-      "e": 535.4,
-      "t": "I had to use my legs kind of like Steph. So that was a good way to start and then",
-      "r": "必须像斯蒂芬那样运用我的腿。所以这是一个很好的开始，之后再慢慢"
-    },
-    {
-      "s": 535.4,
-      "e": 539.1,
-      "t": "learning later, but yeah, it's",
-      "r": "学习，是的，"
-    },
-    {
-      "s": 539.1,
-      "e": 542.5,
-      "t": "it's interesting, right? Like the the journey people go on.",
-      "r": "这很有趣，对吧？就像人们经历的旅程一样。"
-    },
-    {
-      "s": 542.5,
+      "s": 540.9,
       "e": 548.7,
-      "t": "Yeah, because my like my shooting journey is like literally like",
-      "r": "是的，因为我的投篮之路就像是在"
+      "t": "journey people go on. Yeah, because my like my shooting journey is like literally like",
+      "r": "人们经历的旅程一样。是的，因为我的投篮之路就像是在"
     },
     {
       "s": 548.9,
-      "e": 551.4,
-      "t": "watching Michael Jordan.",
-      "r": "看迈克尔·乔丹的比赛一样。"
-    },
-    {
-      "s": 551.4,
       "e": 555.3,
-      "t": "Mhm. And but the thing I didn't realize is",
-      "r": "嗯。但我没有意识到的是，"
+      "t": "watching Michael Jordan. Mhm. And but the thing I didn't realize is",
+      "r": "看迈克尔·乔丹的比赛一样。嗯。但我没有意识到的是，"
     },
     {
       "s": 555.3,
-      "e": 557.8,
-      "t": "how balanced Right.",
-      "r": "平衡性有多好。"
-    },
-    {
-      "s": 557.8,
       "e": 559.6,
-      "t": "Michael Jordan was. What did you see as a kid?",
-      "r": "迈克尔·乔丹是。你小时候都见过什么？"
+      "t": "how balanced Right. Michael Jordan was. What did you see as a kid?",
+      "r": "平衡性有多好。迈克尔·乔丹是。你小时候都见过什么？"
     },
     {
       "s": 559.6,
-      "e": 561.3,
-      "t": "fadeaway. Yeah.",
-      "r": "逐渐消失。是的。"
-    },
-    {
-      "s": 561.3,
       "e": 563.8,
-      "t": "And And And I So the flick of the wrist, the head",
-      "r": "于是，于是，于是，于是，手腕一抖，头向"
+      "t": "fadeaway. Yeah. And And And I So the flick of the wrist, the head",
+      "r": "逐渐消失。是的。于是，于是，于是，于是，手腕一抖，头向"
     },
     {
       "s": 563.8,
-      "e": 567.7,
-      "t": "back. I saw a fadeaway. So when I when I",
-      "r": "后仰。我看到画面逐渐消失。所以当我"
-    },
-    {
-      "s": 567.7,
       "e": 570.7,
-      "t": "when I started to see that I had some athletic genes,",
-      "r": "开始意识到自己有一些运动基因的时候，"
+      "t": "back. I saw a fadeaway. So when I when I when I started to see that I had some athletic genes,",
+      "r": "后仰。我看到画面逐渐消失。所以当我开始意识到自己有一些运动基因的时候，"
     },
     {
       "s": 570.7,
-      "e": 574.3,
-      "t": "Mhm. I maybe picked up some bad habits in my",
-      "r": "嗯。我可能在射击中养成了一些坏习惯，"
-    },
-    {
-      "s": 574.3,
       "e": 575.5,
-      "t": "shooting emulate that.",
-      "r": "模仿了那些习惯。"
+      "t": "Mhm. I maybe picked up some bad habits in my shooting emulate that.",
+      "r": "嗯。我可能在射击中养成了一些坏习惯，模仿了那些习惯。"
     },
     {
       "s": 575.5,
@@ -1034,15 +722,9 @@
     },
     {
       "s": 579.4,
-      "e": 582.5,
-      "t": "high school or I was And I would make them,",
-      "r": "而且我还能投进，"
-    },
-    {
-      "s": 582.5,
       "e": 585.3,
-      "t": "Mhm. but I didn't realize that I was picking",
-      "r": "嗯。但我当时并没有意识到自己正在"
+      "t": "high school or I was And I would make them, Mhm. but I didn't realize that I was picking",
+      "r": "而且我还能投进，嗯。但我当时并没有意识到自己正在"
     },
     {
       "s": 585.3,
@@ -1058,15 +740,9 @@
     },
     {
       "s": 593.7,
-      "e": 596.8,
-      "t": "Right. You have no idea that or he's been doing",
-      "r": "正确的。你根本不知道，或者他已经这样做了很多"
-    },
-    {
-      "s": 596.8,
       "e": 599.1,
-      "t": "this for years and years and years and you're",
-      "r": "年，而"
+      "t": "Right. You have no idea that or he's been doing this for years and years and years and you're",
+      "r": "正确的。你根本不知道，或者他已经这样做了很多年，而"
     },
     {
       "s": 599.1,
@@ -1094,15 +770,9 @@
     },
     {
       "s": 611.8,
-      "e": 614.6,
-      "t": "shot of like I right off the top.",
-      "r": "镜头里，就像我直接从顶部开始一样。"
-    },
-    {
-      "s": 614.6,
       "e": 616.3,
-      "t": "That's crazy, man. the top, I",
-      "r": "太疯狂了，老兄。顶部，是的"
+      "t": "shot of like I right off the top. That's crazy, man. the top, I",
+      "r": "镜头里，就像我直接从顶部开始一样。太疯狂了，老兄。顶部，是的"
     },
     {
       "s": 616.3,
@@ -1118,27 +788,15 @@
     },
     {
       "s": 625.4,
-      "e": 630.3,
-      "t": "I tried to build this shot in my bed. We We all know to like have the basketball",
-      "r": "我尝试在床上拍摄这张照片。我们都知道要像拿着篮球一样"
-    },
-    {
-      "s": 630.3,
       "e": 632.3,
-      "t": "or just shoot up like Okay.",
-      "r": "投篮，就像这样。"
+      "t": "I tried to build this shot in my bed. We We all know to like have the basketball or just shoot up like Okay.",
+      "r": "我尝试在床上拍摄这张照片。我们都知道要像拿着篮球一样投篮，就像这样。"
     },
     {
       "s": 632.3,
-      "e": 635.1,
-      "t": "Flick in the wrist. in the wrist. Like I did build that in",
-      "r": "手腕轻轻一抖。在手腕处。就像我在"
-    },
-    {
-      "s": 635.1,
       "e": 638.9,
-      "t": "my bed. But as far as like",
-      "r": "床上搭建的那个一样。但说到，是"
+      "t": "Flick in the wrist. in the wrist. Like I did build that in my bed. But as far as like",
+      "r": "手腕轻轻一抖。在手腕处。就像我在床上搭建的一样。但说到，是"
     },
     {
       "s": 638.9,
@@ -1148,15 +806,9 @@
     },
     {
       "s": 643,
-      "e": 648.2,
-      "t": "didn't know the details as a kid enough about shooting.",
-      "r": "小时候没注意过，我对投篮的细节了解不够。"
-    },
-    {
-      "s": 648.2,
       "e": 652.4,
-      "t": "All I knew that he was making shots",
-      "r": "我只知道他在投篮，"
+      "t": "didn't know the details as a kid enough about shooting. All I knew that he was making shots",
+      "r": "小时候没注意过，我对投篮的细节了解不够。我只知道他在投篮，"
     },
     {
       "s": 652.4,
@@ -1172,39 +824,21 @@
     },
     {
       "s": 658.6,
-      "e": 660.6,
-      "t": "Yeah. Like you'd be out playing outside and it",
-      "r": "。就像你在外面玩耍，然后突然听到“"
-    },
-    {
-      "s": 660.6,
       "e": 663.6,
-      "t": "was like 3 2 1 Yeah.",
-      "r": "3、2、1”的声音。"
+      "t": "Yeah. Like you'd be out playing outside and it was like 3 2 1 Yeah.",
+      "r": "。就像你在外面玩耍，然后突然听到“ 3、2、1”的声音。"
     },
     {
       "s": 663.6,
-      "e": 666.8,
-      "t": "What the are you doing? In the schoolyard open open",
-      "r": "你他妈在干什么？在学校操场上，敞开着，敞开着。"
-    },
-    {
-      "s": 666.8,
       "e": 668.7,
-      "t": "Yeah, yeah. Going down.",
-      "r": "是啊，是啊。下降。是"
+      "t": "What the are you doing? In the schoolyard open open Yeah, yeah. Going down.",
+      "r": "你他妈在干什么？在学校操场上，敞开着，敞开着。是啊，是啊。下降。是"
     },
     {
       "s": 668.7,
-      "e": 672.7,
-      "t": "Yeah, like going down like not having no idea that I'm",
-      "r": "啊，就像往下走，完全不知道我"
-    },
-    {
-      "s": 672.7,
       "e": 676.2,
-      "t": "You're doing the wrong I'm I'm killing my shot.",
-      "r": "他妈的做错了，我错失良机。"
+      "t": "Yeah, like going down like not having no idea that I'm You're doing the wrong I'm I'm killing my shot.",
+      "r": "啊，就像往下走，完全不知道我他妈的做错了，我错失良机。"
     },
     {
       "s": 676.2,
@@ -1214,15 +848,9 @@
     },
     {
       "s": 682.7,
-      "e": 687.3,
-      "t": "really like my until my athletic genes kicked in",
-      "r": "我，直到我的运动基因开始发挥作用。"
-    },
-    {
-      "s": 687.3,
       "e": 691.4,
-      "t": "Mhm. my shooting was very like if you look at",
-      "r": "嗯。如果你看"
+      "t": "really like my until my athletic genes kicked in Mhm. my shooting was very like if you look at",
+      "r": "我，直到我的运动基因开始发挥作用。嗯。如果你看"
     },
     {
       "s": 691.4,
@@ -1232,27 +860,15 @@
     },
     {
       "s": 697,
-      "e": 701.6,
-      "t": "I was a freshman, I really got like 12 shots a game stuff like that. Like",
-      "r": "我上九年级）的比赛录像，我的投篮表现就像那样，我一场比赛真的能出手 12 次左右。就像，"
-    },
-    {
-      "s": 701.6,
       "e": 704.1,
-      "t": "but everything was Yeah.",
-      "r": "但一切都是，是的。"
+      "t": "I was a freshman, I really got like 12 shots a game stuff like that. Like but everything was Yeah.",
+      "r": "我上九年级）的比赛录像，我的投篮表现就像那样，我一场比赛真的能出手 12 次左右。就像，但一切都是，是的。"
     },
     {
       "s": 704.1,
-      "e": 706.6,
-      "t": "I was I was textbook with it. I was",
-      "r": "我完全掌握了教科书式的知识。我当时很"
-    },
-    {
-      "s": 706.6,
       "e": 709,
-      "t": "Compact. Yeah, I was",
-      "r": "紧凑。是的，我当时就在现场"
+      "t": "I was I was textbook with it. I was Compact. Yeah, I was",
+      "r": "我完全掌握了教科书式的知识。我当时很紧凑。是的，我当时就在现场"
     },
     {
       "s": 709,
@@ -1268,15 +884,9 @@
     },
     {
       "s": 716.9,
-      "e": 719,
-      "t": "started I was all Trying stuff.",
-      "r": "开始尝试了很多东西。"
-    },
-    {
-      "s": 719,
       "e": 723.4,
-      "t": "I was just trying and just as far as my shooting mechanics, it just",
-      "r": "我当时只是随便试试，至于我的投篮技巧，就那样吧。"
+      "t": "started I was all Trying stuff. I was just trying and just as far as my shooting mechanics, it just",
+      "r": "开始尝试了很多东西。我当时只是随便试试，至于我的投篮技巧，就那样吧。"
     },
     {
       "s": 723.4,
@@ -1334,15 +944,9 @@
     },
     {
       "s": 761.3,
-      "e": 763.6,
-      "t": "to work on this. So So not enough detail and volume.",
-      "r": "练习了。一般般，细节和内容都不够丰富。是的"
-    },
-    {
-      "s": 763.6,
       "e": 766.4,
-      "t": "Yeah, not enough detail. And when did that come for you?",
-      "r": "，细节不够。你是什么时候遇到这种情况的？"
+      "t": "to work on this. So So not enough detail and volume. Yeah, not enough detail. And when did that come for you?",
+      "r": "练习了。一般般，细节和内容都不够丰富。是的，细节不够。你是什么时候遇到这种情况的？"
     },
     {
       "s": 766.4,
@@ -1364,15 +968,9 @@
     },
     {
       "s": 779.2,
-      "e": 782.4,
-      "t": "Houston. And he is now the assistant coach. He's",
-      "r": "。他现在是助理教练。他又"
-    },
-    {
-      "s": 782.4,
       "e": 787.3,
-      "t": "won another ring with the Knicks. But he joined Mike Brown",
-      "r": "随尼克斯队赢得了一枚总冠军戒指。但他加入了迈克·布朗的行列"
+      "t": "Houston. And he is now the assistant coach. He's won another ring with the Knicks. But he joined Mike Brown",
+      "r": "。他现在是助理教练。他又随尼克斯队赢得了一枚总冠军戒指。但他加入了迈克·布朗的行列"
     },
     {
       "s": 787.3,
@@ -1406,15 +1004,9 @@
     },
     {
       "s": 810.8,
-      "e": 815.3,
-      "t": "rubbing that rubbing them ribs, follow through, getting that getting that arc",
-      "r": "肋骨，完成投篮动作，投出那个弧线"
-    },
-    {
-      "s": 815.3,
       "e": 817.8,
-      "t": "on it. And",
-      "r": "。于是"
+      "t": "rubbing that rubbing them ribs, follow through, getting that getting that arc on it. And",
+      "r": "肋骨，完成投篮动作，投出那个弧线。于是"
     },
     {
       "s": 817.8,
@@ -1436,15 +1028,9 @@
     },
     {
       "s": 831.9,
-      "e": 835.2,
-      "t": "I would like, yo, CJ, I need you to I need you to come with me. We need to",
-      "r": "我想说，嘿，CJ，我需要你，我需要你跟我一起去。我们需要"
-    },
-    {
-      "s": 835.2,
       "e": 838.1,
-      "t": "work. And he was kind enough to",
-      "r": "工作。他很友善地陪"
+      "t": "I would like, yo, CJ, I need you to I need you to come with me. We need to work. And he was kind enough to",
+      "r": "我想说，嘿，CJ，我需要你，我需要你跟我一起去。我们需要工作。他很友善地陪"
     },
     {
       "s": 838.1,
@@ -1484,261 +1070,177 @@
     },
     {
       "s": 858.5,
-      "e": 862.5,
-      "t": "So, hone in on a technique. on this. Like, hone in on this. Like, he",
-      "r": "所以，要专注于一项技术。关于这一点。比如，集中精力研究这一点。比如，他"
+      "e": 865.7,
+      "t": "So, hone in on a technique. on this. Like, hone in on this. Like, he he would start me like",
+      "r": "所以，要专注于一项技术。关于这一点。比如，集中精力研究这一点。比如，他会跟我说，像我这样的"
     },
     {
-      "s": 862.5,
-      "e": 868.6,
-      "t": "he would start me like Kids like myself, when we grow up, we",
-      "r": "会跟我说，像我这样的孩子，长大后都"
+      "s": 866.8,
+      "e": 872.3,
+      "t": "Kids like myself, when we grow up, we want to do flashy right. And the last thing we want to do is sit",
+      "r": "孩子，长大后都想做一些炫酷的事情。正确的。我们最不想看到的就是坐在"
     },
     {
-      "s": 868.6,
-      "e": 870.6,
-      "t": "want to do flashy right.",
-      "r": "想做一些炫酷的事情。正确的。"
+      "s": 872.3,
+      "e": 876.2,
+      "t": "right in front of the rim and the coach give you the ball and you hold here and",
+      "r": "篮筐前，教练把球递给你，你拿着球，然后把球"
     },
     {
-      "s": 870.6,
-      "e": 874.3,
-      "t": "And the last thing we want to do is sit right in front of the rim and the coach",
-      "r": "我们最不想看到的就是坐在篮筐前，教练把"
+      "s": 876.2,
+      "e": 880.9,
+      "t": "the you put it in your palm and you say just shoot it off the fingertips. Yeah. Do the boring stuff.",
+      "r": "放在手掌里，教练说用指尖投篮就行了。是的。去做那些枯燥乏味的事情。"
     },
     {
-      "s": 874.3,
-      "e": 877.9,
-      "t": "give you the ball and you hold here and the you put it in your palm and you say",
-      "r": "球递给你，你拿着球，然后把球放在手掌里，教练说用"
+      "s": 880.9,
+      "e": 888.3,
+      "t": "Yep, do the boring stuff. Just catch. Catch. We going to make we going to spend 20",
+      "r": "没错，去做那些枯燥乏味的事情。抓住它。抓住。我们将花"
     },
     {
-      "s": 877.9,
-      "e": 880,
-      "t": "just shoot it off the fingertips. Yeah.",
-      "r": "指尖投篮就行了。是的。"
+      "s": 888.3,
+      "e": 892.3,
+      "t": "straight minutes on you just getting the ball off the palm.",
+      "r": "整整 20 分钟的时间，让你从手掌上把球弄下来。"
     },
     {
-      "s": 880,
-      "e": 882.5,
-      "t": "Do the boring stuff. Yep, do the boring stuff.",
-      "r": "去做那些枯燥乏味的事情。没错，去做那些枯燥乏味的事情。"
+      "s": 892.3,
+      "e": 896.3,
+      "t": "Let's get it closer to the fingertips. Yeah, let's get this card underneath quarter underneath there.",
+      "r": "让我们把它拿到指尖附近。对，我们把这张卡片放到下面的四分之一处。"
     },
     {
-      "s": 882.5,
-      "e": 886.3,
-      "t": "Just catch. Catch.",
-      "r": "抓住它。抓住。"
+      "s": 896.3,
+      "e": 899.5,
+      "t": "Exactly. And we going to just do this for 20 minutes. We're doing in the",
+      "r": "确切地。我们要做 20分钟。我们在中间做"
     },
     {
-      "s": 886.3,
-      "e": 890.3,
-      "t": "We going to make we going to spend 20 straight minutes on you just",
-      "r": "我们将花整整 20 分钟的时间，让你从"
+      "s": 899.5,
+      "e": 903.5,
+      "t": "middle, we're doing on the side, both sides, moving out a little bit right",
+      "r": "，我们在边线做，两边都做，稍微往"
     },
     {
-      "s": 890.3,
-      "e": 893.9,
-      "t": "getting the ball off the palm. Let's get it closer to the fingertips.",
-      "r": "手掌上把球弄下来。让我们把它拿到指尖附近。"
+      "s": 903.5,
+      "e": 908.2,
+      "t": "underneath the free throw line. So, it was just like super super detailed",
+      "r": "罚球线下方移动一点。所以，"
     },
     {
-      "s": 893.9,
-      "e": 896.2,
-      "t": "Yeah, let's get this card underneath quarter underneath",
-      "r": "对，我们把这张卡片放到下面的四分之一处"
+      "s": 908.2,
+      "e": 913.1,
+      "t": "to when I did want to shoot my fadeaways, I had structure.",
+      "r": "当我想要拍摄后仰跳投时，我的计划非常非常详细，因为我已经有了计划。"
     },
     {
-      "s": 896.2,
-      "e": 897.8,
-      "t": "there. Exactly. And we going to just do this",
-      "r": "。确切地。我们要做"
+      "s": 913.1,
+      "e": 919,
+      "t": "Yes, a platform to build off of. platform to build off of that and then he he for sure.",
+      "r": "是的，一个可以以此为基础进行开发的平台。以此为平台继续发展，然后他肯定会这么做。"
     },
     {
-      "s": 897.8,
-      "e": 901.3,
-      "t": "for 20 minutes. We're doing in the middle, we're doing on the side, both",
-      "r": "20分钟。我们在中间做，我们在边线做，两边都做"
+      "s": 919,
+      "e": 921.5,
+      "t": "And that's an interesting note for kids is that",
+      "r": "对于孩子们来说，这是一个有趣的发现，很"
     },
     {
-      "s": 901.3,
-      "e": 905.2,
-      "t": "sides, moving out a little bit right underneath the free throw line. So, it",
-      "r": "，稍微往罚球线下方移动一点。所以，"
+      "s": 921.5,
+      "e": 928.2,
+      "t": "so obviously standing on the rim and shooting that two-footer, eight-footer, 10-footer slowly is easy.",
+      "r": "明显，站在篮筐上慢慢投篮，无论是两英尺、八英尺还是十英尺的投篮，都是很容易的。"
     },
     {
-      "s": 905.2,
-      "e": 911.1,
-      "t": "was just like super super detailed to when I did want to shoot my",
-      "r": "当我想要拍摄"
+      "s": 928.2,
+      "e": 937,
+      "t": "Mhm. But for it to be a habit, for it to be repeatable, for it to be um stress test, you have to put in those",
+      "r": "嗯。但要养成习惯，要能够重复，要能够进行压力测试，你就必须投入那些你"
     },
     {
-      "s": 911.1,
-      "e": 915.1,
-      "t": "fadeaways, I had structure. Yes, a platform to build off of.",
-      "r": "后仰跳投时，我的计划非常非常详细，因为我已经有了计划。是的，一个可以以此为基础进行开发的平台。以此为"
+      "s": 937,
+      "e": 944,
+      "t": "like ugly hours of just doing it not want to do. Right. And so your body now cannot do",
+      "r": "不想做却不得不做的痛苦时间。正确的。所以你的身体现在无法做到"
     },
     {
-      "s": 915.1,
-      "e": 918.4,
-      "t": "platform to build off of that and then he he",
-      "r": "平台继续发展，然后他"
+      "s": 944,
+      "e": 948,
+      "t": "the other. Yeah. Yeah. Which takes time. Yeah, he got me comfortable with being",
+      "r": "另一件事了。是的。是的。这需要时间。是的，他让我习惯了不"
     },
     {
-      "s": 918.4,
-      "e": 920.3,
-      "t": "for sure. And that's an interesting note for kids",
-      "r": "肯定会这么做。对于孩子们来说，这是一个有趣的发现，很"
+      "s": 948,
+      "e": 954.7,
+      "t": "uncomfortable. That was like one of my first stages of like falling in love with being",
+      "r": "舒服的感觉。那就像是我爱上"
     },
     {
-      "s": 920.3,
-      "e": 923.2,
-      "t": "is that so obviously standing on the rim and",
-      "r": "明显，站在篮筐上"
+      "s": 954.7,
+      "e": 961.1,
+      "t": "uncomfortable. Mhm. Like he he had me doing stuff that I just one I didn't I didn't",
+      "r": "不适感的最初阶段之一。嗯。就像他让我做一些我根本不想做的事情，我真的不想"
     },
     {
-      "s": 923.2,
-      "e": 926.4,
-      "t": "shooting that two-footer, eight-footer, 10-footer",
-      "r": "投篮 2 英尺、8 英尺、10 英尺"
+      "s": 961.1,
+      "e": 967.2,
+      "t": "didn't do Yeah. or didn't have to do. I mean, I was so dominant even with",
+      "r": "做。或者说，他不必这样做。我的意思是，即使"
     },
     {
-      "s": 926.4,
-      "e": 929.2,
-      "t": "slowly is easy. Mhm.",
-      "r": "慢慢投篮，无论是两英尺、八英尺还是十英尺的投篮，都是很容易的。嗯。"
+      "s": 967.2,
+      "e": 972.7,
+      "t": "I was possessed with, but I wanted to be I wanted to be I didn't want to have a flaw. Yeah.",
+      "r": "我被某种东西控制，我仍然非常强势，但我想要成为那样的人，我不想有任何缺点。是的。"
     },
     {
-      "s": 929.2,
-      "e": 933.8,
-      "t": "But for it to be a habit, for it to be repeatable, for it to be",
-      "r": "但要养成习惯，要能够重复，要能够进行"
+      "s": 972.7,
+      "e": 975.2,
+      "t": "You know, I didn't want to have a flaw. I didn't want",
+      "r": "你知道，我不想身上有任何瑕疵。我不想让"
     },
     {
-      "s": 933.8,
-      "e": 938.4,
-      "t": "um stress test, you have to put in those like",
-      "r": "压力测试，你就必须投入那些你"
+      "s": 975.2,
+      "e": 981.3,
+      "t": "teams to be able to just like go under my pick and rolls all game long",
+      "r": "对手整场比赛都能轻易绕过我的挡拆，"
     },
     {
-      "s": 938.4,
-      "e": 941.9,
-      "t": "ugly hours of just doing it not want to do.",
-      "r": "不想做却不得不做的痛苦时间。"
+      "s": 981.3,
+      "e": 985.4,
+      "t": "or stunt and fall off of me or if I'm bringing the ball up, my man is just",
+      "r": "或者佯攻然后放开我，或者当我运球推进时，我的防守人就"
     },
     {
-      "s": 941.9,
-      "e": 944.6,
-      "t": "Right. And so your body now cannot do the other.",
-      "r": "正确的。所以你的身体现在无法做到另一件事了。是的"
+      "s": 985.4,
+      "e": 988.8,
+      "t": "sitting at the free throw line. Like I I never wanted to feel that way on the",
+      "r": "站在罚球线上。我从来不想那样倒在"
     },
     {
-      "s": 944.6,
-      "e": 946.4,
-      "t": "Yeah. Yeah. Which takes time.",
-      "r": "。是的。这需要时间。"
+      "s": 988.8,
+      "e": 991.9,
+      "t": "floor. Yes, there was games where I didn't shoot it particularly well from",
+      "r": "地上。是的，有些比赛中我的"
     },
     {
-      "s": 946.4,
-      "e": 949.5,
-      "t": "Yeah, he got me comfortable with being uncomfortable. That was like one of my",
-      "r": "是的，他让我习惯了不舒服的感觉。那就像是我爱上"
+      "s": 991.9,
+      "e": 996.4,
+      "t": "the outside or teams would go under or they'll force me to shoot. Those are",
+      "r": "外线投篮不太好，或者对方会采用内线投篮，或者他们会迫使我出手。那些"
     },
     {
-      "s": 949.5,
-      "e": 953.6,
-      "t": "first stages of like",
-      "r": "喜欢的第一阶段"
+      "s": 996.4,
+      "e": 999.8,
+      "t": "those things that I still I still had to learn, but",
+      "r": "东西我当时还得学习，但"
     },
     {
-      "s": 953.6,
-      "e": 955.3,
-      "t": "falling in love with being uncomfortable.",
-      "r": "不适感的最初阶段之一。"
-    },
-    {
-      "s": 955.3,
-      "e": 958.2,
-      "t": "Mhm. Like he he had me doing stuff that I",
-      "r": "嗯。就像他让我做一些我"
-    },
-    {
-      "s": 958.2,
-      "e": 962,
-      "t": "just one I didn't I didn't didn't do",
-      "r": "根本不想做的事情，我真的不想做"
-    },
-    {
-      "s": 962,
-      "e": 965.3,
-      "t": "Yeah. or didn't have to do. I mean, I was",
-      "r": "。或者说，他不必这样做。我的意思是，"
-    },
-    {
-      "s": 965.3,
-      "e": 969.6,
-      "t": "so dominant even with I was possessed with, but I wanted to be",
-      "r": "即使我被某种东西控制，我仍然非常强势，但我"
-    },
-    {
-      "s": 969.6,
-      "e": 972.2,
-      "t": "I wanted to be I didn't want to have a flaw.",
-      "r": "想要成为那样的人，我不想有任何缺点。是的"
-    },
-    {
-      "s": 972.2,
-      "e": 974.1,
-      "t": "Yeah. You know, I didn't want to have a flaw.",
-      "r": "。你知道，我不想身上有任何瑕疵。"
-    },
-    {
-      "s": 974.1,
-      "e": 977.9,
-      "t": "I didn't want teams to be able to just like",
-      "r": "我不想让对手"
-    },
-    {
-      "s": 977.9,
-      "e": 983.9,
-      "t": "go under my pick and rolls all game long or stunt and fall off of me or if I'm",
-      "r": "整场比赛都能轻易绕过我的挡拆，或者佯攻然后放开我，或者当我"
-    },
-    {
-      "s": 983.9,
-      "e": 987.5,
-      "t": "bringing the ball up, my man is just sitting at the free throw line. Like I I",
-      "r": "运球推进时，我的防守人就站在罚球线上。我从来不想那样倒"
-    },
-    {
-      "s": 987.5,
-      "e": 990.7,
-      "t": "never wanted to feel that way on the floor. Yes, there was games where I",
-      "r": "在地上。是的，有些比赛中我的"
-    },
-    {
-      "s": 990.7,
-      "e": 994.5,
-      "t": "didn't shoot it particularly well from the outside or teams would go under or",
-      "r": "外线投篮不太好，或者对方会采用内线投篮，或者"
-    },
-    {
-      "s": 994.5,
-      "e": 998.5,
-      "t": "they'll force me to shoot. Those are those things that I still I still had to",
-      "r": "他们会迫使我出手。那些东西我当时还得"
-    },
-    {
-      "s": 998.5,
-      "e": 1002,
-      "t": "learn, but in my mind I just I always wanted to be",
-      "r": "学习，但我一直想做的不仅仅是展现"
-    },
-    {
-      "s": 1002,
-      "e": 1006.75,
-      "t": "more than just, you know, my athletic ability.",
-      "r": "我的运动能力。"
+      "s": 999.8,
+      "e": 1008.77,
+      "t": "in my mind I just I always wanted to be more than just, you know, my athletic ability.",
+      "r": "我一直想做的不仅仅是展现我的运动能力。 [音乐]"
     },
     {
       "s": 1014.5,
@@ -1748,15 +1250,9 @@
     },
     {
       "s": 1019,
-      "e": 1022.6,
-      "t": "hit different. My daughter's out in Madison, Wisconsin,",
-      "r": "感受却截然不同。我女儿住在威斯康星州麦迪逊市，"
-    },
-    {
-      "s": 1022.6,
       "e": 1025.4,
-      "t": "and any chance I get to visit her, I take it.",
-      "r": "只要有机会去看她，我都会抓住。"
+      "t": "hit different. My daughter's out in Madison, Wisconsin, and any chance I get to visit her, I take it.",
+      "r": "感受却截然不同。我女儿住在威斯康星州麦迪逊市，只要有机会去看她，我都会抓住。"
     },
     {
       "s": 1025.4,
@@ -1814,57 +1310,33 @@
     },
     {
       "s": 1062.5,
-      "e": 1068.6,
-      "t": "might be worth more than you think. Find out how much at airbnb.com/host.",
-      "r": "可能比你想象的更有价值。请访问 airbnb.com/host 查询价格。"
+      "e": 1071.63,
+      "t": "might be worth more than you think. Find out how much at airbnb.com/host. [music]",
+      "r": "可能比你想象的更有价值。请访问 airbnb.com/host 查询价格。 [音乐]"
     },
     {
       "s": 1077,
-      "e": 1079,
-      "t": "So you put the time in. Yeah.",
-      "r": "所以你投入了时间。是的。"
-    },
-    {
-      "s": 1079,
       "e": 1083,
-      "t": "Sorry, this is interesting to me. Uh you put the time in, you gain confidence.",
-      "r": "抱歉，我对这个很感兴趣。嗯，你投入时间，就会获得自信。"
+      "t": "So you put the time in. Yeah. Sorry, this is interesting to me. Uh you put the time in, you gain confidence.",
+      "r": "所以你投入了时间。是的。抱歉，我对这个很感兴趣。嗯，你投入时间，就会获得自信。"
     },
     {
       "s": 1083,
-      "e": 1086.7,
-      "t": "When was it you're like, oh, you're leaving me?",
-      "r": "你是什么时候突然说“哦，你要离开我了”的？"
-    },
-    {
-      "s": 1086.7,
       "e": 1088.4,
-      "t": "Oh, you're late to me? Yeah.",
-      "r": "哦，你迟到了？是的。"
+      "t": "When was it you're like, oh, you're leaving me? Oh, you're late to me? Yeah.",
+      "r": "你是什么时候突然说“哦，你要离开我了”的？哦，你迟到了？是的。"
     },
     {
       "s": 1088.4,
-      "e": 1091.3,
-      "t": "When did you have that like, oh, I got this now?",
-      "r": "你是什么时候有那种“哦，我现在明白了”的感觉的？"
-    },
-    {
-      "s": 1091.3,
       "e": 1095.1,
-      "t": "Pressure moments I'm Pressure moments. Yeah, I mean I think I",
-      "r": "压力时刻，我就是压力时刻。是的，我的意思是，我觉得……"
+      "t": "When did you have that like, oh, I got this now? Pressure moments I'm Pressure moments. Yeah, I mean I think I",
+      "r": "你是什么时候有那种“哦，我现在明白了”的感觉的？压力时刻，我就是压力时刻。是的，我的意思是，我觉得……"
     },
     {
       "s": 1095.1,
-      "e": 1097.5,
-      "t": "think it You remember a change?",
-      "r": "你还记得那次变化吗？"
-    },
-    {
-      "s": 1097.5,
       "e": 1103,
-      "t": "No, I don't know exactly when it changed, but think in like 2012",
-      "r": "不，我不知道具体是什么时候改变的，但我想大概在2012年，"
+      "t": "think it You remember a change? No, I don't know exactly when it changed, but think in like 2012",
+      "r": "你还记得那次变化吗？不，我不知道具体是什么时候改变的，但我想大概在2012年，"
     },
     {
       "s": 1103,
@@ -1874,1197 +1346,969 @@
     },
     {
       "s": 1108.6,
-      "e": 1112.9,
-      "t": "I think it still took me time to still like just hone in on that,",
-      "r": "仍然花了一段时间才真正专注于此，"
+      "e": 1116.5,
+      "t": "I think it still took me time to still like just hone in on that, you know, of like",
+      "r": "仍然花了一段时间才真正专注于此，你知道，就像……是的"
     },
     {
-      "s": 1112.9,
-      "e": 1119.2,
-      "t": "you know, of like Yeah, I think 12 13 is when I finally",
-      "r": "你知道，就像……是的，我想在12、13年的时候，我终于"
+      "s": 1116.9,
+      "e": 1125.4,
+      "t": "Yeah, I think 12 13 is when I finally started to be like Okay, I I I I I want to I dare you to like go",
+      "r": "，我想在12、13年的时候，我终于开始想，好吧，我敢打赌你不敢"
     },
     {
-      "s": 1119.2,
-      "e": 1124.1,
-      "t": "started to be like Okay, I I I I I want to I dare you to",
-      "r": "开始想，好吧，我敢打赌你不敢"
+      "s": 1125.4,
+      "e": 1130.3,
+      "t": "or to remove the my pick and roll or I dare you to not guard me at the top of",
+      "r": "取消我的挡拆，或者不敢在弧顶防守我，"
     },
     {
-      "s": 1124.1,
-      "e": 1127.6,
-      "t": "like go or to remove the my pick and roll or I",
-      "r": "取消我的挡拆，或者"
+      "s": 1130.3,
+      "e": 1134.9,
+      "t": "the floor like and I may miss a couple and that's fine, but",
+      "r": "我可能会投丢几个球，没关系，但"
     },
     {
-      "s": 1127.6,
-      "e": 1132.5,
-      "t": "dare you to not guard me at the top of the floor like and",
-      "r": "不敢在弧顶防守我，"
+      "s": 1134.9,
+      "e": 1142.2,
+      "t": "I know how to make this shot and I know exactly the I know the feeling. Yeah. I know the feeling.",
+      "r": "我知道怎么投进这个球，我完全明白那种感觉。是的。我懂这种感觉。"
     },
     {
-      "s": 1132.5,
-      "e": 1137.6,
-      "t": "I may miss a couple and that's fine, but I know how to make this shot and I know",
-      "r": "我可能会投丢几个球，没关系，但我知道怎么投进这个球，我"
+      "s": 1142.2,
+      "e": 1148.2,
+      "t": "I know the feeling of if I missed this short or if I missed it",
+      "r": "我知道那种感觉，如果我错过了这个短球，或者以"
     },
     {
-      "s": 1137.6,
-      "e": 1140.7,
-      "t": "exactly the I know the feeling. Yeah.",
-      "r": "完全明白那种感觉。是的。"
+      "s": 1148.2,
+      "e": 1152.9,
+      "t": "you know, a certain way, I knew what would happen in my mechanics from",
+      "r": "某种方式错过了它，我知道从那一刻到下一球，我的动作会发生什么变化"
     },
     {
-      "s": 1140.7,
-      "e": 1144.8,
-      "t": "I know the feeling. I know the feeling of if I missed this",
-      "r": "我懂这种感觉。我知道那种感觉，如果我错失了这次"
+      "s": 1152.9,
+      "e": 1156.4,
+      "t": "that moment to the next shot. Yeah. It's interesting cuz people talk about",
+      "r": "。是的。这很有意思，因为人们谈论"
     },
     {
-      "s": 1144.8,
-      "e": 1151.1,
-      "t": "short or if I missed it you know, a certain way, I knew",
-      "r": "短球，或者以某种方式错失了机会，我知道"
+      "s": 1156.4,
+      "e": 1160.5,
+      "t": "visualization as a tool for everything but shooting. I think to take it a step",
+      "r": "可视化是将其作为万能工具，唯独不谈论射击。我认为更进一步来说"
     },
     {
-      "s": 1151.1,
-      "e": 1155.3,
-      "t": "what would happen in my mechanics from that moment to the next shot. Yeah.",
-      "r": "从那一刻到下一球，我的动作会发生什么变化。是的。"
+      "s": 1160.5,
+      "e": 1164.4,
+      "t": "further, it's it's not necessarily visualize, it's feeling.",
+      "r": "，这不一定是视觉上的，而是一种感觉。"
     },
     {
-      "s": 1155.3,
-      "e": 1158.6,
-      "t": "It's interesting cuz people talk about visualization as a tool for everything",
-      "r": "这很有意思，因为人们谈论可视化是将其作为万能工具，"
+      "s": 1164.4,
+      "e": 1167.9,
+      "t": "feeling. Yeah. feeling the rhythm, the technique, the",
+      "r": "感觉。是的。感受节奏、技巧和"
     },
     {
-      "s": 1158.6,
-      "e": 1162.9,
-      "t": "but shooting. I think to take it a step further, it's it's not necessarily",
-      "r": "唯独不谈论射击。我认为更进一步来说，这不一定是"
+      "s": 1167.9,
+      "e": 1173.7,
+      "t": "body position. I think like doing a mental rehearsal or visualization with",
+      "r": "身体姿势。我认为，像进行心理演练或想象这样的方式来体会这些"
     },
     {
-      "s": 1162.9,
-      "e": 1165.5,
-      "t": "visualize, it's feeling. feeling. Yeah.",
-      "r": "视觉上的，而是一种感觉。感觉。是的。"
+      "s": 1173.7,
+      "e": 1178.4,
+      "t": "the feelings is impactful. Oh man, what is so impactful? It's so",
+      "r": "感受是很有帮助的。天哪，到底是什么影响如此之大？它"
     },
     {
-      "s": 1165.5,
-      "e": 1171,
-      "t": "feeling the rhythm, the technique, the body position. I think like doing a",
-      "r": "感受节奏、技巧和身体姿势。我认为，像进行"
+      "s": 1178.4,
+      "e": 1183.4,
+      "t": "impactful. Like I'm a guy and I and I'm It's funny because I'm a guy who don't",
+      "r": "影响深远。就像我是一个男人，而且我，这很有趣，因为我是一个不"
     },
     {
-      "s": 1171,
-      "e": 1175.7,
-      "t": "mental rehearsal or visualization with the feelings is impactful.",
-      "r": "心理演练或想象这样的方式来体会这些感受是很有帮助的。"
+      "s": 1183.4,
+      "e": 1188.2,
+      "t": "like shooting uh against the laces. And what I mean",
+      "r": "喜欢对着鞋带投篮的男人。我的意思是，对于"
     },
     {
-      "s": 1175.7,
-      "e": 1181.1,
-      "t": "Oh man, what is so impactful? It's so impactful. Like I'm a guy and I and I'm",
-      "r": "天哪，到底是什么影响如此之大？它影响深远。就像我是一个男人，而且我，"
+      "s": 1188.2,
+      "e": 1194.4,
+      "t": "for people out there like the ball has lines on it obviously.",
+      "r": "像球上显然有线条的人来说，情况就是这样。"
     },
     {
-      "s": 1181.1,
-      "e": 1185.7,
-      "t": "It's funny because I'm a guy who don't like shooting",
-      "r": "这很有趣，因为我是一个不喜欢"
+      "s": 1194.4,
+      "e": 1198.6,
+      "t": "I like to shoot with the laces going this way. Some people can shoot",
+      "r": "我喜欢鞋带朝这个方向穿鞋。有些人可以"
     },
     {
-      "s": 1185.7,
-      "e": 1190.3,
-      "t": "uh against the laces. And what I mean for people out there like",
-      "r": "对着鞋带投篮的男人。我的意思是，对于像"
+      "s": 1198.6,
+      "e": 1203.3,
+      "t": "Wherever. wherever off the laces whenever they catch they If you ever watch my shot if when the",
+      "r": "随时随地开枪。无论球从鞋带处飞出，无论球何时被接住，如果你看过我的投篮，当"
     },
     {
-      "s": 1190.3,
-      "e": 1196.1,
-      "t": "the ball has lines on it obviously. I like to shoot with the laces going",
-      "r": "球上显然有线条的人来说，情况就是这样。我喜欢鞋带朝"
+      "s": 1203.3,
+      "e": 1208.4,
+      "t": "ball is coming towards me, I'm almost fixing it. Well, not almost. I am fixing",
+      "r": "球飞向我时，我几乎都在调整姿势。嗯，差一点儿也没到那一步。"
     },
     {
-      "s": 1196.1,
-      "e": 1199.1,
-      "t": "this way. Some people can shoot Wherever.",
-      "r": "这个方向穿鞋。有些人可以随时随地开枪。无论球从"
+      "s": 1208.4,
+      "e": 1213,
+      "t": "the laces before I even get to my to my shot, you know, or even off the",
+      "r": "你知道吗，我甚至在投篮之前就开始整理鞋带，或者"
     },
     {
-      "s": 1199.1,
-      "e": 1201.6,
-      "t": "wherever off the laces whenever they catch they",
-      "r": "鞋带处飞出，无论球何时被接住，"
+      "s": 1213,
+      "e": 1219.8,
+      "t": "dribble I'm trying to fix the laces and I didn't realize that a lot of players are like that as well.",
+      "r": "运球的时候也一样，我都在努力整理鞋带，我之前都没意识到很多球员也都是这样。"
     },
     {
-      "s": 1201.6,
-      "e": 1205.5,
-      "t": "If you ever watch my shot if when the ball is coming towards me, I'm almost",
-      "r": "如果你看过我的投篮，当球飞向我时，我几乎都在"
+      "s": 1219.8,
+      "e": 1222.5,
+      "t": "I I was like that. Yeah, so like any team I go to or play",
+      "r": "我以前也是那样。是的，所以就像我去的任何球队或者"
     },
     {
-      "s": 1205.5,
-      "e": 1211.3,
-      "t": "fixing it. Well, not almost. I am fixing the laces before I even get to my",
-      "r": "调整姿势。嗯，差一点儿也没到那一步。"
+      "s": 1222.5,
+      "e": 1225.81,
+      "t": "with or guys like if I'm new to the team always ask them like how do you how do",
+      "r": "一起打球的队友一样，如果我是新加入的，我总是会问他们，比如“"
     },
     {
-      "s": 1211.3,
-      "e": 1214.6,
-      "t": "to my shot, you know, or even off the dribble I'm trying to",
-      "r": "你知道吗，我甚至在投篮之前就开始整理鞋带，或者运球的时候也一样，我都在努力"
+      "s": 1225.81,
+      "e": 1227.51,
+      "t": "you like to shoot the ball? Yeah.",
+      "r": "你喜欢怎么投篮？”是的。"
     },
     {
-      "s": 1214.6,
-      "e": 1218.8,
-      "t": "fix the laces and I didn't realize that a lot of players",
-      "r": "整理鞋带，我之前都没意识到很多球员也都是"
+      "s": 1227.51,
+      "e": 1230.51,
+      "t": "And they they like I like you like what do you mean? I'm like do you like laces",
+      "r": "他们喜欢我，喜欢你，你是什么意思？我问你，你喜欢系鞋带"
     },
     {
-      "s": 1218.8,
-      "e": 1220.4,
-      "t": "are like that as well. I I was like that.",
-      "r": "这样。我以前也是那样。"
+      "s": 1230.51,
+      "e": 1234.2,
+      "t": "or no laces do you prefer? Because when I deliver the ball",
+      "r": "还是不系鞋带？因为当我把球传给你的时候，"
     },
     {
-      "s": 1220.4,
-      "e": 1224.31,
-      "t": "Yeah, so like any team I go to or play with or guys like if I'm new to the team",
-      "r": "是的，所以就像我去的任何球队或者一起打球的队友一样，如果我是新加入的，我"
+      "s": 1234.2,
+      "e": 1237.9,
+      "t": "I want to be able to deliver the ball right to you so all you have to do is",
+      "r": "我希望能够把球准确地传到你那里，所以你只需要……虽然"
     },
     {
-      "s": 1224.31,
-      "e": 1226.9,
-      "t": "always ask them like how do you how do you like to shoot the ball?",
-      "r": "总是会问他们，比如“你喜欢怎么投篮？”是的"
+      "s": 1237.9,
+      "e": 1240.4,
+      "t": "and it's not going to be like perfect every time but sometimes you got to like",
+      "r": "不可能每次都完美，但有时候你需要让球"
     },
     {
-      "s": 1226.9,
-      "e": 1229.11,
-      "t": "Yeah. And they they like I like you like what",
-      "r": "。他们喜欢我，喜欢你，"
+      "s": 1240.4,
+      "e": 1244.4,
+      "t": "bounce it you got to spin it but like I want to know how you shoot the ball so",
+      "r": "弹跳一下，或者旋转一下，但我想知道你是如何射门的，所以"
     },
     {
-      "s": 1229.11,
-      "e": 1232.4,
-      "t": "do you mean? I'm like do you like laces or no laces do you prefer? Because when",
-      "r": "你是什么意思？我问你，你喜欢系鞋带还是不系鞋带？因为当"
+      "s": 1244.4,
+      "e": 1247.81,
+      "t": "when I deliver it to you either if you if you like the laces the",
+      "r": "当我把球传给你的时候，如果你喜欢用鞋带，"
     },
     {
-      "s": 1232.4,
-      "e": 1235.51,
-      "t": "I deliver the ball I want to be able to deliver the ball",
-      "r": "我把球传给你的时候，我希望能够把球"
+      "s": 1247.81,
+      "e": 1251.51,
+      "t": "ball is coming to you like this so it's already in the pocket or if you don't",
+      "r": "球就会像这样飞过来，这样它就已经进了口袋；如果你不喜欢，"
     },
     {
-      "s": 1235.51,
-      "e": 1239.11,
-      "t": "right to you so all you have to do is and it's not going to be like perfect",
-      "r": "准确地传到你那里，所以你只需要……虽然不可能"
+      "s": 1251.51,
+      "e": 1254.61,
+      "t": "then I know to put a little spin on it too so.",
+      "r": "那我就知道要稍微加点旋转。"
     },
     {
-      "s": 1239.11,
-      "e": 1242.61,
-      "t": "every time but sometimes you got to like bounce it you got to spin it but like",
-      "r": "每次都完美，但有时候你需要让球弹跳一下，或者旋转一下，但"
+      "s": 1254.61,
+      "e": 1258.61,
+      "t": "Uh so that's an interesting one laces no laces I I mean didn't need laces but I",
+      "r": "嗯，这很有意思，鞋带？没有鞋带？我的意思是，我不需要鞋带，但我又"
     },
     {
-      "s": 1242.61,
-      "e": 1246.4,
-      "t": "I want to know how you shoot the ball so when I deliver it to you",
-      "r": "我想知道你是如何射门的，所以当我把球传给你的时候，"
+      "s": 1258.61,
+      "e": 1265.61,
+      "t": "wanted laces which is crazy. Finkle. Laces out. But it's crazy because you think like",
+      "r": "想要鞋带，这太疯狂了。芬克尔。鞋带脱出。但这很疯狂，因为你会想，就像运球后"
     },
     {
-      "s": 1246.4,
-      "e": 1249.4,
-      "t": "either if you if you like the laces the ball is coming to you like this so it's",
-      "r": "如果你喜欢用鞋带，球就会像这样飞过来，这样它就"
+      "s": 1265.61,
+      "e": 1269.7,
+      "t": "coming off the dribble hard pull up still trying to find while you're like",
+      "r": "猛地急停跳投，还在努力寻找机会，而你却在"
     },
     {
-      "s": 1249.4,
-      "e": 1253.2,
-      "t": "already in the pocket or if you don't then I know to put a little spin on it",
-      "r": "已经进了口袋；如果你不喜欢，那我就知道要稍微加点旋转"
+      "s": 1269.7,
+      "e": 1273.4,
+      "t": "trying to Man I can feel it sometimes. Yeah same. If I come off and them laces is messed",
+      "r": "努力……伙计，我有时能感觉到。是啊，我也是。如果我下场时鞋带乱了，感觉"
     },
     {
-      "s": 1253.2,
-      "e": 1256.51,
-      "t": "too so. Uh so that's an interesting one laces no",
-      "r": "。嗯，这很有意思，鞋带？没有"
+      "s": 1273.4,
+      "e": 1276.81,
+      "t": "up like it it would slip it like something would slip or something would",
+      "r": "它会滑脱，就像有什么东西会滑脱一样，或者"
     },
     {
-      "s": 1256.51,
-      "e": 1260.7,
-      "t": "laces I I mean didn't need laces but I wanted laces which is crazy.",
-      "r": "鞋带？我的意思是，我不需要鞋带，但我又想要鞋带，这太疯狂了。"
+      "s": 1276.81,
+      "e": 1280.31,
+      "t": "trigger in my head like so sometimes I'll come off a a quick",
+      "r": "我的脑子里会冒出某种念头，比如有时候我快速"
     },
     {
-      "s": 1260.7,
-      "e": 1264.51,
-      "t": "Finkle. Laces out.",
-      "r": "芬克尔。鞋带脱出。"
+      "s": 1280.31,
+      "e": 1286.61,
+      "t": "stop and I'm about to raise and I can feel the laces not fixed I'll turn that into a pump fake. Interesting.",
+      "r": "停顿了一下，正要起跳，感觉鞋带没系好，我就会用假动作来化解。有趣的。"
     },
     {
-      "s": 1264.51,
-      "e": 1267.2,
-      "t": "But it's crazy because you think like coming off the dribble hard pull up",
-      "r": "但这很疯狂，因为你会想，就像运球后猛地急停跳投，"
+      "s": 1286.61,
+      "e": 1290.51,
+      "t": "And then and then you know like hard dribble I'll come oh the laces not",
+      "r": "然后，然后你知道，就像用力运球一样，我会来，哦，糟糕，鞋带不见了，"
     },
     {
-      "s": 1267.2,
-      "e": 1270.01,
-      "t": "still trying to find while you're like trying to",
-      "r": "还在努力寻找机会，而你却在努力……伙计，"
+      "s": 1290.51,
+      "e": 1292.7,
+      "t": "there okay fix it on the okay now I got it.",
+      "r": "好吧，把它固定好，好吧，现在我明白了。"
     },
     {
-      "s": 1270.01,
-      "e": 1271.81,
-      "t": "Man I can feel it sometimes. Yeah same.",
-      "r": "我有时能感觉到。是啊，我也是。"
+      "s": 1292.7,
+      "e": 1297.2,
+      "t": "Some yeah sometimes I feel like I even on a hard pull up could fix it just from",
+      "r": "有时候我觉得，即使是做高难度的引体向上，我也可以调整一下，从"
     },
     {
-      "s": 1271.81,
-      "e": 1275.61,
-      "t": "If I come off and them laces is messed up like it it would slip it like",
-      "r": "如果我下场时鞋带乱了，感觉它会滑脱，就像有"
+      "s": 1297.2,
+      "e": 1302.4,
+      "t": "here to here to shoot just just change it I can't always do that that's awesome though.",
+      "r": "这里到这里投篮，只要改变一下就行了。但我并不总是能做到这一点，不过这很棒。"
     },
     {
-      "s": 1275.61,
-      "e": 1278.7,
-      "t": "something would slip or something would trigger in my head like",
-      "r": "什么东西会滑脱一样，或者我的脑子里会冒出某种念头，比如"
+      "s": 1302.4,
+      "e": 1307.7,
+      "t": "would would be okay if I couldn't but also would still try to crazy trying to",
+      "r": "如果做不到也没关系，但我还是会疯狂地尝试"
     },
     {
-      "s": 1278.7,
-      "e": 1282.61,
-      "t": "so sometimes I'll come off a a quick stop and I'm about to raise and I can",
-      "r": "有时候我快速停顿了一下，正要起跳，"
+      "s": 1307.7,
+      "e": 1309.81,
+      "t": "adjust the the ball. That's that's awesome.",
+      "r": "调整球的位置。太棒了。"
     },
     {
-      "s": 1282.61,
-      "e": 1286.01,
-      "t": "feel the laces not fixed I'll turn that into a pump fake.",
-      "r": "感觉鞋带没系好，我就会用假动作来化解。"
+      "s": 1309.81,
+      "e": 1314.9,
+      "t": "So laces no laces what about this one are you a ball watcher or a rim watcher? I'm a ball watcher. Me too.",
+      "r": "所以，有鞋带和无鞋带的篮球，你是关注球还是关注篮筐？我喜欢看球。我也是。是的"
     },
     {
-      "s": 1286.01,
-      "e": 1288.51,
-      "t": "Interesting. And then and then you know like hard",
-      "r": "有趣的。然后，然后你知道，就像用力"
+      "s": 1314.9,
+      "e": 1318.01,
+      "t": "Yeah. Me too. Yeah Dirk always says used to",
+      "r": "。我也是。是啊，德克总是说"
     },
     {
-      "s": 1288.51,
-      "e": 1292.31,
-      "t": "dribble I'll come oh the laces not there okay fix it on the okay now I got",
-      "r": "运球一样，我会来，哦，糟糕，鞋带不见了，好吧，把它修好，好吧，现在我明白了"
+      "s": 1318.01,
+      "e": 1320.61,
+      "t": "kill me because I was a ball watcher because you're not supposed to do that.",
+      "r": "我以前老盯着球看，这可把我气死了，因为那样是不应该的。"
     },
     {
-      "s": 1292.31,
-      "e": 1295.2,
-      "t": "it. Some yeah sometimes I feel like I even",
-      "r": "。有时候我觉得，即使是做"
+      "s": 1320.61,
+      "e": 1323.2,
+      "t": "My little league coach used to tell me that too he used to always tell me what",
+      "r": "我的少棒教练也经常这样跟我说，他总是问我："
     },
     {
-      "s": 1295.2,
-      "e": 1299.11,
-      "t": "on a hard pull up could fix it just from here to here to shoot just",
-      "r": "高难度的引体向上，我也可以调整一下，从这里到这里投篮，只要"
+      "s": 1323.2,
+      "e": 1327.11,
+      "t": "what what what are you looking at why are you looking at the ball? Yeah. And I just",
+      "r": "你在看什么？你在看什么？你为什么盯着球看？是的。我只是……"
     },
     {
-      "s": 1299.11,
-      "e": 1302.11,
-      "t": "just change it I can't always do that that's awesome",
-      "r": "改变一下就行了。但我并不总是能做到这一点，不过这很棒"
+      "s": 1327.11,
+      "e": 1329.7,
+      "t": "I don't know I couldn't I couldn't I tried it.",
+      "r": "我不知道……我做不到……我试过了。"
     },
     {
-      "s": 1302.11,
-      "e": 1304.11,
-      "t": "though. would would be okay if I couldn't but",
-      "r": "。如果做不到也没关系，但我还是会"
+      "s": 1329.7,
+      "e": 1333.7,
+      "t": "I even tried it there was times where like even in high school you know on my",
+      "r": "我甚至试过，有时候，比如在高中罚球的时候，你知道，我就是盯着"
     },
     {
-      "s": 1304.11,
-      "e": 1308.7,
-      "t": "also would still try to crazy trying to adjust the the ball.",
-      "r": "疯狂地尝试调整球的位置。"
+      "s": 1333.7,
+      "e": 1337.31,
+      "t": "free throws like just just look at the look at the rim aim for",
+      "r": "篮筐，瞄准"
     },
     {
-      "s": 1308.7,
-      "e": 1311.51,
-      "t": "That's that's awesome. So laces no laces what about this one",
-      "r": "太棒了。所以，有鞋带和无鞋带的篮球，"
+      "s": 1337.31,
+      "e": 1341.81,
+      "t": "the back of the rim and I tried it for a little bit and it just didn't it it",
+      "r": "篮筐后部，我试了一会儿，但就是不行，"
     },
     {
-      "s": 1311.51,
-      "e": 1314.2,
-      "t": "are you a ball watcher or a rim watcher? I'm a ball watcher.",
-      "r": "你是关注球还是关注篮筐？我喜欢看球。"
+      "s": 1341.81,
+      "e": 1345.51,
+      "t": "didn't feel right it didn't feel right so I switched I went back to what I was",
+      "r": "感觉不对劲，感觉不对劲，所以我换了方法，又回到了我原来的方法"
     },
     {
-      "s": 1314.2,
-      "e": 1315.31,
-      "t": "Me too. Yeah.",
-      "r": "我也是。是的。"
+      "s": 1345.51,
+      "e": 1350.91,
+      "t": "at. Same. I don't know why I don't feel comfortable just looking at the rim. I I look at the rim, of course,",
+      "r": "。相同的。我不知道为什么光看轮辋就觉得不自在。我当然会看轮辋，是的"
     },
     {
-      "s": 1315.31,
-      "e": 1319.61,
-      "t": "Me too. Yeah Dirk always says used to kill me because I was a ball watcher",
-      "r": "我也是。是啊，德克总是说我以前老盯着球看，这让他很生气，"
+      "s": 1350.91,
+      "e": 1355.71,
+      "t": "Yeah. but then I want to see the rim for some reason. I got to find that rim.",
+      "r": "。但不知为何，我又想看看轮辋。我得找到那个轮辋。"
     },
     {
-      "s": 1319.61,
-      "e": 1321.81,
-      "t": "because you're not supposed to do that. My little league coach used to tell me",
-      "r": "因为那样做是不应该的。我的少棒教练也经常这样跟我说，"
+      "s": 1355.71,
+      "e": 1360.11,
+      "t": "I don't know why. I couldn't do it. Um but I think this is I mean as soon as",
+      "r": "我不知道为什么。我做不到 [笑]。嗯，但我觉得，我的意思是，一旦"
     },
     {
-      "s": 1321.81,
-      "e": 1324.4,
-      "t": "that too he used to always tell me what what what what are you looking at why",
-      "r": "他总是问我：你在看什么？你在看什么？"
+      "s": 1360.11,
+      "e": 1363.11,
+      "t": "you can talk about technique of shooting, you know, and guys have",
+      "r": "你能谈论投篮技巧，你知道，每个人的"
     },
     {
-      "s": 1324.4,
-      "e": 1325.7,
-      "t": "are you looking at the ball? Yeah.",
-      "r": "你为什么盯着球看？是的。"
+      "s": 1363.11,
+      "e": 1367.31,
+      "t": "different techniques, but some things they you know, that guys get the same",
+      "r": "技巧都不同，但有些东西，你知道，"
     },
     {
-      "s": 1325.7,
-      "e": 1328.51,
-      "t": "And I just I don't know I couldn't I couldn't I",
-      "r": "我只是……我不知道……我做不到……我"
+      "s": 1367.31,
+      "e": 1374.61,
+      "t": "the good shooters is the footwork, balance, legs, rhythm, release. You know, whether the",
+      "r": "优秀的射手都具备的，就是脚步、平衡、腿部、节奏和出手。你知道，虽然"
     },
     {
-      "s": 1328.51,
-      "e": 1331.31,
-      "t": "tried it. I even tried it there was times where",
-      "r": "试过了。我甚至试过，有时候，比如"
+      "s": 1374.61,
+      "e": 1377.81,
+      "t": "eyes can be somewhere else and guys like you said, different players move the",
+      "r": "球员的目光可能会飘到别处，就像你说的，不同的球员会在"
     },
     {
-      "s": 1331.31,
-      "e": 1335.4,
-      "t": "like even in high school you know on my free throws like just",
-      "r": "在高中罚球的时候，你知道，我就是盯着"
+      "s": 1377.81,
+      "e": 1385.41,
+      "t": "ball around the pocket, but it's about the totality of all those those moves. Um but the the",
+      "r": "口袋区内移动球，但关键在于所有这些动作的整体效果。嗯，不过"
     },
     {
-      "s": 1335.4,
-      "e": 1339.11,
-      "t": "just look at the look at the rim aim for the back of the rim and I tried it for a",
-      "r": "篮筐，瞄准篮筐后部，我试了一会儿，但就是不行，"
+      "s": 1385.41,
+      "e": 1389.21,
+      "t": "why it's an interesting topic right now too is like you almost have to be able",
+      "r": "现在这也是个有趣的话题，因为"
     },
     {
-      "s": 1339.11,
-      "e": 1343.51,
-      "t": "little bit and it just didn't it it didn't feel right it didn't feel right",
-      "r": "感觉不对劲，感觉不对劲，"
+      "s": 1389.21,
+      "e": 1396.31,
+      "t": "to shoot to play in our league. Yeah. Like unless you're AA+ at a at another the Thompson twins,",
+      "r": "在我们这个联赛里，你几乎必须会投篮才能上场比赛。是的。除非你是汤普森双胞胎的 AA+ 级，对吧"
     },
     {
-      "s": 1343.51,
-      "e": 1345.71,
-      "t": "so I switched I went back to what I was at.",
-      "r": "所以我换了方法，又回到了我原来的方法。"
+      "s": 1396.31,
+      "e": 1401.31,
+      "t": "Right. you know, or you're the the one rim-running five, Right.",
+      "r": "。你知道，或者你是那个擅长跑动的五号位球员，对吧。"
     },
     {
-      "s": 1345.71,
-      "e": 1349.71,
-      "t": "Same. I don't know why I don't feel comfortable just looking at the rim. I I",
-      "r": "相同的。我不知道为什么光看轮辋就觉得不自在。我"
+      "s": 1401.31,
+      "e": 1409.21,
+      "t": "um you kind of have to shoot like that how many how many guys on NBA benches would play",
+      "r": "嗯，你得像那样投篮才行。"
     },
     {
-      "s": 1349.71,
-      "e": 1351.51,
-      "t": "look at the rim, of course, Yeah.",
-      "r": "当然会看轮辋，是的。"
+      "s": 1409.21,
+      "e": 1412.91,
+      "t": "30 plus minutes a night if they just were a better three-point shooter?",
+      "r": "如果NBA替补席上的球员三分球投得更好一些，他们每晚能上场30分钟以上吗？是啊是啊"
     },
     {
-      "s": 1351.51,
-      "e": 1354.41,
-      "t": "but then I want to see the rim for some reason.",
-      "r": "但不知为何，我又想看看轮辋。"
+      "s": 1412.91,
+      "e": 1416.11,
+      "t": "Yeah, yeah. I think you go to every team.",
+      "r": "。我认为你应该去每个球队。"
     },
     {
-      "s": 1354.41,
-      "e": 1356.53,
-      "t": "I got to find that rim. I don't know why. I couldn't do",
-      "r": "我得找到那个轮辋。我不知道为什么。我做不到（"
+      "s": 1416.11,
+      "e": 1419.71,
+      "t": "It's gold. It's liquid gold in our league right now to be able to have the",
+      "r": "它是黄金。现在在我们联盟里，能够"
     },
     {
-      "s": 1356.53,
-      "e": 1358.91,
-      "t": "it. Um",
-      "r": "笑）。嗯，"
+      "s": 1419.71,
+      "e": 1425.11,
+      "t": "ability to to shoot the ball um because like you said, that's our whole",
+      "r": "投篮简直就是天赐之物，因为就像你说的，我们整个"
     },
     {
-      "s": 1358.91,
-      "e": 1361.51,
-      "t": "but I think this is I mean as soon as you can talk about technique of",
-      "r": "但我觉得，我的意思是，一旦你能谈论"
+      "s": 1425.11,
+      "e": 1430.41,
+      "t": "league is played outside of the perimeter. So You got and you got to create space for the best players.",
+      "r": "联盟的比赛都是在外线进行的。所以你必须为最优秀的球员创造空间。"
     },
     {
-      "s": 1361.51,
-      "e": 1364.61,
-      "t": "shooting, you know, and guys have different techniques, but some things",
-      "r": "投篮技巧，你知道，每个人的技巧都不同，但有些东西，"
+      "s": 1430.41,
+      "e": 1433.41,
+      "t": "So if you if your guy is sitting in their lap all night, it doesn't matter",
+      "r": "所以，如果你的球员整晚都坐在他们的腿上，那么"
     },
     {
-      "s": 1364.61,
-      "e": 1369.51,
-      "t": "they you know, that guys get the same the good shooters is the footwork,",
-      "r": "你知道，优秀的射手都具备的，就是脚步、"
+      "s": 1433.41,
+      "e": 1439.51,
+      "t": "sometimes how good how well you guard or pass. right, right. Um so",
+      "r": "有时候你的防守或传球有多好，都无济于事。对，对。嗯，"
     },
     {
-      "s": 1369.51,
-      "e": 1372.01,
-      "t": "balance, legs,",
-      "r": "平衡、腿部、"
+      "s": 1439.51,
+      "e": 1443.71,
+      "t": "you know, it's it's kids grow up I think in a different era where shooting's even",
+      "r": "你知道，孩子们长大后，我认为所处的时代不同了，投篮变得"
     },
     {
-      "s": 1372.01,
-      "e": 1376.31,
-      "t": "rhythm, release. You know, whether the eyes can be somewhere else and guys like",
-      "r": "节奏和出手。你知道，虽然球员的目光可能会飘到别处，就像"
+      "s": 1443.71,
+      "e": 1447.01,
+      "t": "more important um but even in the league. So",
+      "r": "更加重要，即使在联盟中也是如此。所以我"
     },
     {
-      "s": 1376.31,
-      "e": 1379.91,
-      "t": "you said, different players move the ball around the pocket, but it's about",
-      "r": "你说的，不同的球员会在口袋区内移动球，但关键在于"
+      "s": 1447.01,
+      "e": 1451.91,
+      "t": "I I I just find it so so important because I do think that like some people",
+      "r": "觉得这非常非常重要，因为我认为像"
     },
     {
-      "s": 1379.91,
-      "e": 1384.11,
-      "t": "the totality of all those those moves. Um",
-      "r": "所有这些动作的整体效果。嗯，"
+      "s": 1451.91,
+      "e": 1456.91,
+      "t": "like you improved your shooting. Yeah. Um I could shoot from the start. Hopefully",
+      "r": "你这样的人，射击水平确实有所提高。是的。嗯，我可以从一开始就开枪。希望"
     },
     {
-      "s": 1384.11,
-      "e": 1387.41,
-      "t": "but the the why it's an interesting topic right now",
-      "r": "不过现在这也是个有趣的话题，因为"
+      "s": 1456.91,
+      "e": 1461.61,
+      "t": "I improved. I I know I improved. But there's some guys that just no",
+      "r": "我有所进步。我知道我进步了。但有些人无论"
     },
     {
-      "s": 1387.41,
-      "e": 1390.61,
-      "t": "too is like you almost have to be able to shoot to play in our league.",
-      "r": "在我们这个联赛里，你几乎必须会投篮才能上场比赛。是的"
+      "s": 1461.61,
+      "e": 1468.01,
+      "t": "matter how much time they put in can't shoot and their mechanics might not even be awful. they so so",
+      "r": "投入多少时间都无法投篮，即使他们的投篮动作可能并不糟糕。所以，"
     },
     {
-      "s": 1390.61,
-      "e": 1395.21,
-      "t": "Yeah. Like unless you're AA+ at a at another",
-      "r": "。除非你是"
+      "s": 1468.01,
+      "e": 1477.41,
+      "t": "do you think there's guys that's like are born shoot the ball like just they're born to be a sniper",
+      "r": "你认为有些人天生就会投篮，就像天生就是狙击手一样，"
     },
     {
-      "s": 1395.21,
-      "e": 1397.21,
-      "t": "the Thompson twins, Right.",
-      "r": "汤普森双胞胎的 AA+ 级，对吧。"
+      "s": 1477.41,
+      "e": 1482.71,
+      "t": "and there's guys that just are just are not born with that ability. Like For sure.",
+      "r": "而有些人天生就没有这种能力吗？确实如此。"
     },
     {
-      "s": 1397.21,
-      "e": 1400.51,
-      "t": "you know, or you're the the one rim-running five,",
-      "r": "你知道，或者你是那个擅长跑动的五号位球员，"
+      "s": 1482.71,
+      "e": 1486.61,
+      "t": "and no matter how much they work on it or whatever the case may be or like guys",
+      "r": "无论他们为此付出多少努力，或者其他任何情况，或者像那些"
     },
     {
-      "s": 1400.51,
-      "e": 1402.51,
-      "t": "Right. um you kind of have to shoot like that",
-      "r": "对吧。嗯，你得像那样投篮才行。"
+      "s": 1486.61,
+      "e": 1489.81,
+      "t": "that was born with it. There's guys that maybe that's never even made it to the",
+      "r": "天生就拥有这种能力的人。有些人可能"
     },
     {
-      "s": 1402.51,
-      "e": 1407.81,
-      "t": "how many how many guys on NBA benches",
-      "r": "NBA 替补席上有多少人"
+      "s": 1489.81,
+      "e": 1493.91,
+      "t": "NBA before or whatever the case may be, but you take them out to the park right",
+      "r": "以前从未进入过 NBA，或者不管怎样，但你现在把他们带到公园里，"
     },
     {
-      "s": 1407.81,
-      "e": 1411.21,
-      "t": "would play 30 plus minutes a night if they just",
-      "r": "如果NBA替补席上的球员三分球投得更好一些，他们每晚能上场30分钟以上吗"
+      "s": 1493.91,
+      "e": 1496.81,
+      "t": "now and they pick up a ball and it's just like riding a bike. It's just like",
+      "r": "他们拿起一个篮球，就像骑自行车一样轻松自如。"
     },
     {
-      "s": 1411.21,
-      "e": 1414.51,
-      "t": "were a better three-point shooter? Yeah, yeah.",
-      "r": "？是啊是啊。"
+      "s": 1496.81,
+      "e": 1501.51,
+      "t": "I was born with this ability to shoot the peel.",
+      "r": "我好像天生就有这种拍摄果皮照片的能力。"
     },
     {
-      "s": 1414.51,
-      "e": 1417.81,
-      "t": "I think you go to every team. It's gold. It's liquid gold in our",
-      "r": "我认为你应该去每个球队。它是黄金。现在在我们"
+      "s": 1501.51,
+      "e": 1505.71,
+      "t": "I I from my own experience, I think I could shoot from the start.",
+      "r": "根据我自己的经验，我觉得我一开始就能开枪。"
     },
     {
-      "s": 1417.81,
-      "e": 1423.31,
-      "t": "league right now to be able to have the ability to to shoot the ball um",
-      "r": "联盟里，能够投篮简直就是天赐之物，"
+      "s": 1505.71,
+      "e": 1509.21,
+      "t": "Um I don't know why. It just made sense to me. Almost I was oblivious that not",
+      "r": "嗯，我不知道为什么。我觉得这很合情理。我几乎没意识到，并不是"
     },
     {
-      "s": 1423.31,
-      "e": 1426.41,
-      "t": "because like you said, that's our whole league is played outside of the",
-      "r": "因为就像你说的，我们整个联盟的比赛都是在"
+      "s": 1509.21,
+      "e": 1512.31,
+      "t": "everyone why couldn't everyone shoot from the start to some degree of",
+      "r": "每个人都能从一开始就取得一定程度的"
     },
     {
-      "s": 1426.41,
-      "e": 1429.11,
-      "t": "perimeter. So You got and you got to create space for",
-      "r": "外线进行的。所以你必须为最"
+      "s": 1512.31,
+      "e": 1517.81,
+      "t": "success. Now of course I had to like work at it every day to do it at the the",
+      "r": "成功。当然，我必须每天努力练习，才能掌握"
     },
     {
-      "s": 1429.11,
-      "e": 1431.91,
-      "t": "the best players. So if you if your guy is sitting in",
-      "r": "优秀的球员创造空间。所以，如果你的球员"
+      "s": 1517.81,
+      "e": 1521.61,
+      "t": "different levels, the different speeds, different distances, different off the",
+      "r": "不同的水平、不同的速度、不同的距离、不同的"
     },
     {
-      "s": 1431.91,
-      "e": 1435.91,
-      "t": "their lap all night, it doesn't matter sometimes how good how well you guard or",
-      "r": "整晚都坐在他们的腿上，那么有时候你的防守或传球有多好，都无济于事"
+      "s": 1521.61,
+      "e": 1527.51,
+      "t": "dribble, left, right fade, all that stuff. But I have to say from the start I could shoot.",
+      "r": "运球方式、左后撤步、右后撤步等等。但我必须说，从一开始我就能射击。"
     },
     {
-      "s": 1435.91,
-      "e": 1437.21,
-      "t": "pass. right, right.",
-      "r": "。对，对。"
+      "s": 1527.51,
+      "e": 1531.31,
+      "t": "But then there's other guys you see that um",
+      "r": "但还有一些球员，比如"
     },
     {
-      "s": 1437.21,
-      "e": 1442.21,
-      "t": "Um so you know, it's it's kids grow up I think",
-      "r": "嗯，你知道，孩子们长大后，我认为所处的"
+      "s": 1531.31,
+      "e": 1535.21,
+      "t": "I I saw when I coached, you know, you'd have guys and you'd put development guys",
+      "r": "我执教时看到的那些，你知道，你会让一些球员"
     },
     {
-      "s": 1442.21,
-      "e": 1445.61,
-      "t": "in a different era where shooting's even more important um but even in the",
-      "r": "时代不同了，投篮变得更加重要，即使在"
+      "s": 1535.21,
+      "e": 1538.91,
+      "t": "through summer of shooting high volume of shots",
+      "r": "在夏天进行大量的投篮训练，"
     },
     {
-      "s": 1445.61,
-      "e": 1449.31,
-      "t": "league. So I I I just find it so so important",
-      "r": "联盟中也是如此。所以我觉得这非常非常重要，"
+      "s": 1538.91,
+      "e": 1543.21,
+      "t": "and they would shoot the ball well. They would improve in the empty gym, but it",
+      "r": "而他们的投篮命中率会很高。他们在空荡荡的体育馆里训练会有所进步，但"
     },
     {
-      "s": 1449.31,
-      "e": 1453.21,
-      "t": "because I do think that like some people like you improved your shooting.",
-      "r": "因为我认为像你这样的人，射击水平确实有所提高。是的"
+      "s": 1543.21,
+      "e": 1549.21,
+      "t": "was never really there for them in a full speed game. Um I always find",
+      "r": "在全速比赛中，他们始终无法真正发挥出应有的水平。嗯，我一直觉得"
     },
     {
-      "s": 1453.21,
-      "e": 1455.41,
-      "t": "Yeah. Um",
-      "r": "。嗯，"
+      "s": 1549.21,
+      "e": 1552.81,
+      "t": "that fascinating. What is it in this kinetic chain?",
+      "r": "这很有意思。这个动力链中究竟是什么？"
     },
     {
-      "s": 1455.41,
-      "e": 1460.11,
-      "t": "I could shoot from the start. Hopefully I improved. I I know I improved.",
-      "r": "我可以从一开始就开枪。希望我有所进步。我知道我进步了。"
+      "s": 1552.81,
+      "e": 1557.11,
+      "t": "And there's two things. One, I think it's in something in the repeatable act.",
+      "r": "有两件事。第一，我认为它存在于可重复的行为中。"
     },
     {
-      "s": 1460.11,
-      "e": 1463.61,
-      "t": "But there's some guys that just no matter how much time they put in can't",
-      "r": "但有些人无论投入多少时间都无法"
+      "s": 1557.11,
+      "e": 1560.51,
+      "t": "There was too much variance in the repetitions for them. But then there's",
+      "r": "对他们来说，重复次数的差异太大了。但是还有，"
     },
     {
-      "s": 1463.61,
-      "e": 1466.31,
-      "t": "shoot and their mechanics might not even be awful.",
-      "r": "投篮，即使他们的投篮动作可能并不糟糕。"
+      "s": 1560.51,
+      "e": 1564.51,
+      "t": "also and I I I'm I'm sure you've seen this. There's guys that can really shoot",
+      "r": "而且我，我，我确信你也见过这种情况。有些球员在"
     },
     {
-      "s": 1466.31,
-      "e": 1468.31,
-      "t": "they so so do you",
-      "r": "所以，你"
+      "s": 1564.51,
+      "e": 1568.21,
+      "t": "that when the lights come on aren't the same shooter.",
+      "r": "灯光亮起时投篮命中率很高，但到了关键时刻，他们的投篮水平就大不如前了。"
     },
     {
-      "s": 1468.31,
-      "e": 1474.21,
-      "t": "think there's guys that's like are born shoot the ball",
-      "r": "认为有些人天生就会投篮，就像"
+      "s": 1568.21,
+      "e": 1570.71,
+      "t": "And that's a whole another that's a whole another topic right",
+      "r": "那完全是另一个话题了"
     },
     {
-      "s": 1474.21,
-      "e": 1479.11,
-      "t": "like just they're born to be a sniper and there's guys that just are just are",
-      "r": "天生就是狙击手一样，而有些人"
+      "s": 1570.71,
+      "e": 1575.01,
+      "t": "there. That's that old that's that old that bug right here that taps into",
+      "r": "。那是一种很古老的病毒，就是那种会感染"
     },
     {
-      "s": 1479.11,
-      "e": 1482.01,
-      "t": "not born with that ability. Like",
-      "r": "天生就没有这种能力吗？确实如此"
+      "s": 1575.01,
+      "e": 1584.31,
+      "t": "people's forearms that that nerve bug. You know, um those are yeah, that's",
+      "r": "人们前臂神经的病毒。你知道，嗯，那些就是，"
     },
     {
-      "s": 1482.01,
-      "e": 1484.31,
-      "t": "For sure. and no matter how much they work on it",
-      "r": "。无论他们为此付出多少努力，"
+      "s": 1584.31,
+      "e": 1589.71,
+      "t": "those are the frustrating ones right there. Yeah. of it. We all have different makeup. Um",
+      "r": "那些才是真正令人沮丧的事情。是的。它的。我们每个人的体质都不一样。嗯，"
     },
     {
-      "s": 1484.31,
-      "e": 1488.41,
-      "t": "or whatever the case may be or like guys that was born with it. There's guys that",
-      "r": "或者其他任何情况，或者像那些天生就拥有这种能力的人。有些人"
+      "s": 1589.71,
+      "e": 1596.91,
+      "t": "That's the psychology of it do. And then again, like it's not the makeup I I think this and I",
+      "r": "这就是其中的心理学原理。然后，我觉得这跟化妆无关，虽然"
     },
     {
-      "s": 1488.41,
-      "e": 1492.31,
-      "t": "maybe that's never even made it to the NBA before or whatever the case may be,",
-      "r": "可能以前从未进入过 NBA，或者不管怎样，"
+      "s": 1596.91,
+      "e": 1600.81,
+      "t": "it's a little tangent, but I think it's applicable to shooting.",
+      "r": "有点跑题，但我认为这跟拍摄有关。"
     },
     {
-      "s": 1492.31,
-      "e": 1495.41,
-      "t": "but you take them out to the park right now and they pick up a ball and it's",
-      "r": "但你现在把他们带到公园里，他们拿起一个篮球，就像"
+      "s": 1600.81,
+      "e": 1606.71,
+      "t": "I think that someone's mental makeup can can grow. Yeah, I agree. We don't approach it that way. Like as a",
+      "r": "我认为一个人的心理素质是可以培养的。是的，我同意。我们不采用那种方法。就像"
     },
     {
-      "s": 1495.41,
-      "e": 1499.11,
-      "t": "just like riding a bike. It's just like I was born with this ability to shoot",
-      "r": "骑自行车一样轻松自如。我好像天生就有这种拍摄"
+      "s": 1606.71,
+      "e": 1610.91,
+      "t": "like a it's a muscle or a skill. But like having that mental makeup of",
+      "r": "肌肉或技能一样。但就像拥有那种心理"
     },
     {
-      "s": 1499.11,
-      "e": 1503.61,
-      "t": "the peel. I I from my own experience, I think I",
-      "r": "果皮照片的能力。根据我自己的经验，我觉得我一"
+      "s": 1610.91,
+      "e": 1617.81,
+      "t": "resilience or building resilience to either a workload or an obstacle. Like I shoot it well. Right.",
+      "r": "韧性，或者培养应对工作量或障碍的韧性一样。好像我射击技术很好。正确的。"
     },
     {
-      "s": 1503.61,
-      "e": 1507.51,
-      "t": "could shoot from the start. Um I don't know why. It just made sense",
-      "r": "开始就能开枪。嗯，我不知道为什么。我觉得这很合情理"
+      "s": 1617.81,
+      "e": 1621.21,
+      "t": "You know, how many guys have we heard they they don't miss their free throws in practice? Right.",
+      "r": "你知道吗，我们听说过多少人说他们在练习中罚球百发百中？正确的。"
     },
     {
-      "s": 1507.51,
-      "e": 1510.51,
-      "t": "to me. Almost I was oblivious that not everyone why couldn't everyone shoot",
-      "r": "。我几乎没意识到，并不是每个人都能"
+      "s": 1621.21,
+      "e": 1624.31,
+      "t": "Then they you know, they get out there during the game and they don't make them. Right.",
+      "r": "然后你知道，他们在比赛中上场，却没能得分。正确的。"
     },
     {
-      "s": 1510.51,
-      "e": 1515.11,
-      "t": "from the start to some degree of success. Now of course I had to like",
-      "r": "从一开始就取得一定程度的成功。当然，我必须"
+      "s": 1624.31,
+      "e": 1628.41,
+      "t": "Having a resistance, a resilience to that outcome that I'm I'm going to stick",
+      "r": "我对这种结果有抵抗力、有韧性，所以我决定坚持"
     },
     {
-      "s": 1515.11,
-      "e": 1519.91,
-      "t": "work at it every day to do it at the the different levels, the different speeds,",
-      "r": "每天努力练习，才能掌握不同的水平、不同的速度、"
+      "s": 1628.41,
+      "e": 1629.61,
+      "t": "with this and I'm going to take a step back.",
+      "r": "下去，并退后一步。"
     },
     {
-      "s": 1519.91,
-      "e": 1523.01,
-      "t": "different distances, different off the dribble, left, right fade, all that",
-      "r": "不同的距离、不同的运球方式、左后撤步、右后撤步"
+      "s": 1629.61,
+      "e": 1635.31,
+      "t": "I mean because it's not like I mean we've seen multiple guys in our league",
+      "r": "我的意思是，因为我们联盟里有很多球员"
     },
     {
-      "s": 1523.01,
-      "e": 1526.31,
-      "t": "stuff. But I have to say from the start I could",
-      "r": "等等。但我必须说，从一开始我就能"
+      "s": 1635.31,
+      "e": 1639.41,
+      "t": "came into the league not great shooters. People say their mechanics maybe looked",
+      "r": "刚进联盟的时候并不是很擅长投篮。人们说他们的机械师可能看起来"
     },
     {
-      "s": 1526.31,
-      "e": 1529.81,
-      "t": "shoot. But then there's other guys you see that",
-      "r": "射击。但还有一些球员，比如"
+      "s": 1639.41,
+      "e": 1645.31,
+      "t": "a little whatever the case may be. And after work and work and either",
+      "r": "有点……不管是什么情况。下班后，要么和"
     },
     {
-      "s": 1529.81,
-      "e": 1533.21,
-      "t": "um I I saw when I coached, you know, you'd",
-      "r": "我执教时看到的那些，你知道，"
+      "s": 1645.31,
+      "e": 1648.31,
+      "t": "working with somebody or just putting in the work.",
+      "r": "别人一起工作，要么自己埋头苦干。"
     },
     {
-      "s": 1533.21,
-      "e": 1537.71,
-      "t": "have guys and you'd put development guys through summer of shooting high volume",
-      "r": "你会让一些球员在夏天进行大量的"
+      "s": 1648.31,
+      "e": 1651.51,
+      "t": "I mean look at J Kidd. When J Kidd came into the league, it wasn't like J Kidd",
+      "r": "我的意思是，看看J Kidd。 J·基德刚进入联盟时，"
     },
     {
-      "s": 1537.71,
-      "e": 1540.91,
-      "t": "of shots and they would shoot the ball well. They",
-      "r": "投篮训练，而他们的投篮命中率会很高。他们"
+      "s": 1651.51,
+      "e": 1654.11,
+      "t": "was burning the perimeter as far as his shooting.",
+      "r": "他的外线投篮能力并不突出。"
     },
     {
-      "s": 1540.91,
-      "e": 1545.91,
-      "t": "would improve in the empty gym, but it was never really there for them",
-      "r": "在空荡荡的体育馆里训练会有所进步，但"
+      "s": 1654.11,
+      "e": 1658.01,
+      "t": "Very streaky and fast when he started. and now he's what top five in",
+      "r": "他刚开始的时候表现非常出色，速度也很快。现在，他已经跻身"
     },
     {
-      "s": 1545.91,
-      "e": 1550.91,
-      "t": "in a full speed game. Um I always find that fascinating. What is it in this",
-      "r": "在全速比赛中，他们始终无法真正发挥出应有的水平。嗯，我一直觉得这很有意思。这个动力链中究竟是什么"
+      "s": 1658.01,
+      "e": 1661.11,
+      "t": "three-pointers made in career history, made big shot after big shot from the",
+      "r": "职业生涯三分球命中数前五的行列，在外线一次又一次地投进关键球"
     },
     {
-      "s": 1550.91,
-      "e": 1553.91,
-      "t": "kinetic chain? And there's two things. One, I think",
-      "r": "？有两件事。第一，我认为"
+      "s": 1661.11,
+      "e": 1665.11,
+      "t": "perimeter. J Kidd was known more for downhill, right to left crossover,",
+      "r": "。 J Kidd 以下坡突破、从右到左的交叉运球、"
     },
     {
-      "s": 1553.91,
-      "e": 1558.31,
-      "t": "it's in something in the repeatable act. There was too much variance in the",
-      "r": "它存在于可重复的行为中。"
+      "s": 1665.11,
+      "e": 1668.91,
+      "t": "getting into the lane, passing ability. And can make an outside shot, but that's",
+      "r": "进入内线和传球能力而闻名。他也能投篮，但这"
     },
     {
-      "s": 1558.31,
-      "e": 1562.21,
-      "t": "repetitions for them. But then there's also and I I I'm I'm sure you've seen",
-      "r": "对他们来说，重复次数的差异太大了。但是还有，而且我，我，我确信你也见过这种情况"
+      "s": 1668.91,
+      "e": 1674.01,
+      "t": "not what he was known for. nights. But he wasn't a shooter. And the same same with Kawhi. Yeah.",
+      "r": "并不是他为人所知的强项。夜晚。但他并不是个神枪手。卡哇伊的情况也一样。是的。"
     },
     {
-      "s": 1562.21,
-      "e": 1566.41,
-      "t": "this. There's guys that can really shoot that when the lights come on",
-      "r": "。有些球员在灯光亮起时投篮命中率很高，但到了关键时刻，他们的投篮水平就"
+      "s": 1674.01,
+      "e": 1677.01,
+      "t": "I mean Kawhi is one of the best best shooters that we got in our game",
+      "r": "我的意思是，卡哇伊是我们这个时代最他妈顶尖的射手之一"
     },
     {
-      "s": 1566.41,
-      "e": 1569.31,
-      "t": "aren't the same shooter. And that's a whole another that's a",
-      "r": "大不如前了。那完全是另一个"
+      "s": 1677.01,
+      "e": 1681.11,
+      "t": "today. But Kawhi didn't come in, you know, as",
+      "r": "。但你知道，卡哇伊并不是"
     },
     {
-      "s": 1569.31,
-      "e": 1573.31,
-      "t": "whole another topic right there. That's that old that's that old",
-      "r": "话题了。那是一种很古老的"
+      "s": 1681.11,
+      "e": 1684.51,
+      "t": "you know, a shooter. They they drafted him because of his attributes. Long",
+      "r": "一个射手。他们选中他是因为他的各项能力。他手臂很长"
     },
     {
-      "s": 1573.31,
-      "e": 1577.81,
-      "t": "that bug right here that taps into people's forearms that that nerve bug.",
-      "r": "病毒，就是那种会感染人们前臂神经的病毒。"
+      "s": 1684.51,
+      "e": 1690.11,
+      "t": "arms, Scottie Pippen kind of feel, you know, big ass hands, you know, they knew",
+      "r": "，有点像斯科蒂·皮蓬那种感觉，你知道，他的手也很大，你知道，他们知道"
     },
     {
-      "s": 1577.81,
-      "e": 1582.61,
-      "t": "You know, um those are",
-      "r": "你知道，嗯，那些就是"
+      "s": 1690.11,
+      "e": 1694.11,
+      "t": "he could fit at the wing. They had Timmy, they had Manu,",
+      "r": "他可以胜任边锋的位置。他们有蒂米，他们有（清嗓子）马努，"
     },
     {
-      "s": 1582.61,
-      "e": 1585.51,
-      "t": "yeah, that's those are the frustrating ones right",
-      "r": "，那些才是真正令人沮丧的事情"
+      "s": 1694.11,
+      "e": 1698.61,
+      "t": "they had Tony. They they needed that wing kind of presence.",
+      "r": "他们有托尼。他们需要那种翼型的存在感。"
     },
     {
-      "s": 1585.51,
-      "e": 1587.81,
-      "t": "there. Yeah. of it.",
-      "r": "。是的。它的。"
+      "s": 1698.61,
+      "e": 1703.61,
+      "t": "And he developed into So there is you know, so it's",
+      "r": "然后他发展成了……所以你知道，所以这又"
     },
     {
-      "s": 1587.81,
-      "e": 1590.71,
-      "t": "We all have different makeup. Um That's the psychology of it",
-      "r": "我们每个人的体质都不一样。嗯，这就是其中的心理学原理"
+      "s": 1703.61,
+      "e": 1711.01,
+      "t": "going back on our on our what you were just saying, it's like is it is it the individual or is it",
+      "r": "回到了你刚才说的，就像是个人的问题，还是"
     },
     {
-      "s": 1590.71,
-      "e": 1593.41,
-      "t": "do. And then again, like",
-      "r": "。然后，"
+      "s": 1711.01,
+      "e": 1719.81,
+      "t": "just some people are don't have the ability to I I just don't know. Like, cuz if you see certain guys that",
+      "r": "有些人没有能力……我真的不知道。比如，如果你看到某些人一开始完全"
     },
     {
-      "s": 1593.41,
-      "e": 1598.11,
-      "t": "it's not the makeup I I think this and I it's a little tangent, but I think it's",
-      "r": "我觉得这跟化妆无关，虽然有点跑题，但我认为这"
+      "s": 1719.81,
+      "e": 1724.41,
+      "t": "can't shoot at all, and then they become you know, great shooters and like",
+      "r": "不会投篮，然后他们就变成了优秀的射手，而且"
     },
     {
-      "s": 1598.11,
-      "e": 1603.11,
-      "t": "applicable to shooting. I think that someone's mental makeup can",
-      "r": "跟拍摄有关。我认为一个人的心理素质是可以"
+      "s": 1724.41,
+      "e": 1730.51,
+      "t": "consistent shooters, almost feel like Right. Can everybody Why can't we?",
+      "r": "投篮很稳定，感觉就像……对吧。每个人都可以做到，为什么我们不能？是的"
     },
     {
-      "s": 1603.11,
-      "e": 1604.91,
-      "t": "can grow. Yeah, I agree.",
-      "r": "培养的。是的，我同意。"
+      "s": 1730.51,
+      "e": 1733.81,
+      "t": "Yeah, at our level. You know, and all the time that we have to put into our",
+      "r": "，在我们这个级别。你知道，"
     },
     {
-      "s": 1604.91,
-      "e": 1608.81,
-      "t": "We don't approach it that way. Like as a like a it's a muscle or a skill. But",
-      "r": "我们不采用那种方法。就像肌肉或技能一样。但"
+      "s": 1733.81,
+      "e": 1740.61,
+      "t": "craft if you are serious and really want to But I don't know the answer. I'm not saying that you should",
+      "r": "如果我们认真对待自己的技艺，真的想有所成就，就必须投入大量的时间。但我不知道答案。我不是说你应该（清嗓子）"
     },
     {
-      "s": 1608.81,
-      "e": 1613.31,
-      "t": "like having that mental makeup of resilience or building resilience to",
-      "r": "就像拥有那种心理韧性，或者培养应对"
+      "s": 1740.61,
+      "e": 1745.21,
+      "t": "be able to, but you almost feel like why can't you improve?",
+      "r": "能够做到，但你几乎会觉得，为什么你不能进步呢？"
     },
     {
-      "s": 1613.31,
-      "e": 1617.31,
-      "t": "either a workload or an obstacle. Like I shoot it well.",
-      "r": "工作量或障碍的韧性一样。好像我射击技术很好。"
+      "s": 1745.21,
+      "e": 1747.71,
+      "t": "I think it's the million dollar question. I think it's",
+      "r": "我认为这是一个价值百万美元的问题。我认为"
     },
     {
-      "s": 1617.31,
-      "e": 1618.81,
-      "t": "Right. You know, how many guys have we heard",
-      "r": "正确的。你知道吗，我们听说过多少人说"
+      "s": 1747.71,
+      "e": 1751.41,
+      "t": "the all outcomes are possible. So you have the player that can't shoot the",
+      "r": "所有结果都有可能。所以你让一个连字母投篮都投不进的球员"
     },
     {
-      "s": 1618.81,
-      "e": 1620.71,
-      "t": "they they don't miss their free throws in practice?",
-      "r": "他们在练习中罚球百发百中？"
+      "s": 1751.41,
+      "e": 1755.31,
+      "t": "letters to shoot Kawhi, right? J Kidd, you know?",
+      "r": "去投卡哇伊，对吧？你认识J Kidd吗？"
     },
     {
-      "s": 1620.71,
-      "e": 1622.51,
-      "t": "Right. Then they you know, they get out there",
-      "r": "正确的。然后你知道，他们"
+      "s": 1755.31,
+      "e": 1759.31,
+      "t": "Then you have the guy that can shoot but doesn't like the lights on.",
+      "r": "还有一种人，他枪法很好，但却不喜欢开灯。"
     },
     {
-      "s": 1622.51,
-      "e": 1623.71,
-      "t": "during the game and they don't make them.",
-      "r": "在比赛中上场，却没能得分。"
+      "s": 1759.31,
+      "e": 1765.01,
+      "t": "So you have a you have this kind of continuum of possibilities shooters.",
+      "r": "所以，射击游戏拥有这样一种可能性连续体。"
     },
     {
-      "s": 1623.71,
-      "e": 1626.41,
-      "t": "Right. Having a resistance, a resilience to",
-      "r": "正确的。"
+      "s": 1765.71,
+      "e": 1770.31,
+      "t": "Some overcome, some Some don't. Some work at it and can't",
+      "r": "有些人克服了困难，有些人则没有。有些人努力尝试，但"
     },
     {
-      "s": 1626.41,
-      "e": 1629.51,
-      "t": "that outcome that I'm I'm going to stick with this and I'm going to take a step",
-      "r": "我对这种结果有抵抗力、有韧性，所以我决定坚持下去，并退后一步"
+      "s": 1770.31,
+      "e": 1777.51,
+      "t": "get there because of something in their kinetic chain. Something in their Another guy with their mentality.",
+      "r": "由于自身动力链中的某些环节出现问题，最终无法成功。他们身上有些东西，另一个人也有这种心态。"
     },
     {
-      "s": 1629.51,
-      "e": 1631.91,
-      "t": "back. I mean because it's not like I mean",
-      "r": "。我的意思是，因为"
+      "s": 1777.51,
+      "e": 1780.81,
+      "t": "And clearly the number one thing is you have to do the work. Like you have to",
+      "r": "显然，最重要的一点是你必须付出努力。就像你必须成为"
     },
     {
-      "s": 1631.91,
-      "e": 1637.81,
-      "t": "we've seen multiple guys in our league came into the league not great shooters.",
-      "r": "我们联盟里有很多球员刚进联盟的时候并不是很擅长投篮。"
+      "s": 1780.81,
+      "e": 1784.91,
+      "t": "Shooters My old coach Jay Triano used to say for",
+      "r": "射手一样。我的老教练杰伊·特里亚诺过去常说，对于"
     },
     {
-      "s": 1637.81,
-      "e": 1642.31,
-      "t": "People say their mechanics maybe looked a little whatever the case may be.",
-      "r": "人们说他们的机械师可能看起来有点……不管是什么情况。"
+      "s": 1784.91,
+      "e": 1788.11,
+      "t": "shooters, shooting is like breathing. You got to do it every day. You got to",
+      "r": "射手来说，投篮就像呼吸一样。你必须每天都做。你必须"
     },
     {
-      "s": 1642.31,
-      "e": 1647.21,
-      "t": "And after work and work and either working with somebody or just putting in",
-      "r": "下班后，要么和别人一起工作，要么自己"
+      "s": 1788.11,
+      "e": 1792.31,
+      "t": "do it every day. And it's true. But that doesn't mean you're going to",
+      "r": "每天都做。这是真的。但这并不意味着你就会"
     },
     {
-      "s": 1647.21,
-      "e": 1650.01,
-      "t": "the work. I mean look at J Kidd. When J Kidd came",
-      "r": "埋头苦干。我的意思是，看看J Kidd。 J·基德刚"
+      "s": 1792.31,
+      "e": 1794.71,
+      "t": "become a great shooter. It doesn't mean you have the mentality. It doesn't mean",
+      "r": "成为一名优秀的射手。但这并不意味着你就具备那种心态。但这并不意味着"
     },
     {
-      "s": 1650.01,
-      "e": 1653.71,
-      "t": "into the league, it wasn't like J Kidd was burning the perimeter as far as his",
-      "r": "进入联盟时，他的外线"
+      "s": 1794.71,
+      "e": 1799.21,
+      "t": "there's something in your motion that isn't making it",
+      "r": "你的动作中存在某种导致其无法"
     },
     {
-      "s": 1653.71,
-      "e": 1656.21,
-      "t": "shooting. Very streaky and fast when he started.",
-      "r": "投篮能力并不突出。他刚开始的时候表现非常出色，速度也很快。"
+      "s": 1799.21,
+      "e": 1803.41,
+      "t": "unrepeatable. So it's it's a fascinating thing because of what where the game is",
+      "r": "重复的因素。所以这是一件非常有趣的事情，因为比赛的"
     },
     {
-      "s": 1656.21,
-      "e": 1659.51,
-      "t": "and now he's what top five in three-pointers made in career history,",
-      "r": "现在，他已经跻身职业生涯三分球命中数前五的行列，"
+      "s": 1803.41,
+      "e": 1809.41,
+      "t": "going and how how well you have to shoot. And If you don't know that Everyone should know that nowadays.",
+      "r": "走向以及你的投篮命中率必须有多高。如果你还不知道，那现在每个人都应该知道了。是"
     },
     {
-      "s": 1659.51,
-      "e": 1663.21,
-      "t": "made big shot after big shot from the perimeter. J Kidd was known more for",
-      "r": "在外线一次又一次地投进关键球。 J Kidd 以下"
+      "s": 1809.41,
+      "e": 1813.11,
+      "t": "Yeah, no, everyone should know that. If you if you want to play in in today's",
+      "r": "啊，没错，每个人都应该知道这一点。如果你想在当今"
     },
     {
-      "s": 1663.21,
-      "e": 1667.41,
-      "t": "downhill, right to left crossover, getting into the lane, passing ability.",
-      "r": "坡突破、从右到左的交叉运球、进入内线和传球能力而闻名。他也"
+      "s": 1813.11,
+      "e": 1817.31,
+      "t": "game at a high level, you have to be able to",
+      "r": "高水平的比赛中打球，你必须能够投篮。"
     },
     {
-      "s": 1667.41,
-      "e": 1669.91,
-      "t": "And can make an outside shot, but that's not what he was known for.",
-      "r": "能投篮，但这并不是他为人所知的强项。"
+      "s": 1817.31,
+      "e": 1820.91,
+      "t": "You have to be able to You don't need to be Steve Nash and and and Steph Curry,",
+      "r": "你不需要成为史蒂夫·纳什或斯蒂芬·库里，"
     },
     {
-      "s": 1669.91,
-      "e": 1673.71,
-      "t": "nights. But he wasn't a shooter. And the same same with Kawhi.",
-      "r": "夜晚。但他并不是个神枪手。卡哇伊的情况也一样。是的"
+      "s": 1820.91,
+      "e": 1824.41,
+      "t": "but you have to be able to make a shot. You got to make a shot.",
+      "r": "但你必须能够投篮得分。你必须投篮得分。"
     },
     {
-      "s": 1673.71,
-      "e": 1675.71,
-      "t": "Yeah. I mean Kawhi is one of the best",
-      "r": "。我的意思是，卡哇伊是"
-    },
-    {
-      "s": 1675.71,
-      "e": 1678.61,
-      "t": "best shooters that we got in our game today. But Kawhi didn't",
-      "r": "我们这个时代最他妈顶尖的射手之一。但"
-    },
-    {
-      "s": 1678.61,
-      "e": 1682.71,
-      "t": "come in, you know, as you know, a shooter. They they drafted",
-      "r": "你知道，卡哇伊并不是一个射手。他们选中"
-    },
-    {
-      "s": 1682.71,
-      "e": 1687.21,
-      "t": "him because of his attributes. Long arms, Scottie Pippen kind of feel, you",
-      "r": "他是因为他的各项能力。他手臂很长，有点像斯科蒂·皮蓬那种感觉，你"
-    },
-    {
-      "s": 1687.21,
-      "e": 1692.51,
-      "t": "know, big ass hands, you know, they knew he could fit at the wing. They had",
-      "r": "知道，他的手也很大，你知道，他们知道他可以胜任边锋的位置。他们有"
-    },
-    {
-      "s": 1692.51,
-      "e": 1695.81,
-      "t": "Timmy, they had Manu, they had Tony. They they needed that",
-      "r": "蒂米，他们有（清嗓子）马努，他们有托尼。他们需要那种"
-    },
-    {
-      "s": 1695.81,
-      "e": 1702.01,
-      "t": "wing kind of presence. And he developed into So there is you",
-      "r": "翼型的存在感。然后他发展成了……所以你"
-    },
-    {
-      "s": 1702.01,
-      "e": 1705.31,
-      "t": "know, so it's going back on our on our what you were",
-      "r": "知道，所以这又回到了你"
-    },
-    {
-      "s": 1705.31,
-      "e": 1709.51,
-      "t": "just saying, it's like is it is it the individual",
-      "r": "刚才说的，就像是个人的问题，"
-    },
-    {
-      "s": 1709.51,
-      "e": 1713.41,
-      "t": "or is it just some people are",
-      "r": "还是有些人"
-    },
-    {
-      "s": 1713.41,
-      "e": 1717.91,
-      "t": "don't have the ability to I I just don't know. Like, cuz if you",
-      "r": "没有能力……我真的不知道。比如，如果你"
-    },
-    {
-      "s": 1717.91,
-      "e": 1722.71,
-      "t": "see certain guys that can't shoot at all, and then they become",
-      "r": "看到某些人一开始完全不会投篮，然后他们就变成了"
-    },
-    {
-      "s": 1722.71,
-      "e": 1728.21,
-      "t": "you know, great shooters and like consistent shooters, almost feel like",
-      "r": "优秀的射手，而且投篮很稳定，感觉就像……对吧"
-    },
-    {
-      "s": 1728.21,
-      "e": 1732.11,
-      "t": "Right. Can everybody Why can't we? Yeah, at our level. You know, and all",
-      "r": "。每个人都可以做到，为什么我们不能？是的，在我们这个级别。你知道，"
-    },
-    {
-      "s": 1732.11,
-      "e": 1735.31,
-      "t": "the time that we have to put into our craft",
-      "r": "我们必须投入到我们的技艺中的时间"
-    },
-    {
-      "s": 1735.31,
-      "e": 1739.61,
-      "t": "if you are serious and really want to But I don't know the answer. I'm not",
-      "r": "如果我们认真对待自己的技艺，真的想有所成就，就必须投入大量的时间。但我不知道答案。我不是"
-    },
-    {
-      "s": 1739.61,
-      "e": 1743.31,
-      "t": "saying that you should be able to, but you almost feel like why",
-      "r": "说你应该（清嗓子）能够做到，但你几乎会觉得，为什么"
-    },
-    {
-      "s": 1743.31,
-      "e": 1746.21,
-      "t": "can't you improve? I think it's the million dollar",
-      "r": "你不能进步呢？我认为这是一个价值百万美元的"
-    },
-    {
-      "s": 1746.21,
-      "e": 1749.51,
-      "t": "question. I think it's the all outcomes are possible. So you",
-      "r": "问题。我认为所有结果都有可能。所以你"
-    },
-    {
-      "s": 1749.51,
-      "e": 1754.11,
-      "t": "have the player that can't shoot the letters to shoot Kawhi, right? J Kidd,",
-      "r": "让一个连字母投篮都投不进的球员去投卡哇伊，对吧？"
-    },
-    {
-      "s": 1754.11,
-      "e": 1757.21,
-      "t": "you know? Then you have the guy that can shoot",
-      "r": "你认识J Kidd吗？还有一种人，他枪法很好，"
-    },
-    {
-      "s": 1757.21,
-      "e": 1760.71,
-      "t": "but doesn't like the lights on. So you have a you have this kind of",
-      "r": "但却不喜欢开灯。所以，"
-    },
-    {
-      "s": 1760.71,
-      "e": 1768.31,
-      "t": "continuum of possibilities shooters. Some overcome, some",
-      "r": "射击游戏拥有这样一种可能性连续体。有些人克服了困难，有些人则"
-    },
-    {
-      "s": 1768.31,
-      "e": 1772.31,
-      "t": "Some don't. Some work at it and can't get there because of something in their",
-      "r": "没有。有些人努力尝试，但由于自身动力链中的某些环节出现问题，最终无法成功"
-    },
-    {
-      "s": 1772.31,
-      "e": 1775.21,
-      "t": "kinetic chain. Something in their",
-      "r": "。他们身上有些东西，"
-    },
-    {
-      "s": 1775.21,
-      "e": 1778.91,
-      "t": "Another guy with their mentality. And clearly the number one thing is you",
-      "r": "另一个人也有这种心态。显然，最重要的一点是你"
-    },
-    {
-      "s": 1778.91,
-      "e": 1782.71,
-      "t": "have to do the work. Like you have to Shooters",
-      "r": "必须付出努力。就像你必须成为射手一样。"
-    },
-    {
-      "s": 1782.71,
-      "e": 1786.41,
-      "t": "My old coach Jay Triano used to say for shooters, shooting is like breathing.",
-      "r": "我的老教练杰伊·特里亚诺过去常说，对于射手来说，投篮就像呼吸一样。"
-    },
-    {
-      "s": 1786.41,
-      "e": 1791.11,
-      "t": "You got to do it every day. You got to do it every day. And it's true.",
-      "r": "你必须每天都做。你必须每天都做。这是真的。"
-    },
-    {
-      "s": 1791.11,
-      "e": 1793.61,
-      "t": "But that doesn't mean you're going to become a great shooter. It doesn't mean",
-      "r": "但这并不意味着你就会成为一名优秀的射手。但这并不意味着"
-    },
-    {
-      "s": 1793.61,
-      "e": 1796.51,
-      "t": "you have the mentality. It doesn't mean there's something in your",
-      "r": "你就具备那种心态。但这并不意味着你的动作中存在某种导致其"
-    },
-    {
-      "s": 1796.51,
-      "e": 1801.41,
-      "t": "motion that isn't making it unrepeatable. So it's it's a fascinating",
-      "r": "无法重复的因素。所以这是一件非常有趣的"
-    },
-    {
-      "s": 1801.41,
-      "e": 1804.91,
-      "t": "thing because of what where the game is going and how how well you have to",
-      "r": "事情，因为比赛的走向以及你的"
-    },
-    {
-      "s": 1804.91,
-      "e": 1808.01,
-      "t": "shoot. And If you don't know that Everyone should",
-      "r": "投篮命中率必须有多高。如果你还不知道，那现在每个人都应该"
-    },
-    {
-      "s": 1808.01,
-      "e": 1810.61,
-      "t": "know that nowadays. Yeah, no, everyone should know that. If",
-      "r": "知道了。是啊，没错，每个人都应该知道这一点。如果"
-    },
-    {
-      "s": 1810.61,
-      "e": 1815.41,
-      "t": "you if you want to play in in today's game at a high level, you have to be",
-      "r": "你想在当今高水平的比赛中打球，你必须能够投篮。"
-    },
-    {
-      "s": 1815.41,
-      "e": 1818.61,
-      "t": "able to You have to be able to You don't need to",
-      "r": "你不需要"
-    },
-    {
-      "s": 1818.61,
-      "e": 1823.01,
-      "t": "be Steve Nash and and and Steph Curry, but you have to be able to make a shot.",
-      "r": "成为史蒂夫·纳什或斯蒂芬·库里，但你必须能够投篮得分。"
-    },
-    {
-      "s": 1823.01,
+      "s": 1824.41,
       "e": 1827.41,
       "t": "You got to make a shot. You got to have some gravity and create",
-      "r": "你必须投篮得分。你需要一些重力，创造"
+      "r": "你需要一些重力，创造"
     },
     {
       "s": 1827.41,
@@ -3080,51 +2324,27 @@
     },
     {
       "s": 1839.01,
-      "e": 1842.31,
-      "t": "Mhm. I mean, that's borderline elite.",
-      "r": "嗯。我的意思是，这几乎算是精英级别了。"
-    },
-    {
-      "s": 1842.31,
       "e": 1846.81,
-      "t": "33.2% threes before he went back to Dallas,",
-      "r": "在他回到达拉斯之前，他的三分球命中率为 33.2%（"
+      "t": "Mhm. I mean, that's borderline elite. 33.2% threes before he went back to Dallas,",
+      "r": "嗯。我的意思是，这几乎算是精英级别了。在他回到达拉斯之前，他的三分球命中率为 33.2%（"
     },
     {
       "s": 1846.81,
-      "e": 1850.51,
-      "t": "I'm assuming this is, 38 after. Come on.",
-      "r": "我猜是这样），之后是 38%。快点。"
-    },
-    {
-      "s": 1850.51,
       "e": 1852.71,
-      "t": "So, you know Right.",
-      "r": "所以，你知道的。"
+      "t": "I'm assuming this is, 38 after. Come on. So, you know Right.",
+      "r": "我猜是这样），之后是 38%。快点。所以，你知道的。"
     },
     {
       "s": 1852.71,
-      "e": 1855.91,
-      "t": "I mean, one one thing I will say about Jason that he had on his side is not",
-      "r": "我的意思是，关于杰森，我要说的一点是他有一点优势，那就是他不"
-    },
-    {
-      "s": 1855.91,
       "e": 1857.31,
-      "t": "afraid of the moment. Right.",
-      "r": "畏惧关键时刻。正确的。"
+      "t": "I mean, one one thing I will say about Jason that he had on his side is not afraid of the moment. Right.",
+      "r": "我的意思是，关于杰森，我要说的一点是他有一点优势，那就是他不畏惧关键时刻。正确的。"
     },
     {
       "s": 1857.31,
-      "e": 1860.21,
-      "t": "So, the lights are never an issue. And of course, he was already a star before",
-      "r": "所以，灯光从来都不是问题。当然，在他学会射击之前，他就已经是一位明星了"
-    },
-    {
-      "s": 1860.21,
       "e": 1862.91,
-      "t": "he learned to shoot. Right.",
-      "r": "。正确的。"
+      "t": "So, the lights are never an issue. And of course, he was already a star before he learned to shoot. Right.",
+      "r": "所以，灯光从来都不是问题。当然，在他学会射击之前，他就已经是一位明星了。正确的。"
     },
     {
       "s": 1862.91,
@@ -3158,39 +2378,21 @@
     },
     {
       "s": 1883.71,
-      "e": 1888.41,
-      "t": "can get there and others can't with variation in the skill, variation",
-      "r": "能达到目标而有些人却不能，这很令人着迷，这与技能和"
-    },
-    {
-      "s": 1888.41,
       "e": 1890.71,
-      "t": "in the technique. Yeah.",
-      "r": "技术上的差异有关。是的。"
+      "t": "can get there and others can't with variation in the skill, variation in the technique. Yeah.",
+      "r": "能达到目标而有些人却不能，这很令人着迷，这与技能和技术上的差异有关。是的。"
     },
     {
       "s": 1890.71,
-      "e": 1895.61,
-      "t": "Hey, listen. It's it's it's a dying breed for people",
-      "r": "嘿，听着。对于那些"
-    },
-    {
-      "s": 1895.61,
       "e": 1897.91,
-      "t": "who can't get there. Yeah.",
-      "r": "无法到达那里的人来说，这是一种正在消亡的物种。是的。"
+      "t": "Hey, listen. It's it's it's a dying breed for people who can't get there. Yeah.",
+      "r": "嘿，听着。对于那些无法到达那里的人来说，这是一种正在消亡的物种。是的。"
     },
     {
       "s": 1897.91,
-      "e": 1901.41,
-      "t": "You know, and and we have nothing but time.",
-      "r": "你知道，我们除了时间什么也没有。"
-    },
-    {
-      "s": 1901.41,
       "e": 1904.31,
-      "t": "Right. Yeah. it's nothing but time. You can get to",
-      "r": "正确的。是的。时间就是一切。您可以"
+      "t": "You know, and and we have nothing but time. Right. Yeah. it's nothing but time. You can get to",
+      "r": "你知道，我们除了时间什么也没有。正确的。是的。一切都只是时间。您可以"
     },
     {
       "s": 1904.31,
@@ -3230,15 +2432,9 @@
     },
     {
       "s": 1928.21,
-      "e": 1932.61,
-      "t": "guys are not putting in enough of the work",
-      "r": "人没有持续投入足够的努力？"
-    },
-    {
-      "s": 1932.61,
       "e": 1936.61,
-      "t": "consistently, like you said, shooting is like breathing",
-      "r": "就像你说的，投篮就像呼吸一样，"
+      "t": "guys are not putting in enough of the work consistently, like you said, shooting is like breathing",
+      "r": "人没有持续投入足够的努力？就像你说的，投篮就像呼吸一样，"
     },
     {
       "s": 1936.61,
@@ -3248,15 +2444,9 @@
     },
     {
       "s": 1941.01,
-      "e": 1944.81,
-      "t": "What's your routine now shooting was? Every day? Daily?",
-      "r": "你现在的拍摄流程和以前一样吗？每天？日常的？是的"
-    },
-    {
-      "s": 1944.81,
       "e": 1947.11,
-      "t": "Yeah. And",
-      "r": "。"
+      "t": "What's your routine now shooting was? Every day? Daily? Yeah. And",
+      "r": "你现在的拍摄流程是怎样的？每天？日常的？是的。"
     },
     {
       "s": 1947.11,
@@ -3302,15 +2492,9 @@
     },
     {
       "s": 1974.81,
-      "e": 1977.41,
-      "t": "Yep. And nobody wants to feel like",
-      "r": "。没有人愿意觉得自己是在"
-    },
-    {
-      "s": 1977.41,
       "e": 1980.11,
-      "t": "You're challenging yourself. I'm challenging myself. So yeah.",
-      "r": "挑战自己。我在挑战自己。是的。"
+      "t": "Yep. And nobody wants to feel like You're challenging yourself. I'm challenging myself. So yeah.",
+      "r": "。没有人愿意觉得自己是在挑战自己。我在挑战自己。是的。"
     },
     {
       "s": 1980.11,
@@ -3332,63 +2516,33 @@
     },
     {
       "s": 1991.11,
-      "e": 1995.21,
-      "t": "game situations, which sometimes is stationary but it's also",
-      "r": "游戏情况，有时是静止的，但有时是向上"
-    },
-    {
-      "s": 1995.21,
       "e": 1998.81,
-      "t": "uh shift up, shift down, coming off a screen, uh",
-      "r": "换挡，向下换挡，离开屏幕，"
+      "t": "game situations, which sometimes is stationary but it's also uh shift up, shift down, coming off a screen, uh",
+      "r": "游戏情况，有时是静止的，但有时是向上换挡，向下换挡，离开屏幕，"
     },
     {
       "s": 1998.81,
-      "e": 2002.11,
-      "t": "running out to space, uh and also heart rate up.",
-      "r": "跑到太空，心率也会上升。"
-    },
-    {
-      "s": 2002.11,
       "e": 2003.81,
-      "t": "Heart rate up. a little differently.",
-      "r": "心率加快。略有不同。"
+      "t": "running out to space, uh and also heart rate up. Heart rate up. a little differently.",
+      "r": "跑到太空，心率也会上升。心率加快。略有不同。"
     },
     {
       "s": 2003.81,
-      "e": 2006.51,
-      "t": "Someone running at you. legs a little bit more tired. It's",
-      "r": "有人朝你跑过来。腿有点累了。现在是"
-    },
-    {
-      "s": 2006.51,
       "e": 2009.01,
-      "t": "fourth quarter. You have to be able to train",
-      "r": "第四节。你必须训练"
+      "t": "Someone running at you. legs a little bit more tired. It's fourth quarter. You have to be able to train",
+      "r": "有人朝你跑过来。腿有点累了。现在是第四节。你必须训练"
     },
     {
       "s": 2009.01,
-      "e": 2013.41,
-      "t": "your body and train your mind for those for those moments,",
-      "r": "你的身体和你的意志，为那些时刻做好准备，"
-    },
-    {
-      "s": 2013.41,
       "e": 2015.71,
-      "t": "you know. Getting organized, getting your feet",
-      "r": "你知道的。做好准备，站稳脚跟"
+      "t": "your body and train your mind for those for those moments, you know. Getting organized, getting your feet",
+      "r": "你的身体和你的意志，为那些时刻做好准备，你知道的。做好准备，站稳脚跟"
     },
     {
       "s": 2015.71,
-      "e": 2019.31,
-      "t": "set, your core tight, stability.",
-      "r": "，收紧核心肌群，保持稳定。"
-    },
-    {
-      "s": 2019.31,
       "e": 2022.81,
-      "t": "is I'm like I ain't the greatest of shooters but I damn sure ain't the worst",
-      "r": "我感觉自己虽然不是最厉害的射手，但肯定也不是最差的"
+      "t": "set, your core tight, stability. is I'm like I ain't the greatest of shooters but I damn sure ain't the worst",
+      "r": "，收紧核心肌群，保持稳定。我感觉自己虽然不是最厉害的射手，但肯定也不是最差的"
     },
     {
       "s": 2022.81,
@@ -3416,27 +2570,15 @@
     },
     {
       "s": 2039.61,
-      "e": 2042.61,
-      "t": "Yeah, how do you your swing in golf in golf terms. Swing",
-      "r": "是的，用高尔夫术语来说，你的挥杆动作是怎样的？挥杆！把"
-    },
-    {
-      "s": 2042.61,
       "e": 2046.11,
-      "t": "your swing. stuff out, not necessarily add stuff,",
-      "r": "东西拿出来，不一定是要添加东西，"
+      "t": "Yeah, how do you your swing in golf in golf terms. Swing your swing. stuff out, not necessarily add stuff,",
+      "r": "是的，用高尔夫术语来说，你的挥杆动作是怎样的？挥杆！把东西拿出来，不一定是要添加东西，"
     },
     {
       "s": 2046.11,
-      "e": 2048.31,
-      "t": "right? Absolutely.",
-      "r": "对吧？绝对地。是的"
-    },
-    {
-      "s": 2048.31,
       "e": 2054.01,
-      "t": "Yeah, but I mean there's there's one I don't think there's anyone ever has",
-      "r": "，但我的意思是，我认为"
+      "t": "right? Absolutely. Yeah, but I mean there's there's one I don't think there's anyone ever has",
+      "r": "对吧？绝对地。是的，但我的意思是，我认为"
     },
     {
       "s": 2054.01,
@@ -3446,15 +2588,9 @@
     },
     {
       "s": 2056.71,
-      "e": 2058.61,
-      "t": "Yeah. That's the key. You got to put the work",
-      "r": "。这是关键所在。你必须"
-    },
-    {
-      "s": 2058.61,
       "e": 2060.91,
-      "t": "in day in, day out. And I've hung around some of the",
-      "r": "日复一日地努力工作。我曾与一些"
+      "t": "Yeah. That's the key. You got to put the work in day in, day out. And I've hung around some of the",
+      "r": "。这是关键所在。你必须日复一日地努力工作。我曾与一些"
     },
     {
       "s": 2060.91,
@@ -3464,27 +2600,15 @@
     },
     {
       "s": 2064.71,
-      "e": 2071.61,
-      "t": "far as great shots. I forgot JR Smith, Mike Miller, James Jones, Kyle Korver,",
-      "r": "照片也很精彩。我忘了JR·史密斯、迈克·米勒、詹姆斯·琼斯、凯尔·科沃尔，"
-    },
-    {
-      "s": 2071.61,
       "e": 2073.11,
-      "t": "like Kyle, oof.",
-      "r": "还有凯尔，哎呀。"
+      "t": "far as great shots. I forgot JR Smith, Mike Miller, James Jones, Kyle Korver, like Kyle, oof.",
+      "r": "照片也很精彩。我忘了JR·史密斯、迈克·米勒、詹姆斯·琼斯、凯尔·科沃尔，还有凯尔，哎呀。"
     },
     {
       "s": 2073.11,
-      "e": 2076.51,
-      "t": "like those are four names that I played with personally",
-      "r": "比如，我曾和其中四位球员一起打球，"
-    },
-    {
-      "s": 2076.51,
       "e": 2078.61,
-      "t": "that are",
-      "r": "那是"
+      "t": "like those are four names that I played with personally that are",
+      "r": "比如，我曾和其中四位球员一起打球，"
     },
     {
       "s": 2078.61,
@@ -3500,39 +2624,21 @@
     },
     {
       "s": 2089.81,
-      "e": 2095.01,
-      "t": "Kyle Korver was like a like a laser It gets off so fast.",
-      "r": "凯尔·科沃尔就像激光一样，出手速度极快。"
-    },
-    {
-      "s": 2095.01,
       "e": 2097.31,
-      "t": "You know? And guys that shot every day. You know",
-      "r": "你知道？还有那些每天都练习射击的人。你知道，"
+      "t": "Kyle Korver was like a like a laser It gets off so fast. You know? And guys that shot every day. You know",
+      "r": "凯尔·科沃尔就像激光一样，出手速度极快。你知道？还有那些每天都练习射击的人。你知道，"
     },
     {
       "s": 2097.31,
-      "e": 2101.31,
-      "t": "like clearly but like needed it. Needed to live.",
-      "r": "就像很清楚，但又需要它。生存的需要。是的。"
-    },
-    {
-      "s": 2101.31,
       "e": 2103.81,
-      "t": "yeah. It was it was literally their breathing. They had to.",
-      "r": "那简直就是他们的呼吸。他们不得不这样做。是的"
+      "t": "like clearly but like needed it. Needed to live. yeah. It was it was literally their breathing. They had to.",
+      "r": "就像很清楚，但又需要它。生存的需要。是的。那简直就是他们的呼吸。他们不得不这样做。是的"
     },
     {
       "s": 2103.81,
-      "e": 2106.51,
-      "t": "Yeah. Did not leave the gym until they shot",
-      "r": "。直到他们喊着“好了，我走了，你们回头见”我才离开健身房"
-    },
-    {
-      "s": 2106.51,
       "e": 2109.51,
-      "t": "over like okay I go I'm going y'all see you",
-      "r": "好吧，我走了，我要走了，你们会看到你的"
+      "t": "Yeah. Did not leave the gym until they shot over like okay I go I'm going y'all see you",
+      "r": "。直到他们喊着“好了，我走了，你们回头见”我才离开健身房"
     },
     {
       "s": 2109.51,
@@ -3548,189 +2654,129 @@
     },
     {
       "s": 2116.11,
-      "e": 2120.81,
-      "t": "you know all skills but shooting every day volume summer",
-      "r": "各种技能，但每天拍摄大量夏季照片却什么都不做"
-    },
-    {
-      "s": 2120.81,
       "e": 2124.91,
-      "t": "day off everything. And then stop playing and",
-      "r": "。然后停止游戏，"
+      "t": "you know all skills but shooting every day volume summer day off everything. And then stop playing and",
+      "r": "各种技能，但每天拍摄大量夏季照片却什么都不做。然后停止游戏，"
     },
     {
       "s": 2124.91,
-      "e": 2127.46,
-      "t": "You want to shoot that all day. Don't shoot that like",
-      "r": "你想整天都开枪射击。别那样投篮"
+      "e": 2128.31,
+      "t": "You want to shoot that all day. Don't shoot that like It's a weird",
+      "r": "你想整天都开枪射击。别那样投篮 [笑声] 这很奇怪"
     },
     {
-      "s": 2128.01,
-      "e": 2128.91,
-      "t": "It's a weird When was the last time you shot a",
-      "r": "这很奇怪你上次"
+      "s": 2128.31,
+      "e": 2129.61,
+      "t": "When was the last time you shot a basketball?",
+      "r": "你上次投篮是什么时候？"
     },
     {
-      "s": 2128.91,
-      "e": 2131.71,
-      "t": "basketball? I mean if I'm like at the gym and the",
-      "r": "投篮是什么时候？我的意思是，如果我在健身房，"
+      "s": 2129.61,
+      "e": 2133.11,
+      "t": "I mean if I'm like at the gym and the ball rolls to me I'll take a couple",
+      "r": "我的意思是，如果我在健身房，球滚到我脚下，我会投几个"
     },
     {
-      "s": 2131.71,
-      "e": 2136.11,
-      "t": "ball rolls to me I'll take a couple shots but I've I've never retired 12",
-      "r": "球滚到我脚下，我会投几个球，但我从来没有像12"
+      "s": 2133.11,
+      "e": 2137.71,
+      "t": "shots but I've I've never retired 12 years ago I've never like let's go",
+      "r": "球，但我从来没有像12 年前那样退役，我从来没有想过“我们去"
     },
     {
-      "s": 2136.11,
-      "e": 2138.41,
-      "t": "years ago I've never like let's go shoot.",
-      "r": "年前那样退役，我从来没有想过“我们去投篮吧”。是啊是啊"
+      "s": 2137.71,
+      "e": 2141.11,
+      "t": "shoot. Yeah yeah. That's not something you do right? That's not something you do right?",
+      "r": "投篮吧”。是啊是啊。你不会做那种事吧？你不会做那种事吧？简直"
     },
     {
-      "s": 2138.41,
-      "e": 2140.91,
-      "t": "Yeah yeah. That's not something you do right? That's not something you do",
-      "r": "。你不会做那种事吧？你不会做那种事吧"
+      "s": 2141.11,
+      "e": 2143.51,
+      "t": "crazy like uh My wife is pissed at me right now. We're",
+      "r": "疯了，呃，我老婆现在生我的气了。我们正在"
     },
     {
-      "s": 2140.91,
-      "e": 2142.01,
-      "t": "right? crazy like uh",
-      "r": "？简直疯了，呃，"
+      "s": 2143.51,
+      "e": 2150.21,
+      "t": "building a house in Los Angeles. me more. Here we go the good stuff. Yeah my wife is she's she's pissed at me.",
+      "r": "洛杉矶盖房子。我更爱我。接下来是精彩部分。是的，我老婆很生气。"
     },
     {
-      "s": 2142.01,
-      "e": 2145.01,
-      "t": "My wife is pissed at me right now. We're building a house in Los Angeles.",
-      "r": "我老婆现在生我的气了。我们正在洛杉矶盖房子。"
+      "s": 2150.21,
+      "e": 2154.21,
+      "t": "And she's right too. I put like a little half court",
+      "r": "她说的也对。我在健身场地外面建了一个小小的半场"
     },
     {
-      "s": 2145.01,
-      "e": 2149.31,
-      "t": "me more. Here we go the good stuff. Yeah my wife is she's she's pissed at",
-      "r": "我更爱我。接下来是精彩部分。是的，我老婆很生气"
+      "s": 2154.21,
+      "e": 2158.91,
+      "t": "little basketball court outside the the workout she was like",
+      "r": "篮球场，她却说"
     },
     {
-      "s": 2149.31,
-      "e": 2151.81,
-      "t": "me. And she's right too.",
-      "r": "。她说的也对。"
+      "s": 2158.91,
+      "e": 2161.91,
+      "t": "we could have used that real estate for something else. You know that right?",
+      "r": "我们本来可以用那块地做点别的。你知道的，对吧？你他妈"
     },
     {
-      "s": 2151.81,
-      "e": 2157.01,
-      "t": "I put like a little half court little basketball court outside the the",
-      "r": "我在健身场地外面建了一个小小的半场篮球场，"
+      "s": 2161.91,
+      "e": 2163.91,
+      "t": "Like when the are you going to go out",
+      "r": "什么时候才会打完球出去"
     },
     {
-      "s": 2157.01,
-      "e": 2160.81,
-      "t": "workout she was like we could have used that real estate for",
-      "r": "她却说我们本来可以用那块地做点"
+      "s": 2163.91,
+      "e": 2167.21,
+      "t": "there and shoot a basketball after you done playing ball? In my head when I was",
+      "r": "投篮啊？当我"
     },
     {
-      "s": 2160.81,
-      "e": 2162.81,
-      "t": "something else. You know that right? Like",
-      "r": "别的。你知道的，对吧？你他妈"
+      "s": 2167.21,
+      "e": 2172.31,
+      "t": "building this I've been building this for five years I'm like I'm going to go out and shoot some shots. Yeah.",
+      "r": "建造这个东西的时候，我脑子里想的是，我已经建造这个东西五年了，我当时想的是，我要出去投几票。是的。"
     },
     {
-      "s": 2162.81,
-      "e": 2165.11,
-      "t": "when the are you going to go out there and shoot a basketball after you",
-      "r": "什么时候才会打完球出去投篮啊"
+      "s": 2172.31,
+      "e": 2179.21,
+      "t": "No I'm I'm going to tell you who's right. She's James She's James is right. absolutely right.",
+      "r": "不，我要告诉你谁是对的。她是詹姆斯。她是詹姆斯，没错。完全正确。"
     },
     {
-      "s": 2165.11,
-      "e": 2168.51,
-      "t": "done playing ball? In my head when I was building this I've been building this",
-      "r": "？当我建造这个东西的时候，我脑子里想的是，我已经建造这个东西"
+      "s": 2179.21,
+      "e": 2182.81,
+      "t": "She's absolutely it's going to be a hoop just just sitting there",
+      "r": "她绝对认为那会是一个该死的圆环，就这么"
     },
     {
-      "s": 2168.51,
-      "e": 2171.41,
-      "t": "for five years I'm like I'm going to go out and shoot some shots.",
-      "r": "五年了，我当时想的是，我要出去投几票。是的"
+      "s": 2182.81,
+      "e": 2190.11,
+      "t": "for no reason. Hopefully hopefully like Bronny or Bryce or Bronny or Bryce grandkids uh",
+      "r": "毫无理由地放在那里。希望像 Bronny 或 Bryce 或 Bronny 或 Bryce 的孙辈们那样，嗯，是的，是的"
     },
     {
-      "s": 2171.41,
-      "e": 2173.51,
-      "t": "Yeah. No I'm",
-      "r": "。不，"
+      "s": 2190.11,
+      "e": 2195.01,
+      "t": "Yeah yeah. or you know you can always use that space for something later.",
+      "r": "。或者你知道，你以后总能把那个空间用在其他地方。"
     },
     {
-      "s": 2173.51,
-      "e": 2177.51,
-      "t": "I'm going to tell you who's right. She's James She's James is right.",
-      "r": "我要告诉你谁是对的。她是詹姆斯。她是詹姆斯，没错。"
+      "s": 2195.01,
+      "e": 2200.01,
+      "t": "turn it to a putting green or something. Yeah. We'll use that. Yeah we'll put some bunkers back there.",
+      "r": "把它改成高尔夫球场之类的吧。是的。我们会利用这一点。是的，我们会在那边建一些掩体。"
     },
     {
-      "s": 2177.51,
-      "e": 2180.11,
-      "t": "absolutely right. She's absolutely it's going to be a",
-      "r": "完全正确。她绝对认为那会是一个"
+      "s": 2200.01,
+      "e": 2204.51,
+      "t": "Yeah and that little driving range little that. Exactly.",
+      "r": "对，还有那个小型高尔夫练习场。 [笑声] 正是如此。"
     },
     {
-      "s": 2180.11,
-      "e": 2185.51,
-      "t": "hoop just just sitting there for no reason. Hopefully hopefully like",
-      "r": "该死的圆环，就这么毫无理由地放在那里。希望像"
-    },
-    {
-      "s": 2185.51,
-      "e": 2188.81,
-      "t": "Bronny or Bryce or Bronny or Bryce",
-      "r": "Bronny 或 Bryce 或 Bronny 或 Bryce 的"
-    },
-    {
-      "s": 2188.81,
-      "e": 2191.51,
-      "t": "grandkids uh Yeah yeah.",
-      "r": "孙辈们那样，嗯，是的，是的。"
-    },
-    {
-      "s": 2191.51,
-      "e": 2194.11,
-      "t": "or you know you can always use that space",
-      "r": "或者你知道，你以后总能把那个空间用在其他"
-    },
-    {
-      "s": 2194.11,
-      "e": 2196.31,
-      "t": "for something later. turn it to a putting green or something.",
-      "r": "地方。把它改成高尔夫推杆练习场之类的。是的"
-    },
-    {
-      "s": 2196.31,
-      "e": 2198.11,
-      "t": "Yeah. We'll use that.",
-      "r": "。我们会利用这一点。"
-    },
-    {
-      "s": 2198.11,
-      "e": 2201.41,
-      "t": "Yeah we'll put some bunkers back there. Yeah and that little driving range",
-      "r": "是的，我们会在那边建一些掩体。是啊，还有那个小型高尔夫练习场"
-    },
-    {
-      "s": 2201.41,
-      "e": 2202.21,
-      "t": "little that. [laughter]",
-      "r": "。 [笑声]"
-    },
-    {
-      "s": 2202.21,
-      "e": 2206.02,
-      "t": "Exactly. Shout out to the YouTube channel.",
-      "r": "正是如此。向YouTube频道致敬！对"
-    },
-    {
-      "s": 2206.02,
+      "s": 2204.81,
       "e": 2211.99,
-      "t": "Yeah, exactly. [music]",
-      "r": "，没错。 [音乐]"
+      "t": "Shout out to the YouTube channel. Yeah, exactly. [music]",
+      "r": "向YouTube频道致敬！对，没错。 [音乐]"
     },
     {
       "s": 2217.62,
@@ -3790,7 +2836,7 @@
       "s": 2257.02,
       "e": 2261.62,
       "t": "your Wi-Fi price for 5 years guaranteed with equipment included.",
-      "r": "Wi-Fi 价格，保证 5 年不受影响，并且包含设备。"
+      "r": "Wi-Fi 价格 5 年，并包含设备。"
     },
     {
       "s": 2261.62,
@@ -3806,483 +2852,351 @@
     },
     {
       "s": 2270.82,
-      "e": 2276.42,
-      "t": "areas. Xfinity xFi Complete requires Xfinity gateway. 5-year price guarantee",
-      "r": "地区都提供此服务。 Xfinity xFi Complete 需要 Xfinity 网关。"
+      "e": 2279.62,
+      "t": "areas. Xfinity xFi Complete requires Xfinity gateway. 5-year price guarantee on select plans only.",
+      "r": "地区都提供此服务。 Xfinity xFi Complete 需要 Xfinity 网关。仅限指定套餐提供5年价格保证。"
     },
     {
-      "s": 2276.42,
-      "e": 2282.08,
-      "t": "on select plans only. [music]",
-      "r": "仅限指定套餐提供5年价格保证。 [音乐]"
+      "s": 2285.98,
+      "e": 2294.32,
+      "t": "All right, fan question from IG at Grant The Wizard. As a good free throw shooter, it's hard",
+      "r": "[音乐] 好的，来自 Instagram 用户 Grant The Wizard 的一个粉丝提问。作为一名罚球命中率很高的球员，像"
     },
     {
-      "s": 2287.02,
-      "e": 2292.42,
-      "t": "All right, fan question from IG at Grant The Wizard.",
-      "r": "好的，来自 Instagram 用户 Grant The Wizard 的一个粉丝提问。"
+      "s": 2294.32,
+      "e": 2297.72,
+      "t": "for the common fans like me to understand how good NBA players struggle",
+      "r": "我这样的普通球迷很难理解优秀的NBA球员在"
     },
     {
-      "s": 2292.42,
-      "e": 2295.52,
-      "t": "As a good free throw shooter, it's hard for the common fans like me to",
-      "r": "作为一名罚球命中率很高的球员，像我这样的普通球迷很难"
+      "s": 2297.72,
+      "e": 2301.02,
+      "t": "with free throws. Can you help me understand? Great. It's actually a great",
+      "r": "罚球方面遇到的困难。你能帮我理解一下吗？伟大的。这确实是个好"
     },
     {
-      "s": 2295.52,
-      "e": 2299.32,
-      "t": "understand how good NBA players struggle with free throws. Can you help me",
-      "r": "理解优秀的NBA球员在罚球方面遇到的困难。你能帮我"
+      "s": 2301.02,
+      "e": 2307.62,
+      "t": "question. I damn sure ain't answering that. Cuz I'm a career 70 something free throw shooter.",
+      "r": "问题。我绝对不会回答这个问题。因为我是一名职业生涯罚球命中率超过70%的球员。"
     },
     {
-      "s": 2299.32,
-      "e": 2301.92,
-      "t": "understand? Great. It's actually a great question.",
-      "r": "理解一下吗？伟大的。这确实是个好问题。"
+      "s": 2307.62,
+      "e": 2311.82,
+      "t": "So so tell me though, like what do you what is the feeling at the line? Why are",
+      "r": "所以，告诉我，你站在那条线上是什么感觉？"
     },
     {
-      "s": 2301.92,
-      "e": 2307.02,
-      "t": "I damn sure ain't answering that. Cuz I'm a career 70 something free throw",
-      "r": "我绝对不会回答这个问题。因为我是一名职业生涯罚球命中率超过70%的球员"
+      "s": 2311.82,
+      "e": 2317.52,
+      "t": "you not in the 80s? Cuz you're clearly capable. I don't know. Is your Is it your mind?",
+      "r": "你为什么不是80年代的人？因为你显然有能力做到。我不知道。是你的想法吗？"
     },
     {
-      "s": 2307.02,
-      "e": 2310.12,
-      "t": "shooter. So so tell me though, like what do you",
-      "r": "。所以，告诉我，你站在那条"
+      "s": 2317.52,
+      "e": 2325.12,
+      "t": "No. No, it used to be It used to be, but no. It used to be like I used to feel like uh I would like",
+      "r": "不，不，以前是，但现在不是了。以前我感觉就像，呃，我会"
     },
     {
-      "s": 2310.12,
-      "e": 2313.82,
-      "t": "what is the feeling at the line? Why are you not in the 80s? Cuz you're clearly",
-      "r": "线上是什么感觉？你为什么不是80年代的人？因为你显然有"
+      "s": 2325.12,
+      "e": 2328.42,
+      "t": "struggle for a free throw, I'd go a game where I would like.",
+      "r": "努力争取罚球，我会去参加一场比赛，我会想。"
     },
     {
-      "s": 2313.82,
-      "e": 2315.52,
-      "t": "capable. I don't know.",
-      "r": "能力做到。我不知道。"
+      "s": 2328.42,
+      "e": 2332.12,
+      "t": "five for 13 or something like five for 12 I'm like what is wrong with",
+      "r": "他妈的五件13美元，或者五件12美元之类的，我心想"
     },
     {
-      "s": 2315.52,
-      "e": 2319.12,
-      "t": "Is your Is it your mind? No.",
-      "r": "是你的想法吗？"
+      "s": 2332.12,
+      "e": 2335.22,
+      "t": "you like what are you doing? Is it the mechanics? Is it the release point? Is",
+      "r": "你们到底怎么了，你们在干什么？是机械方面的问题吗？这是释放点吗？是因为"
     },
     {
-      "s": 2319.12,
-      "e": 2323.02,
-      "t": "No, it used to be It used to be, but no. It used to be",
-      "r": "不，不，以前是，但现在不是了。以前"
+      "s": 2335.22,
+      "e": 2338.52,
+      "t": "it the routine? Like changing my routine from game to",
+      "r": "例行公事吗？比如每场比赛都改变我的游戏流程之"
     },
     {
-      "s": 2323.02,
-      "e": 2326.62,
-      "t": "like I used to feel like uh I would like struggle for a free throw, I'd go a game",
-      "r": "我感觉就像，呃，我会努力争取罚球，我会去参加一场比赛，"
+      "s": 2338.52,
+      "e": 2343.12,
+      "t": "game like that. Now it's it's not even like I don't know.",
+      "r": "类的。现在我甚至都不知道了。"
     },
     {
-      "s": 2326.62,
-      "e": 2330.22,
-      "t": "where I would like. five for 13 or something like",
-      "r": "我会想。他妈的五件13美元，或者"
+      "s": 2343.12,
+      "e": 2346.82,
+      "t": "But are you thinking about other things? Like do you lock into the free throw",
+      "r": "但你有没有在想其他事情？就像"
     },
     {
-      "s": 2330.22,
-      "e": 2333.12,
-      "t": "five for 12 I'm like what is wrong with you like what are you doing? Is it the",
-      "r": "五件12美元之类的，我心想你们到底怎么了，你们在干什么？是"
+      "s": 2346.82,
+      "e": 2350.02,
+      "t": "like I need this right now? Are you totally there or do you think you get a",
+      "r": "我现在急需罚球一样，你是不是已经锁定了罚球位置？你完全投入了吗？还是你觉得你有点被带偏了，"
     },
     {
-      "s": 2333.12,
-      "e": 2336.72,
-      "t": "mechanics? Is it the release point? Is it the routine?",
-      "r": "机械方面的问题吗？这是释放点吗？是因为例行公事吗？"
+      "s": 2350.02,
+      "e": 2354.72,
+      "t": "little bit like taken on the whole like okay we got to play better today we got to get in this set",
+      "r": "就像“好吧，我们今天必须打得更好，我们必须进入状态”？是的，就像如果"
     },
     {
-      "s": 2336.72,
-      "e": 2340.92,
-      "t": "Like changing my routine from game to game like that. Now it's it's not",
-      "r": "比如每场比赛都改变我的游戏流程之类的。现在我甚至"
+      "s": 2354.72,
+      "e": 2361.96,
+      "t": "Yeah it's like if I don't like if I don't make this first one I'm on the road crowd going boo.",
+      "r": "我做不到，如果我没能完成第一场，我就要上路了，观众会嘘我。"
     },
     {
-      "s": 2340.92,
-      "e": 2345.62,
-      "t": "even like I don't know. But are you thinking about other things?",
-      "r": "都不知道了。但你有没有在想其他事情？"
+      "s": 2361.96,
+      "e": 2367.12,
+      "t": "They they want you to miss the second one so they get free chicken tenders or free chicken wings yeah yeah",
+      "r": "[笑声] 他们想让你错过第二个，这样他们就能免费吃鸡柳或鸡翅了，是啊是啊，就是那种事，"
     },
     {
-      "s": 2345.62,
-      "e": 2348.72,
-      "t": "Like do you lock into the free throw like I need this right now? Are you",
-      "r": "就像我现在急需罚球一样，你是不是已经锁定了罚球位置？你"
+      "s": 2367.12,
+      "e": 2373.22,
+      "t": "that type of so like Yeah that's not good that's I would say I'm going to guess that's not good.",
+      "r": "所以，是啊，这不好，我想说，我猜这不好。"
     },
     {
-      "s": 2348.72,
-      "e": 2351.32,
-      "t": "totally there or do you think you get a little bit like",
-      "r": "完全投入了吗？还是你觉得你有点被带偏了，"
+      "s": 2373.22,
+      "e": 2376.22,
+      "t": "listen at the end of the you know I'm not like I'm not afraid to go to the",
+      "r": "听着，你知道，我不是那种害怕站上"
     },
     {
-      "s": 2351.32,
-      "e": 2354.42,
-      "t": "taken on the whole like okay we got to play better today we got to get in this",
-      "r": "就像“好吧，我们今天必须打得更好，我们必须进入"
+      "s": 2376.22,
+      "e": 2379.02,
+      "t": "free throw line so No clearly you're not and clearly you",
+      "r": "罚球线的人，所以很明显你不是，而且很明显你在"
     },
     {
-      "s": 2354.42,
-      "e": 2356.32,
-      "t": "set Yeah it's like if I don't like if I",
-      "r": "状态”？是的，就像如果我做不到，如果我"
+      "s": 2379.02,
+      "e": 2382.72,
+      "t": "make them when you need them but my my what's interesting is like uh",
+      "r": "需要的时候也能罚进，但是有趣的是，"
     },
     {
-      "s": 2356.32,
-      "e": 2360.32,
-      "t": "don't make this first one I'm on the road",
-      "r": "没能完成第一场，我就要上路了，"
+      "s": 2382.72,
+      "e": 2386.42,
+      "t": "I've always wanted to shoot in the 80s. Is the distance strange for you?",
+      "r": "我一直想在80年代投篮。你觉得这个距离很奇怪吗？"
     },
     {
-      "s": 2360.32,
-      "e": 2362.52,
-      "t": "crowd going boo. [laughter]",
-      "r": "观众会嘘我。 [笑声]"
+      "s": 2386.42,
+      "e": 2389.22,
+      "t": "It's not is it too is it in between? Is it like",
+      "r": "不是，是吗？还是介于两者之间？感觉就像，"
     },
     {
-      "s": 2362.52,
-      "e": 2365.42,
-      "t": "They they want you to miss the second one so they get free chicken tenders or",
-      "r": "他们想让你错过第二个，这样他们就能免费吃鸡柳或"
+      "s": 2389.22,
+      "e": 2394.32,
+      "t": "be it could be like I wish I could shoot a fade away right there. If I could turn",
+      "r": "我真希望我能立刻在那里投出一个后仰跳投。如果我能"
     },
     {
-      "s": 2365.42,
-      "e": 2368.62,
-      "t": "free chicken wings yeah yeah that type of so like",
-      "r": "鸡翅了，是啊是啊，就是那种事，所以，是"
+      "s": 2394.32,
+      "e": 2397.42,
+      "t": "around and shoot right shoulder from the free throw line",
+      "r": "转身从罚球线用右肩投篮，"
     },
     {
-      "s": 2368.62,
-      "e": 2371.92,
-      "t": "Yeah that's not good that's I would say I'm going to guess that's",
-      "r": "啊，这不好，我想说，我猜这"
+      "s": 2397.42,
+      "e": 2399.92,
+      "t": "That feels more comfortable. If I could just take one dribble and",
+      "r": "那感觉会更舒服。如果我能运球一次，然后"
     },
     {
-      "s": 2371.92,
-      "e": 2374.62,
-      "t": "not good. listen at the end of the you know I'm",
-      "r": "不好。听着，你知道，我"
-    },
-    {
-      "s": 2374.62,
-      "e": 2377.72,
-      "t": "not like I'm not afraid to go to the free throw line so",
-      "r": "不是那种害怕站上罚球线的人，所以很"
-    },
-    {
-      "s": 2377.72,
-      "e": 2381.32,
-      "t": "No clearly you're not and clearly you make them when you need them but my my",
-      "r": "明显你不是，而且很明显你在需要的时候也能罚进，但是"
-    },
-    {
-      "s": 2381.32,
-      "e": 2384.12,
-      "t": "what's interesting is like uh I've always wanted to shoot in the 80s.",
-      "r": "有趣的是，我一直想在80年代投篮。"
-    },
-    {
-      "s": 2384.12,
-      "e": 2388.72,
-      "t": "Is the distance strange for you? It's not is it too is it in between? Is",
-      "r": "你觉得这个距离很奇怪吗？不是，是吗？还是介于两者之间？感觉就像，"
-    },
-    {
-      "s": 2388.72,
-      "e": 2391.52,
-      "t": "it like be it could be like I wish I could shoot",
-      "r": "我真希望我能立刻在"
-    },
-    {
-      "s": 2391.52,
-      "e": 2395.92,
-      "t": "a fade away right there. If I could turn around and shoot right shoulder from the",
-      "r": "那里投出一个后仰跳投。如果我能转身从罚球线用右肩投篮，"
-    },
-    {
-      "s": 2395.92,
-      "e": 2398.42,
-      "t": "free throw line That feels more comfortable.",
-      "r": "那感觉会更舒服。"
-    },
-    {
-      "s": 2398.42,
-      "e": 2401.12,
-      "t": "If I could just take one dribble and shoot right shoulder from the free throw",
-      "r": "如果我能运球一次，然后从罚球线右肩投篮就好了"
-    },
-    {
-      "s": 2401.12,
-      "e": 2402.57,
-      "t": "line. tomorrow night.",
-      "r": "。明天晚上。"
+      "s": 2399.92,
+      "e": 2403.32,
+      "t": "shoot right shoulder from the free throw line. tomorrow night.",
+      "r": "从罚球线右肩投篮就好了。明天晚上。那是一个……"
     },
     {
       "s": 2403.32,
-      "e": 2406.32,
-      "t": "Is that a It's technically that's not that's not a",
-      "r": "严格来说，那不是……那不是……在"
-    },
-    {
-      "s": 2406.32,
       "e": 2408.82,
-      "t": "long inside the circle right I could turn around",
-      "r": "圆圈内很长的地方，对吧？我可以转身，是的，"
+      "t": "Is that a It's technically that's not that's not a long inside the circle right I could turn around",
+      "r": "严格来说，那不是……那不是……在圆圈内很长的地方，对吧？我可以转身，是的，"
     },
     {
       "s": 2408.82,
-      "e": 2410.12,
-      "t": "yeah as long as you don't go over the line.",
-      "r": "只要你不越过线。"
-    },
-    {
-      "s": 2410.12,
       "e": 2412.52,
-      "t": "and and shoot a fade I'm I walk cuz I'm shooting a fade away so",
-      "r": "然后投一个后仰球，我走着，因为我要投一个后仰球，所以对，"
+      "t": "yeah as long as you don't go over the line. and and shoot a fade I'm I walk cuz I'm shooting a fade away so",
+      "r": "只要你不越过线。然后投一个后仰球，我走着，因为我要投一个后仰球，所以对，"
     },
     {
       "s": 2412.52,
-      "e": 2415.72,
-      "t": "Right but your toe you got to just make sure you pivot.",
-      "r": "但是你的脚尖你必须确保你转身。"
-    },
-    {
-      "s": 2415.72,
       "e": 2418.22,
-      "t": "Do the the KD I want to step on the line.",
-      "r": "做KD，我想踏上这条线。"
+      "t": "Right but your toe you got to just make sure you pivot. Do the the KD I want to step on the line.",
+      "r": "但是你的脚尖你必须确保你转身。做KD，我想踏上这条线。"
     },
     {
       "s": 2418.22,
-      "e": 2421.72,
-      "t": "I want to see it. Yeah I might I would make more but go",
-      "r": "我想看看。是的，我可能会做更多，但你先别管了，"
-    },
-    {
-      "s": 2421.72,
       "e": 2423.32,
-      "t": "ahead so uh I mean",
-      "r": "呃，我是说那个"
+      "t": "I want to see it. Yeah I might I would make more but go ahead so uh I mean",
+      "r": "我想看看。是的，我可能会做更多，但你先别管了，呃，我是说那个"
     },
     {
       "s": 2423.32,
-      "e": 2425.72,
-      "t": "the wizard. Why can",
-      "r": "巫师。为什么"
-    },
-    {
-      "s": 2425.72,
       "e": 2428.11,
-      "t": "wizard uh why one wizard to the next.",
-      "r": "巫师可以……呃，为什么一个巫师可以联系另一个巫师？"
+      "t": "the wizard. Why can wizard uh why one wizard to the next.",
+      "r": "巫师。为什么巫师可以……呃，为什么一个巫师可以联系另一个巫师？"
     },
     {
-      "s": 2429.32,
-      "e": 2434.82,
-      "t": "Why do some guys struggle? I mean I do think like you remember Nick Van",
-      "r": "为什么有些人会遇到困难？我的意思是，我记得尼克·范·"
+      "s": 2428.11,
+      "e": 2436.12,
+      "t": "Why do some guys struggle? I mean I do think like you remember Nick Van Exel used to shoot from like a foot",
+      "r": "[笑声] 为什么有些人会遇到困难？我的意思是，我记得尼克·范· 埃克塞尔以前经常在"
     },
     {
-      "s": 2434.82,
-      "e": 2438.22,
-      "t": "Exel used to shoot from like a foot behind the line? Like the distance is",
-      "r": "埃克塞尔以前经常在三分线后一英尺的地方投篮吧？就像"
+      "s": 2436.12,
+      "e": 2440.62,
+      "t": "behind the line? Like the distance is strange for some people. Um",
+      "r": "三分线后一英尺的地方投篮吧？就像有些人觉得距离很奇怪一样。嗯，"
     },
     {
-      "s": 2438.22,
-      "e": 2442.12,
-      "t": "strange for some people. Um I remember I mean Derek Fisher used to",
-      "r": "有些人觉得距离很奇怪一样。嗯，我记得，我是说德里克·费舍尔以前总是往"
+      "s": 2440.62,
+      "e": 2444.42,
+      "t": "I remember I mean Derek Fisher used to move like all the way to the left side",
+      "r": "我记得，我是说德里克·费舍尔以前总是往左边跑，"
     },
     {
-      "s": 2442.12,
-      "e": 2445.72,
-      "t": "move like all the way to the left side cuz I don't know if it was cuz he was a",
-      "r": "左边跑，因为我不知道是不是因为他是"
+      "s": 2444.42,
+      "e": 2449.72,
+      "t": "cuz I don't know if it was cuz he was a lefty crosses I don't know. sense for him um it's",
+      "r": "因为我不知道是不是因为他是左撇子，我也不知道。对他来说，嗯，感觉有"
     },
     {
-      "s": 2445.72,
-      "e": 2448.82,
-      "t": "lefty crosses I don't know. sense for him",
-      "r": "左撇子，我也不知道。对他来说，"
+      "s": 2449.72,
+      "e": 2453.72,
+      "t": "it's a million things. Like, I can't exactly express it, but I think some",
+      "r": "很多方面。我无法确切地表达出来，但我认为有些"
     },
     {
-      "s": 2448.82,
-      "e": 2452.02,
-      "t": "um it's it's a million things. Like, I can't",
-      "r": "嗯，这其中有很多原因。我无法"
+      "s": 2453.72,
+      "e": 2457.12,
+      "t": "people just feel uncomfortable at the distance. Some people feel uncomfortable",
+      "r": "人会因为距离而感到不自在。有些人感到不舒服，因为"
     },
     {
-      "s": 2452.02,
-      "e": 2455.02,
-      "t": "exactly express it, but I think some people just feel uncomfortable at the",
-      "r": "确切地表达出来，但我认为有些人会因为距离而感到不自在"
+      "s": 2457.12,
+      "e": 2463.92,
+      "t": "that now a game went from a fluid game to a static game where everyone's Everybody's watching just you.",
+      "r": "游戏从流畅的游戏变成了静态的游戏，每个人都在看着你。"
     },
     {
-      "s": 2455.02,
-      "e": 2459.82,
-      "t": "distance. Some people feel uncomfortable that now a game went from a fluid game",
-      "r": "。有些人感到不舒服，因为游戏从流畅的游戏变成了"
+      "s": 2463.92,
+      "e": 2467.12,
+      "t": "And that's a lot of the guys that like uh make free throws in practice but",
+      "r": "很多球员在练习中罚球命中率很高，但"
     },
     {
-      "s": 2459.82,
-      "e": 2462.52,
-      "t": "to a static game where everyone's",
-      "r": "静态的游戏，每个人都在"
+      "s": 2467.12,
+      "e": 2469.72,
+      "t": "weren't good free throw shooters in games, right? It's just all of a sudden",
+      "r": "在比赛中罚球却不准，对吧？"
     },
     {
-      "s": 2462.52,
-      "e": 2465.72,
-      "t": "Everybody's watching just you. And that's a lot of the guys that like",
-      "r": "看着你。很多球员"
+      "s": 2469.72,
+      "e": 2474.32,
+      "t": "you're in this situation. Um, fatigue, Yeah. uh",
+      "r": "你突然就陷入了这种境地。嗯，疲劳，是的。呃，"
     },
     {
-      "s": 2465.72,
-      "e": 2468.22,
-      "t": "uh make free throws in practice but weren't good free throw shooters in",
-      "r": "在练习中罚球命中率很高，但在比赛中罚球却不准"
+      "s": 2474.32,
+      "e": 2477.92,
+      "t": "maybe like some guy's heart rate is going. Whatever it is,",
+      "r": "也许是像某个人的心率在加快。不管是什么，"
     },
     {
-      "s": 2468.22,
-      "e": 2472.42,
-      "t": "games, right? It's just all of a sudden you're in this situation. Um,",
-      "r": "，对吧？你突然就陷入了这种境地。嗯，"
+      "s": 2477.92,
+      "e": 2480.42,
+      "t": "mechanics, like there's a lot of things. I think that's the thing interesting,",
+      "r": "机械方面的东西，就像有很多东西一样。我觉得有趣的是，"
     },
     {
-      "s": 2472.42,
-      "e": 2473.72,
-      "t": "fatigue, Yeah.",
-      "r": "疲劳，是的。"
+      "s": 2480.42,
+      "e": 2487.72,
+      "t": "like a guy could be a a a great basketball player, a guy could be a decent free a capable free throw",
+      "r": "一个人可能是一位很棒的篮球运动员，一个罚球能力不错的罚球"
     },
     {
-      "s": 2473.72,
-      "e": 2476.22,
-      "t": "uh maybe like some guy's heart rate is",
-      "r": "呃，也许就像某个人的心跳加速了一样"
+      "s": 2487.72,
+      "e": 2492.22,
+      "t": "shooter, but like relying on it when the whole gym's looking at you, the game's",
+      "r": "手，但是当整个体育馆的人都在看着你，比赛"
     },
     {
-      "s": 2476.22,
-      "e": 2479.42,
-      "t": "going. Whatever it is, mechanics, like there's a lot of things.",
-      "r": "。不管是什么，机械方面的东西，就像有很多东西一样。"
+      "s": 2492.22,
+      "e": 2501.72,
+      "t": "stopped is a different thing. Uh you know, I tried to embrace that instead of",
+      "r": "暂停的时候，依靠罚球是另一回事。你知道，我试着接受这一点，而不是"
     },
     {
-      "s": 2479.42,
-      "e": 2482.72,
-      "t": "I think that's the thing interesting, like a guy could be a",
-      "r": "我觉得有趣的是，一个人可能是一位"
+      "s": 2501.72,
+      "e": 2507.02,
+      "t": "wait with they get chicken tenders if I miss. Like that. I tried to embrace like",
+      "r": "等着如果我没吃到鸡柳，他们会给我鸡柳。就是这样。我试着接受，就像“是"
     },
     {
-      "s": 2482.72,
-      "e": 2486.12,
-      "t": "a a great basketball player, a guy could be",
-      "r": "很棒的篮球运动员，一个"
+      "s": 2507.02,
+      "e": 2514.22,
+      "t": "Yeah, yeah, absolutely. Yeah. Put me on the line I dare you. let's go. Um, so but I do think like there's so",
+      "r": "啊，是啊，绝对的”。是的。你敢让我上钩吗？我们走吧。嗯，所以，但我确实认为有"
     },
     {
-      "s": 2486.12,
-      "e": 2490.72,
-      "t": "a decent free a capable free throw shooter, but like relying on it when the",
-      "r": "罚球能力不错的罚球手，但是当"
+      "s": 2514.22,
+      "e": 2517.72,
+      "t": "much that go It seems like such a simple thing and that's the key, is make it",
+      "r": "很多事情要做。这看起来是一件很简单的事情，而关键就在于，要把它还原"
     },
     {
-      "s": 2490.72,
-      "e": 2495.42,
-      "t": "whole gym's looking at you, the game's stopped is a different thing. Uh",
-      "r": "整个体育馆的人都在看着你，比赛暂停的时候，依靠罚球是另一回事。"
+      "s": 2517.72,
+      "e": 2520.42,
+      "t": "take it down to what it is. You you've done it a million times.",
+      "r": "到它本来的样子。你已经做过无数次了。"
     },
     {
-      "s": 2495.42,
-      "e": 2499.82,
-      "t": "you know, I tried to embrace",
-      "r": "你知道，我试着接受"
+      "s": 2520.42,
+      "e": 2521.92,
+      "t": "They always say it's the only thing that's free.",
+      "r": "他们总是说这是唯一免费的东西。"
     },
     {
-      "s": 2499.82,
-      "e": 2503.52,
-      "t": "that instead of wait with they get chicken tenders if I",
-      "r": "这一点，而不是等着如果我没吃到鸡柳，他们会给我鸡柳"
+      "s": 2521.92,
+      "e": 2526.72,
+      "t": "Lock in right now, right? Let's lock in right now. But if you have if you have a",
+      "r": "现在就锁定，对吧？我们现在就锁定这个日期。但是，如果你连"
     },
     {
-      "s": 2503.52,
-      "e": 2509.42,
-      "t": "miss. Like that. I tried to embrace like Yeah, yeah, absolutely. Yeah. Put me on",
-      "r": "。就是这样。我试着接受，就像“是啊，是啊，绝对的”。是的。你"
+      "s": 2526.72,
+      "e": 2530.62,
+      "t": "problem locking in on the small simple task at hand,",
+      "r": "手头的小任务都无法集中精力完成，"
     },
     {
-      "s": 2509.42,
-      "e": 2511.72,
-      "t": "the line I dare you. let's go.",
-      "r": "敢让我上钩吗？我们走吧。"
+      "s": 2530.62,
+      "e": 2533.02,
+      "t": "it becomes a big deal. becomes something that's not, right? And",
+      "r": "那就会变成一件大事。变成了某种原本不是的东西，对吧？"
     },
     {
-      "s": 2511.72,
-      "e": 2516.02,
-      "t": "Um, so but I do think like there's so much that go It seems like such a simple",
-      "r": "嗯，所以，但我确实认为有很多事情要做。这看起来是一件很简单的"
+      "s": 2533.02,
+      "e": 2540.12,
+      "t": "so I do think that is a factor is a mentality, poise. Uh but a great question because you we see it all.",
+      "r": "所以我认为心态和沉着冷静也是一个因素。嗯，但这是一个很好的问题，因为我们（音乐人）什么都看到了。"
     },
     {
-      "s": 2516.02,
-      "e": 2519.32,
-      "t": "thing and that's the key, is make it take it down to what it is.",
-      "r": "事情，而关键就在于，要把它还原到它本来的样子。"
-    },
-    {
-      "s": 2519.32,
-      "e": 2521.32,
-      "t": "You you've done it a million times. They always say it's the only thing",
-      "r": "你已经做过无数次了。他们总是说这是唯一"
-    },
-    {
-      "s": 2521.32,
-      "e": 2524.52,
-      "t": "that's free. Lock in right now, right? Let's lock in",
-      "r": "免费的东西。现在就锁定，对吧？我们"
-    },
-    {
-      "s": 2524.52,
-      "e": 2529.22,
-      "t": "right now. But if you have if you have a problem locking in on the small simple",
-      "r": "现在就锁定这个日期。但是，如果你连"
-    },
-    {
-      "s": 2529.22,
-      "e": 2531.22,
-      "t": "task at hand, it becomes a big deal.",
-      "r": "手头的小任务都无法集中精力完成，那就会变成一件大事。"
-    },
-    {
-      "s": 2531.22,
-      "e": 2534.72,
-      "t": "becomes something that's not, right? And so I do think that is a factor is a",
-      "r": "变成了原本不是的东西，对吧？所以我认为心态和沉着冷静也是一个因素"
-    },
-    {
-      "s": 2534.72,
-      "e": 2539.46,
-      "t": "mentality, poise. Uh but a great question because you we",
-      "r": "。嗯，但这是一个很好的问题，因为我们"
-    },
-    {
-      "s": 2539.46,
-      "e": 2542.02,
-      "t": "see it all. Yeah, we see it all for sure. We see it",
-      "r": "（音乐人）什么都看到了。是的，我们肯定都看到了。我们什么都看到了"
-    },
-    {
-      "s": 2542.02,
+      "s": 2540.12,
       "e": 2548.01,
-      "t": "all. Great question. Great fan question. [music]",
-      "r": "。问得好。粉丝提问很棒。 [音乐]"
+      "t": "Yeah, we see it all for sure. We see it all. Great question. Great fan question. [music]",
+      "r": "是的，我们肯定都看到了。我们什么都看到了。问得好。粉丝提问很棒。 [音乐]"
     },
     {
       "s": 2551.52,
