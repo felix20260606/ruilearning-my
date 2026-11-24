@@ -66,9 +66,11 @@ python3 tools/cn-data/make_city.py web <省> tools/sights/<省>
 
 ## 5. 提交
 
-- 在自己的工作副本（worktree）里做。
+- **好几个会话共用同一个文件夹（`cloudflare/`）同时在做**，别的省的文件随时在变。所以：
+  - 不要 `git stash`、`git reset`、`git checkout .`、`git add -A`、`git add .`、`git rebase`、`git pull --rebase`；
+  - 遇到 `index.lock` 就等几秒重试，不要删它。
 - 提交前跑 `node tools/bump-versions.js`、`sh tools/lint.sh`、`node tools/check-syntax.js`，以及 `for t in tests/t*.js; do node $t; done`。
-- 只 `git add` 自己的文件：`tools/sights/<省>/`、`web/cn/city/<省>-*.json`、`web/cn/<省>.json`（如果变了）。
-- 然后 `git fetch origin && git rebase origin/main && git push origin HEAD:main`；推不上就再 fetch、rebase 一次。
+- 只 `git add` 自己的文件（写全路径）：`tools/sights/<省>/`、`web/cn/city/<省>-*.json`、`web/cn/<省>.json`（如果变了）。然后 `git commit -m … -- <这些路径>`。
+- 推送：`git pull --no-rebase --no-edit origin main && git push origin main`。别的会话改的是别的文件，合并不会冲突；推不上就再来一次。
 - 等 GitHub CI 通过（`gh run list` / `gh run watch`）。
 - 仓库保持公开，不用提醒设私有。回复用户用中文。

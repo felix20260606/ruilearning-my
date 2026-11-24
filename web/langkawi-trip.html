@@ -120,6 +120,9 @@ footer b{color:var(--ink)}
 
 <div class="wrap">
 
+  <a class="gmap" id="lkall" href="lk-sights.html" style="margin-top:16px">🏝 兰卡威全部景点（带星级推荐）→</a>
+  <script>document.getElementById("lkall").addEventListener("click",function(e){if(window.parent&&window.parent!==window){e.preventDefault();try{parent.postMessage({tripGo:"lksights"},"*");}catch(x){}}}); // 在网站里（iframe）让外层切到景点大全，单独打开就直接跳</script>
+
   <!-- 今晚要订的 -->
   <div class="sec-h">⚡ 今晚就订好（明早就飞）</div>
   <p class="sec-sub">顺序按「越晚越难订」排。排法是按这几天的实际情况定的：<b>天空缆车周三是维护日中午才开</b>、<b>芭雅岛周二周三关闭且每天限人数</b>、<b>11 月底下午常下阵雨</b>——所以出海放上午、缆车放周五早上。</p>
