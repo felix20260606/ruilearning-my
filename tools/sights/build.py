@@ -1,7 +1,7 @@
 import json,os,sys
 D=os.path.dirname(os.path.abspath(__file__))
 CATS=["地标","街区","美食夜市","商场","宗教建筑","博物馆","室内","公园自然","动物","徒步","乐园","周边一日"]
-SYNC='「✅ 去过」「⭐ 想去」可以勾：在网站里（旅游中心的 iframe）用 trip-state.js（TRIPST）存到后台 /api/mine?k=trip（按家人分开、换设备也在）；单独打开只存本机。\n     景点资料是 2026-11 网上查的（每张卡片有来源链接），开放时间、票价以官方 / 现场为准。照片来自 Wikimedia Commons，点照片看原图和作者。\n     数据在下面 DATA 里，由 tools/sights/build.py 生成（python3 tools/sights/build.py web kl cq hz）'
+SYNC='「✅ 去过」「⭐ 想去」可以勾：在网站里（旅游中心的 iframe）用 trip-state.js（TRIPST）存到后台 /api/mine?k=trip（按家人分开、换设备也在）；单独打开只存本机。\n     景点资料是 2026-11 网上查的（每张卡片有来源链接），开放时间、票价以官方 / 现场为准。照片来自 Wikimedia Commons，点照片看原图和作者。\n     数据在下面 DATA 里，由 tools/sights/build.py 生成（python3 tools/sights/build.py web kl cq hz lk bk）'
 C={
 'kl':dict(files=['landmarks.json','culture.json','nature.json','extra.json'],out='kl-sights.html',title='吉隆坡景点大全 · 去过的打勾',
   k="Kuala Lumpur · Every Sight · Tick What You've Done",h1='📍 吉隆坡景点大全',sub='市区 + 周边当天来回 · {N} 个景点 · 照片、地址、怎么去、开放时间、门票 · 去过的打勾，想去的标星',
@@ -15,6 +15,10 @@ C={
   k='Langkawi · Every Sight · Tick What You\'ve Done',h1='🏝 兰卡威景点大全',sub='海滩 · 浮潜跳岛 · 红树林 · 天空之桥 · 夜市免税 · {N} 个景点 · 星级推荐、照片、怎么去（住 Cenang 不租车）、开放时间、门票 · 去过的打勾，想去的标星',
   comment='🏝 兰卡威景点大全：海滩、海岛、红树林、瀑布、缆车、镇上、夜市和免税店，每个都有星级推荐、照片、地址、从 Pantai Cenang 怎么去（按不租车写）、开放时间、门票、待多久、介绍和提醒、Google 地图。\n     从旅游中心「🇲🇾 马来西亚」/「🧭 导航」的卡片打开（没有单独的标签）。带「🧭 照着走」的在 11/25–27 兰卡威行程里。',
   goto={'lk':'langkawi-trip.html'},cfg={'map':'google'}),
+'bk':dict(files=['bk/city.json','bk/nearby.json'],out='bk-sights.html',title='曼谷景点大全 · 去过的打勾',
+  k="Bangkok · Every Sight · Tick What You've Done",h1='🛕 曼谷景点大全',sub='老城寺庙 · 河边 · 唐人街 · 市场夜市 · 商场 + 大城、芭提雅、佛统等周边一日 · {N} 个景点 · 照片、地址、坐 BTS / MRT / 快船怎么去、开放时间、门票 · 去过的打勾，想去的标星',
+  comment='🛕 曼谷景点大全：曼谷市区 + 周边一日（大城、芭提雅、佛统、水上市场、美功铁道市场、北碧…），照片、地址、BTS / MRT / 快船怎么去、开放时间、门票、待多久、介绍和提醒、Google 地图。\n     从旅游中心「🇹🇭 泰国」标签 / 「🧭 导航」的卡片打开。周边一日里大城、芭提雅、佛统默认「去过」，和导航页泰国卡片右上角是同一条记录。',
+  goto={},cfg={'map':'google'}),
 'hz':dict(files=['hz/westlake.json','hz/city.json'],out='hz-sights.html',title='杭州景点大全 · 去过的打勾',
   k='Hangzhou · Every Sight · Tick What You\'ve Done',h1='🍵 杭州景点大全',sub='西湖 + 城区 + 周边一日 · {N} 个景点 · 照片、地址、坐几号线、开放时间、门票 · 去过的打勾，想去的标星 · 地图用高德',
   comment='🍵 杭州景点大全：西湖景区、城区和周边一日游的景点，照片、地址、地铁公交、开放时间、门票、待多久、介绍和提醒、高德地图。\n     从旅游中心导航页「中国」那一栏的卡片打开（没有单独的标签）。',
