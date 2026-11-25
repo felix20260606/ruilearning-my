@@ -1,0 +1,42 @@
+[
+{
+"id": "w-Q118376933",
+"zh": "海南铁路博物馆",
+"en": "Hainan Railway Museum",
+"cat": "博物馆",
+"area": "",
+"addr": "",
+"transit": "",
+"hours": "",
+"price": "",
+"dur": "",
+"desc": "海南铁路博物馆位于中国海南省东方市八所镇八所铁路八所站附近，建筑为原海南铁路总公司大院，最早修建于海南岛日占时期。博物馆由广州局集团设立，是海南岛唯一一家铁路博物馆。",
+"tips": "",
+"q": "东方 海南铁路博物馆",
+"src": "https://zh.wikipedia.org/zh-cn/海南铁路博物馆",
+"rate": 2,
+"photo": "",
+"lat": 19.10282,
+"lng": 108.63046
+},
+{
+"id": "w-Q133309476",
+"zh": "侵华日军侵琼八所死难劳工纪念地",
+"en": "Memorial for the Victims during the Japanese Invasion and Plunder in Basuo",
+"cat": "地标",
+"area": "全国重点文物保护单位",
+"addr": "",
+"transit": "",
+"hours": "",
+"price": "",
+"dur": "",
+"desc": "",
+"tips": "",
+"q": "东方 侵华日军侵琼八所死难劳工纪念地",
+"src": "https://www.wikidata.org/wiki/Q133309476",
+"rate": 1,
+"photo": "",
+"lat": 19.09383,
+"lng": 108.62255
+}
+]
