@@ -45,6 +45,11 @@
     ".cm-cs{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}.cm-cs a{font-size:12px;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:3px 9px;color:var(--ink);background:var(--bg);cursor:pointer;text-decoration:none}.cm-cs a:hover{border-color:#c59bef}" +
     ".cm-cs a.been{background:rgba(47,191,113,.22);border-color:rgba(47,191,113,.7)}.cm-cs a.pass{background:rgba(31,160,160,.2);border-color:rgba(31,160,160,.7)}.cm-cs a.want{background:rgba(255,201,77,.16);border-color:rgba(255,201,77,.7)}" +
     ".cm-bar{height:5px;border-radius:3px;background:rgba(255,255,255,.08);display:flex;overflow:hidden;margin:6px 0 2px}.cm-bar span{display:block;height:100%}" +
+    ".cm-5a{font-size:calc(var(--f5,9) * 1px);text-anchor:middle;dominant-baseline:central;fill:#ffc94d;fill-opacity:.92;stroke:#101217;stroke-width:.5;paint-order:stroke;cursor:pointer;transition:fill .2s}.cm-5a:hover{fill:#fff;fill-opacity:1}" +
+    ".cm-5a.been{fill:#2fbf71;fill-opacity:1}.cm-5a.pass{fill:#1fa0a0;fill-opacity:1}.cm-5a.want,.cm-5a.plan{fill:#ffe08a;fill-opacity:1}.cm-5a.skip{fill:#6b707c;fill-opacity:.6}.cm-5a.sel{fill:#fff;fill-opacity:1;stroke:#c59bef;stroke-width:.8}" +
+    ".cm-box svg.nopin .cm-pin{display:none}.cm-box svg.drag .cm-5a{pointer-events:none}" +
+    ".cm-l5{display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap}.cm-l5 b{color:var(--ink);font-weight:800;margin-right:2px}.cm-bot .cm-l5 button{padding:2px 9px}.cm-bot .cm-l5 button.on{background:#b98410;border-color:#b98410;color:#fff}" +
+    ".cm-n.a b{color:#ffc94d}.cm-a5{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line)}.cm-a5 .meta{margin-bottom:2px}.cm-cs a.a5:before{content:\"★ \";color:#ffc94d}.cm-cs a.a5.been:before{color:#2fbf71}" +
     ".cm-bot{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;padding:9px 16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--soft)}.cm-bot label{cursor:pointer}.cm-bot button{font:inherit;font-size:12.5px;font-weight:700;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:4px 12px;cursor:pointer;margin-left:auto}" +
     ".cm-rec{padding:0 16px 13px;font-size:12.5px;color:var(--soft)}.cm-rec a{color:var(--ink);text-decoration:none;cursor:pointer;margin-right:10px;white-space:nowrap}.cm-rec a:hover{color:#c59bef}" +
     ".cm-shot{position:absolute;inset:0;z-index:5;display:none;align-items:center;justify-content:center;background:rgba(8,9,12,.82);backdrop-filter:blur(4px);padding:14px}.cm-shot.on{display:flex}.cm-sh{max-width:100%;max-height:100%;text-align:center;color:#fff;font-size:13px}" +
@@ -76,17 +81,21 @@
     host.innerHTML = '<div class="cm"><div class="cm-top"><div><h2>🗺 我的中国足迹</h2><div class="cm-sub">点省份放大 · 点城市标记 · 滚轮 / 双指缩放</div></div><div class="cm-st" id="cm-st"></div></div><div class="cm-pg" id="cm-pg"></div>' +
       '<div class="cm-stage" style="position:relative"><div class="cm-box" id="cm-box"><div class="cm-ctl"><button type="button" data-z="1.6" title="放大">＋</button><button type="button" data-z="0.625" title="缩小">－</button><button type="button" data-z="0" title="回到全国（Esc）">⟲</button></div>' +
       '<div class="cm-crumb" id="cm-crumb"></div><div class="cm-tip" id="cm-tip"></div>' +
-      '<div class="cm-lg"><span><i style="background:' + COL.been + '"></i>去过</span><span><i style="background:' + COL.pass + '"></i>路过</span><span><i style="background:' + COL.want + '"></i>想去</span><span><i style="background:#2a3042;border:1px solid #4a5166"></i>还没去</span></div></div>' +
+      '<div class="cm-lg"><span><i style="background:' + COL.been + '"></i>去过</span><span><i style="background:' + COL.pass + '"></i>路过</span><span><i style="background:' + COL.want + '"></i>想去</span><span><i style="background:#2a3042;border:1px solid #4a5166"></i>还没去</span><span id="cm-lg5"><b style="color:#ffc94d">★</b> 5A 景区</span></div></div>' +
       '<div class="cm-pn" id="cm-pn"></div></div>' +
-      '<div class="cm-bot"><label><input type="checkbox" id="cm-lab" checked> 省名</label><label><input type="checkbox" id="cm-cl" checked> 城市名（放大后）</label><button type="button" id="cm-png">📷 导出图片</button></div>' +
+      '<div class="cm-bot"><label><input type="checkbox" id="cm-lab" checked> 省名</label><label><input type="checkbox" id="cm-cl" checked> 城市名（放大后）</label><label><input type="checkbox" id="cm-pins" checked> 足迹点</label><span class="cm-l5" id="cm-l5"></span><button type="button" id="cm-png">📷 导出图片</button></div>' +
       '<div class="cm-rec" id="cm-rec"></div></div>';
     // 📂 全国目录（省卡片 + 下面所有城市）：页面里有 #cntree 就放那里，没有就接在地图下面
     var tw = document.getElementById("cntree"); if (!tw) { tw = document.createElement("div"); host.appendChild(tw); }
     tw.innerHTML = '<div class="ct-h"><h2>🗺 全国 34 个省级行政区 · 所有城市</h2><input class="ct-q" id="ct-q" type="search" placeholder="🔍 搜城市 / 省…" autocomplete="off"></div>' +
       '<div class="ct-dp" id="ct-dp"></div><div class="ct-sum" id="ct-sum"></div><div id="ct-body"></div>';
     var $ = function (id) { return document.getElementById(id); };
-    Promise.all([fetch("cn/map.json").then(function (r) { return r.json(); }), fetch("cn/visited.json", { cache: "no-cache" }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }), fetch("cn/index.json").then(function (r) { return r.json(); }).catch(function () { return []; })]).then(function (res) {
+    Promise.all([fetch("cn/map.json").then(function (r) { return r.json(); }), fetch("cn/visited.json", { cache: "no-cache" }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }), fetch("cn/index.json").then(function (r) { return r.json(); }).catch(function () { return []; }), fetch("cn/5a.json").then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; })]).then(function (res) {
       var M = res[0], DEF = res[1] || {}, TREE = res[2] || [], BY = {}, PV = {}, TC = {}, TP = {}, sel = null, foc = null;
+      // 🏅 5A 图层：cn/5a.json（tools/cn-data/5a/make_5a.py），每处一颗星；L5 = 显示哪些（all 全部 / left 没去过 / been 去过 / want 想去 / off 隐藏），记在本机
+      var A5 = res[3] || [], A5BY = {}, sel5 = null, L5 = "all", L5N = { all: "全部", left: "没去过", been: "去过", want: "想去", off: "隐藏" };
+      try { L5 = localStorage.getItem("cnmap_5a") || "all"; if (!L5N[L5]) L5 = "all"; } catch (e) {}
+      A5.forEach(function (a) { A5BY[a.id] = a; });
       var defBeen = {}, defWant = {};
       (DEF.been || []).forEach(function (id) { defBeen[id] = 1; }); (DEF.want || []).forEach(function (id) { defWant[id] = 1; });
       M.cities.forEach(function (c) { BY[c.id] = c; });
@@ -116,6 +125,8 @@
         c.pin = el("circle", { cx: c.x, cy: c.y, r: 2, "class": "cm-pin" }, gD); c.pin.style.display = "none";
         c.lab = el("text", { x: c.x, y: c.y, "class": "cm-cl", dy: "-0.45em" }, gL); c.lab.textContent = c.zh.replace(/^(.+?)(?:[一-龥]{1,5}?族)+自治(州|县|旗)$/, "$1$2").replace(/(市|地区)$/, ""); // 黔东南苗族侗族自治州 → 黔东南州
       });
+      var g5 = el("g", {}, svg); svg.insertBefore(g5, gL);
+      A5.forEach(function (a) { if (!a.xy) return; a.el = el("text", { x: a.xy[0], y: a.xy[1], "class": "cm-5a" }, g5); a.el.textContent = "★"; a.el.dataset.a = a.id; });
       M.prov.forEach(function (p) { p.lab = el("text", { x: p.cx, y: p.cy - 5, "class": "cm-l" }, gL); p.lab.textContent = p.short; });
       $("cm-box").insertBefore(svg, $("cm-box").firstChild);
 
@@ -134,9 +145,19 @@
       var S = {};
       function base(id) { var r = TRIPST.get(id); if (r) return r; var s = S[id] || {}; return { been: !!s.been, want: !!s.want }; }
       function stOf(id) { var s = S[id] || {}; return s.been ? "been" : s.pass ? "pass" : s.want ? "want" : s.skip ? "skip" : ""; }
+      function st5(a) { return TRIPST.S.norm(TRIPST.get(a.id) || {}); }
+      function cls5(v) { return v.been ? "been" : v.pass ? "pass" : v.plan ? "plan" : v.want ? "want" : v.skip ? "skip" : ""; }
+      function show5(v) { return L5 === "all" || (L5 === "left" && !v.been && !v.skip) || (L5 === "been" && v.been) || (L5 === "want" && (v.want || v.plan)); }
+      function paint5() {
+        var nb = 0, by = {}; A5.forEach(function (a) { var v = st5(a); if (v.been && !a.dup) nb++; if (!by[a.ps]) by[a.ps] = { n: 0, b: 0 }; by[a.ps].n++; if (v.been) by[a.ps].b++;
+          if (a.el) { a.el.setAttribute("class", "cm-5a " + cls5(v) + (sel5 === a.id ? " sel" : "")); a.el.style.display = L5 !== "off" && show5(v) ? "" : "none"; } });
+        A5.nb = nb; A5.by = by;
+        $("cm-l5").innerHTML = A5.length ? "<b>🏅 5A</b>" + ["all", "left", "been", "want", "off"].map(function (k) { return '<button type="button" data-l5="' + k + '"' + (L5 === k ? ' class="on"' : "") + ">" + L5N[k] + "</button>"; }).join("") : "";
+        $("cm-lg5").style.display = A5.length && L5 !== "off" ? "" : "none";
+      }
       function bar(b, t, w, n) { var f = function (x) { return (x / Math.max(n, 1) * 100).toFixed(1) + "%"; }; return '<span style="width:' + f(b) + ';background:' + COL.been + '"></span><span style="width:' + f(t) + ';background:' + COL.pass + '"></span><span style="width:' + f(w) + ';background:' + COL.want + '"></span>'; }
       function paint() {
-        S = state();
+        S = state(); paint5();
         var nb = 0, nw = 0, nt = 0, np = 0;
         M.prov.forEach(function (p) { p.nb = p.nt = p.nw = 0; });
         M.cities.forEach(function (c) { var s = stOf(c.id), p = PV[c.p];
@@ -149,17 +170,31 @@
         svg.classList.toggle("nol", !$("cm-lab").checked); svg.classList.toggle("nocl", !$("cm-cl").checked);
         var N = M.cities.length;
         $("cm-st").innerHTML = '<div class="cm-n g"><b>' + np + '<small>/ ' + M.prov.length + '</small></b><span>个省去过</span></div><div class="cm-n g"><b>' + nb + '<small>/ ' + N + '</small></b><span>个城市去过</span></div>' +
-          (nt ? '<div class="cm-n t"><b>' + nt + '</b><span>个路过</span></div>' : "") + '<div class="cm-n y"><b>' + nw + '</b><span>个想去</span></div>';
+          (nt ? '<div class="cm-n t"><b>' + nt + '</b><span>个路过</span></div>' : "") + '<div class="cm-n y"><b>' + nw + '</b><span>个想去</span></div>' +
+          (A5.length ? '<div class="cm-n a"><b>' + A5.nb + '<small>/ ' + A5.filter(function (a) { return !a.dup; }).length + '</small></b><span>🏅 5A 去过</span></div>' : "");
+        svg.classList.toggle("nopin", !$("cm-pins").checked);
         $("cm-pg").innerHTML = bar(nb, nt, nw, N);
         var R = Object.keys(S).filter(function (id) { return S[id].been && S[id].at && BY[id]; }).sort(function (a, b) { return S[b].at - S[a].at; }).slice(0, 10);
         $("cm-rec").innerHTML = R.length ? "🕘 最近标记：" + R.map(function (id) { var c = BY[id], d = new Date(S[id].at); return '<a data-c="' + id + '">' + esc(c.zh.replace(/市$/, "")) + ' <small>' + (d.getMonth() + 1) + "/" + d.getDate() + "</small></a>"; }).join("") :
           "还没有标记：点地图上的省份放大，再点城市就能标「去过」；省页、城市页、景点大全里勾的也会自动算进来 · 也可以直接告诉 Claude 去过哪";
-        crumb(); if (sel || foc) panel();
+        crumb(); if (sel || sel5 || foc) panel();
       }
       function crumb() { $("cm-crumb").innerHTML = foc || vb[2] < M.w * 0.98 ? '<a data-z="0">⟲ 全国</a>' + (foc ? '<i>›</i><a data-zoom="' + foc + '">' + esc(PV[foc].zh) + "</a>" : "") : ""; }
       // ---- 卡片：选中城市 → 城市卡；只选了省 → 省卡（封面 + 进度 + 所有城市）----
+      function href5(g) { return /^city:/.test(g) ? "cn-city.html?c=" + g.slice(5) : /^prov:/.test(g) ? provHref(g.slice(5)) : g === "hzsights" ? "hz-sights.html" : g === "cqsights" ? "cq-sights.html" : "#"; }
+      function panel5(a) {
+        var v = st5(a), im = a.th ? "https://upload.wikimedia.org/wikipedia/commons/thumb/" + a.th + "/500px-" + a.th.split("/").pop() : "";
+        return '<div class="cm-ph">' + (im ? '<img alt="" src="' + esc(im) + '">' : "") + "<b>🏅 " + esc(a.n) + '</b><button type="button" class="cm-x" data-close="1" title="关闭">✕</button></div>' +
+          '<div class="cm-pb"><div class="meta">📍 ' + esc(a.p) + (a.c ? " · " + esc(a.c) : "") + (a.k ? " · " + esc(a.k) : "") + " · " + esc(a.y.slice(0, 4)) + (a.new ? " 年公示（🆕 待正式公告）" : " 年评为 5A") + (a.la ? "<br><small>星星画在城市附近，是大概位置</small>" : "") + "</div>" +
+          '<div class="meta">' + (v.been ? "✅ 去过" + (v.rate ? " " + TRIPST.S.RATE[v.rate] : "") : v.pass ? "🚶 路过" : v.want ? "⭐ 想去" : v.plan ? "📅 计划" : v.skip ? "🚫 不想去" : "还没去") + (a.sz && a.sz !== a.n ? " · 城市页里叫「" + esc(a.sz) + "」" : "") + "</div>" +
+          '<div class="cm-acts">' + TRIPST.S.btns(v) + "</div>" +
+          '<div class="cm-acts"><a class="pri" href="' + esc(href5(a.go)) + '" data-go="' + esc(a.go) + '">' + (/^prov:/.test(a.go) ? "省页 ›" : "🏙 城市页 ›") + '</a><a href="https://uri.amap.com/search?keyword=' + encodeURIComponent(a.n) + "&city=" + encodeURIComponent(a.cz || a.c || a.p) + '&callnative=1" target="_blank" rel="noopener">高德地图</a><a href="cn-5a.html" data-go="cn5a">🏅 5A 汇总 ›</a>' +
+          (foc !== a.ps ? '<button type="button" data-zoom="' + esc(a.ps) + '">🔍 放大这个省</button>' : "") + "</div></div>";
+      }
       function panel() {
-        var pn = $("cm-pn"), c = sel && BY[sel], p = c ? PV[c.p] : PV[foc]; if (!p) { pn.className = "cm-pn"; return; }
+        var pn = $("cm-pn");
+        if (sel5 && A5BY[sel5]) { pn.innerHTML = panel5(A5BY[sel5]); pn.className = "cm-pn on"; return; }
+        var c = sel && BY[sel], p = c ? PV[c.p] : PV[foc]; if (!p) { pn.className = "cm-pn"; return; }
         var tp = TP[p.slug] || {};
         if (c) {
           var s = S[c.id] || {}, tc = TC[c.id] || {}, im = pic(tc, 120);
@@ -172,6 +207,8 @@
           pn.innerHTML = '<div class="cm-ph">' + (tp.img ? '<img alt="" src="' + esc(pic(tp, 500)) + '">' : "") + "<b>" + esc(p.zh) + '</b><button type="button" class="cm-x" data-close="1" title="关闭">✕</button></div>' +
             '<div class="cm-pb"><div class="meta">去过 <b>' + p.nb + "</b> / " + n + " 个城市" + (p.nt ? " · 路过 " + p.nt : "") + (p.nw ? " · 想去 " + p.nw : "") + '</div><div class="cm-bar">' + bar(p.nb, p.nt, p.nw, n) + "</div>" +
             '<div class="cm-cs">' + p.cs.map(function (x) { return '<a class="' + stOf(x.id) + '" data-c="' + x.id + '">' + (x.cap ? "★ " : "") + esc(x.zh.replace(/(市|地区)$/, "")) + "</a>"; }).join("") + "</div>" +
+            (function () { var L = A5.filter(function (a) { return a.ps === p.slug; }); if (!L.length) return ""; var b = L.filter(function (a) { return st5(a).been; }).length;
+              return '<div class="cm-a5"><div class="meta">🏅 5A 景区：去过 <b>' + b + "</b> / " + L.length + '</div><div class="cm-cs">' + L.map(function (a) { return '<a class="a5 ' + cls5(st5(a)) + '" data-a="' + esc(a.id) + '">' + esc(a.n.replace(/(旅游|文化|生态)*(风景名胜区|风景区|景区|旅游区|名胜区)$/, "") || a.n) + "</a>"; }).join("") + "</div></div>"; })() +
             '<div class="cm-acts" style="margin-top:12px"><a class="pri" href="' + esc(provHref(p.slug)) + '" data-go="prov:' + esc(p.slug) + '">打开省页 ›</a><button type="button" data-z="0">⟲ 全国</button></div></div>';
         }
         pn.className = "cm-pn on";
@@ -181,7 +218,7 @@
       var vb = [0, 0, M.w, M.h], anim = null;
       function clampVB(v) { var w = Math.max(M.w / 16, Math.min(M.w * 1.05, v[2])), h = w * M.h / M.w; return [Math.max(-M.w * 0.15, Math.min(M.w * 1.15 - w, v[0])), Math.max(-M.h * 0.15, Math.min(M.h * 1.15 - h, v[1])), w, h]; }
       function setVB(v) { vb = clampVB(v); svg.setAttribute("viewBox", vb.join(" ")); var k = M.w / vb[2];
-        svg.style.setProperty("--fs", (15 / Math.pow(k, 0.85)).toFixed(3)); svg.style.setProperty("--fc", (11.5 / k).toFixed(3)); svg.classList.toggle("z2", k >= 2.2);
+        svg.style.setProperty("--fs", (15 / Math.pow(k, 0.85)).toFixed(3)); svg.style.setProperty("--fc", (11.5 / k).toFixed(3)); svg.style.setProperty("--f5", (11 / Math.pow(k, 0.62)).toFixed(3)); svg.classList.toggle("z2", k >= 2.2);
         var r = 2.6 / Math.sqrt(k), rp = 2.4 / Math.pow(k, 0.7); M.cities.forEach(function (c) { if (!c.d) c.el.setAttribute("r", r); c.pin.setAttribute("r", rp); c.pin.setAttribute("stroke-width", 5); }); }
       function animTo(v, ms) { v = clampVB(v); if (anim) cancelAnimationFrame(anim); var a = vb.slice(), t0 = performance.now(); ms = ms || 520;
         (function step(t) { var x = Math.min(1, (t - t0) / ms), e = x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; setVB([0, 1, 2].map(function (i) { return a[i] + (v[i] - a[i]) * e; })); if (x < 1) anim = requestAnimationFrame(step); else { anim = null; crumb(); } })(t0); }
@@ -206,35 +243,41 @@
         if (e.pointerType !== "mouse" || svg.classList.contains("drag")) { box.style.display = "none"; return; }
         if (t.dataset && t.dataset.c) { var c = BY[t.dataset.c], s = S[c.id] || {}, tc = TC[c.id] || {}, im = pic(tc, 120); key = c.id;
           h = (im ? '<img alt="" src="' + esc(im) + '">' : "") + "<span><b>" + esc(c.zh) + "</b><small>" + esc(PV[c.p].zh) + " · " + (s.been ? "✅ 去过" : s.pass ? "🚶 路过" : s.want ? "⭐ 想去" : "还没去") + (tc.n ? " · " + tc.n + " 个景点" : "") + "</small></span>"; }
+        else if (t.dataset && t.dataset.a && A5BY[t.dataset.a]) { var a = A5BY[t.dataset.a], v = st5(a), im5 = a.th ? "https://upload.wikimedia.org/wikipedia/commons/thumb/" + a.th + "/120px-" + a.th.split("/").pop() : ""; key = "a:" + a.id;
+          h = (im5 ? '<img alt="" src="' + esc(im5) + '">' : "") + "<span><b>🏅 " + esc(a.n) + "</b><small>" + esc((a.cz || a.c || a.p).replace(/(市|地区)$/, "")) + " · " + (v.been ? "✅ 去过" : v.want ? "⭐ 想去" : "还没去") + " · " + a.y.slice(0, 4) + (a.new ? " 公示" : "") + "</small></span>"; }
         else if (t.dataset && t.dataset.p) { var p = PV[t.dataset.p]; key = p.slug; h = "<span><b>" + esc(p.zh) + "</b><small>去过 " + p.nb + " / " + p.cs.length + " 个城市</small></span>"; }
         if (!key) { box.style.display = "none"; tipKey = ""; return; }
         if (key !== tipKey) { box.innerHTML = h; tipKey = key; }
         var br = $("cm-box").getBoundingClientRect(), x = e.clientX - br.left + 14, y = e.clientY - br.top + 12; box.style.display = "flex";
         if (x + box.offsetWidth > br.width - 6) x = e.clientX - br.left - box.offsetWidth - 12; box.style.left = x + "px"; box.style.top = Math.min(y, br.height - box.offsetHeight - 6) + "px";
       }
-      function pick(id) { var c = BY[id]; if (!c) return; if (foc !== c.p) focus(c.p); sel = id; paint(); }
+      function pick(id) { var c = BY[id]; if (!c) return; if (foc !== c.p) focus(c.p); sel = id; sel5 = null; paint(); }
       function up(e) { delete ptr[e.pointerId]; svg.classList.remove("drag"); if (!Object.keys(ptr).length) {
           if (moved <= 4 && drag) { var t = document.elementFromPoint(e.clientX, e.clientY), k = M.w / vb[2];
-            if (t && t.dataset && (t.dataset.c || t.dataset.p)) { var slug = t.dataset.c ? BY[t.dataset.c].p : t.dataset.p;
+            if (t && t.dataset && t.dataset.a && A5BY[t.dataset.a]) { sel5 = t.dataset.a; sel = null; paint(); }
+            else if (t && t.dataset && (t.dataset.c || t.dataset.p)) { sel5 = null; var slug = t.dataset.c ? BY[t.dataset.c].p : t.dataset.p;
               if (k < 1.8 && foc !== slug) focus(slug); // 全国视图：先放大到这个省
               else if (t.dataset.c) { sel = t.dataset.c; if (foc !== slug) foc = slug; paint(); }
               else focus(slug); }
-            else if (foc || sel) { sel = null; paint(); } }
+            else if (foc || sel || sel5) { sel = null; sel5 = null; paint(); } }
           drag = null; } }
       svg.addEventListener("pointerup", up); svg.addEventListener("pointercancel", up); svg.addEventListener("pointerleave", function () { $("cm-tip").style.display = "none"; tipKey = ""; });
-      if (window.KEYS) KEYS.on("cnmap", { when: function () { return KEYS.visible(host) && !!(foc || sel); } }, function (k) { if (k !== "esc") return false; if (sel) { sel = null; paint(); } else zoomAt(0); return true; }); // Esc：先关城市卡，再回全国
+      if (window.KEYS) KEYS.on("cnmap", { when: function () { return KEYS.visible(host) && !!(foc || sel || sel5); } }, function (k) { if (k !== "esc") return false; if (sel5) { sel5 = null; paint(); } else if (sel) { sel = null; paint(); } else zoomAt(0); return true; }); // Esc：先关城市卡，再回全国
       host.addEventListener("click", function (e) {
         var t = e.target.closest && e.target.closest("button,a"); if (!t) return;
         if (t.dataset.z != null) { var f = +t.dataset.z; if (!f) zoomAt(0); else zoomAt(f, vb[0] + vb[2] / 2, vb[1] + vb[3] / 2, true); return; }
-        if (t.dataset.zoom) { focus(t.dataset.zoom); return; }
-        if (t.dataset.back) { sel = null; paint(); return; }
-        if (t.dataset.close) { sel = null; foc = null; $("cm-pn").className = "cm-pn"; paint(); return; }
+        if (t.dataset.zoom) { sel5 = null; focus(t.dataset.zoom); return; }
+        if (t.dataset.l5) { L5 = t.dataset.l5; try { localStorage.setItem("cnmap_5a", L5); } catch (er) {} if (L5 === "off") sel5 = null; paint(); return; }
+        if (t.dataset.a && A5BY[t.dataset.a]) { sel5 = t.dataset.a; sel = null; if (L5 === "off") L5 = "all"; paint(); return; }
+        if (t.dataset.back) { sel = null; sel5 = null; paint(); return; }
+        if (t.dataset.close) { sel = null; sel5 = null; foc = null; $("cm-pn").className = "cm-pn"; paint(); return; }
+        if (t.dataset.k && sel5 && A5BY[sel5]) { TRIPST.set(sel5, TRIPST.S.toggle(TRIPST.get(sel5) || {}, t.dataset.k)); return; }
         if (t.dataset.k && BY[sel]) { TRIPST.set(sel, TRIPST.S.toggle(base(sel), t.dataset.k)); return; }
         if (t.dataset.c && !t.dataset.k) { pick(t.dataset.c); return; }
         if (t.dataset.go) { e.preventDefault(); go(t.dataset.go, t.getAttribute("href")); }
         if (t.id === "cm-png") exportPng();
       });
-      ["cm-lab", "cm-cl"].forEach(function (id) { $(id).addEventListener("change", paint); });
+      ["cm-lab", "cm-cl", "cm-pins"].forEach(function (id) { $(id).addEventListener("change", paint); });
       setVB(vb);
       // ---- 导出图片：把全国地图画成 PNG 下载（样式内联进去）----
       function exportPng() {
@@ -242,7 +285,7 @@
         cl.style.setProperty("--fs", "15"); cl.style.setProperty("--fc", "8"); cl.classList.remove("z2");
         var css = document.createElementNS(NS, "style"); css.textContent = ".cm-pv{fill:#242936}.cm-pv.been{fill:#22352f}.cm-ln{fill:none;stroke:#4a5166;stroke-width:.8}.cm-cp{fill-opacity:0;stroke:#fff;stroke-opacity:.06;stroke-width:.3}.cm-cp.been{fill:#2fbf71;fill-opacity:.85}.cm-cp.pass{fill:#1fa0a0;fill-opacity:.7}.cm-cp.want{fill:#ffc94d;fill-opacity:.5}.cm-cp.skip{fill-opacity:0}" +
           ".cm-halo{fill:#7c5cd6;opacity:.38}.cm-jd{fill:#6a7080;stroke:#6a7080;stroke-width:.6}.cm-in{fill:#151821;stroke:#3a4052}.cm-dot{fill:#9aa2b5;opacity:.5}.cm-dot.been{fill:#2fbf71;opacity:1}.cm-dot.want{fill:#ffc94d;opacity:1}.cm-dot.pass{fill:#1fa0a0;opacity:1}" +
-          ".cm-pin{fill:#7ce3b8;stroke:rgba(124,227,184,.35)}.cm-pin.want{fill:#ffd36b;stroke:rgba(255,211,107,.3)}.cm-pin.pass{fill:#5fd6d6}.cm-l{font:800 15px sans-serif;fill:#aab1c2;text-anchor:middle;paint-order:stroke;stroke:#101217;stroke-width:3.3}.cm-l.been{fill:#fff}.cm-cl{display:none}" + (svg.classList.contains("nol") ? ".cm-l{display:none}" : "");
+          ".cm-pin{fill:#7ce3b8;stroke:rgba(124,227,184,.35)}.cm-pin.want{fill:#ffd36b;stroke:rgba(255,211,107,.3)}.cm-pin.pass{fill:#5fd6d6}.cm-l{font:800 15px sans-serif;fill:#aab1c2;text-anchor:middle;paint-order:stroke;stroke:#101217;stroke-width:3.3}.cm-l.been{fill:#fff}.cm-cl{display:none}.cm-5a{font-size:9px;text-anchor:middle;dominant-baseline:central;fill:#ffc94d;fill-opacity:.85;stroke:#101217;stroke-width:.35;paint-order:stroke}.cm-5a.been{fill:#2fbf71;fill-opacity:1}.cm-5a.want,.cm-5a.plan{fill:#ffe08a;fill-opacity:1}.cm-5a.skip{fill:#6b707c}" + (svg.classList.contains("nol") ? ".cm-l{display:none}" : "") + (svg.classList.contains("nopin") ? ".cm-pin{display:none}" : "");
         cl.insertBefore(css, cl.firstChild); cl.querySelectorAll(".cm-dot").forEach(function (e) { e.setAttribute("r", 2.6); }); cl.querySelectorAll(".cm-pin").forEach(function (e) { e.setAttribute("r", 2.4); });
         var txt = new XMLSerializer().serializeToString(cl), img = new Image(), cv = document.createElement("canvas"); cv.width = W; cv.height = H + 150;
         img.onload = function () { var x = cv.getContext("2d"), g = x.createRadialGradient(W / 2, H / 2, 50, W / 2, H / 2, W * 0.7); g.addColorStop(0, "#1b1f2b"); g.addColorStop(1, "#0e1015"); x.fillStyle = g; x.fillRect(0, 0, cv.width, cv.height); x.drawImage(img, 0, 150, W, H);
