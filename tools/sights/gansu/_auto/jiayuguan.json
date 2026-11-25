@@ -1,0 +1,42 @@
+[
+{
+"id": "w-Q1193122",
+"zh": "嘉峪关",
+"en": "Jiayuguan",
+"cat": "公园自然",
+"area": "国家 5A 级景区 · 全国重点文物保护单位",
+"addr": "",
+"transit": "",
+"hours": "",
+"price": "",
+"dur": "",
+"desc": "嘉峪关位于甘肃省嘉峪关市峪泉镇嘉峪关村，是明长城西端的第一重关，也是古代“丝绸之路”的交通要冲。",
+"tips": "",
+"q": "嘉峪关 嘉峪关",
+"src": "https://zh.wikipedia.org/zh-cn/嘉峪关",
+"rate": 3,
+"photo": "JiayuguanFort.jpg",
+"lat": 39.80146,
+"lng": 98.21618
+},
+{
+"id": "w-Q11179035",
+"zh": "黑山岩画",
+"en": "Heishan Rock Art",
+"cat": "公园自然",
+"area": "全国重点文物保护单位",
+"addr": "",
+"transit": "",
+"hours": "",
+"price": "",
+"dur": "",
+"desc": "黑山岩画，位于中国甘肃省嘉峪关市，为一个全国重点文物保护单位，类型为石窟寺及石刻。 黑山岩画的历史年代为战国至明。",
+"tips": "",
+"q": "嘉峪关 黑山岩画",
+"src": "https://zh.wikipedia.org/zh-cn/黑山岩画",
+"rate": 1,
+"photo": "",
+"lat": 39.84498,
+"lng": 98.16382
+}
+]
