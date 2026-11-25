@@ -84,6 +84,18 @@ footer{text-align:center;color:var(--soft);font-size:11px;margin-top:24px;line-h
     <div class="nc" data-go="sg2"><span class="em">🇸🇬</span><b>新加坡</b><p>TBS 大巴过关去：2 天版按你的时间表（凌晨机回中国、存包攻略）；3 天版有入境清单、过关流程和 16 站景点大图</p><div class="vers"><a data-go2="sg2">2天1夜</a><a data-go2="sg">3天2夜</a></div><span class="tag t3">📖 攻略</span></div>
   </div>
 
+  <div class="sec" data-r="th">▍🇹🇭 曼谷</div>
+  <div class="grid" data-r="th">
+    <div class="nc" data-go="bksights"><span class="em">🛕</span><b>曼谷景点大全</b><p>大皇宫、卧佛寺、郑王庙、唐人街、乍都乍、ICONSIAM、夜市，加上大城、芭提雅、佛统这些周边一日：照片、地址、坐 BTS / MRT / 快船怎么去、开放时间、门票；去过的打 ✅、想去的标 ⭐</p><span class="tag t1">📍 景点大全</span></div>
+  </div>
+
+  <div class="sec" data-r="th">▍🇹🇭 曼谷周边</div>
+  <div class="grid" data-r="th">
+    <div class="nc done" data-go="bk-ayu"><span class="em">🏯</span><b>大城府 Ayutthaya</b><p>暹罗古都遗址（世界遗产）：树根里的佛头、三塔、河边柴瓦塔那兰寺日落；曼谷坐火车 1.5–2 小时</p><span class="tag t1">📍 景点大全里</span></div>
+    <div class="nc done" data-go="bk-pty"><span class="em">🏖</span><b>芭提雅 Pattaya</b><p>离曼谷最近的海边：真理寺、大佛山、Walking Street，坐船去格兰岛看清海水；Ekkamai 坐大巴 2 小时</p><span class="tag t1">📍 景点大全里</span></div>
+    <div class="nc done" data-go="bk-npt"><span class="em">🛕</span><b>佛统府 Nakhon Pathom</b><p>泰国最古老的城市之一：120 米高的佛统大塔、沙南膛宫；可以和水上市场、美功铁道市场排同一天</p><span class="tag t1">📍 景点大全里</span></div>
+  </div>
+
   <div id="cnmap" data-r="cn"></div>
   <div class="sec" data-r="cn">▍🇨🇳 中国 · 已经做好的</div>
   <div class="grid" data-r="cn">
@@ -96,7 +108,7 @@ footer{text-align:center;color:var(--soft);font-size:11px;margin-top:24px;line-h
 
   <div id="cntree" data-r="cn"></div><!-- 全国目录：省份照片卡 + 下面所有城市（cn-map.js 按 cn/index.json 画） -->
 
-  <footer>📍 景点大全：去过的打勾 · 🧭 照着走：按时间线一步步走 · 📖 攻略：行程手册<br>点卡片直接打开；有版本的点卡片里的按钮选版本；马来西亚卡片右上角点一下改「去过 / 还没去」</footer>
+  <footer>📍 景点大全：去过的打勾 · 🧭 照着走：按时间线一步步走 · 📖 攻略：行程手册<br>点卡片直接打开；有版本的点卡片里的按钮选版本；马来西亚、泰国卡片右上角点一下改「去过 / 还没去」</footer>
 </div>
 <script>
 document.querySelectorAll('.nc').forEach(function(c){
@@ -107,14 +119,14 @@ document.querySelectorAll('.nc').forEach(function(c){
 });
 // 🗺 「🇨🇳 中国」最上面画足迹地图（cn-map.js）
 if(new URLSearchParams(location.search).get("r")==="cn"&&window.CNMAP)CNMAP.init(document.getElementById("cnmap"));
-// 🇨🇳 / 🇲🇾 标签：网址带 ?r=cn 或 ?r=my 时只显示那几栏（tabs.js 打开），不带就是全部
+// 🇨🇳 / 🇲🇾 / 🇹🇭 标签：网址带 ?r=cn、?r=my 或 ?r=th 时只显示那几栏（tabs.js 打开），不带就是全部
 (function(){var r=new URLSearchParams(location.search).get("r");if(!r)return;
   document.querySelectorAll("[data-r]").forEach(function(e){if(e.getAttribute("data-r")!==r)e.style.display="none";});
-  var H={cn:["China","🇨🇳 中国","足迹地图 · 已经做好的攻略 · 全国 34 个省级行政区和所有城市"],my:["Malaysia","🇲🇾 马来西亚","吉隆坡景点大全 · 周边一日游 · 从吉隆坡出发去新加坡 · 卡片右上角点一下改「去过 / 还没去」"]}[r];
+  var H={cn:["China","🇨🇳 中国","足迹地图 · 已经做好的攻略 · 全国 34 个省级行政区和所有城市"],th:["Thailand","🇹🇭 泰国","曼谷景点大全 · 周边一日（大城、芭提雅、佛统…） · 卡片右上角点一下改「去过 / 还没去」"],my:["Malaysia","🇲🇾 马来西亚","吉隆坡景点大全 · 周边一日游 · 从吉隆坡出发去新加坡 · 卡片右上角点一下改「去过 / 还没去」"]}[r];
   if(H){var h=document.querySelector(".head");h.querySelector(".k").textContent=H[0];h.querySelector("h1").textContent=H[1];h.querySelector("p").textContent=H[2];}
 })();
-// ✅ 去过 / 还没去：马来西亚这几张卡片右上角的标记点一下就能改（记在 trip-state.js，换设备也在）；没点过就用页面上写的默认
-var KEY={lk:"foot:langkawi",pg:"foot:penang",mel1:"dt-melaka",sg2:"foot:sg",genting:"dt-genting",ks:"dt-kselangor"},OLD={mel1:"foot:melaka"},DEF={}; // dt-…：和吉隆坡景点大全里那张卡片是同一条记录
+// ✅ 去过 / 还没去：马来西亚、泰国这几张卡片右上角的标记点一下就能改（记在 trip-state.js，换设备也在）；没点过就用页面上写的默认
+var KEY={lk:"foot:langkawi",pg:"foot:penang",mel1:"dt-melaka",sg2:"foot:sg",genting:"dt-genting",ks:"dt-kselangor","bk-ayu":"bk-dt-ayutthaya","bk-pty":"bk-dt-pattaya","bk-npt":"bk-dt-nakhonpathom"},OLD={mel1:"foot:melaka"},DEF={}; // dt-…：和吉隆坡景点大全里那张卡片是同一条记录
 document.querySelectorAll(".nc[data-go]").forEach(function(c){var g=c.getAttribute("data-go");if(KEY[g])DEF[g]=c.classList.contains("done");});
 function rec(g){return TRIPST.get(KEY[g])||(OLD[g]&&TRIPST.get(OLD[g]))||null;}
 function been(g){var r=rec(g);return r?!!r.been:!!DEF[g];}
