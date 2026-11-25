@@ -16,7 +16,7 @@
   var FAT_FILES={nav:'fat-nav.html',calc:'jianzhi-calc.html',wrap:'jianzhi-wrap.html',x10:'jianzhi-exec10.html','14d':'jianzhi-14day.html',kl:'jianzhi-kl.html',ly:'jianzhi-linyi.html',bkk:'jianzhi-plan.html'};
   var row=document.getElementById('triprow'),empty=document.getElementById('tripempty');
   var destTnav=document.getElementById('dest-tnav'),destCn=document.getElementById('dest-cn'),destMy=document.getElementById('dest-my'),destTh=document.getElementById('dest-th'); // 🧭 旅游有四个标签：导航 / 中国 / 马来西亚 / 泰国，其它行程都从导航页的卡片进
-  var SIGHTS_FILE='kl-sights.html',CQS_FILE='cq-sights.html',HZS_FILE='hz-sights.html',LKS_FILE='lk-sights.html',KS_FILE='kselangor-1day.html',GT_FILE='genting-1day.html',CQ_FILE='cq-transit.html',LAST6_FILE='last6-trip.html',MELAKA_FILE='malacca.html',MELAKA1_FILE='malacca-1day.html',SG_FILE='sg-trip.html',SG2_FILE='sg-2day.html',PG_FILE='penang-trip.html',LK_FILE='langkawi-trip.html',BKS_FILE='bk-sights.html',TNAV_FILE='trip-nav.html';
+  var SIGHTS_FILE='kl-sights.html',CQS_FILE='cq-sights.html',HZS_FILE='hz-sights.html',LKS_FILE='lk-sights.html',KS_FILE='kselangor-1day.html',GT_FILE='genting-1day.html',CQ_FILE='cq-transit.html',LAST6_FILE='last6-trip.html',MELAKA_FILE='malacca.html',MELAKA1_FILE='malacca-1day.html',SG_FILE='sg-trip.html',SG2_FILE='sg-2day.html',PG_FILE='penang-trip.html',LK_FILE='langkawi-trip.html',BKS_FILE='bk-sights.html',CN5A_FILE='cn-5a.html',TNAV_FILE='trip-nav.html';
   var grpEn=document.querySelector('.subgrp[data-l1="en"]'),grpLife=document.querySelector('.subgrp[data-l1="life"]');
   if(!l1En||!l1Life||!tNb)return;
   var root=document.documentElement, tripLoaded=false, fatLoaded=false;
@@ -52,7 +52,7 @@
   // 🧭 旅游标签：导航（全部）、🇨🇳 中国、🇲🇾 马来西亚、🇹🇭 泰国；这三个打开的是导航页只显示那几栏（trip-nav.html?r=cn|my|th）
   var PROV=/^prov:[a-z]+$/,CITY=/^city:[a-z-]+$/; // 🏙 城市页：city:<拼音> → cn-city.html?c=<拼音>（数据在 cn/city/<拼音>.json）
   // 🇨🇳 省份页：prov:<拼音> → cn-prov.html?p=<拼音>（数据在 cn/<拼音>.json）
-  var CN_GRP=['cn','cq','cqsights','hzsights','db'],MY_GRP=['my','sights','lksights','last6','genting','ks','lk','pg','mel1','mel','sg','sg2'],TH_GRP=['th','bksights']; // 🇹🇭 泰国：曼谷景点大全 + 周边（芭提雅、大城、佛统…）
+  var CN_GRP=['cn','cq','cqsights','hzsights','cn5a','db'],MY_GRP=['my','sights','lksights','last6','genting','ks','lk','pg','mel1','mel','sg','sg2'],TH_GRP=['th','bksights']; // 🇹🇭 泰国：曼谷景点大全 + 周边（芭提雅、大城、佛统…）
   function setDest(d){
     if(d==='foot')d='my'; // 「我的足迹」那页删了，统一用 🇲🇾 马来西亚（老的记录 / 链接也跳到这里）
     var isDb=(d==='db');
@@ -65,7 +65,7 @@
     }else{
       if(row)row.style.display='none';
       if(empty)empty.style.display='none';
-      if(tf){tf.style.display='block';tf.setAttribute('src',PROV.test(d)?'cn-prov.html?p='+d.slice(5):CITY.test(d)?'cn-city.html?c='+d.slice(5):d==='cn'?TNAV_FILE+'?r=cn':d==='my'?TNAV_FILE+'?r=my':d==='th'?TNAV_FILE+'?r=th':d==='bksights'?BKS_FILE:d==='cqsights'?CQS_FILE:d==='hzsights'?HZS_FILE:d==='lksights'?LKS_FILE:d==='sights'?SIGHTS_FILE:d==='ks'?KS_FILE:d==='genting'?GT_FILE:d==='cq'?CQ_FILE:d==='last6'?LAST6_FILE:d==='tnav'?TNAV_FILE:(d==='lk'?LK_FILE:(d==='pg'?PG_FILE:(d==='sg2'?SG2_FILE:(d==='sg'?SG_FILE:(d==='mel1'?MELAKA1_FILE:MELAKA_FILE))))));}
+      if(tf){tf.style.display='block';tf.setAttribute('src',PROV.test(d)?'cn-prov.html?p='+d.slice(5):CITY.test(d)?'cn-city.html?c='+d.slice(5):d==='cn'?TNAV_FILE+'?r=cn':d==='my'?TNAV_FILE+'?r=my':d==='th'?TNAV_FILE+'?r=th':d==='bksights'?BKS_FILE:d==='cqsights'?CQS_FILE:d==='cn5a'?CN5A_FILE:d==='hzsights'?HZS_FILE:d==='lksights'?LKS_FILE:d==='sights'?SIGHTS_FILE:d==='ks'?KS_FILE:d==='genting'?GT_FILE:d==='cq'?CQ_FILE:d==='last6'?LAST6_FILE:d==='tnav'?TNAV_FILE:(d==='lk'?LK_FILE:(d==='pg'?PG_FILE:(d==='sg2'?SG2_FILE:(d==='sg'?SG_FILE:(d==='mel1'?MELAKA1_FILE:MELAKA_FILE))))));}
     }
     try{localStorage.setItem('trip_dest',d);}catch(e){}
     if(window.NAV)NAV.mark();
@@ -144,7 +144,7 @@
       root.classList.add('show-trip');
       if(!tripLoaded){tripLoaded=true;
         var d0='tnav';try{d0=localStorage.getItem('trip_dest')||'tnav';}catch(e){} // 第一次打开默认「🧭 导航」
-        setDest((d0==='db'||d0==='mel'||d0==='mel1'||d0==='sg'||d0==='sg2'||d0==='pg'||d0==='lk'||d0==='tnav'||d0==='foot'||d0==='last6'||d0==='cq'||d0==='genting'||d0==='ks'||d0==='sights'||d0==='cqsights'||d0==='hzsights'||d0==='lksights'||d0==='cn'||d0==='my'||d0==='th'||d0==='bksights'||PROV.test(d0)||CITY.test(d0))?d0:'tnav'); // 新加的「🗺 我的足迹」排最前、第一次默认它
+        setDest((d0==='db'||d0==='mel'||d0==='mel1'||d0==='sg'||d0==='sg2'||d0==='pg'||d0==='lk'||d0==='tnav'||d0==='foot'||d0==='last6'||d0==='cq'||d0==='genting'||d0==='ks'||d0==='sights'||d0==='cqsights'||d0==='cn5a'||d0==='hzsights'||d0==='lksights'||d0==='cn'||d0==='my'||d0==='th'||d0==='bksights'||PROV.test(d0)||CITY.test(d0))?d0:'tnav'); // 新加的「🗺 我的足迹」排最前、第一次默认它
       }
     }else if(which==='ielts'){
       root.classList.add('show-ielts');
@@ -202,7 +202,7 @@
   if(destCn)destCn.onclick=function(){setDest('cn');};
   if(destMy)destMy.onclick=function(){setDest('my');};
   if(destTh)destTh.onclick=function(){setDest('th');};
-  window.addEventListener('message',function(e){var m={lk:'lk',pg:'pg',sg2:'sg2',sg:'sg',mel1:'mel1',mel:'mel',db:'db',foot:'my',last6:'last6',cq:'cq',genting:'genting',ks:'ks',sights:'sights',cqsights:'cqsights',hzsights:'hzsights',lksights:'lksights',cn:'cn',my:'my',th:'th',bksights:'bksights','bk-ayu':'bksights','bk-pty':'bksights','bk-npt':'bksights',tnav:'tnav'};if(e&&e.data&&e.data.tripGo&&(m[e.data.tripGo]||PROV.test(e.data.tripGo)||CITY.test(e.data.tripGo)))setDest(m[e.data.tripGo]||e.data.tripGo);});
+  window.addEventListener('message',function(e){var m={lk:'lk',pg:'pg',sg2:'sg2',sg:'sg',mel1:'mel1',mel:'mel',db:'db',foot:'my',last6:'last6',cq:'cq',genting:'genting',ks:'ks',sights:'sights',cqsights:'cqsights',cn5a:'cn5a',hzsights:'hzsights',lksights:'lksights',cn:'cn',my:'my',th:'th',bksights:'bksights','bk-ayu':'bksights','bk-pty':'bksights','bk-npt':'bksights',tnav:'tnav'};if(e&&e.data&&e.data.tripGo&&(m[e.data.tripGo]||PROV.test(e.data.tripGo)||CITY.test(e.data.tripGo)))setDest(m[e.data.tripGo]||e.data.tripGo);});
   l1En.onclick=function(){show(L2_OF.en);};
   l1Life.onclick=function(){show(L2_OF.life);};
   tNb.onclick=function(){show('notebook');};
