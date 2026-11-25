@@ -3,6 +3,7 @@ RAW=os.path.join(os.path.dirname(os.path.abspath(__file__)),'raw')  # 查回来�
 P=json.load(open(os.path.join(RAW,'data_all.json'),encoding='utf-8'))
 # 每个省的封面图：手挑一个代表景点（covers.json：省名 → [景点, Commons 文件名]），省页大图和中国页目录卡片都用它
 COV=json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'covers.json'),encoding='utf-8'))
+WIP=json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'wip.json'),encoding='utf-8'))  # 正在做详细版的省（手动维护：开会话时加，做完删）
 SLUG={'北京市':'beijing','天津市':'tianjin','河北省':'hebei','山西省':'shanxi','内蒙古自治区':'neimenggu','辽宁省':'liaoning','吉林省':'jilin','黑龙江省':'heilongjiang',
 '上海市':'shanghai','江苏省':'jiangsu','浙江省':'zhejiang','安徽省':'anhui','福建省':'fujian','江西省':'jiangxi','山东省':'shandong','河南省':'henan','湖北省':'hubei','湖南省':'hunan',
 '广东省':'guangdong','广西壮族自治区':'guangxi','海南省':'hainan','重庆市':'chongqing','四川省':'sichuan','贵州省':'guizhou','云南省':'yunnan','西藏自治区':'xizang',
@@ -58,11 +59,11 @@ for reg,names in REG:
             n=f.replace(' ','_');h=hashlib.md5(n.encode('utf-8')).hexdigest();return h[0]+'/'+h[:2]+'/'+urllib.parse.quote(n)
         def cinfo(c):  # 城市页里有几个景点 + 缩略图（城市页里最好的那个有照片的景点；没有就用城市自己的照片）
             f=os.path.join(out,'city',c['slug']+'.json')
-            if not os.path.exists(f): return 0,c.get('img','')
-            S=json.load(open(f,encoding='utf-8'))['sights'];ph=sorted([x for x in S if x.get('photo')],key=lambda x:-int(x.get('rate') or 1))
-            return len(S),(ph[0]['photo'] if ph else c.get('img',''))
-        TREE.append(dict(slug=d['slug'],zh=d['zh'],short=d['short'],region=reg,img=d['img'],th=th(d['img']),cover=COV.get(zh,['',''])[0],cap=d['cap'],
-                         cities=[dict(id=c['id'],zh=c['zh'],slug=c['slug'],go=c.get('go',''),n=cinfo(c)[0],img=cinfo(c)[1],th=th(cinfo(c)[1])) for c in d['cities']]))
+            if not os.path.exists(f): return 0,c.get('img',''),int(c.get('go','') in ('hzsights','cqsights'))  # 杭州、渝中：单独的景点大全页，算详细版
+            J=json.load(open(f,encoding='utf-8'));S=J['sights'];ph=sorted([x for x in S if x.get('photo')],key=lambda x:-int(x.get('rate') or 1))
+            return len(S),(ph[0]['photo'] if ph else c.get('img','')),int(not J.get('auto'))  # 第 3 个：1 = 手写详细版，0 = 维基数据自动版
+        TREE.append(dict(slug=d['slug'],zh=d['zh'],short=d['short'],region=reg,img=d['img'],th=th(d['img']),cover=COV.get(zh,['',''])[0],cap=d['cap'],wip=int(zh in WIP),
+                         cities=[dict(id=c['id'],zh=c['zh'],slug=c['slug'],go=c.get('go',''),n=cinfo(c)[0],img=cinfo(c)[1],th=th(cinfo(c)[1]),d=cinfo(c)[2]) for c in d['cities']]))
 json.dump(TREE,open(os.path.join(out,'index.json'),'w',encoding='utf-8'),ensure_ascii=False,separators=(',',':'))  # 中国页三级目录：地区 → 省 → 市
 print(len(idx),'provinces',sum(i['n'] for i in idx),'cities')
 for i in idx: print(i['region'],i['zh'],i['n'],bool(i['img']))
