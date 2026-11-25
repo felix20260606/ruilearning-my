@@ -61,8 +61,11 @@
     ".ct-nm{position:absolute;left:13px;bottom:11px;z-index:1;display:flex;align-items:center;gap:7px;font-size:18px;font-weight:900;text-shadow:0 1px 8px rgba(0,0,0,.6)}.ct-nm i{font-style:normal;font-size:11px;font-weight:800;border:1px solid rgba(255,255,255,.55);border-radius:6px;padding:0 5px;text-shadow:none}" +
     ".ct-pr{position:absolute;right:12px;bottom:12px;z-index:1;font-size:12px;font-weight:800;text-shadow:0 1px 6px rgba(0,0,0,.6)}.ct-pr b{color:#7ce3b8}.ct-cv{position:absolute;right:9px;top:8px;z-index:1;font-size:10.5px;background:rgba(0,0,0,.45);border-radius:999px;padding:2px 8px;opacity:.85}" +
     ".ct-bar{position:absolute;left:0;right:0;bottom:0;height:3px;z-index:1;background:rgba(255,255,255,.12);display:flex}.ct-bar span{display:block;height:100%}" +
+    ".ct-dp{background:var(--paper);border:1px solid rgba(197,155,239,.35);border-radius:14px;padding:10px 13px 11px;margin:0 0 10px}.ct-dp h4{margin:0 0 7px;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;font-size:13.5px;font-weight:900;color:var(--ink)}.ct-dp h4 b{font-family:var(--display);font-size:20px;color:#c59bef}.ct-dp h4 small{font-size:12px;font-weight:700;color:var(--soft)}" +
+    ".ct-dpb{height:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;display:flex}.ct-dpb span{display:block;height:100%;background:linear-gradient(90deg,#8e5fd6,#c59bef)}.ct-dpb span+span{background:rgba(255,201,77,.55)}.ct-dp p{margin:7px 0 0;font-size:12px;color:var(--soft);line-height:1.6}.ct-dp p em{font-style:normal;color:#ffc94d;font-weight:800}" +
+    ".ct-dt{position:absolute;left:9px;top:8px;z-index:1;font-size:10.5px;font-weight:800;border-radius:999px;padding:2px 8px;background:rgba(0,0,0,.5)}.ct-dt.ok{background:rgba(142,95,214,.85)}.ct-dt.wip{background:rgba(255,201,77,.9);color:#2a2000}.ct-dt.no{opacity:.75;font-weight:600}" +
     ".ct-cs{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:7px;padding:11px 11px 13px}" +
-    ".ct-c{display:flex;align-items:center;gap:8px;min-width:0;padding:4px 8px 4px 4px;border:1px solid var(--line);border-radius:12px;color:var(--ink);background:var(--bg);text-decoration:none;transition:border-color .12s,transform .12s}.ct-c:hover{border-color:#c59bef;transform:translateY(-1px)}" +
+    ".ct-c{display:flex;align-items:center;gap:8px;min-width:0;padding:4px 8px 4px 4px;border:1px solid var(--line);border-radius:12px;color:var(--ink);background:var(--bg);text-decoration:none;transition:border-color .12s,transform .12s}.ct-c:hover{border-color:#c59bef;transform:translateY(-1px)}.ct-c{position:relative}.ct-c.dt:after{content:\"✓\";position:absolute;right:4px;top:3px;width:14px;height:14px;border-radius:50%;background:#8e5fd6;color:#fff;font-size:9px;font-weight:900;line-height:14px;text-align:center}.ct-c.dt b{padding-right:12px}" +
     ".ct-c img,.ct-c .ni{flex:none;width:40px;height:40px;border-radius:9px;object-fit:cover;background:#2a2e38;display:flex;align-items:center;justify-content:center;font-size:17px}.ct-c span{min-width:0;display:flex;flex-direction:column;line-height:1.25}" +
     ".ct-c b{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ct-c small{font-size:10.5px;font-weight:600;color:var(--soft);white-space:nowrap}.ct-c.cap{border-color:rgba(197,155,239,.55)}" +
     ".ct-c.been{background:rgba(47,191,113,.16);border-color:rgba(47,191,113,.7)}.ct-c.been small{color:#7ce3b8}.ct-c.pass{background:rgba(31,160,160,.15);border-color:rgba(31,160,160,.7)}.ct-c.want{background:rgba(255,201,77,.12);border-color:rgba(255,201,77,.7)}.ct-c.skip{opacity:.45}.ct-none{color:var(--soft);font-size:13px;padding:14px 2px}" +
@@ -80,7 +83,7 @@
     // 📂 全国目录（省卡片 + 下面所有城市）：页面里有 #cntree 就放那里，没有就接在地图下面
     var tw = document.getElementById("cntree"); if (!tw) { tw = document.createElement("div"); host.appendChild(tw); }
     tw.innerHTML = '<div class="ct-h"><h2>🗺 全国 34 个省级行政区 · 所有城市</h2><input class="ct-q" id="ct-q" type="search" placeholder="🔍 搜城市 / 省…" autocomplete="off"></div>' +
-      '<div class="ct-sum" id="ct-sum"></div><div id="ct-body"></div>';
+      '<div class="ct-dp" id="ct-dp"></div><div class="ct-sum" id="ct-sum"></div><div id="ct-body"></div>';
     var $ = function (id) { return document.getElementById(id); };
     Promise.all([fetch("cn/map.json").then(function (r) { return r.json(); }), fetch("cn/visited.json", { cache: "no-cache" }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }), fetch("cn/index.json").then(function (r) { return r.json(); }).catch(function () { return []; })]).then(function (res) {
       var M = res[0], DEF = res[1] || {}, TREE = res[2] || [], BY = {}, PV = {}, TC = {}, TP = {}, sel = null, foc = null;
@@ -273,6 +276,10 @@
         var body = $("ct-body"); if (!body) return; var regs = [], byR = {}, ql = q.toLowerCase(), all = 0, nb = 0, np = 0, nw = 0;
         TREE.forEach(function (p) { if (!byR[p.region]) { byR[p.region] = []; regs.push(p.region); } byR[p.region].push(p);
           p.cities.forEach(function (c) { var s = S[c.id] || {}; all++; if (s.been) nb++; else if (s.pass) np++; else if (s.want || s.plan) nw++; }); });
+        var dc = 0, pd = 0, wipN = 0, wipL = []; TREE.forEach(function (p) { var k = p.cities.filter(function (c) { return c.d; }).length; dc += k; if (k === p.cities.length) pd++; else if (p.wip) { wipL.push(p.zh.replace(/(壮族|回族|维吾尔)?(自治区|特别行政区|省|市)$/, "")); wipN += p.cities.length - k; } });
+        $("ct-dp").innerHTML = '<h4>📝 城市详细版进度 <b>' + Math.round(dc / all * 100) + '%</b><small>' + dc + ' / ' + all + ' 个城市 · ' + pd + ' / ' + TREE.length + ' 个省级做完</small></h4>' +
+          '<div class="ct-dpb"><span style="width:' + (dc / all * 100).toFixed(1) + '%"></span><span style="width:' + (wipN / all * 100).toFixed(1) + '%"></span></div>' +
+          '<p>城市右上角 <b style="color:#c59bef">✓</b> = 手写详细版（交通、门票、开放时间、照片都整理过）；没有 ✓ 的是维基数据自动版' + (wipL.length ? '　·　<em>整理中：' + wipL.map(esc).join("、") + '</em>（黄条）' : "") + '</p>';
         $("ct-sum").innerHTML = '<span>' + TREE.length + ' 个省级 · ' + all + ' 个城市</span><span><i style="background:#2fbf71"></i>去过 ' + nb + '</span><span><i style="background:#1fa0a0"></i>路过 ' + np + '</span><span><i style="background:#ffc94d"></i>想去 ' + nw + '</span><span style="opacity:.8">点大图进省页 · 点城市进城市页</span>';
         body.innerHTML = regs.map(function (r) {
           var cards = byR[r].map(function (p) {
@@ -282,11 +289,12 @@
             var pct = function (x) { return (x / n * 100).toFixed(1) + "%"; };
             return '<div class="ct-k' + (b ? " been" : "") + '"><a class="ct-ph" href="' + provHref(p.slug) + '" data-go="prov:' + p.slug + '" title="打开' + esc(p.zh) + '省页">' +
               (p.img ? '<img alt="" data-src="' + esc(cw(p, 500)) + '">' : "") + (p.cover ? '<span class="ct-cv">📷 ' + esc(p.cover) + "</span>" : "") +
+              (function () { var k = p.cities.filter(function (c) { return c.d; }).length; return k === n ? '<span class="ct-dt ok">✓ 详细版</span>' : p.wip ? '<span class="ct-dt wip">🛠 整理中' + (k ? " " + k + "/" + n : "") + "</span>" : k ? '<span class="ct-dt">详细版 ' + k + "/" + n + "</span>" : '<span class="ct-dt no">自动版</span>'; })() +
               '<span class="ct-nm">' + esc(p.zh) + "<i>" + esc(p.short) + '</i></span><span class="ct-pr">' + (b ? "去过 <b>" + b + "</b> / " + n : n + " 个城市") + " ›</span>" +
               '<span class="ct-bar"><span style="width:' + pct(b) + ';background:#2fbf71"></span><span style="width:' + pct(ps) + ';background:#1fa0a0"></span><span style="width:' + pct(w) + ';background:#ffc94d"></span></span></a>' +
               '<div class="ct-cs">' + cs.map(function (c) { var s = S[c.id] || {};
                 var st = s.been ? "去过" : s.pass ? "路过" : s.want || s.plan ? "想去" : "";
-                return '<a class="ct-c' + (s.been ? " been" : s.pass ? " pass" : s.want || s.plan ? " want" : s.skip ? " skip" : "") + (c.zh === p.cap ? " cap" : "") + '" href="' + esc(cHref(c, p)) + '" data-go="' + esc(cityGo(c, p)) + '" title="' + esc(c.zh) + '">' +
+                return '<a class="ct-c' + (c.d ? " dt" : "") + (s.been ? " been" : s.pass ? " pass" : s.want || s.plan ? " want" : s.skip ? " skip" : "") + (c.zh === p.cap ? " cap" : "") + '" href="' + esc(cHref(c, p)) + '" data-go="' + esc(cityGo(c, p)) + '" title="' + esc(c.zh) + '">' +
                   (c.img ? '<img alt="" data-src="' + esc(cw(c, 120)) + '">' : '<i class="ni">🏙</i>') + "<span><b>" + (c.zh === p.cap ? "★ " : "") + esc(c.zh.replace(/(市|地区)$/, "")) + "</b><small>" +
                   [st, c.zh === p.cap ? "省会" : "", c.n ? c.n + " 个景点" : (c.go && !/^city:/.test(c.go) ? "景点大全" : "")].filter(Boolean).join(" · ") + "</small></span></a>"; }).join("") + "</div></div>";
           }).join("");
