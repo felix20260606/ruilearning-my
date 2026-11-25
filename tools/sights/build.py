@@ -13,7 +13,7 @@ C={
   goto={'cq':'cq-transit.html'},cfg={'map':'amap','city':'重庆'}),
 'lk':dict(files=['lk/nature.json','lk/culture.json'],out='lk-sights.html',title='兰卡威景点大全 · 去过的打勾',
   k='Langkawi · Every Sight · Tick What You\'ve Done',h1='🏝 兰卡威景点大全',sub='海滩 · 浮潜跳岛 · 红树林 · 天空之桥 · 夜市免税 · {N} 个景点 · 星级推荐、照片、怎么去（住 Cenang 不租车）、开放时间、门票 · 去过的打勾，想去的标星',
-  comment='🏝 兰卡威景点大全：海滩、海岛、红树林、瀑布、缆车、镇上、夜市和免税店，每个都有星级推荐、照片、地址、从 Pantai Cenang 怎么去（按不租车写）、开放时间、门票、待多久、介绍和提醒、Google 地图。\n     从旅游中心「🇲🇾 马来西亚」/「🧭 导航」的卡片打开（没有单独的标签）。带「🧭 照着走」的在 11/25–27 兰卡威行程里。',
+  comment='🏝 兰卡威景点大全：海滩、海岛、红树林、瀑布、缆车、镇上、夜市和免税店，每个都有星级推荐、照片、地址、从 Pantai Cenang 怎么去（按不租车写）、开放时间、门票、待多久、介绍和提醒、Google 地图。\n     从旅游中心「🇲🇾 马来西亚」/「🧭 导航」的卡片打开（没有单独的标签）。带「🧭 照着走」的在 11/26–28 兰卡威行程里。',
   goto={'lk':'langkawi-trip.html'},cfg={'map':'google'}),
 'bk':dict(files=['bk/city.json','bk/nearby.json'],out='bk-sights.html',title='曼谷景点大全 · 去过的打勾',
   k="Bangkok · Every Sight · Tick What You've Done",h1='🛕 曼谷景点大全',sub='老城寺庙 · 河边 · 唐人街 · 市场夜市 · 商场 + 大城、芭提雅、佛统等周边一日 · {N} 个景点 · 照片、地址、坐 BTS / MRT / 快船怎么去、开放时间、门票 · 去过的打勾，想去的标星',

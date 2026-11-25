@@ -7,11 +7,11 @@
   "area": "Oriental Village（Pantai Kok）",
   "addr": "Oriental Village, Jalan Telaga Tujuh, Pantai Kok, 07000 Langkawi, Kedah",
   "transit": "从 Pantai Cenang 打 Grab 约 20 分钟，约 RM20–30",
-  "hours": "平日 9:30–18:00；2026-11-25（周三）每周维护，只开 12:00–18:00；11-26、11-27 正常 9:30–18:00",
+  "hours": "平日 9:30–18:00；2026-11-25（周三）每周维护，只开 12:00–18:00；其它日子正常 9:30–18:00",
   "price": "外国成人套票约 RM85（不含天空之桥）/ RM89（含天空之桥），另含 SkyDome、SkyRex、3D Art；快速通道 +RM50。以官网为准",
   "dur": "半天（3–4 小时）",
   "desc": "兰卡威最有名的景点。缆车从山脚爬到海拔约 650 米的 Machinchang 山顶，坡很陡，一路能看到雨林、海和远处的小岛。中间站和山顶站都有观景台。",
-  "tips": "周三 11-25 上午不开，想上午坐就安排在周四或周五。早上 9:30 一开门就去，云少、排队短，下午常起雾或下雨。风大或雷雨会临时停运。建议官网提前买票；山顶比山下凉，带件薄外套。",
+  "tips": "每周三上午维护不开。这次行程放在周六 11-28 早上第一班（住 Berjaya，走路约 10 分钟到）。周末人多，更要一开门就去。早上 9:30 一开门就去，云少、排队短，下午常起雾或下雨。风大或雷雨会临时停运。建议官网提前买票；山顶比山下凉，带件薄外套。",
   "warn": "2026-11-25（周三）每周维护，12:00 才开；遇恶劣天气临时停运",
   "rate": 3,
   "photo": "Langkawi Cable Car SKYCAB.jpg",
@@ -55,7 +55,8 @@
   "rate": 2,
   "photo": "MY-Langkawi-oriental-village-01.jpg",
   "q": "Oriental Village Langkawi",
-  "src": "https://panoramalangkawi.com/oriental-village/"
+  "src": "https://panoramalangkawi.com/oriental-village/",
+  "go": "lk"
  },
  {
   "id": "lk-eaglesquare",
@@ -73,8 +74,7 @@
   "rate": 2,
   "photo": "Langkawi Eagle Square - Dataran Lang (11129976185).jpg",
   "q": "Eagle Square Langkawi",
-  "src": "https://www.langkawi-insight.com/langkawi_000016.htm",
-  "go": "lk"
+  "src": "https://www.langkawi-insight.com/langkawi_000016.htm"
  },
  {
   "id": "lk-kuahtown",
@@ -106,12 +106,11 @@
   "price": "免费，小吃一般几块钱",
   "dur": "1–1.5 小时",
   "desc": "兰卡威最大最热闹的夜市之一，烤鸡翅、沙爹、炒粿条、椰子水、水果、甜品应有尽有，价格比餐厅便宜很多。",
-  "tips": "2026-11-25 正好是周三，可以白天在 Kuah 逛完傍晚来。带现金和小零钱，自备纸巾和湿巾。每周夜市：周日 Padang Matsirat（Beras Terbakar 旁停车场）、周一 Ulu Melaka、周二 Kedawang（Cenang 附近）、周三和周六 Kuah 码头旁、周四 Temoyong（Cenang）、周五 Ayer Hangat（Padang Lalang）。大多 17:30–22:00，下雨很多摊位不出。",
+  "tips": "周三、周六在 Kuah 码头旁（这次行程周四到、周六走，碰不上）。带现金和小零钱，自备纸巾和湿巾。每周夜市：周日 Padang Matsirat（Beras Terbakar 旁停车场）、周一 Ulu Melaka、周二 Kedawang（Cenang 附近）、周三和周六 Kuah 码头旁、周四 Temoyong（Cenang）、周五 Ayer Hangat（Padang Lalang）。大多 17:30–22:00，下雨很多摊位不出。",
   "rate": 3,
   "photo": "",
   "q": "Kuah Night Market Langkawi",
-  "src": "https://www.langkawi-insight.com/langkawi_0000bb.htm",
-  "go": "lk"
+  "src": "https://www.langkawi-insight.com/langkawi_0000bb.htm"
  },
  {
   "id": "lk-temoyongnightmarket",
@@ -129,7 +128,8 @@
   "rate": 2,
   "photo": "",
   "q": "Temoyong Night Market Langkawi",
-  "src": "https://www.langkawi-insight.com/langkawi_0000bb.htm"
+  "src": "https://www.langkawi-insight.com/langkawi_0000bb.htm",
+  "go": "lk"
  },
  {
   "id": "lk-cenangstrip",
