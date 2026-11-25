@@ -1,0 +1,2914 @@
+{
+  "v": "av3oi6AbHkc",
+  "title": "印尼大妈助力中国AI：下乡收Claude账号，国产大模型真能靠性价比反超美国吗？夸克说|誇克说",
+  "author": "夸克说",
+  "lang": "en",
+  "tl": "zh-CN",
+  "at": 1795594070814,
+  "cues": [
+    {
+      "s": 0.56,
+      "e": 9.11,
+      "t": "Hello everyone, welcome to Quark Says, I'm Quark. Let's watch a few clips first .",
+      "r": "大家好，欢迎来到夸克说，我是夸克。我们先来看几个片段。"
+    },
+    {
+      "s": 12.86,
+      "e": 16.82,
+      "t": "Can I lean on your shoulder?",
+      "r": "我可以靠在你的肩膀上吗？"
+    },
+    {
+      "s": 18.94,
+      "e": 22.23,
+      "t": "Even if someone in the countryside has never written a line of code in their",
+      "r": "即使农村地区的人一辈子都没写过一行代码"
+    },
+    {
+      "s": 22.23,
+      "e": 25.58,
+      "t": "life, they can still access the most advanced, cutting-edge AI. No matter how",
+      "r": "，他们仍然可以接触到最先进、最前沿的人工智能。无论"
+    },
+    {
+      "s": 25.58,
+      "e": 28.65,
+      "t": "strong your technical risk controls are, once you encounter “physical” rural",
+      "r": "你的技术风险控制措施多么强大，一旦遇到“实际的”农村"
+    },
+    {
+      "s": 28.65,
+      "e": 30.82,
+      "t": "outreach, you still have to rely on buying accounts.",
+      "r": "推广活动，你仍然需要依靠购买账户。"
+    },
+    {
+      "s": 30.82,
+      "e": 35.05,
+      "t": "A company is hiring a subscription engineer for GPT memberships, offering",
+      "r": "一家公司正在招聘 GPT 会员订阅工程师，提供"
+    },
+    {
+      "s": 35.05,
+      "e": 39.89,
+      "t": "20-40 k per month for 16 months, with an annual salary of up to 640k. Experience",
+      "r": "每月 2 万至 4 万美元的薪水，为期 16 个月，年薪最高可达 64 万美元。经验"
+    },
+    {
+      "s": 39.89,
+      "e": 44.85,
+      "t": "is not strictly required. The core job is just to handle cross-border payments",
+      "r": "并非绝对必要条件。核心工作就是处理跨境支付"
+    },
+    {
+      "s": 44.85,
+      "e": 49.6,
+      "t": "and maintain the membership subscription system, helping people keep using Claude",
+      "r": "和维护会员订阅系统，帮助人们在"
+    },
+    {
+      "s": 49.6,
+      "e": 52.14,
+      "t": "and GPT after their accounts get banned.",
+      "r": "账户被封禁后继续使用 Claude 和 GPT 。"
+    },
+    {
+      "s": 52.14,
+      "e": 56.4,
+      "t": "Open Douyin or Xiaohongshu and search for the keywords. “Claude account",
+      "r": "打开抖音或小红书，搜索关键词。搜索“Claude账号"
+    },
+    {
+      "s": 56.4,
+      "e": 59.6,
+      "t": "acquisition“ and you'll see a ton of similar videos, all recruiting people to",
+      "r": "获取”，你会看到很多类似的视频，这些视频都在招募人员前往"
+    },
+    {
+      "s": 59.6,
+      "e": 62.77,
+      "t": "go to Southeast Asian countries like Indonesia, Vietnam, and the Philippines",
+      "r": "印度尼西亚、越南和菲律宾等东南亚国家，"
+    },
+    {
+      "s": 62.77,
+      "e": 66.75,
+      "t": "to collect Claude accounts in rural areas. Let me explain this briefly. KYC",
+      "r": "在农村地区收集Claude账号。让我简单解释一下。 KYC"
+    },
+    {
+      "s": 66.75,
+      "e": 70.27,
+      "t": "stands for “Know Your Customer,” a real-name authentication mechanism",
+      "r": "代表“了解你的客户”，是由 OpenAI 创建的一种实名认证机制，"
+    },
+    {
+      "s": 70.27,
+      "e": 74.23,
+      "t": "created by OpenAI to prevent other AI companies from abusing the system. It is",
+      "r": "旨在防止其他 AI 公司滥用该系统。它的"
+    },
+    {
+      "s": 74.23,
+      "e": 77.41,
+      "t": "mainly designed to guard against these large Chinese model developers. The",
+      "r": "主要目的是防范这些大型中国模型开发商。该"
+    },
+    {
+      "s": 77.41,
+      "e": 80.7,
+      "t": "practice involves requiring certain users to verify their identity. Such as",
+      "r": "做法要求某些用户验证其身份。例如"
+    },
+    {
+      "s": 80.7,
+      "e": 84.21,
+      "t": "showing ID, performing face verification, etc. Previously, account dealers only",
+      "r": "出示身份证、进行人脸验证等。以前，账户经销商只"
+    },
+    {
+      "s": 84.21,
+      "e": 87.59,
+      "t": "needed to get an account. Just using a VPN and rotating IPs worked, but now",
+      "r": "需要注册一个账户即可。以前只要使用 VPN 和轮换 IP 地址就能解决问题，但现在"
+    },
+    {
+      "s": 87.59,
+      "e": 91.13,
+      "t": "with real-name verification, that trick doesn't work anymore. So, to counter",
+      "r": "有了实名验证，这个方法就不管用了。因此，为了应对"
+    },
+    {
+      "s": 91.13,
+      "e": 94.69,
+      "t": "these measures, Chinese AI companies have resorted to “rural account",
+      "r": "这些措施，中国人工智能公司诉诸“农村账户"
+    },
+    {
+      "s": 94.69,
+      "e": 98.98,
+      "t": "collection.“ These internet giants are very familiar with using on-the-ground",
+      "r": "催收”。这些互联网巨头非常熟悉如何利用一线"
+    },
+    {
+      "s": 98.98,
+      "e": 103.02,
+      "t": "sales teams. Specifically, dealers send people to rural areas in certain",
+      "r": "销售团队。具体来说，经销商会派人前往东南亚某些国家的农村地区"
+    },
+    {
+      "s": 103.02,
+      "e": 107.49,
+      "t": "Southeast Asian countries, paying locals to register, verify their faces, and pay",
+      "r": "，付钱给当地人让他们登记、验证身份，并"
+    },
+    {
+      "s": 107.49,
+      "e": 111.58,
+      "t": "with local credit cards. Once the accounts are obtained, they are resold",
+      "r": "使用当地的信用卡付款。获取账户后，会将其转售给"
+    },
+    {
+      "s": 111.58,
+      "e": 115.55,
+      "t": "to domestic big model firms for them to use. Those who are a bit sharper",
+      "r": "国内大型模特公司供其使用。那些比较精明的人会"
+    },
+    {
+      "s": 115.55,
+      "e": 119.56,
+      "t": "directly cooperate with local businesses or staffing agencies, paying a fee for",
+      "r": "直接与当地企业或人力资源公司合作，支付"
+    },
+    {
+      "s": 119.56,
+      "e": 124.48,
+      "t": "bulk registration, which is more efficient than running around yourself.",
+      "r": "批量注册费，这比自己到处奔波要高效得多。"
+    },
+    {
+      "s": 124.48,
+      "e": 129.13,
+      "t": "Recently, I’ve received calls from Indonesia, and in the last couple of",
+      "r": "最近，我接到了来自印度尼西亚的电话，在过去的"
+    },
+    {
+      "s": 129.13,
+      "e": 134.21,
+      "t": "days, suppliers from Thailand and India have reached out to me, saying they have",
+      "r": "几天里，来自泰国和印度的供应商也联系了我，说他们有"
+    },
+    {
+      "s": 134.21,
+      "e": 138.99,
+      "t": "local resources—either through labor dispatch or by going deep into rural",
+      "r": "当地资源——无论是通过劳务派遣还是深入农村"
+    },
+    {
+      "s": 138.99,
+      "e": 143.95,
+      "t": "areas—to get locals to register with their own emails and pay with their own",
+      "r": "地区——让当地人用自己的电子邮件注册，并用自己的"
+    },
+    {
+      "s": 143.95,
+      "e": 148.01,
+      "t": "bank cards, right? Once the Claude account is ready, you",
+      "r": "银行卡付款，对吧？ Claude 账户准备就绪后，"
+    },
+    {
+      "s": 148.01,
+      "e": 151.84,
+      "t": "can use it directly. According to feedback from some netizens, in",
+      "r": "即可直接使用。根据一些网友的反馈，在"
+    },
+    {
+      "s": 151.84,
+      "e": 155.85,
+      "t": "Indonesia, a KYC account that only guarantees a first-time login costs",
+      "r": "印度尼西亚，一个仅保证首次登录的 KYC 账户售价"
+    },
+    {
+      "s": 155.85,
+      "e": 160.42,
+      "t": "around 20 USD, but reselling it to a big firm can earn one or two thousand RMB.",
+      "r": "约为 20 美元，但将其转售给大公司可以赚取一两千元人民币。"
+    },
+    {
+      "s": 160.42,
+      "e": 163.45,
+      "t": "If it’s an account that includes after-sales support, the price can even",
+      "r": "如果账户包含售后支持，价格甚至可以"
+    },
+    {
+      "s": 163.45,
+      "e": 166.63,
+      "t": "be driven up to over 10,000 RMB. Since domestic tech giants get these accounts",
+      "r": "超过 10,000 元人民币。由于国内科技巨头获得了这些账户"
+    },
+    {
+      "s": 166.63,
+      "e": 169.7,
+      "t": ", they usually use a VPN, but if they connect to the wrong country or switch",
+      "r": "，他们通常会使用 VPN，但如果他们连接到错误的国家或"
+    },
+    {
+      "s": 169.7,
+      "e": 173.15,
+      "t": "IPs too often, there's a risk of being banned. When that happens, they need the",
+      "r": "频繁切换 IP 地址，则存在被封禁的风险。发生这种情况时，他们需要"
+    },
+    {
+      "s": 173.15,
+      "e": 176.66,
+      "t": "original registrant to help verify and unlock the account. Beyond manual",
+      "r": "原注册人帮助验证并解锁帐户。除了人工"
+    },
+    {
+      "s": 176.66,
+      "e": 180.91,
+      "t": "verification, some have figured out new methods, like using locals 'identities",
+      "r": "核实之外，一些人还想出了新的方法，例如利用当地人的身份"
+    },
+    {
+      "s": 180.91,
+      "e": 185.06,
+      "t": "to rent offices and setting up a bunch of computers to run massive accounts,",
+      "r": "租用办公室，并设置大量计算机来运行庞大的账户，这些账户"
+    },
+    {
+      "s": 185.06,
+      "e": 189.12,
+      "t": "controlled remotely from China via software. Most absurdly, some people",
+      "r": "通过软件从中国远程控制。最荒谬的是，有些人"
+    },
+    {
+      "s": 189.12,
+      "e": 193.65,
+      "t": "have even chosen to emigrate just to use Claude. But even then, there's still no",
+      "r": "甚至为了使用 Claude 这个名字而选择移民。但即便如此，也不能"
+    },
+    {
+      "s": 193.65,
+      "e": 197.28,
+      "t": "guarantee that they won't get banned. For instance, the person below",
+      "r": "保证他们不会被禁赛。例如，下面这个人"
+    },
+    {
+      "s": 197.28,
+      "e": 201.56,
+      "t": "physically moved to Vietnam, yet still couldn't escape the fate of having their",
+      "r": "虽然搬到了越南，但仍然无法避免"
+    },
+    {
+      "s": 201.56,
+      "e": 208.1,
+      "t": "account banned. “To use Claude, I even moved all the way to Vietnam.",
+      "r": "账号被封禁的命运。“为了用Claude，我甚至搬到了越南。"
+    },
+    {
+      "s": 208.1,
+      "e": 213.23,
+      "t": "I used a local Vietnamese person's verified identity and a local network,",
+      "r": "我用了当地越南人的认证身份和本地网络，"
+    },
+    {
+      "s": 213.23,
+      "e": 219.82,
+      "t": "and it still banned me. I'm speechless, it's just a total ban.“",
+      "r": "结果还是被封号了。我无语了，这完全就是封号。”"
+    },
+    {
+      "s": 219.82,
+      "e": 224.1,
+      "t": "There are many theories about why this happens; for example, some in China",
+      "r": "关于这种现象发生的原因，有很多种理论；例如，中国有些人"
+    },
+    {
+      "s": 224.1,
+      "e": 228.67,
+      "t": "think Claude is anti-Chinese, believing that if your computer uses a Simplified",
+      "r": "认为克劳德是反华的，他们认为如果你的电脑使用简体"
+    },
+    {
+      "s": 228.67,
+      "e": 233.07,
+      "t": "Chinese OS or if you communicate in Chinese, you'll be banned, so they stick",
+      "r": "中文操作系统或者你用中文交流，你就会被封禁，所以他们坚持"
+    },
+    {
+      "s": 233.07,
+      "e": 237.34,
+      "t": "to English. But in my own experience, that's absolutely not the case. I chat",
+      "r": "使用英语。但就我个人经验而言，情况绝对并非如此。我一直都用"
+    },
+    {
+      "s": 237.34,
+      "e": 241.1,
+      "t": "with Claude in Chinese all the time. I've been using it for so long, and I've",
+      "r": "中文和克劳德聊天。我用了这么久，从来"
+    },
+    {
+      "s": 241.1,
+      "e": 244.16,
+      "t": "never had any issues. I suspect it’s because those guys were scraping data to",
+      "r": "没出过任何问题。我怀疑这是因为那些人正在搜集数据，以"
+    },
+    {
+      "s": 244.16,
+      "e": 247.28,
+      "t": "help domestic AI companies get ahead. If you're just working normally, like",
+      "r": "帮助国内人工智能公司取得领先地位。如果你只是在做正常的工作，比如"
+    },
+    {
+      "s": 247.28,
+      "e": 250.87,
+      "t": "writing code or building a game, you won't have any problems. So, how big is",
+      "r": "编写代码或开发游戏，就不会遇到任何问题。那么，"
+    },
+    {
+      "s": 250.87,
+      "e": 254.93,
+      "t": "this gray-market industry of using fake identities to register Claude accounts?",
+      "r": "利用虚假身份注册 Claude 账户的这种灰色市场产业规模究竟有多大？"
+    },
+    {
+      "s": 254.93,
+      "e": 258.95,
+      "t": "We can look at data from Anthropic’s filing with the U.S. Securities and",
+      "r": "我们可以查看 Anthropic 向美国证券"
+    },
+    {
+      "s": 258.95,
+      "e": 262.97,
+      "t": "Exchange Commission, which estimates that in the first six months of 2024,",
+      "r": "交易委员会提交的文件中的数据，该文件估计，在 2024 年上半年，"
+    },
+    {
+      "s": 262.97,
+      "e": 266.83,
+      "t": "about 5%to 7%of revenue came from customers violating usage policies or",
+      "r": "约有 5% 至 7% 的收入来自违反使用政策或"
+    },
+    {
+      "s": 266.83,
+      "e": 271.78,
+      "t": "terms. Total revenue for that period was about $ 3.32 billion, so based on that 5",
+      "r": "条款的客户。该期间的总收入约为 33.2 亿美元，按 5"
+    },
+    {
+      "s": 271.78,
+      "e": 276.01,
+      "t": "%to 7%, that's roughly $ 160 million to $ 230 million. Although it doesn't",
+      "r": "% 到 7% 的增长率计算，大约是 1.6 亿美元到 2.3 亿美元。虽然它没有"
+    },
+    {
+      "s": 276.01,
+      "e": 279.12,
+      "t": "explicitly state that all banned non-compliant customers are from China.",
+      "r": "明确指出所有被禁止的不合规客户都来自中国。"
+    },
+    {
+      "s": 279.12,
+      "e": 283.35,
+      "t": "But everyone knows the truth. There are only a few countries where Claude is",
+      "r": "但人人都知道真相。克劳德这个角色只在少数几个国家受到"
+    },
+    {
+      "s": 283.35,
+      "e": 287.32,
+      "t": "restricted; besides China, there's Iran, Syria, Afghanistan, and Cuba. None of",
+      "r": "限制；除了中国，还有伊朗、叙利亚、阿富汗和古巴。"
+    },
+    {
+      "s": 287.32,
+      "e": 291.08,
+      "t": "those countries have major AI model firms, and their IT industries aren't",
+      "r": "这些国家都没有大型人工智能模型公司，它们的IT产业也不"
+    },
+    {
+      "s": 291.08,
+      "e": 295.48,
+      "t": "developed. So, it's almost certain that the vast majority of this money comes",
+      "r": "发达。因此，几乎可以肯定，这笔钱的绝大部分"
+    },
+    {
+      "s": 295.48,
+      "e": 299.2,
+      "t": "from China. That raises the question: for the past two years, hasn't China",
+      "r": "来自中国。这就引出了一个问题：过去两年里，中国不是"
+    },
+    {
+      "s": 299.2,
+      "e": 302.87,
+      "t": "been claiming that our model companies trained AI models on par with GPT and",
+      "r": "一直声称我们的模型公司"
+    },
+    {
+      "s": 302.87,
+      "e": 306.16,
+      "t": "Claude using only 1%of the budget of U.S. firms, and even achieving “",
+      "r": "仅用美国公司 1% 的预算就训练出了与 GPT 和 Claude 水平相当的 AI 模型，甚至实现了“"
+    },
+    {
+      "s": 306.16,
+      "e": 309.65,
+      "t": "overtaking on the curve“? Weren't we told that our DeepSeek and Qwen are both",
+      "r": "曲线上的超越”吗？不是一直告诉我们，我们的 DeepSeek 和 Qwen 价格"
+    },
+    {
+      "s": 309.65,
+      "e": 312.49,
+      "t": "cheap and powerful, with a price-to-performance ratio that crushes",
+      "r": "低廉且功能强大，性价比远超"
+    },
+    {
+      "s": 312.49,
+      "e": 315.47,
+      "t": "their American counterparts? Is positioning Chinese LLMs as cheap,",
+      "r": "美国同类产品吗？将中国LLM定位"
+    },
+    {
+      "s": 315.47,
+      "e": 319.03,
+      "t": "high-compute alternatives for overseas markets a “downgrade strike” that leaves",
+      "r": "为海外市场的廉价、高计算能力替代方案，这是否是一种“降级打击”，让"
+    },
+    {
+      "s": 319.03,
+      "e": 322.91,
+      "t": "the U.S. scrambling? Then why are so many Chinese companies spending billions",
+      "r": "美国措手不及？那么，为什么这么多中国公司要花费数十亿"
+    },
+    {
+      "s": 322.91,
+      "e": 326.86,
+      "t": "of dollars, risking account bans, to cross the ocean and use Claude? Isn't",
+      "r": "美元，冒着账户被封禁的风险，跨越重洋使用 Claude 呢？"
+    },
+    {
+      "s": 326.86,
+      "e": 332.19,
+      "t": "DeepSeek good enough for you? In this episode, we’ll discuss this and",
+      "r": "DeepSeek 还不够好用吗？在这一集中，我们将讨论这个问题，并"
+    },
+    {
+      "s": 332.19,
+      "e": 337,
+      "t": "address a popular claim in China: that Chinese AI, with its superior",
+      "r": "回应中国的一种流行说法：中国人工智能凭借其卓越的"
+    },
+    {
+      "s": 337,
+      "e": 342.1,
+      "t": "cost-efficiency and application advantages, will eventually overtake the",
+      "r": "成本效益和应用优势，最终将超越"
+    },
+    {
+      "s": 342.1,
+      "e": 347.2,
+      "t": "U.S. and dominate globally. Let’s answer the first question. Can Chinese AI",
+      "r": "美国，并在全球占据主导地位。我们先来回答第一个问题。中国人工智能能否"
+    },
+    {
+      "s": 347.2,
+      "e": 351.53,
+      "t": "overtake the U.S. by relying on “ distillation”? First, let’s look at how",
+      "r": "依靠“提炼”技术超越美国？首先，我们来看看"
+    },
+    {
+      "s": 351.53,
+      "e": 356.19,
+      "t": "Chinese companies operate. In February, an Anthropic report named three Chinese",
+      "r": "中国公司是如何运作的。今年二月， Anthropic 的一份报告点名了三家中国"
+    },
+    {
+      "s": 356.19,
+      "e": 360.28,
+      "t": "companies: DeepSeek, Baichuan, and ModelBest. According to the report,",
+      "r": "公司：DeepSeek、百川和 ModelBest。根据该报告，"
+    },
+    {
+      "s": 360.28,
+      "e": 364.33,
+      "t": "these companies used around 2,400 accounts to interact with Claude over 16",
+      "r": "这些公司使用了大约 2400 个账户与 Claude 互动超过 1600"
+    },
+    {
+      "s": 364.33,
+      "e": 368.65,
+      "t": "million times, aiming to use Claude’s capabilities to improve their own models",
+      "r": "万次，旨在利用 Claude 的功能来改进他们自己的模型"
+    },
+    {
+      "s": 368.65,
+      "e": 372.56,
+      "t": ". By September, Anthropic released another investigation. This time,",
+      "r": "。到了9月份，Anthropic发布了另一项调查报告。这一次，"
+    },
+    {
+      "s": 372.56,
+      "e": 376.51,
+      "t": "Alibaba was named, and the scale was even larger. Accounts linked to Alibaba",
+      "r": "阿里巴巴被点名，而且规模更大。在短短三个月内，与阿里巴巴关联的账户"
+    },
+    {
+      "s": 376.51,
+      "e": 380.68,
+      "t": "interacted with Claude over 150 million times in just three months. That’s like",
+      "r": "与 Claude 互动超过 1.5 亿次。这就像连续 4000 多年，"
+    },
+    {
+      "s": 380.68,
+      "e": 384.55,
+      "t": "asking Claude 100 questions a day, without a single break, for over 4,000",
+      "r": "每天不间断地问克劳德 100 个问题一样"
+    },
+    {
+      "s": 384.55,
+      "e": 387.9,
+      "t": "years. Of course, these questions weren't typed by a person sitting in",
+      "r": "。当然，这些问题不是坐在电脑前的人打出来的"
+    },
+    {
+      "s": 387.9,
+      "e": 391.48,
+      "t": "front of a computer, but sent in bulk by programs. Essentially, you prepare a",
+      "r": "，而是由程序批量发送的。本质上，你准备一份"
+    },
+    {
+      "s": 391.48,
+      "e": 394.8,
+      "t": "massive list of questions, send them to Claude via these accounts, and then",
+      "r": "长长的问题清单，通过这些账户发送给克劳德，然后"
+    },
+    {
+      "s": 394.8,
+      "e": 398.4,
+      "t": "collect the answers. For instance, if I want to train my model to code, I could",
+      "r": "收集答案。例如，如果我想训练我的模型来编写代码，我可以"
+    },
+    {
+      "s": 398.4,
+      "e": 401.7,
+      "t": "feed Claude a million programming problems and have it generate solutions",
+      "r": "给 Claude 提供一百万个编程问题，让它"
+    },
+    {
+      "s": 401.7,
+      "e": 405.69,
+      "t": "for each. After getting the answers, I filter and organize them, then use the",
+      "r": "为每个问题生成解决方案。得到答案后，我对其进行筛选和整理，然后使用这些"
+    },
+    {
+      "s": 405.69,
+      "e": 409.43,
+      "t": "question-answer pairs to train my own model. Once trained, my model can",
+      "r": "问答对来训练我自己的模型。经过训练后，我的模型可以"
+    },
+    {
+      "s": 409.43,
+      "e": 413.22,
+      "t": "provide better answers for similar problems. This process is called “",
+      "r": "为类似问题提供更好的答案。这个过程叫做“"
+    },
+    {
+      "s": 413.22,
+      "e": 418.64,
+      "t": "distillation.“ So, is this method effective? Extremely. For example, after",
+      "r": "蒸馏”。那么，这种方法有效吗？极其。例如，"
+    },
+    {
+      "s": 418.64,
+      "e": 422.9,
+      "t": "DeepSeek released its model in 2024, it used R1 to generate and filter about",
+      "r": "DeepSeek 在 2024 年发布其模型后，使用 R1 生成并筛选了约"
+    },
+    {
+      "s": 422.9,
+      "e": 427.27,
+      "t": "800,000 training samples, using them to train smaller models. Some of these",
+      "r": "80 万个训练样本，并用它们来训练较小的模型。这些"
+    },
+    {
+      "s": 427.27,
+      "e": 432.32,
+      "t": "smaller models were based on Alibaba’s Qwen, others on Meta’s Llama. Once",
+      "r": "较小的模型中，有些是基于阿里巴巴的 Qwen，有些是基于Meta的Llama。经过"
+    },
+    {
+      "s": 432.32,
+      "e": 437.17,
+      "t": "trained, these models showed significant improvements in math and coding",
+      "r": "训练后，这些模型在数学和编程基准测试中均表现出显著的进步"
+    },
+    {
+      "s": 437.17,
+      "e": 442.81,
+      "t": "benchmarks. DeepSeek even released them with “Distill” in their names. Now you",
+      "r": "。 DeepSeek 甚至在发行时将它们命名为“Distill”。现在你"
+    },
+    {
+      "s": 442.81,
+      "e": 446.94,
+      "t": "should understand why Chinese companies are willing to pay for Claude accounts.",
+      "r": "应该明白为什么中国公司愿意为 Claude 账户付费了。"
+    },
+    {
+      "s": 446.94,
+      "e": 451.2,
+      "t": "Directly distilling the world’s best models saves massive amounts of R&D time",
+      "r": "直接借鉴世界上最好的模型可以节省大量的研发时间"
+    },
+    {
+      "s": 451.2,
+      "e": 455.7,
+      "t": "and trial-and-error costs. So here is the question. Relying on distillation",
+      "r": "和反复试验的成本。问题来了。依靠蒸馏"
+    },
+    {
+      "s": 455.7,
+      "e": 459.89,
+      "t": "can boost model performance, but can it lead to a total overtake? Many people's",
+      "r": "可以提高模型性能，但这能带来完全的超越吗？许多人的"
+    },
+    {
+      "s": 459.89,
+      "e": 463.98,
+      "t": "first reaction is that it's impossible, because if you just follow Claude and",
+      "r": "第一反应是这是不可能的，因为如果你只是跟随 Claude 并"
+    },
+    {
+      "s": 463.98,
+      "e": 467.96,
+      "t": "learn whatever it does—copying its capabilities today and chasing its new",
+      "r": "学习它所做的一切——今天复制它的能力，明天追逐它的新"
+    },
+    {
+      "s": 467.96,
+      "e": 472.04,
+      "t": "answers tomorrow—you will always be one step behind. But the thing is, Chinese",
+      "r": "答案——你永远都会落后一步。但问题是，中国的"
+    },
+    {
+      "s": 472.04,
+      "e": 475.27,
+      "t": "large model companies aren't just distilling; they are still doing their",
+      "r": "大型模型公司不仅仅是在进行蒸馏；他们仍在进行"
+    },
+    {
+      "s": 475.27,
+      "e": 479.13,
+      "t": "own training. Furthermore, they aren't just distilling from one source. For",
+      "r": "自主训练。此外，他们并非只从单一来源进行蒸馏。"
+    },
+    {
+      "s": 479.13,
+      "e": 482.94,
+      "t": "instance, we all know there's talk of the “Big Three” in US large models. Some",
+      "r": "例如，我们都知道美国大型车型领域有“三大巨头”的说法。部分"
+    },
+    {
+      "s": 482.94,
+      "e": 488.24,
+      "t": "versions include Claude, ChatGPT, and Gemini. Others include Claude, ChatGPT,",
+      "r": "版本包含 Claude、ChatGPT 和 Gemini。其他包括 Claude、ChatGPT"
+    },
+    {
+      "s": 488.24,
+      "e": 492.05,
+      "t": "and Grok. But regardless of the version, each has its strengths; some are",
+      "r": "和 Grok。但无论哪个版本，各有其优点；有些人"
+    },
+    {
+      "s": 492.05,
+      "e": 495.69,
+      "t": "better at image generation, some have strong coding skills, and others excel",
+      "r": "擅长图像生成，有些人拥有强大的编程技能，还有些人擅长"
+    },
+    {
+      "s": 495.69,
+      "e": 499.29,
+      "t": "at writing. So, when Chinese companies distill, they can combine the strengths",
+      "r": "写作。因此，当中国企业进行技术精炼时，他们可以结合"
+    },
+    {
+      "s": 499.29,
+      "e": 502.85,
+      "t": "of these providers while incorporating their own, potentially creating a better",
+      "r": "这些供应商的优势，同时融入自身优势，从而有可能创造出更好的"
+    },
+    {
+      "s": 502.85,
+      "e": 506.79,
+      "t": "model. Take a student as an example: one who studies math with a math teacher and",
+      "r": "模式。以学生为例：一个学生跟数学老师学习数学，"
+    },
+    {
+      "s": 506.79,
+      "e": 510.18,
+      "t": "language with a language teacher. In the end, they might be better at writing",
+      "r": "跟语言老师学习语言。最终，他们的写作能力可能"
+    },
+    {
+      "s": 510.18,
+      "e": 513.37,
+      "t": "than the language teacher and better at solving problems than the math teacher.",
+      "r": "比语言老师强，解决问题的能力可能比数学老师强。"
+    },
+    {
+      "s": 513.37,
+      "e": 517.13,
+      "t": "Moreover, Chinese companies are still training on their own. Although the US",
+      "r": "此外，中国企业仍在进行自主培训。尽管美国"
+    },
+    {
+      "s": 517.13,
+      "e": 519.89,
+      "t": "government restricts advanced chip exports to China, recent events",
+      "r": "政府限制了先进芯片对中国的出口，但最近"
+    },
+    {
+      "s": 519.89,
+      "e": 522.91,
+      "t": "involving Jensen Huang prove that Chinese companies still acquire NVIDIA",
+      "r": "黄仁勋事件证明，中国公司仍然"
+    },
+    {
+      "s": 522.91,
+      "e": 526.04,
+      "t": "GPUs through various unofficial channels and lease vast amounts of overseas",
+      "r": "通过各种非官方渠道获得英伟达GPU，并租赁大量的海外"
+    },
+    {
+      "s": 526.04,
+      "e": 529.75,
+      "t": "computing power. In this scenario, they could independently develop certain",
+      "r": "计算能力。在这种情况下，他们可以独立发展某些"
+    },
+    {
+      "s": 529.75,
+      "e": 533.48,
+      "t": "capabilities. If this training happens to cover blind spots for Claude or GPT,",
+      "r": "能力。如果这次培训恰好弥补了 Claude 或 GPT 的盲点，"
+    },
+    {
+      "s": 533.48,
+      "e": 536.79,
+      "t": "they might temporarily pull ahead in those specific areas. This is why",
+      "r": "他们可能会在这些特定领域暂时领先。这就是为什么"
+    },
+    {
+      "s": 536.79,
+      "e": 540.27,
+      "t": "domestic large model manufacturers will do whatever it takes to get a Claude",
+      "r": "国内大型模型制造商会不惜一切代价去获得 Claude"
+    },
+    {
+      "s": 540.27,
+      "e": 543.56,
+      "t": "account, even if they keep getting banned. Because as long as you keep",
+      "r": "账号，即使他们不断被封禁。因为只要你不断"
+    },
+    {
+      "s": 543.56,
+      "e": 547.31,
+      "t": "distilling, you ensure the gap doesn't grow too wide—though the possibility of",
+      "r": "提炼，就能确保差距不会拉得太大——尽管"
+    },
+    {
+      "s": 547.31,
+      "e": 550.87,
+      "t": "overtaking mentioned above is mostly theoretical and very hard to achieve in",
+      "r": "上面提到的超越的可能性大多是理论上的，在现实中很难实现"
+    },
+    {
+      "s": 550.87,
+      "e": 554.6,
+      "t": "reality. That is because US AI possesses an overwhelming advantage in computing",
+      "r": "。这是因为美国人工智能在计算能力方面拥有压倒性优势"
+    },
+    {
+      "s": 554.6,
+      "e": 557.7,
+      "t": "power. Even if you are the first to distill, you are only distilling the",
+      "r": "。即使你是第一个进行蒸馏的人，你也只能蒸馏"
+    },
+    {
+      "s": 557.7,
+      "e": 560.65,
+      "t": "previous-generation models they have released, not their latest ones.",
+      "r": "他们上一代发布的型号，而不是他们最新的型号。"
+    },
+    {
+      "s": 560.65,
+      "e": 565.05,
+      "t": "Speaking of this, some might wonder. Why must we feel the need to surpass them at",
+      "r": "说到这里，有些人可能会感到疑惑。我们为什么一定要超越他们呢"
+    },
+    {
+      "s": 565.05,
+      "e": 569.63,
+      "t": "all? “Made in China” has always won on low prices. If your Claude is 100 points",
+      "r": "？“中国制造”的产品一直以低价取胜。如果你的 Claude 型号评分为 100 分"
+    },
+    {
+      "s": 569.63,
+      "e": 573.43,
+      "t": "but expensive, and my model is 90 points but costs one-tenth as much, can't I",
+      "r": "但价格昂贵，而我的型号评分为 90 分但价格只有它的十分之一，我难道不能"
+    },
+    {
+      "s": 573.43,
+      "e": 578.24,
+      "t": "steal some business or even push you out of the market? After all, low prices are",
+      "r": "抢走你的生意，甚至把你挤出市场吗？毕竟，低价才是"
+    },
+    {
+      "s": 578.24,
+      "e": 582.57,
+      "t": "king. Isn't that exactly how BYD has been conquering the global market all",
+      "r": "王道。比亚迪这些年来征服全球市场不正是靠这个吗"
+    },
+    {
+      "s": 582.57,
+      "e": 586.89,
+      "t": "these years? There is certainly some merit to that argument. After all, large",
+      "r": "？这种说法确实有一定的道理。毕竟，"
+    },
+    {
+      "s": 586.89,
+      "e": 590.12,
+      "t": "models are already very powerful now, and for many customers, 90 points is",
+      "r": "现在大型号的功能已经非常强大了，对于很多客户来说，90 分"
+    },
+    {
+      "s": 590.12,
+      "e": 593.04,
+      "t": "enough to complete most tasks; they don't necessarily need the most",
+      "r": "足以完成大多数任务；他们未必需要最贵的"
+    },
+    {
+      "s": 593.04,
+      "e": 596.31,
+      "t": "expensive one. But the question of how many customers you have versus how much",
+      "r": "。但是，你拥有多少客户和"
+    },
+    {
+      "s": 596.31,
+      "e": 599.65,
+      "t": "money you can actually make are two different things. Let's just take an",
+      "r": "你实际能赚多少钱是两回事。我们举个"
+    },
+    {
+      "s": 599.65,
+      "e": 603.28,
+      "t": "example. Suppose you are the boss of a game company and want to use AI to help",
+      "r": "例子。假设你是一家游戏公司的老板，你想利用人工智能来帮助"
+    },
+    {
+      "s": 603.28,
+      "e": 606.99,
+      "t": "develop a game and write code. Now there are two models, one cheap and one",
+      "r": "开发游戏和编写代码。现在有两种型号，一种便宜，一种"
+    },
+    {
+      "s": 606.99,
+      "e": 610.39,
+      "t": "expensive. Which one would you choose? If the quality of the work produced by",
+      "r": "贵。你会选择哪一个？如果两款机型生产出的产品质量"
+    },
+    {
+      "s": 610.39,
+      "e": 613.01,
+      "t": "both models is about the same, then of course you would choose the cheap one.",
+      "r": "大致相同，那么你当然会选择价格便宜的那款。"
+    },
+    {
+      "s": 613.01,
+      "e": 617.67,
+      "t": "But what if there is a big difference? A netizen once used the same prompt to ask",
+      "r": "但如果存在很大差异呢？一位网友曾使用同样的提示，要求"
+    },
+    {
+      "s": 617.67,
+      "e": 621.67,
+      "t": "several AI models to each create a shooter game within two hours. Here,",
+      "r": "多个 AI 模型在两小时内各自创建一个射击游戏。接下来，我们暂"
+    },
+    {
+      "s": 621.67,
+      "e": 625.45,
+      "t": "let's look at the finished products one by one without mentioning their names.",
+      "r": "且不提它们的名称，逐一来看这些成品。"
+    },
+    {
+      "s": 625.45,
+      "e": 628.71,
+      "t": "Model A made an underground reactor; the lighting and shadows are very realistic",
+      "r": "A型机制造了地下反应堆；光照和阴影非常逼真"
+    },
+    {
+      "s": 628.71,
+      "e": 632.07,
+      "t": ", the visuals have great texture, and the drone attacks are very smooth. Next",
+      "r": "，画面质感极佳，无人机攻击也非常流畅。接下来"
+    },
+    {
+      "s": 632.07,
+      "e": 636.21,
+      "t": "is B, which created a port scene. The cargo containers, the building shadows,",
+      "r": "是 B，它创建了一个港口场景。货物集装箱、建筑物阴影"
+    },
+    {
+      "s": 636.21,
+      "e": 639.47,
+      "t": "and the reflections on the ground are all executed with great attention to",
+      "r": "和地面上的倒影都处理得非常"
+    },
+    {
+      "s": 639.47,
+      "e": 644.26,
+      "t": "detail. Now let's look at C, it's like this. It is technically playable. But",
+      "r": "细致。现在我们来看C，它是这样写的。从技术上讲，它是可以玩的。但从"
+    },
+    {
+      "s": 644.26,
+      "e": 647.52,
+      "t": "everything from the modeling to the scene details is very rough. It's",
+      "r": "建模到场景细节，一切都非常粗糙。"
+    },
+    {
+      "s": 647.52,
+      "e": 651.02,
+      "t": "basically hard to have any desire to play it. As for D and E, they didn't",
+      "r": "基本上很难产生想玩这款游戏的欲望。至于D和E，它们"
+    },
+    {
+      "s": 651.02,
+      "e": 654.47,
+      "t": "even meet the most basic requirement of being playable. One just has visuals,",
+      "r": "甚至连最基本的可玩性要求都没达到。一个只有画面，"
+    },
+    {
+      "s": 654.47,
+      "e": 658.53,
+      "t": "but you can't interact with it. One only has a menu and an end screen, you can't",
+      "r": "但你不能与之互动。一个版本只有菜单和结束画面，"
+    },
+    {
+      "s": 658.53,
+      "e": 662.19,
+      "t": "even see the game scene. Just looking at these few segments, which one would you",
+      "r": "甚至连游戏画面都看不到。仅从这几个片段来看，你会"
+    },
+    {
+      "s": 662.19,
+      "e": 666.03,
+      "t": "want to play? If you had to pay, which one would you be willing to pay for?",
+      "r": "选择玩哪一个？如果必须付费，你愿意为哪一个付费？"
+    },
+    {
+      "s": 666.03,
+      "e": 671.77,
+      "t": "Alright, now I will reveal the answers. A is GPT-4, B is Claude 3.5 Sonnet, C",
+      "r": "好了，现在我将揭晓答案。 A 是 GPT-4，B 是 Claude 3.5 Sonnet，C"
+    },
+    {
+      "s": 671.77,
+      "e": 676.53,
+      "t": "and D are Doubao, and E is Alibaba's Qwen. Having finished looking at the",
+      "r": "和 D 是豆宝，E 是阿里巴巴的 Qwen。"
+    },
+    {
+      "s": 676.53,
+      "e": 679.84,
+      "t": "first set of comparisons, let's look at another set. This task was to let the AI",
+      "r": "第一组对比分析完毕，让我们来看另一组。这项任务是让人工智能"
+    },
+    {
+      "s": 679.84,
+      "e": 683.22,
+      "t": "generate the interior of a cathedral in a game. First, look at A; the vaulted",
+      "r": "在游戏中生成大教堂的内部结构。首先，看A；拱形"
+    },
+    {
+      "s": 683.22,
+      "e": 686.4,
+      "t": "ceiling extends forward layer by layer, the colored light from the stained glass",
+      "r": "天花板一层层向前延伸，彩色玻璃的彩色光线"
+    },
+    {
+      "s": 686.4,
+      "e": 689.53,
+      "t": "falls on the floor, and the floor tiles even reflect the windows and pillars.",
+      "r": "洒在地板上，地板砖甚至映照出窗户和柱子。"
+    },
+    {
+      "s": 689.53,
+      "e": 693.35,
+      "t": "Then there is B; although it also made windows and pillars, the overall colors",
+      "r": "然后是B；虽然它也制作了窗户和柱子，但整体颜色"
+    },
+    {
+      "s": 693.35,
+      "e": 697.07,
+      "t": "are very disjointed, and it lags far behind in details, not even in the same",
+      "r": "非常不协调，细节方面也远远落后，甚至连同一个"
+    },
+    {
+      "s": 697.07,
+      "e": 703.5,
+      "t": "dimension. A is still Claude. B is the previously popular Kimi K3. In terms of",
+      "r": "维度都达不到。 A 还是克劳德。 B 是之前很受欢迎的 Kimi K3。就"
+    },
+    {
+      "s": 703.5,
+      "e": 708.7,
+      "t": "test costs, Claude cost $ 17.65, Kimi was much cheaper at only $ 0.92, but the",
+      "r": "测试成本而言，Claude 的成本为 17.65 美元，Kimi 的成本要便宜得多，仅为 0.92 美元，但"
+    },
+    {
+      "s": 708.7,
+      "e": 713.44,
+      "t": "question is, if you were a game developer, would you pick Kimi or spend",
+      "r": "问题是，如果你是一名游戏开发者，你会选择 Kimi 还是把"
+    },
+    {
+      "s": 713.44,
+      "e": 716.92,
+      "t": "the money on Claude? Looking at these two sets of comparisons, you can",
+      "r": "钱花在 Claude 上？通过这两组对比，你"
+    },
+    {
+      "s": 716.92,
+      "e": 720.21,
+      "t": "probably understand why it is difficult for domestic large models to snatch the",
+      "r": "大概就能明白为什么国产大型车型"
+    },
+    {
+      "s": 720.21,
+      "e": 723.29,
+      "t": "market from Claude and GPT relying solely on low prices. Because for a",
+      "r": "仅靠低价很难从 Claude 和 GPT 手中抢占市场了。因为在"
+    },
+    {
+      "s": 723.29,
+      "e": 726.63,
+      "t": "scenario like game development, customers will only pay for the best",
+      "r": "游戏开发这类场景中，顾客只会为最佳"
+    },
+    {
+      "s": 726.63,
+      "e": 731.56,
+      "t": "experience. Being cheap but only barely usable is meaningless in itself. Forget",
+      "r": "体验付费。价格低廉但几乎无法使用本身毫无意义。别想着"
+    },
+    {
+      "s": 731.56,
+      "e": 734.72,
+      "t": "about paying; even if it's a piece of junk game that's free, most players",
+      "r": "付钱了；即使是一款免费的垃圾游戏，大多数玩家也"
+    },
+    {
+      "s": 734.72,
+      "e": 738.5,
+      "t": "wouldn't bother wasting their time on it. In such a situation, what is the use",
+      "r": "不会浪费时间在上面。在这种情况下，"
+    },
+    {
+      "s": 738.5,
+      "e": 742.24,
+      "t": "of just being cheap? Not to mention that for many tasks, a good model might",
+      "r": "一味追求低价又有什么用呢？更何况，对于许多任务来说，一个好的模型可能"
+    },
+    {
+      "s": 742.24,
+      "e": 745.89,
+      "t": "succeed on the first try, while a cheap, poor-performing model keeps needing",
+      "r": "第一次就能成功，而一个廉价、性能差的模型则需要不断"
+    },
+    {
+      "s": 745.89,
+      "e": 750.09,
+      "t": "revisions, wasting time. Gaming is just one application scenario. But the",
+      "r": "修改，浪费时间。游戏只是其中一个应用场景。但"
+    },
+    {
+      "s": 750.09,
+      "e": 754.56,
+      "t": "underlying pattern it reflects is very real. The customers most willing to pay",
+      "r": "它所反映的潜在模式却是非常真实的。最愿意为人工智能付费的客户"
+    },
+    {
+      "s": 754.56,
+      "e": 758.78,
+      "t": "for AI usually don't just want a model that can finish a task; they want an AI",
+      "r": "通常不仅仅想要一个能够完成任务的模型；他们想要的是一款"
+    },
+    {
+      "s": 758.78,
+      "e": 762.59,
+      "t": "that can perform critical work to perfection. For example, if an AI is",
+      "r": "能够完美完成关键工作的AI 。例如，如果人工智能正在"
+    },
+    {
+      "s": 762.59,
+      "e": 766.75,
+      "t": "debugging software, a poor model might struggle for ages, going in circles and",
+      "r": "调试软件，一个性能较差的模型可能会长时间挣扎，兜圈子，"
+    },
+    {
+      "s": 766.75,
+      "e": 770.57,
+      "t": "constantly outputting errors. But a good model might find the issue quickly,",
+      "r": "不断输出错误。但是，一个好的模型可以快速发现问题，为"
+    },
+    {
+      "s": 770.57,
+      "e": 774.07,
+      "t": "saving the company half a month of development time. In that case, how",
+      "r": "公司节省半个月的开发时间。在这种情况下，"
+    },
+    {
+      "s": 774.07,
+      "e": 778.78,
+      "t": "would you calculate the extra cost? Some might say, “That's not right. I use",
+      "r": "您将如何计算额外成本？有些人可能会说：“这不对。我"
+    },
+    {
+      "s": 778.78,
+      "e": 783.45,
+      "t": "domestic models for my daily work, like making PPTs or organizing copy, and it's",
+      "r": "日常工作中用的是家用模型，比如制作PPT或整理文案，这就"
+    },
+    {
+      "s": 783.45,
+      "e": 787.87,
+      "t": "plenty; I don't need Claude at all.“ And most of the people around me are the",
+      "r": "足够了；我根本不需要Claude。”我周围的大多数人也"
+    },
+    {
+      "s": 787.87,
+      "e": 791.53,
+      "t": "same. Doesn't this prove that the low-price strategy of domestic models is",
+      "r": "一样。这难道不证明国产车型的低价策略是"
+    },
+    {
+      "s": 791.53,
+      "e": 795.2,
+      "t": "effective? You're right, many application scenarios really don't need",
+      "r": "有效的吗？你说得对，很多应用场景确实不需要"
+    },
+    {
+      "s": 795.2,
+      "e": 799.24,
+      "t": "Claude. But users in these scenarios also have a lower willingness to pay.",
+      "r": "Claude。但这些情况下的用户支付意愿也较低。"
+    },
+    {
+      "s": 799.24,
+      "e": 803.51,
+      "t": "The reason is simple: if any company can do the job and do it well, then this",
+      "r": "原因很简单：如果任何一家公司都能做好这项工作，那么这种"
+    },
+    {
+      "s": 803.51,
+      "e": 807.72,
+      "t": "type of market will inevitably devolve into price wars to snatch customers.",
+      "r": "类型的市场必然会演变成争夺客户的价格战。"
+    },
+    {
+      "s": 807.72,
+      "e": 811.4,
+      "t": "Because everyone's level is roughly the same; there's nothing irreplaceable, so",
+      "r": "因为大家的水平都差不多；没有什么东西是不可替代的，所以"
+    },
+    {
+      "s": 811.4,
+      "e": 815,
+      "t": "no one can command pricing power. This logic is the same as why, despite",
+      "r": "没有人可以垄断定价权。这个逻辑与以下原因相同：尽管"
+    },
+    {
+      "s": 815,
+      "e": 818.62,
+      "t": "crushing iOS in quantity and market share, the combined profits of the",
+      "r": "在数量和市场份额上碾压iOS，综合利润"
+    },
+    {
+      "s": 818.62,
+      "e": 822.56,
+      "t": "entire Android camp can't match Apple alone. Many phone manufacturers are",
+      "r": "安卓阵营在销量和市场份额上碾压 iOS，但整个安卓阵营的利润总和仍然无法与苹果公司相提并论。许多手机制造商"
+    },
+    {
+      "s": 822.56,
+      "e": 826.75,
+      "t": "still losing money, and this point is indeed supported by statistics. This",
+      "r": "仍在亏损，这一点也确实有统计数据佐证。今年"
+    },
+    {
+      "s": 826.75,
+      "e": 831.61,
+      "t": "November, veteran Silicon Valley VC firm Andreessen Horowitz released a research",
+      "r": "11 月，硅谷老牌风投公司 Andreessen Horowitz 发布了一份研究"
+    },
+    {
+      "s": 831.61,
+      "e": 836.35,
+      "t": "report, surveying nearly 400 enterprise AI procurement leads and estimating US",
+      "r": "报告，调查了近 400 位企业 AI 采购负责人，并估算了美国"
+    },
+    {
+      "s": 836.35,
+      "e": 841.35,
+      "t": "corporate model spending. The results showed that the top-tier models handle",
+      "r": "企业在 AI 模型方面的支出。结果显示，顶级型号的"
+    },
+    {
+      "s": 841.35,
+      "e": 846.35,
+      "t": "about 42%of usage but capture about 63% of customer spending. On the other hand",
+      "r": "使用率约为 42%，但客户支出却占比约为 63% 。另一方面"
+    },
+    {
+      "s": 846.35,
+      "e": 850.45,
+      "t": ", models classified as open-source handle about 19%of the volume, but their",
+      "r": "，被归类为开源的模型处理了约 19% 的交易量，但它们的"
+    },
+    {
+      "s": 850.45,
+      "e": 854.38,
+      "t": "revenue share is minimal, basically confirming our previous conclusion.",
+      "r": "收入份额却微乎其微，这基本上证实了我们之前的结论。"
+    },
+    {
+      "s": 854.38,
+      "e": 857.74,
+      "t": "Besides that, for a cheap model to overtake the competition through price",
+      "r": "除此之外，廉价机型要想通过价格战超越竞争对手"
+    },
+    {
+      "s": 857.74,
+      "e": 861.51,
+      "t": "wars, there’s a major prerequisite: your costs must be low enough. But this",
+      "r": "，还有一个重要的前提条件：成本必须足够低。但这个"
+    },
+    {
+      "s": 861.51,
+      "e": 865.95,
+      "t": "premise is very likely not true. On the surface, the price per million tokens",
+      "r": "前提很可能并不成立。从表面上看，中国模型的每百万代币价格"
+    },
+    {
+      "s": 865.95,
+      "e": 869.95,
+      "t": "for Chinese models is much lower than Claude or GPT. But selling cheaply and",
+      "r": "远低于 Claude 或 GPT。但低价销售和"
+    },
+    {
+      "s": 869.95,
+      "e": 874.08,
+      "t": "having low costs are two different things. Let me give you an example. Take",
+      "r": "低成本是两回事。我举个例子。假设有"
+    },
+    {
+      "s": 874.08,
+      "e": 877.51,
+      "t": "two bun shops: the first has a production cost of 5 yuan per steamer",
+      "r": "两家包子店：第一家每只包子的成本是 5 元，"
+    },
+    {
+      "s": 877.51,
+      "e": 881.49,
+      "t": "and sells them for 10, making a 5-yuan profit, while the second has a cost of 7",
+      "r": "售价是 10 元，利润是 5 元；第二家每只包子的成本是 7"
+    },
+    {
+      "s": 881.49,
+      "e": 885.1,
+      "t": "yuan but only sells them for 6. When customers see that the second shop is",
+      "r": "元，售价却是 6 元。顾客看到第二家店的价格"
+    },
+    {
+      "s": 885.1,
+      "e": 888.8,
+      "t": "much cheaper, they line up in droves; it looks like great business on the surface",
+      "r": "便宜很多，就蜂拥而至；表面上看这似乎是一笔很棒的生意"
+    },
+    {
+      "s": 888.8,
+      "e": 892.32,
+      "t": ", but the more they sell, the more they lose. Some might disagree, arguing that",
+      "r": "，但实际上卖得越多，亏得越多。有些人可能会不同意这种说法，认为"
+    },
+    {
+      "s": 892.32,
+      "e": 895.42,
+      "t": "the cost of manufacturing in China is vastly lower than in the US across the",
+      "r": "中国的制造成本"
+    },
+    {
+      "s": 895.42,
+      "e": 899.23,
+      "t": "board. Why do you assume Chinese large models are just selling at a loss?",
+      "r": "总体上远低于美国。你为什么会认为中国的大型车型都是亏本销售的？会"
+    },
+    {
+      "s": 899.23,
+      "e": 903.21,
+      "t": "Couldn't it be that we simply have better cost control? Let’s break this",
+      "r": "不会是我们成本控制做得更好了？让我们来分析一下，"
+    },
+    {
+      "s": 903.21,
+      "e": 907.21,
+      "t": "down and look at the numbers. We know that for any large model company, the",
+      "r": "看看具体数字。我们知道，对于任何大型模型公司而言，"
+    },
+    {
+      "s": 907.21,
+      "e": 911.15,
+      "t": "bulk of the expenses—computing power costs—mainly falls into two parts:",
+      "r": "大部分费用（计算能力成本）主要分为两部分："
+    },
+    {
+      "s": 911.15,
+      "e": 914.54,
+      "t": "training costs and inference costs. So-called training costs are the",
+      "r": "训练成本和推理成本。所谓的训练成本是指"
+    },
+    {
+      "s": 914.54,
+      "e": 917.67,
+      "t": "expenses for building the model: buying chips, preparing data, hiring",
+      "r": "构建模型的费用：购买芯片、准备数据、聘请"
+    },
+    {
+      "s": 917.67,
+      "e": 921.28,
+      "t": "researchers, and running large-scale experiments. In this regard, Chinese",
+      "r": "研究人员和进行大规模实验。在这方面，中国"
+    },
+    {
+      "s": 921.28,
+      "e": 925.17,
+      "t": "companies are indeed much cheaper. As mentioned earlier, they can use",
+      "r": "公司的价格确实便宜得多。如前所述，他们可以使用"
+    },
+    {
+      "s": 925.17,
+      "e": 929.25,
+      "t": "open-source distillation to create decent models at a minimal cost. But",
+      "r": "开源蒸馏技术以最低的成本创建不错的模型。但"
+    },
+    {
+      "s": 929.25,
+      "e": 934.08,
+      "t": "beyond that, there are daily inference costs. This is the cost incurred every",
+      "r": "除此之外，还有日常推理成本。这是"
+    },
+    {
+      "s": 934.08,
+      "e": 938.36,
+      "t": "time a user calls the model, asks AI a question, or writes code; you cannot",
+      "r": "用户每次调用模型、向 AI 提问或编写代码时产生的成本；"
+    },
+    {
+      "s": 938.36,
+      "e": 942.37,
+      "t": "save on this. As long as users are using it, you must continuously consume energy",
+      "r": "这方面你省不了钱。只要用户在使用，你就必须持续消耗能源"
+    },
+    {
+      "s": 942.37,
+      "e": 945.88,
+      "t": "and occupy your GPUs and servers. No matter how good a model you've distilled",
+      "r": "并占用你的GPU和服务器。无论你开发出多么优秀的模型"
+    },
+    {
+      "s": 945.88,
+      "e": 949.42,
+      "t": ", you can't just have your servers stop working for you, right? The logic is",
+      "r": "，你的服务器也不能停止为你工作，对吧？这就像"
+    },
+    {
+      "s": 949.42,
+      "e": 953.3,
+      "t": "just like opening a dumpling shop. You could go to someone else's shop, copy",
+      "r": "开一家饺子店一样。你可以去别人的店里，抄袭"
+    },
+    {
+      "s": 953.3,
+      "e": 956.82,
+      "t": "their menu, and steal their recipe, which would indeed save on R&D costs.",
+      "r": "他们的菜单，窃取他们的配方，这确实可以节省研发成本。"
+    },
+    {
+      "s": 956.82,
+      "e": 960.57,
+      "t": "You might come back and make something that tastes decent, but once you open",
+      "r": "你或许能做出味道不错的食物，但一旦开门"
+    },
+    {
+      "s": 960.57,
+      "e": 964.51,
+      "t": "for business, you still have to buy meat and flour every day; rent, ingredients,",
+      "r": "营业，你每天还是得买肉和面粉；租金、原料"
+    },
+    {
+      "s": 964.51,
+      "e": 967.81,
+      "t": "and labor costs are unavoidable. It's impossible to claim that just because",
+      "r": "和人工成本是不可避免的。仅仅因为"
+    },
+    {
+      "s": 967.81,
+      "e": 970.97,
+      "t": "you copied the recipe, you don't have to spend money making the dumplings. The",
+      "r": "你复制了食谱，就声称你不需要花钱做饺子，这是不可能实现的。"
+    },
+    {
+      "s": 970.97,
+      "e": 975.01,
+      "t": "same goes for large models. Training costs are only a small part; the main",
+      "r": "大型模型也一样。培训费用只是其中一小部分；主要的"
+    },
+    {
+      "s": 975.01,
+      "e": 979.04,
+      "t": "comparison must be the daily inference costs. So, do Chinese manufacturers have",
+      "r": "比较对象必须是每日推断成本。那么，中国制造商"
+    },
+    {
+      "s": 979.04,
+      "e": 983.88,
+      "t": "an advantage in inference costs? Clearly, they do not. Based on last month's",
+      "r": "在推断成本方面是否具有优势？显然，他们并没有。根据上个月的"
+    },
+    {
+      "s": 983.88,
+      "e": 987.89,
+      "t": "market rates, a server equipped with eight NVIDIA B200 chips costs about $",
+      "r": "市场价格，一台配备 8 个 NVIDIA B200 芯片的服务器"
+    },
+    {
+      "s": 987.89,
+      "e": 991.73,
+      "t": "550,000 in the US, but once it reaches Hong Kong or Shenzhen, the price",
+      "r": "在美国的售价约为 55 万美元，但一旦运到香港或深圳，价格就会"
+    },
+    {
+      "s": 991.73,
+      "e": 995.95,
+      "t": "skyrockets to 20 or even 30 million RMB —an increase of five to seven times.",
+      "r": "飙升至 2000 万甚至 3000 万元人民币——涨幅达五到七倍。"
+    },
+    {
+      "s": 995.95,
+      "e": 1000.74,
+      "t": "Amortized over three years, the card cost in the US is about $ 502 per day.",
+      "r": "在美国，这张卡三年摊销下来每天的成本约为 502 美元。"
+    },
+    {
+      "s": 1000.74,
+      "e": 1006.19,
+      "t": "In China, calculating based on 25 million RMB, it’s $ 3,250 per day, which",
+      "r": "在中国，以 2500 万人民币计算，每天的收入为 3250 美元，"
+    },
+    {
+      "s": 1006.19,
+      "e": 1010.7,
+      "t": "is 6.5 times higher. Some might say, “ But electricity is cheap in China,",
+      "r": "是原来的 6.5 倍。有人可能会说：“但是中国的电价很便宜，"
+    },
+    {
+      "s": 1010.7,
+      "e": 1015.51,
+      "t": "doesn't that offset it?“ Not even close. Because in the cost structure of an AI",
+      "r": "这难道不能抵消它的影响吗？”差远了。因为在人工智能数据中心的成本结构中"
+    },
+    {
+      "s": 1015.51,
+      "e": 1018.65,
+      "t": "data center, the share of electricity expenses is actually very low. For",
+      "r": "，电力费用所占比例实际上非常低。"
+    },
+    {
+      "s": 1018.65,
+      "e": 1022.18,
+      "t": "instance, Huatai Securities estimated in 2026 that in the overseas high-end chip",
+      "r": "例如，华泰证券在 2026 年估计，在他们分析的海外高端芯片"
+    },
+    {
+      "s": 1022.18,
+      "e": 1025.32,
+      "t": "inference schemes they analyzed, electricity costs accounted for about 6",
+      "r": "推理方案中，电力成本约占"
+    },
+    {
+      "s": 1025.32,
+      "e": 1029.12,
+      "t": "%to 8%of the token cost. The bulk of the cost remains the chips and servers.",
+      "r": "代币成本的 6% 至 8%。大部分成本仍然在于芯片和服务器。"
+    },
+    {
+      "s": 1029.12,
+      "e": 1033.5,
+      "t": "Let's take the B300 server as an example again. Nvidia announced that the DGX",
+      "r": "我们再以B300服务器为例。英伟达宣布，DGX"
+    },
+    {
+      "s": 1033.5,
+      "e": 1037.77,
+      "t": "B300 server consumes about 14.5 kilowatts. For simplicity, assuming it",
+      "r": "B300 服务器的功耗约为 14.5 千瓦。为简化起见，假设服务器"
+    },
+    {
+      "s": 1037.77,
+      "e": 1042.43,
+      "t": "runs at this power level 24 hours a day and electricity is 15 cents per kWh, the",
+      "r": "每天24小时以该功率运行，电价为每千瓦时15美分，则"
+    },
+    {
+      "s": 1042.43,
+      "e": 1046.87,
+      "t": "daily cost per server in the US would be $ 52. In China, if electricity is",
+      "r": "美国每台服务器的每日成本为 52美元。在中国，如果电价"
+    },
+    {
+      "s": 1046.87,
+      "e": 1051.1,
+      "t": "calculated at 0.5 RMB per kWh, it costs $ 25 a day, saving $ 27. But we",
+      "r": "为每千瓦时0.5元人民币，则每天成本为25美元，节省27美元。但我们"
+    },
+    {
+      "s": 1051.1,
+      "e": 1053.71,
+      "t": "calculated earlier, what is the difference in the average daily",
+      "r": "之前计算过，平均每日"
+    },
+    {
+      "s": 1053.71,
+      "e": 1059.03,
+      "t": "equipment cost amortized over three years? $ 3,250 minus $ 502 equals $",
+      "r": "设备成本分摊到三年后会有多大差异？ 3250美元减去502美元等于"
+    },
+    {
+      "s": 1059.03,
+      "e": 1063.6,
+      "t": "2,748. Even after subtracting the $ 27 saved on electricity, China is still $",
+      "r": "2748美元。即使扣除节省的 27 美元电费，中国的电费"
+    },
+    {
+      "s": 1063.6,
+      "e": 1067.76,
+      "t": "2,721 more expensive per day, and most US data centers don't pay as much as 15",
+      "r": "每天仍然比美国高出 2721 美元，而大多数美国数据中心的电费甚至不到 15"
+    },
+    {
+      "s": 1067.76,
+      "e": 1071.29,
+      "t": "cents for electricity. For example, from 2026 to the present, the average",
+      "r": "美分。例如，从 2026 年至今，"
+    },
+    {
+      "s": 1071.29,
+      "e": 1074.9,
+      "t": "industrial electricity price in the US is only about 9 cents. Many data center",
+      "r": "美国工业用电平均价格仅为 9 美分左右。许多数据中心"
+    },
+    {
+      "s": 1074.9,
+      "e": 1078.57,
+      "t": "solutions can even achieve rates as low as five or six cents per kWh. Beyond",
+      "r": "解决方案甚至可以实现低至每千瓦时五美分或六美分的费率。除此之外"
+    },
+    {
+      "s": 1078.57,
+      "e": 1082.06,
+      "t": "that, in terms of building data centers, China's labor and construction",
+      "r": "，就数据中心建设而言，中国的劳动力和建设"
+    },
+    {
+      "s": 1082.06,
+      "e": 1086.08,
+      "t": "timelines may indeed have an advantage over the US. But even including these,",
+      "r": "进度可能确实比美国更有优势。但即使算上这些因素，"
+    },
+    {
+      "s": 1086.08,
+      "e": 1090.29,
+      "t": "China's large models still do not have a cost advantage. In May 2026, the",
+      "r": "中国的大型车型仍然没有成本优势。 2026 年 5 月，"
+    },
+    {
+      "s": 1090.29,
+      "e": 1094.81,
+      "t": "research firm Epoch AI conducted a cost analysis of large AI data centers. By",
+      "r": "研究公司 Epoch AI 对大型 AI 数据中心进行了成本分析。通过"
+    },
+    {
+      "s": 1094.81,
+      "e": 1098.34,
+      "t": "spreading equipment construction and daily operating expenses over each year",
+      "r": "将设备建设和日常运营费用分摊到每年"
+    },
+    {
+      "s": 1098.34,
+      "e": 1103.58,
+      "t": ". Server costs account for about 59%. Network equipment accounts for 14%. Data",
+      "r": "。服务器成本约占 59%。网络设备占14%。数据"
+    },
+    {
+      "s": 1103.58,
+      "e": 1106.91,
+      "t": "center facilities and infrastructure account for 16%, and electricity for 7%",
+      "r": "中心设施和基础设施占 16%，电力占 7%"
+    },
+    {
+      "s": 1106.91,
+      "e": 1111.29,
+      "t": ". The remaining small portion covers labor, maintenance, and taxes. This",
+      "r": "。剩余的一小部分用于支付人工、维护和税金。这"
+    },
+    {
+      "s": 1111.29,
+      "e": 1116.5,
+      "t": "means for every $ 100 the US spends on a data center, $ 59 goes to buying chips",
+      "r": "意味着美国每花费 100 美元建设数据中心，其中 59 美元用于购买芯片"
+    },
+    {
+      "s": 1116.5,
+      "e": 1121.09,
+      "t": "and servers, with all other expenses totaling only $ 41. As we calculated",
+      "r": "和服务器，而所有其他费用加起来只有 41 美元。正如我们"
+    },
+    {
+      "s": 1121.09,
+      "e": 1124.77,
+      "t": "earlier, for a server with the same computing power, the purchase price in",
+      "r": "之前计算的那样，对于一台计算能力相同的服务器，在中国的购买价格"
+    },
+    {
+      "s": 1124.77,
+      "e": 1128.64,
+      "t": "China is 6.5 times that of the US, so that $ 59 in equipment costs immediately",
+      "r": "是美国的 6.5 倍，因此， 59 美元的设备成本"
+    },
+    {
+      "s": 1128.64,
+      "e": 1132.74,
+      "t": "skyrockets to $ 383 in China. Even if your land, facility electricity, network",
+      "r": "在中国会立即飙升至 383 美元。即使你的土地、设施电力、网络"
+    },
+    {
+      "s": 1132.74,
+      "e": 1137.09,
+      "t": ", and operations were all zero-cost, and all employees worked for free, it would",
+      "r": "和运营成本都是零，所有员工都免费工作，"
+    },
+    {
+      "s": 1137.09,
+      "e": 1141.62,
+      "t": "still be 3.8 times the cost of the US. So how could your AI cost be cheaper",
+      "r": "成本仍然是美国的 3.8 倍。那么，你们的人工智能成本怎么可能"
+    },
+    {
+      "s": 1141.62,
+      "e": 1145.98,
+      "t": "than the US? Some might say, smuggled Nvidia cards are expensive, but don't we",
+      "r": "比美国低呢？有人可能会说，走私的英伟达显卡很贵，但是"
+    },
+    {
+      "s": 1145.98,
+      "e": 1149.9,
+      "t": "have Huawei in China? Domestic cards should be able to lower the cost, right",
+      "r": "中国不是也有华为吗？国内银行卡应该能降低成本，对吧"
+    },
+    {
+      "s": 1149.9,
+      "e": 1153.81,
+      "t": "? Sorry, but actually, the high-priced smuggled Nvidia cards still outperform",
+      "r": "？抱歉，但实际上，价格昂贵的走私英伟达显卡"
+    },
+    {
+      "s": 1153.81,
+      "e": 1157.16,
+      "t": "Huawei in terms of production cost. Because calculating cost isn't just",
+      "r": "在生产成本方面仍然优于华为显卡。因为计算成本不仅仅是指"
+    },
+    {
+      "s": 1157.16,
+      "e": 1160.51,
+      "t": "about the price of the card; you also have to consider production efficiency.",
+      "r": "卡片的价格；你还需要考虑生产效率。"
+    },
+    {
+      "s": 1160.51,
+      "e": 1163.69,
+      "t": "This is the same logic as absolute price; an ox cart is definitely cheaper than",
+      "r": "这与绝对价格的逻辑相同；牛车肯定比"
+    },
+    {
+      "s": 1163.69,
+      "e": 1166.6,
+      "t": "a train, but when spread across the freight cost per kilogram, the train",
+      "r": "火车便宜，但如果按每公斤的货运成本分摊，火车就"
+    },
+    {
+      "s": 1166.6,
+      "e": 1170.38,
+      "t": "wins hands down. Soochow Securities conducted a set of calculations on this",
+      "r": "完胜了。苏州证券"
+    },
+    {
+      "s": 1170.38,
+      "e": 1174.81,
+      "t": "in 2026. Under his defined DeepSeek-V 3 inference conditions, generating 1",
+      "r": "在 2026 年对此进行了一系列计算。根据他定义的 DeepSeek-V 3 推理条件，"
+    },
+    {
+      "s": 1174.81,
+      "e": 1179.48,
+      "t": "million tokens using Nvidia H100 costs about $ 2.42, while using Huawei Ascend",
+      "r": "使用 Nvidia H100 生成 100 万个代币的成本约为 2.42 美元，而使用华为 Ascend"
+    },
+    {
+      "s": 1179.48,
+      "e": 1183.73,
+      "t": "910B costs about $ 16.19—roughly seven times higher. In other words, if",
+      "r": "910B 生成 100 万个代币的成本约为 16.19 美元——大约高出七倍。换句话说，如果"
+    },
+    {
+      "s": 1183.73,
+      "e": 1187.44,
+      "t": "domestic manufacturers stop buying Nvidia and switch to Huawei, inference",
+      "r": "国内厂商停止购买英伟达芯片而转而使用华为芯片，推理"
+    },
+    {
+      "s": 1187.44,
+      "e": 1191.19,
+      "t": "costs will only rise. Some might wonder: since buying cards domestically is so",
+      "r": "成本只会上升。有些人可能会想：既然在国内购买显卡如此"
+    },
+    {
+      "s": 1191.19,
+      "e": 1194.66,
+      "t": "expensive, why not just skip shipping the equipment back and rent computing",
+      "r": "昂贵，为什么不干脆省去将设备运回国内的费用，而是租用计算"
+    },
+    {
+      "s": 1194.66,
+      "e": 1198.07,
+      "t": "power or build data centers overseas for domestic use? That’s true; many",
+      "r": "能力或在海外建立数据中心供国内使用呢？这是真的;"
+    },
+    {
+      "s": 1198.07,
+      "e": 1201.33,
+      "t": "companies have done exactly that in the past, including those that have kept",
+      "r": "过去很多公司都这样做过，包括那些让"
+    },
+    {
+      "s": 1201.33,
+      "e": 1205.19,
+      "t": "Jensen Huang up at night. But this path will likely not be feasible in the",
+      "r": "黄仁勋彻夜难眠的公司。但这条路在未来可能行不通"
+    },
+    {
+      "s": 1205.19,
+      "e": 1208.96,
+      "t": "future. On November 19, according to media reports, a Chinese company",
+      "r": "。据媒体报道，11月19日，一家中国公司"
+    },
+    {
+      "s": 1208.96,
+      "e": 1212.89,
+      "t": "reportedly canceled a deal to rent Nvidia B200 computing power through an",
+      "r": "取消了通过印尼数据中心租用英伟达B200计算能力的交易"
+    },
+    {
+      "s": 1212.89,
+      "e": 1216.54,
+      "t": "Indonesian data center. The deal was worth about $ 150 million, and the",
+      "r": "。这笔交易价值约 1.5 亿美元，"
+    },
+    {
+      "s": 1216.54,
+      "e": 1220.46,
+      "t": "reason was that the U.S. government had just announced new regulations on remote",
+      "r": "原因是美国政府刚刚宣布了关于远程"
+    },
+    {
+      "s": 1220.46,
+      "e": 1223.49,
+      "t": "access to computing power. On November 16, local time, the U.S.",
+      "r": "访问计算能力的新规定。当地时间 11 月 16 日，美国"
+    },
+    {
+      "s": 1223.49,
+      "e": 1226.65,
+      "t": "Department of Commerce released new controls on advanced chips, which",
+      "r": "商务部发布了关于先进芯片的新管制措施，该措施于"
+    },
+    {
+      "s": 1226.65,
+      "e": 1229.96,
+      "t": "officially went into effect today. In the past, Chinese AI companies could",
+      "r": "今日正式生效。过去，中国的人工智能公司可以"
+    },
+    {
+      "s": 1229.96,
+      "e": 1233.09,
+      "t": "keep chips overseas and have domestic teams log in remotely to train large",
+      "r": "将芯片放在海外，让国内团队远程登录，"
+    },
+    {
+      "s": 1233.09,
+      "e": 1236.61,
+      "t": "models using foreign data centers. Now, this method of renting is also subject",
+      "r": "利用国外数据中心训练大型模型。现在，这种租赁方式也"
+    },
+    {
+      "s": 1236.61,
+      "e": 1240.09,
+      "t": "to these controls. The new regulation sets a threshold called the “12 million",
+      "r": "受到这些管制。新规设定了一个名为“1200万"
+    },
+    {
+      "s": 1240.09,
+      "e": 1243.29,
+      "t": "TPP core-weighted“ limit. Simply put, it scores the theoretical performance of",
+      "r": "TPP核心加权”的限制门槛。简单来说，它会对"
+    },
+    {
+      "s": 1243.29,
+      "e": 1246.09,
+      "t": "each chip and then adds up the total score of all chips accessible to the",
+      "r": "每个芯片的理论性能进行评分，然后将客户端可访问的所有芯片的总分加起来"
+    },
+    {
+      "s": 1246.09,
+      "e": 1250.02,
+      "t": "client. 12 million points is roughly equivalent to 220 Nvidia B200 chips.",
+      "r": "。 1200万分大约相当于220个英伟达B200芯片。"
+    },
+    {
+      "s": 1250.02,
+      "e": 1254.02,
+      "t": "Assuming eight cards per server, that’s a scale of 28 B200 servers. If an",
+      "r": "假设每台服务器配备八张卡，那么规模就是 28 台 B200 服务器。如果"
+    },
+    {
+      "s": 1254.02,
+      "e": 1257.16,
+      "t": "overseas data center intends to lease computing power exceeding this threshold",
+      "r": "海外数据中心打算"
+    },
+    {
+      "s": 1257.16,
+      "e": 1260.26,
+      "t": "to a client—or a client whose parent company is headquartered in restricted",
+      "r": "向客户（或母公司总部位于"
+    },
+    {
+      "s": 1260.26,
+      "e": 1263.27,
+      "t": "regions like China—the aware supplier must apply for a license to provide",
+      "r": "中国等受限地区的客户）出租超过此阈值的计算能力，则知情的供应商必须申请提供"
+    },
+    {
+      "s": 1263.27,
+      "e": 1266.43,
+      "t": "these servers, with approval decided by the U.S. Department of Commerce. This",
+      "r": "这些服务器的许可证，该许可证的批准由美国商务部决定。这条"
+    },
+    {
+      "s": 1266.43,
+      "e": 1269.56,
+      "t": "rule applies globally; whether the data center is located in Southeast Asia or",
+      "r": "规则在全球范围内适用；无论数据中心位于东南亚还是"
+    },
+    {
+      "s": 1269.56,
+      "e": 1272.32,
+      "t": "Europe, the same set of standards applies. If multiple data centers are",
+      "r": "欧洲，都适用同一套标准。如果多个数据中心"
+    },
+    {
+      "s": 1272.32,
+      "e": 1275.14,
+      "t": "networked for computing power scheduling, their scores must also be aggregated.",
+      "r": "联网进行计算能力调度，则它们的得分也必须进行汇总。"
+    },
+    {
+      "s": 1275.14,
+      "e": 1277.25,
+      "t": "Even if the contracting company is registered in a third country, the",
+      "r": "即使承包公司在第三国注册，"
+    },
+    {
+      "s": 1277.25,
+      "e": 1279.46,
+      "t": "authorities will trace it back to the ultimate parent company. Take",
+      "r": "当局也会追溯到其最终母公司。以"
+    },
+    {
+      "s": 1279.46,
+      "e": 1282.75,
+      "t": "ByteDance’s project in Malaysia, for example. The Wall Street Journal",
+      "r": "字节跳动在马来西亚的项目为例。《华尔街日报》"
+    },
+    {
+      "s": 1282.75,
+      "e": 1286.04,
+      "t": "reported in March that ByteDance planned to use about 36,000 Nvidia B200 chips",
+      "r": "3月份报道称，字节跳动计划"
+    },
+    {
+      "s": 1286.04,
+      "e": 1289.16,
+      "t": "via a local data center. Based on public B200 specifications, if these cards were",
+      "r": "通过本地数据中心使用约36000颗英伟达B200芯片。根据公开的 B200 规格，如果"
+    },
+    {
+      "s": 1289.16,
+      "e": 1291.71,
+      "t": "fully accessible to ByteDance, the computing power would exceed the new",
+      "r": "字节跳动能够完全使用这些卡，其计算能力将超过新的"
+    },
+    {
+      "s": 1291.71,
+      "e": 1294.66,
+      "t": "threshold by 100 times. Only small-scale R&D might still have a chance to keep",
+      "r": "阈值 100 倍。只有小规模的研发才有机会将"
+    },
+    {
+      "s": 1294.66,
+      "e": 1297.33,
+      "t": "computing power within the threshold. There are exceptions for eligible",
+      "r": "计算能力控制在阈值之内。对于符合条件的"
+    },
+    {
+      "s": 1297.33,
+      "e": 1299.7,
+      "t": "recommended businesses, but for foundation model training involving",
+      "r": "推荐企业，存在例外情况；但对于涉及数千个芯片的基础模型培训"
+    },
+    {
+      "s": 1299.7,
+      "e": 1302.11,
+      "t": "thousands of chips, overseas data centers taking orders from Chinese",
+      "r": "，接受中国客户订单的海外数据中心"
+    },
+    {
+      "s": 1302.11,
+      "e": 1305.18,
+      "t": "clients must obtain U.S. export licenses for the relevant hardware. The U.S. has",
+      "r": "必须获得美国相关硬件的出口许可证。美国"
+    },
+    {
+      "s": 1305.18,
+      "e": 1308.82,
+      "t": "specifically named five countries: Malaysia, Singapore, Thailand, Indonesia",
+      "r": "特别点名了五个国家：马来西亚、新加坡、泰国、印度尼西亚"
+    },
+    {
+      "s": 1308.82,
+      "e": 1312.5,
+      "t": ", and Brazil. In principle, advanced chips and servers shipped to these five",
+      "r": "和巴西。原则上，运往这五个国家的先进芯片和服务器"
+    },
+    {
+      "s": 1312.5,
+      "e": 1316.07,
+      "t": "countries require a license. The U.S. Department of Commerce states that these",
+      "r": "需要获得许可。美国商务部表示，这些"
+    },
+    {
+      "s": 1316.07,
+      "e": 1319.09,
+      "t": "regions have a higher-than-normal risk of transshipment to restricted",
+      "r": "地区货物被转运到受限"
+    },
+    {
+      "s": 1319.09,
+      "e": 1322.89,
+      "t": "destinations. One might wonder, didn't the news say small-scale deployments",
+      "r": "目的地的风险高于正常水平。人们可能会疑惑，新闻不是说小规模部署"
+    },
+    {
+      "s": 1322.89,
+      "e": 1326.94,
+      "t": "don't require a license? Can't I just break it down into smaller parts? What",
+      "r": "不需要许可证吗？我难道不能把它拆分成更小的部分吗？"
+    },
+    {
+      "s": 1326.94,
+      "e": 1330.32,
+      "t": "if I sign small contracts and only rent a few hundred chips at a time?",
+      "r": "如果我签订小额合同，每次只租几百个芯片呢？"
+    },
+    {
+      "s": 1330.32,
+      "e": 1333.56,
+      "t": "Unfortunately, the new regulations have already anticipated this trick. They",
+      "r": "遗憾的是，新规已经预料到了这种伎俩。他们"
+    },
+    {
+      "s": 1333.56,
+      "e": 1336.78,
+      "t": "require overseas suppliers to audit the ownership and control relationships",
+      "r": "要求海外供应商对其客户的所有权和控制关系进行审核"
+    },
+    {
+      "s": 1336.78,
+      "e": 1340.05,
+      "t": "behind their clients. For example, if data centers are connected to share",
+      "r": "。例如，如果数据中心连接起来"
+    },
+    {
+      "s": 1340.05,
+      "e": 1343.53,
+      "t": "computing power for the same client, it may also trigger restrictions. Whether",
+      "r": "为同一客户共享计算能力，也可能触发限制。无论"
+    },
+    {
+      "s": 1343.53,
+      "e": 1346.08,
+      "t": "it's setting up an overseas shell company, using a local proxy, or",
+      "r": "是设立海外空壳公司、使用本地代理，还是在"
+    },
+    {
+      "s": 1346.08,
+      "e": 1349,
+      "t": "distributing hardware across locations, none of these can guarantee avoiding",
+      "r": "不同地点分销硬件，这些都不能保证避免"
+    },
+    {
+      "s": 1349,
+      "e": 1351.84,
+      "t": "scrutiny. Of course, as the saying goes, for every measure, there is a",
+      "r": "审查。当然，正如俗语所说，任何措施都有相应的"
+    },
+    {
+      "s": 1351.84,
+      "e": 1354.89,
+      "t": "countermeasure. I believe that with the talent for finding workarounds, Chinese",
+      "r": "应对措施。我相信，凭借中国企业善于寻找变通方法的能力，它们"
+    },
+    {
+      "s": 1354.89,
+      "e": 1357.76,
+      "t": "companies will surely find ways to bypass these restrictions. But even if",
+      "r": "一定能找到绕过这些限制的途径。但即便如此"
+    },
+    {
+      "s": 1357.76,
+      "e": 1361.14,
+      "t": "they do, the final cost of computing power will remain significantly higher,",
+      "r": "，计算能力的最终成本仍将显著更高，"
+    },
+    {
+      "s": 1361.14,
+      "e": 1364.42,
+      "t": "because the stricter the restrictions, the more suppliers will raise their",
+      "r": "因为限制越严格，供应商就越会提高"
+    },
+    {
+      "s": 1364.42,
+      "e": 1368.13,
+      "t": "prices for helping you bypass them. The logic is simple: the rougher the waters",
+      "r": "价格，以帮助你绕过这些限制。道理很简单：水越汹涌"
+    },
+    {
+      "s": 1368.13,
+      "e": 1372.33,
+      "t": ", the higher the price of the catch. So, coming back to the previous question.",
+      "r": "，渔获物的价格就越高。回到之前的问题。"
+    },
+    {
+      "s": 1372.33,
+      "e": 1375.67,
+      "t": "Chinese models being sold cheaply is likely not due to better cost control,",
+      "r": "中国品牌的车型售价低廉，很可能不是因为成本控制得更好，"
+    },
+    {
+      "s": 1375.67,
+      "e": 1378.75,
+      "t": "but because their model capabilities fall short, preventing them from",
+      "r": "而是因为它们的车型性能不足，无法向"
+    },
+    {
+      "s": 1378.75,
+      "e": 1382.27,
+      "t": "charging high-end clients, forcing them to compete on price to gain market share",
+      "r": "高端客户收费，迫使它们通过价格竞争来获得市场份额"
+    },
+    {
+      "s": 1382.27,
+      "e": 1386.1,
+      "t": ". The above points address the disadvantages of Chinese AI large models",
+      "r": "。以上几点从成本角度指出了中国人工智能大型模型的缺点"
+    },
+    {
+      "s": 1386.1,
+      "e": 1391.26,
+      "t": "from a cost perspective. However, cost is not the only issue facing Chinese AI",
+      "r": "。然而，成本并不是中国人工智能面临的唯一问题"
+    },
+    {
+      "s": 1391.26,
+      "e": 1396.3,
+      "t": ". Recently, top U.S. AI firms have been promoting a concept called Recursive",
+      "r": "。最近，美国顶尖的人工智能公司一直在推广一种叫做递归"
+    },
+    {
+      "s": 1396.3,
+      "e": 1401.21,
+      "t": "Self-Improvement, which means letting AI develop even stronger AI. We",
+      "r": "自我改进（RSI）的概念，这意味着让人工智能发展出更强大的人工智能。我们"
+    },
+    {
+      "s": 1401.21,
+      "e": 1404.39,
+      "t": "know that currently, AI cannot completely detach from human oversight",
+      "r": "知道，目前人工智能还无法完全脱离人类监督"
+    },
+    {
+      "s": 1404.39,
+      "e": 1407.8,
+      "t": "to finish this entire process; it remains an assistant that still requires",
+      "r": "来完成整个过程；它仍然是一个需要"
+    },
+    {
+      "s": 1407.8,
+      "e": 1411.45,
+      "t": "human validation. But once full RSI is achieved, the pace of AI development",
+      "r": "人工验证的助手。但一旦完全实现 RSI ，人工智能的发展速度"
+    },
+    {
+      "s": 1411.45,
+      "e": 1415.03,
+      "t": "will shift to a completely different level than it is today. In the past,",
+      "r": "将提升到一个与今天截然不同的水平。过去，"
+    },
+    {
+      "s": 1415.03,
+      "e": 1418.43,
+      "t": "developing a new model required researchers to propose ideas, write code",
+      "r": "开发新模型需要研究人员提出想法、编写代码"
+    },
+    {
+      "s": 1418.43,
+      "e": 1422.03,
+      "t": ", and organize experiments; if a plan failed, they had to analyze the cause",
+      "r": "和组织实验；如果计划失败，他们必须先分析原因，"
+    },
+    {
+      "s": 1422.03,
+      "e": 1425.85,
+      "t": "before deciding the next step. Imagine if all these tasks could be completed",
+      "r": "然后再决定下一步行动。想象一下，如果所有这些任务都能"
+    },
+    {
+      "s": 1425.85,
+      "e": 1429.56,
+      "t": "autonomously by AI; it could then explore multiple paths simultaneously.",
+      "r": "由人工智能自主完成；这样它就可以同时探索多条路径。"
+    },
+    {
+      "s": 1429.56,
+      "e": 1432,
+      "t": "After completing one round of experiments, it would immediately adjust",
+      "r": "完成一轮实验后，它会立即"
+    },
+    {
+      "s": 1432,
+      "e": 1435,
+      "t": "based on the results and start the next round. Once it creates a more powerful",
+      "r": "根据结果进行调整，并开始下一轮实验。一旦它创建出更强大的"
+    },
+    {
+      "s": 1435,
+      "e": 1438.35,
+      "t": "model, that new model can then be used for further research. In this way, the",
+      "r": "模型，该新模型就可以用于进一步的研究。这样一来，"
+    },
+    {
+      "s": 1438.35,
+      "e": 1441.89,
+      "t": "update speed of large models could be dozens of times faster than today, or",
+      "r": "大型模型的更新速度可以比现在快几十倍，"
+    },
+    {
+      "s": 1441.89,
+      "e": 1446.17,
+      "t": "even more. In fact, many companies are already doing similar things. For",
+      "r": "甚至更快。事实上，很多公司已经在做类似的事情了。"
+    },
+    {
+      "s": 1446.17,
+      "e": 1450.47,
+      "t": "instance, in August, an experiment was announced using Claude 3.5 to improve",
+      "r": "例如，8 月份宣布了一项实验，使用 Claude 3.5 来改进"
+    },
+    {
+      "s": 1450.47,
+      "e": 1454.78,
+      "t": "another model, Opus 3.0, by reducing undesirable behaviors, such as speaking",
+      "r": "另一个模型 Opus 3.0，减少诸如"
+    },
+    {
+      "s": 1454.78,
+      "e": 1459.08,
+      "t": "just to please the user or providing inadequate answers in certain situations",
+      "r": "为了取悦用户而说话或在某些情况下提供不充分的答案等不良行为"
+    },
+    {
+      "s": 1459.08,
+      "e": 1462.63,
+      "t": ". Throughout the process, researchers did not intervene or provide ideas;",
+      "r": "。在整个过程中，研究人员没有进行干预或提供任何想法；"
+    },
+    {
+      "s": 1462.63,
+      "e": 1466.38,
+      "t": "Claude 3.5 developed its own plans and prepared training materials. It then",
+      "r": "Claude 3.5 制定了自己的计划并准备了培训材料。然后，它"
+    },
+    {
+      "s": 1466.38,
+      "e": 1470.74,
+      "t": "used these materials to train and test Opus. If the results weren't good, it",
+      "r": "利用这些材料对 Opus 进行训练和测试。如果结果不好，它就"
+    },
+    {
+      "s": 1470.74,
+      "e": 1474.65,
+      "t": "tried a different approach. The final results showed that in 60 hours, Claude",
+      "r": "尝试另一种方法。最终结果显示，在 60 小时内，克劳德"
+    },
+    {
+      "s": 1474.65,
+      "e": 1478.15,
+      "t": "tried over 50 methods, eventually bringing Opus's performance in these",
+      "r": "尝试了 50 多种方法，最终使 Opus 在这些"
+    },
+    {
+      "s": 1478.15,
+      "e": 1482.18,
+      "t": "safety tests close to the officially released version. And just this month,",
+      "r": "安全测试中的表现接近正式发布的版本。就在本月，"
+    },
+    {
+      "s": 1482.18,
+      "e": 1486.33,
+      "t": "OpenAI also announced a similar experiment in its latest GPT-4o test",
+      "r": "OpenAI 在其最新的 GPT-4o 测试报告中也宣布了一项类似的实验"
+    },
+    {
+      "s": 1486.33,
+      "e": 1490.51,
+      "t": "report. Researchers gave GPT a task: to train a small language model while",
+      "r": "。研究人员给 GPT 布置了一项任务：在"
+    },
+    {
+      "s": 1490.51,
+      "e": 1494.76,
+      "t": "minimizing training time, provided it reached the same level of performance.",
+      "r": "保证达到相同性能水平的前提下，训练一个小型语言模型，同时尽可能缩短训练时间。"
+    },
+    {
+      "s": 1494.76,
+      "e": 1498.68,
+      "t": "GPT was able to modify the training code itself, adjust settings, and run",
+      "r": "GPT 能够修改训练代码本身，调整设置，并运行"
+    },
+    {
+      "s": 1498.68,
+      "e": 1502.87,
+      "t": "experiments to see which method was more effective, with the GPT-4 o-sr scheme",
+      "r": "实验来查看哪种方法更有效，与原始方法相比，GPT-4 o-sr 方案"
+    },
+    {
+      "s": 1502.87,
+      "e": 1506.84,
+      "t": "saving about 43%of training time on average compared to the original method",
+      "r": "平均节省了约 43% 的训练时间"
+    },
+    {
+      "s": 1506.84,
+      "e": 1511.45,
+      "t": ". Why specifically mention this? Because in terms of AI self-iteration and",
+      "r": "。为什么要特别提到这一点？因为就人工智能的自我迭代和"
+    },
+    {
+      "s": 1511.45,
+      "e": 1515.53,
+      "t": "evolution, the constraints faced by the US and China are different. We all know",
+      "r": "演进而言，美国和中国面临的制约因素是不同的。我们都知道，"
+    },
+    {
+      "s": 1515.53,
+      "e": 1518.94,
+      "t": "that the main force in AI research and development worldwide is currently large",
+      "r": "目前全球人工智能研发的主要力量是大型"
+    },
+    {
+      "s": 1518.94,
+      "e": 1521.65,
+      "t": "corporations. As models become stronger, the development tools in the hands of",
+      "r": "企业。随着模型变得越来越强大，企业手中的开发工具"
+    },
+    {
+      "s": 1521.65,
+      "e": 1524.86,
+      "t": "companies will also become increasingly powerful. A few engineers can now use AI",
+      "r": "也将变得越来越强大。现在，少数工程师就可以利用人工智能完成"
+    },
+    {
+      "s": 1524.86,
+      "e": 1528.57,
+      "t": "to complete work that previously required a large team. This is certainly",
+      "r": "以前需要大型团队才能完成的工作。这"
+    },
+    {
+      "s": 1528.57,
+      "e": 1532.3,
+      "t": "a good thing for companies, but is it a good thing from the perspective of the",
+      "r": "对企业来说当然是件好事，但从中国共产党的角度来看，这算好事吗"
+    },
+    {
+      "s": 1532.3,
+      "e": 1536.52,
+      "t": "CCP? Not necessarily. Because they must also consider what capabilities AI might",
+      "r": "？未必。因为他们还必须考虑人工智能"
+    },
+    {
+      "s": 1536.52,
+      "e": 1539.71,
+      "t": "develop in the hands of companies and engineers, and whether a super AI might",
+      "r": "在公司和工程师手中可能会发展出哪些能力，以及是否会"
+    },
+    {
+      "s": 1539.71,
+      "e": 1543,
+      "t": "emerge that escapes regulation or even threatens the CCP's hold on power. What",
+      "r": "出现逃避监管甚至威胁中共政权的超级人工智能。"
+    },
+    {
+      "s": 1543,
+      "e": 1545.98,
+      "t": "if an engineer who masters key technologies is actually a dissident at",
+      "r": "如果一位掌握关键技术的工程师实际上"
+    },
+    {
+      "s": 1545.98,
+      "e": 1549.05,
+      "t": "heart, and uses their super AI to intentionally hide, develop in secret,",
+      "r": "内心是个异见人士，他利用自己的超级人工智能故意隐藏起来，秘密研发，"
+    },
+    {
+      "s": 1549.05,
+      "e": 1552.64,
+      "t": "and then stage an uprising once the technology is mature? Let's just give a",
+      "r": "然后在技术成熟后发动起义，那会怎么样？我们举个"
+    },
+    {
+      "s": 1552.64,
+      "e": 1556.57,
+      "t": "casual example. Suppose in the future, a company can both build robots and",
+      "r": "简单的例子。假设未来一家公司既能制造机器人，又能"
+    },
+    {
+      "s": 1556.57,
+      "e": 1559.92,
+      "t": "control the super AI that runs them. They produce robots and sell them to",
+      "r": "控制运行这些机器人的超级人工智能。他们生产机器人并将其出售给"
+    },
+    {
+      "s": 1559.92,
+      "e": 1562.71,
+      "t": "thousands of households; some clean homes or care for the elderly and",
+      "r": "成千上万的家庭；有些人从事清洁房屋或照顾老人和"
+    },
+    {
+      "s": 1562.71,
+      "e": 1566.19,
+      "t": "children, while others work in factories. These robots usually seem normal,",
+      "r": "儿童的工作，而另一些人则在工厂工作。这些机器人通常看起来很正常，会执行"
+    },
+    {
+      "s": 1566.19,
+      "e": 1569.88,
+      "t": "doing whatever their owners ask them to do. As more people use them, government",
+      "r": "主人交给它们的任何任务。随着越来越多的人使用它们，政府"
+    },
+    {
+      "s": 1569.88,
+      "e": 1572.89,
+      "t": "officials and even high-ranking leaders might buy them, and they might even be",
+      "r": "官员甚至高级领导人可能会购买它们，甚至中南海的居民也可能会"
+    },
+    {
+      "s": 1572.89,
+      "e": 1576.98,
+      "t": "used by those living in Zhongnanhai. These robots stay in your home. Who you",
+      "r": "使用它们。这些机器人会待在你的家里。你"
+    },
+    {
+      "s": 1576.98,
+      "e": 1580.69,
+      "t": "meet with, who you call, what you say, when you leave the house every day, what",
+      "r": "与谁见面，你给谁打电话，你说了什么，你每天什么时候出门，"
+    },
+    {
+      "s": 1580.69,
+      "e": 1584.4,
+      "t": "your habits and hobbies are, how much money you’ve taken, how many mistresses",
+      "r": "你的习惯和爱好是什么，你拿了多少钱，"
+    },
+    {
+      "s": 1584.4,
+      "e": 1588.27,
+      "t": "you have—all of this could be collected and publicized. Isn't this just an AI",
+      "r": "你有多少情妇——所有这些都可能被收集起来并公之于众。这不就是人工智能"
+    },
+    {
+      "s": 1588.27,
+      "e": 1592.31,
+      "t": "version of the “Book of Officials”? So, how many secrets does this company hold",
+      "r": "版的《官书》吗？那么，这家公司究竟掌握着多少秘密"
+    },
+    {
+      "s": 1592.31,
+      "e": 1595.8,
+      "t": ", and how much can it actually do? Assuming this company or a core member",
+      "r": "，它又能做到什么程度呢？假设这家公司或"
+    },
+    {
+      "s": 1595.8,
+      "e": 1599.1,
+      "t": "of the company wanted to rebel, how many ways could they do it? They could",
+      "r": "公司的核心成员想要反抗，他们有多少种反抗方式？他们可以"
+    },
+    {
+      "s": 1599.1,
+      "e": 1602.18,
+      "t": "threaten certain officials with the secrets they've gathered, or they could",
+      "r": "用收集到的秘密威胁某些官员，或者他们可以"
+    },
+    {
+      "s": 1602.18,
+      "e": 1605.66,
+      "t": "use mobile robots to launch a direct uprising. Let’s consider the most",
+      "r": "使用移动机器人发动直接起义。让我们考虑一下最"
+    },
+    {
+      "s": 1605.66,
+      "e": 1609.26,
+      "t": "extreme scenario. Suppose there are 50 robots in Zhongnanhai that suddenly",
+      "r": "极端的情况。假设中南海有 50 个机器人在"
+    },
+    {
+      "s": 1609.26,
+      "e": 1612.82,
+      "t": "revolt in the middle of the night, seize the guards' weapons, and stage a coup—",
+      "r": "半夜突然发动叛乱，夺取了守卫的武器，发动政变——"
+    },
+    {
+      "s": 1612.82,
+      "e": 1616.41,
+      "t": "wouldn't Xi be terrified? And what if this company also controls factories and",
+      "r": "习近平难道不会感到害怕吗？如果这家公司还控制着工厂，并且"
+    },
+    {
+      "s": 1616.41,
+      "e": 1620.03,
+      "t": "has the ability to command robots to secretly produce weapons? Would the CCP",
+      "r": "有能力指挥机器人秘密生产武器呢？中共会"
+    },
+    {
+      "s": 1620.03,
+      "e": 1625.03,
+      "t": "ever allow a company to develop to that extent? Absolutely not. Some might say,",
+      "r": "允许一家公司发展到这种程度吗？绝对不是。有人可能会说："
+    },
+    {
+      "s": 1625.03,
+      "e": 1628.9,
+      "t": "“What's the difficulty in that? The CCP can simply set rules requiring companies",
+      "r": "“这有什么难的？中共完全可以制定规则，要求企业"
+    },
+    {
+      "s": 1628.9,
+      "e": 1632.08,
+      "t": "to create two versions of AI: a weaker one for the public, and the most",
+      "r": "开发两个版本的人工智能：一个功能较弱的版本供公众使用，另一个功能最"
+    },
+    {
+      "s": 1632.08,
+      "e": 1636.14,
+      "t": "powerful one open only to the government and military. Wouldn't that work?“ But",
+      "r": "强大的版本仅供政府和军方使用。这样行不通吗？”但"
+    },
+    {
+      "s": 1636.14,
+      "e": 1639.44,
+      "t": "the problem here isn't whether the AI used by ordinary people will threaten",
+      "r": "这里的问题不在于普通人使用的人工智能是否会对"
+    },
+    {
+      "s": 1639.44,
+      "e": 1642.47,
+      "t": "the government; it's that the most powerful AI is always developed by",
+      "r": "政府构成威胁；最强大的人工智能总是由"
+    },
+    {
+      "s": 1642.47,
+      "e": 1645.62,
+      "t": "companies—specifically, private enterprises. Because if the CCP wants",
+      "r": "公司——特别是私营企业——开发的。因为如果中共想要"
+    },
+    {
+      "s": 1645.62,
+      "e": 1648.87,
+      "t": "China's AI to compete with the US, it must rely on companies like ByteDance,",
+      "r": "中国的人工智能与美国竞争，就必须依靠字节跳动、"
+    },
+    {
+      "s": 1648.87,
+      "e": 1651.77,
+      "t": "Alibaba, and Tencent to develop good products through market economy",
+      "r": "阿里巴巴和腾讯等公司通过市场经济"
+    },
+    {
+      "s": 1651.77,
+      "e": 1654.81,
+      "t": "mechanisms, acquire customers, earn revenue, and then buy more graphics",
+      "r": "机制开发出好的产品，获取客户，赚取收入，然后购买更多的"
+    },
+    {
+      "s": 1654.81,
+      "e": 1657.7,
+      "t": "cards to invest in the next round of research. This is something the",
+      "r": "显卡来投资下一轮研究。这是"
+    },
+    {
+      "s": 1657.7,
+      "e": 1660.71,
+      "t": "government can't do, and state-owned enterprises can't do either; it can only",
+      "r": "政府做不到的事，也是国有企业做不到的事；只有"
+    },
+    {
+      "s": 1660.71,
+      "e": 1663.86,
+      "t": "be done by these tech giants. You can certainly demand that companies create a",
+      "r": "这些科技巨头才能做到。你当然可以要求公司为军方开发"
+    },
+    {
+      "s": 1663.86,
+      "e": 1666.9,
+      "t": "custom version of their strongest model for the military, but as long as you",
+      "r": "其最强模型的定制版本，但只要你"
+    },
+    {
+      "s": 1666.9,
+      "e": 1670.01,
+      "t": "still need these companies to conduct R &D, the first people to access the most",
+      "r": "仍然需要这些公司进行研发，那么最先接触到最"
+    },
+    {
+      "s": 1670.01,
+      "e": 1673.05,
+      "t": "advanced AI will always be the company owners, programmers, and researchers,",
+      "r": "先进人工智能的人永远是公司所有者、程序员和研究人员，而"
+    },
+    {
+      "s": 1673.05,
+      "e": 1676.43,
+      "t": "not government officials. This fact in itself is a hidden danger, and it is the",
+      "r": "不是政府官员。这一事实本身就是一种隐患，也是"
+    },
+    {
+      "s": 1676.43,
+      "e": 1679.75,
+      "t": "point the CCP finds hardest to feel at ease about. This is why, on September",
+      "r": "中共最难以安心的地方。正因如此，今年9月"
+    },
+    {
+      "s": 1679.75,
+      "e": 1682.65,
+      "t": "14th of this year, the National Information Security Standardization",
+      "r": "14日，国家信息安全标准化"
+    },
+    {
+      "s": 1682.65,
+      "e": 1685.92,
+      "t": "Technical Committee released an “AI Safety Governance Framework 3.0.” In the",
+      "r": "技术委员会发布了“人工智能安全治理框架3.0”。前言中"
+    },
+    {
+      "s": 1685.92,
+      "e": 1688.62,
+      "t": "preface, it specifically mentions that AI has already shown trends of",
+      "r": "特别提到，人工智能已经展现出"
+    },
+    {
+      "s": 1688.62,
+      "e": 1691.73,
+      "t": "autonomous learning, optimization, and self-improving capabilities. The speed",
+      "r": "自主学习、优化和自我改进的能力。"
+    },
+    {
+      "s": 1691.73,
+      "e": 1694.71,
+      "t": "and direction of technological development may exceed human prediction",
+      "r": "技术发展的速度和方向可能超出人类的预测"
+    },
+    {
+      "s": 1694.71,
+      "e": 1697.82,
+      "t": "and control. In an article published in the 8th issue of “China Cybersecurity”",
+      "r": "和控制。 2026年，国家安全部长陈欣在《中国网络安全》第8期发表的一篇文章中，"
+    },
+    {
+      "s": 1697.82,
+      "e": 1700.81,
+      "t": "in 2026, Minister of State Security Chen Xin also included political security,",
+      "r": "也将政治安全、"
+    },
+    {
+      "s": 1700.81,
+      "e": 1703.86,
+      "t": "institutional security, and ideological security as risks brought about by AI.",
+      "r": "制度安全和意识形态安全列为人工智能带来的风险。"
+    },
+    {
+      "s": 1703.86,
+      "e": 1706.98,
+      "t": "He also emphasized the need to uphold the Party's comprehensive leadership",
+      "r": "他还强调，必须坚持党"
+    },
+    {
+      "s": 1706.98,
+      "e": 1710.08,
+      "t": "over AI governance. To address these risks, in March 2026, the Ministry of",
+      "r": "对人工智能治理的全面领导。为了应对这些风险，2026年3月，"
+    },
+    {
+      "s": 1710.08,
+      "e": 1713.05,
+      "t": "Industry and Information Technology and other departments issued a set of",
+      "r": "工业和信息化部等部门出台了一套"
+    },
+    {
+      "s": 1713.05,
+      "e": 1716.33,
+      "t": "regulations on AI technology ethics review and services. It requires that if",
+      "r": "关于人工智能技术伦理审查和服务的规定。它规定，如果"
+    },
+    {
+      "s": 1716.33,
+      "e": 1719.74,
+      "t": "a company develops an AI system with high autonomy and the usage scenario",
+      "r": "一家公司开发出具有高度自主性的人工智能系统，并且其使用场景会对"
+    },
+    {
+      "s": 1719.74,
+      "e": 1723.3,
+      "t": "poses risks to human safety, it must first undergo an inspection if it meets",
+      "r": "人类安全构成风险，则必须首先接受检查，前提是符合"
+    },
+    {
+      "s": 1723.3,
+      "e": 1727.94,
+      "t": "specific conditions. And then apply for expert review. Of course, so far, the",
+      "r": "特定条件。然后申请专家评审。当然，到目前为止，这些"
+    },
+    {
+      "s": 1727.94,
+      "e": 1731.59,
+      "t": "measures have not reached the level of requiring pre-approval for every AI",
+      "r": "措施还没有达到要求对每一项人工智能"
+    },
+    {
+      "s": 1731.59,
+      "e": 1735.04,
+      "t": "experiment conducted. But as AI becomes increasingly powerful, and with the",
+      "r": "实验都进行预先批准的程度。但随着人工智能变得越来越强大，以及"
+    },
+    {
+      "s": 1735.04,
+      "e": 1738.48,
+      "t": "emergence of RSI, do you think they will further tighten regulations, requiring",
+      "r": "RSI的出现，你认为他们会进一步收紧监管吗？比如要求"
+    },
+    {
+      "s": 1738.48,
+      "e": 1741.54,
+      "t": "applications and materials to be submitted for approval beforehand, or",
+      "r": "事先提交申请和材料以获得批准，或者"
+    },
+    {
+      "s": 1741.54,
+      "e": 1744.9,
+      "t": "perhaps even conduct background checks on everyone who has access to the most",
+      "r": "甚至对所有能够接触到最"
+    },
+    {
+      "s": 1744.9,
+      "e": 1748.45,
+      "t": "advanced models? Following the CCP's consistent logic of behavior, this",
+      "r": "先进模型的人进行背景调查？按照中共一贯的行为逻辑，这种"
+    },
+    {
+      "s": 1748.45,
+      "e": 1751.79,
+      "t": "possibility is very high. The more granular the control, the more time",
+      "r": "可能性非常高。控制越细致，"
+    },
+    {
+      "s": 1751.79,
+      "e": 1754.9,
+      "t": "companies will likely spend on inspections, rectifications, and waiting",
+      "r": "公司可能花费在检查、整改和等待上的时间就越多"
+    },
+    {
+      "s": 1754.9,
+      "e": 1757.89,
+      "t": ". For some research directions, companies may be too afraid to even",
+      "r": "。对于某些研究方向，公司可能因为"
+    },
+    {
+      "s": 1757.89,
+      "e": 1761.55,
+      "t": "start for fear of crossing a red line. In this way, the speed of AI research",
+      "r": "害怕触犯禁忌而不敢着手。这样一来，人工智能的研究"
+    },
+    {
+      "s": 1761.55,
+      "e": 1765.14,
+      "t": "and application may be impacted. This logic is interesting; in China, once an",
+      "r": "和应用速度可能会受到影响。这种逻辑很有意思；在中国，一款"
+    },
+    {
+      "s": 1765.14,
+      "e": 1768.5,
+      "t": "online game is developed, it cannot be released directly. You have to apply for",
+      "r": "网络游戏一旦开发完成，并不能直接发布。你必须申请"
+    },
+    {
+      "s": 1768.5,
+      "e": 1771.62,
+      "t": "a license, submit the game content to relevant departments for review, and can",
+      "r": "许可证，将游戏内容提交给相关部门审核，"
+    },
+    {
+      "s": 1771.62,
+      "e": 1774.59,
+      "t": "only launch it after approval. For example, in July 2021, China experienced",
+      "r": "只有获得批准后才能发布。例如，2021 年 7 月，中国经历了"
+    },
+    {
+      "s": 1774.59,
+      "e": 1777.09,
+      "t": "a severe suspension of game license issuance, where the department",
+      "r": "游戏牌照发放的严重暂停，"
+    },
+    {
+      "s": 1777.09,
+      "e": 1779.93,
+      "t": "responsible for game approvals did not release any new domestic online game",
+      "r": "负责游戏审批的部门连续八个多月没有发放任何新的国内网络游戏"
+    },
+    {
+      "s": 1779.93,
+      "e": 1783,
+      "t": "licenses for over eight consecutive months. Many finished games had to wait",
+      "r": "牌照。许多已经完成的游戏不得不等待"
+    },
+    {
+      "s": 1783,
+      "e": 1786.36,
+      "t": ", and it wasn't until April of the following year that things resumed. If",
+      "r": "，直到第二年四月，一切才恢复正常。如果"
+    },
+    {
+      "s": 1786.36,
+      "e": 1790.56,
+      "t": "you were a game company, you would be devastated. In the US, once you make a",
+      "r": "你是一家游戏公司，你会感到无比沮丧。在美国，一旦你制作出一款"
+    },
+    {
+      "s": 1790.56,
+      "e": 1794.18,
+      "t": "game, you just upload it to Google Play, and it can go live in a few hours to a",
+      "r": "游戏，只需将其上传到 Google Play ，几个小时到几天内即可上线"
+    },
+    {
+      "s": 1794.18,
+      "e": 1798.22,
+      "t": "few days. You don't need to ask the government for any licenses. Under these",
+      "r": "。你不需要向政府申请任何许可证。在这种"
+    },
+    {
+      "s": 1798.22,
+      "e": 1801.33,
+      "t": "circumstances, do you think the development speed of the Chinese gaming",
+      "r": "情况下，你认为中国游戏产业的发展速度"
+    },
+    {
+      "s": 1801.33,
+      "e": 1804.53,
+      "t": "industry can keep up with the US? Of course, the US government is also",
+      "r": "能赶上美国吗？当然，美国政府也"
+    },
+    {
+      "s": 1804.53,
+      "e": 1807.92,
+      "t": "concerned about AI being subject to cyberattacks and the like. But their",
+      "r": "担心人工智能会遭受网络攻击等威胁。但他们的"
+    },
+    {
+      "s": 1807.92,
+      "e": 1811.51,
+      "t": "considerations are primarily from a perspective of practical security, not",
+      "r": "考虑主要来自实际安全的角度，而不是"
+    },
+    {
+      "s": 1811.51,
+      "e": 1814.69,
+      "t": "ideology. The approach is also not government-led approval, but rather",
+      "r": "意识形态。这种方法也不是政府主导的审批，而是"
+    },
+    {
+      "s": 1814.69,
+      "e": 1818.18,
+      "t": "collaborating with companies on resource testing, letting companies build their",
+      "r": "与企业合作进行资源测试，让企业建立"
+    },
+    {
+      "s": 1818.18,
+      "e": 1821.58,
+      "t": "own security defense mechanisms; after all, they don't have to worry too much",
+      "r": "自己的安全防御机制；毕竟，他们不必太担心"
+    },
+    {
+      "s": 1821.58,
+      "e": 1826.32,
+      "t": "about anyone rebelling, right? Alright, that's it for today's show. If you have",
+      "r": "有人反抗，对吧？好了，今天的节目就到这里。如果您有"
+    },
+    {
+      "s": 1826.32,
+      "e": 1832.78,
+      "t": "any questions, feel free to leave a comment or send me an email, see ya.",
+      "r": "任何疑问，请随时留言或给我发邮件，再见。"
+    }
+  ]
+}

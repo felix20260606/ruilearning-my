@@ -1,0 +1,42 @@
+[
+{
+"id": "w-Q133309281",
+"zh": "小南山遗址",
+"en": "Xiaonanshan Site",
+"cat": "公园自然",
+"area": "全国重点文物保护单位",
+"addr": "",
+"transit": "",
+"hours": "",
+"price": "",
+"dur": "",
+"desc": "",
+"tips": "",
+"q": "双鸭山 小南山遗址",
+"src": "https://www.wikidata.org/wiki/Q133309281",
+"rate": 1,
+"photo": "",
+"lat": 46.79667,
+"lng": 134.02278
+},
+{
+"id": "w-Q133260996",
+"zh": "雁窝岛城址",
+"en": "Yanwodao City Ruins",
+"cat": "公园自然",
+"area": "全国重点文物保护单位",
+"addr": "",
+"transit": "",
+"hours": "",
+"price": "",
+"dur": "",
+"desc": "",
+"tips": "",
+"q": "双鸭山 雁窝岛城址",
+"src": "https://www.wikidata.org/wiki/Q133260996",
+"rate": 1,
+"photo": "",
+"lat": 46.77642,
+"lng": 132.88111
+}
+]
